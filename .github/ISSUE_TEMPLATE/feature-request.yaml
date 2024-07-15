@@ -1,0 +1,47 @@
+name: "Feature Request"
+description: Request for a new Feature
+title: "[Feature] "
+labels: ["feature work", "feature request", "needs triage"]
+body:
+    - type: textarea
+      id: repro
+      attributes:
+          label: Feature Description
+          description: "What feature you are looking for?"
+          value: |
+              ...
+      validations:
+          required: true
+    - type: dropdown
+      attributes:
+          label: Types
+          description: What type is the feature classified as?
+          multiple: true
+          options:
+              - Matter Device Types
+              - Matter Clusters
+              - Matter Attribute
+              - Others
+      validations:
+          required: true
+    - type: input
+      attributes:
+          label: Github SDK version
+          description: Specify the commit ID of the GitHub SDK or Matter version for the feature.
+      validations:
+          required: true
+    - type: dropdown
+      attributes:
+          label: Integrated Circuit (IC)
+          description: Which IC is the target for implementing the feature?
+          multiple: true
+          options:
+            - AmebaZ2 (RTL8710C)
+            - AmebaD (RTL8721D)
+            - other
+    - type: textarea
+      attributes:
+          label: Other Inputs
+          description: Other inputs (e.g., Links, References, Images), if applicable.
+      validations:
+          required: false

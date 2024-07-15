@@ -1,0 +1,38 @@
+name: "General Enquiry"
+description: General Enquiry
+title: "[General] "
+labels: ["general", "needs triage"]
+body:
+    - type: textarea
+      id: repro
+      attributes:
+          label: General Enquiry issue(s)
+          description: "What do you want to know?"
+          value: |
+              1.
+              2.
+              3.
+              ...
+      validations:
+          required: true
+    - type: input
+      attributes:
+          label: Github SDK version
+          description: Specify the commit ID of the GitHub SDK you are inquiring about.
+      validations:
+          required: true
+    - type: dropdown
+      attributes:
+          label: Integrated Circuit (IC)
+          description: Indicate the IC that you are referring to in your inquiry.
+          multiple: true
+          options:
+            - AmebaZ2 (RTL8710C)
+            - AmebaD (RTL8721D)
+            - other
+    - type: textarea
+      attributes:
+          label: Other Inputs
+          description: Other inputs (e.g., Links, References, Images), if applicable.
+      validations:
+          required: false

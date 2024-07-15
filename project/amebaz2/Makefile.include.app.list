@@ -1,0 +1,53 @@
+# Matter Include file list
+# -------------------------------------------------------------------
+
+INCLUDES += -I../../../component/common/application/matter/common/bluetooth/
+INCLUDES += -I../../../component/common/application/matter/common/include
+INCLUDES += -I../../../component/common/application/matter/common/mbedtls
+INCLUDES += -I../../../component/common/application/matter/common/port
+INCLUDES += -I../../../component/common/application/matter/common/protobuf
+INCLUDES += -I../../../component/common/application/matter/common/protobuf/nanopb
+INCLUDES += -I../../../component/common/application/matter/example
+
+# Source file list
+# -------------------------------------------------------------------
+
+#matter - app - atcmd
+SRC_C += ../../../component/common/application/matter/common/atcmd/atcmd_matter.c
+
+#matter - app - bluetooth
+SRC_C += ../../../component/common/application/matter/common/bluetooth/matter_blemgr_common.c
+
+#matter - app - port
+SRC_C += ../../../component/common/application/matter/common/port/matter_dcts.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_lwip.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_ota.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_timers.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_utils.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_wifis.c
+
+#matter - app - mbedtls
+SRC_C += ../../../component/common/application/matter/common/mbedtls/net_sockets.c
+
+#matter - app - protobuf
+SRC_C += ../../../component/common/application/matter/common/protobuf/ameba_factory.pb.c
+SRC_C += ../../../component/common/application/matter/common/protobuf/nanopb/pb_encode.c  # The nanopb encoder
+SRC_C += ../../../component/common/application/matter/common/protobuf/nanopb/pb_decode.c  # The nanopb decoder
+SRC_C += ../../../component/common/application/matter/common/protobuf/nanopb/pb_common.c  # The nanopb common parts
+
+#matter - app - example
+SRC_C += ../../../component/common/application/matter/example/matter_example_entry.c
+SRC_C += ../../../component/common/application/matter/example/chiptest/example_matter.c
+
+# Libraries
+# -------------------------------------------------------------------
+
+LIBFLAGS += -Wl,--start-group -L../../../component/soc/realtek/8710c/misc/bsp/lib/common/GCC -Wl,--whole-archive -l_main -Wl,--no-whole-archive -lCHIP -Wl,--end-group # --whole-archive forces linker to override weak functions with strong ones
+
+
+# Compile options
+# -------------------------------------------------------------------
+include $(MATTER_INCLUDE)
+
+# Required for Matter OTA AT command
+CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1
