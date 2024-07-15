@@ -1,0 +1,23 @@
+LBITS := $(shell getconf LONG_BIT)
+
+#*****************************************************************************#
+#                         Toolchain Declaration                               #
+#*****************************************************************************#
+
+ifeq ($(findstring Linux, $(OS)), Linux)
+	ELF2BIN = $(AMEBAZ2_GCCTOOLDIR)/elf2bin.linux
+	CHKSUM = $(AMEBAZ2_GCCTOOLDIR)/checksum.linux
+	TOOLCHAIN_FILENAME = asdk-10.3.1-linux-newlib-build-3682-x86_64.tar.bz2
+	TOOLCHAIN_BITS = 64
+endif
+
+word-dash = $(word $2,$(subst -, ,$1))
+
+#*****************************************************************************#
+#                         Toolchain Path Extraction                           #
+#*****************************************************************************#
+
+TOOLCHAIN_VER = $(call word-dash,$(TOOLCHAIN_FILENAME), 2)
+ASDK_PLATFORM = $(call word-dash,$(TOOLCHAIN_FILENAME), 3)
+
+ARM_GCC_TOOLCHAIN = $(SDKROOTDIR)/tools/arm-none-eabi-gcc/asdk-$(TOOLCHAIN_VER)/$(ASDK_PLATFORM)/newlib/bin

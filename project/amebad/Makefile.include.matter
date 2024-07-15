@@ -1,0 +1,119 @@
+include $(MATTER_BUILDDIR)/Makefile.toolchain.matter
+
+#*****************************************************************************#
+#                              PATH DECLARATION                               #
+#*****************************************************************************#
+
+CHIPDIR               = $(BASEDIR)/third_party/connectedhomeip
+HP_TOOLCHAINDIR       = $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/toolchain
+LP_TOOLCHAINDIR       = $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp/toolchain
+MATTER_DIR            = $(BASEDIR)/component/common/application/matter
+MATTER_BUILDDIR       = $(MATTER_DIR)/project/amebad
+MATTER_EXAMPLEDIR     = $(MATTER_DIR)/example
+MATTER_TOOLDIR        = $(MATTER_DIR)/tools
+MATTER_TOOLCHAINDIR   = $(MATTER_TOOLDIR)/toolchain
+
+#*****************************************************************************#
+#                              VERSION CONTROL                                #
+#*****************************************************************************#
+
+LWIP_VERSION          = lwip_v2.1.2
+MBEDTLS_VERSION       = mbedtls-2.28.1
+
+#*****************************************************************************#
+#                              INCLUDE DIRECTORY                              #
+#*****************************************************************************#
+
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include/lwip
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include/netif
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek/freertos
+
+IFLAGS               += -I$(MATTER_DIR)/common/include
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/include
+IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
+IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/include
+IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/include/mbedtls
+IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/library
+IFLAGS               += -I$(MATTER_DIR)/common/port
+IFLAGS               += -I$(MATTER_DIR)/common/protobuf
+IFLAGS               += -I$(MATTER_DIR)/common/protobuf/nanopb
+IFLAGS               += -I$(MATTER_DIR)/example
+
+ifeq ($(CONFIG_BT_EN), y)
+IFLAGS               += -I$(MATTER_DIR)/common/bluetooth
+endif
+
+#*****************************************************************************#
+#                              COMPILER FLAGS                                 #
+#*****************************************************************************#
+
+# CPP standards and language
+CPPFLAGS += -std=gnu++17
+CPPFLAGS += -fno-rtti
+
+GLOBAL_CFLAGS += -DCONFIG_MATTER=1
+
+# Compile Warnings
+GLOBAL_CFLAGS += -Wno-deprecated-declarations
+GLOBAL_CFLAGS += -Wno-format
+GLOBAL_CFLAGS += -Wno-format-nonliteral
+GLOBAL_CFLAGS += -Wno-format-security
+GLOBAL_CFLAGS += -Wno-sign-compare
+GLOBAL_CFLAGS += -Wno-unused-function
+GLOBAL_CFLAGS += -Wno-unused-but-set-variable
+GLOBAL_CFLAGS += -Wno-unused-variable
+GLOBAL_CFLAGS += -Wno-unused-label
+GLOBAL_CFLAGS += -Wno-unused-parameter
+
+# chip device options
+GLOBAL_CFLAGS += -DCHIP_DEVICE_LAYER_TARGET=Ameba
+GLOBAL_CFLAGS += -DCHIP_DEVICE_LAYER_NONE=0
+
+# chip System options
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_LWIP=1
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_SOCKETS=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_POSIX_LOCKING=0
+GLOBAL_CFLAGS += -DCHIP_SHELL_MAX_TOKENS=11
+
+# chip IPv4 options
+GLOBAL_CFLAGS += -DINET_CONFIG_ENABLE_IPV4=0
+
+GLOBAL_CFLAGS += -DCHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1
+
+# LwIP options
+GLOBAL_CFLAGS += -DFD_SETSIZE=10
+GLOBAL_CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
+
+# Mbedtls options
+GLOBAL_CFLAGS += -DMBEDTLS_CONFIG_FILE=\"mbedtls_config.h\"
+
+# matter ota options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1
+
+ifeq ($(CONFIG_MATTER_SECURE_EN), y)
+# matter factory data options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_CRYPTO=1
+# matter additional secure options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=1
+else
+# matter factory data options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
+endif
+
+# matter factory data encryption options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_FACTORY_DATA_ENCRYPTION=0
+
+# matter test event options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
+
+# matter dct options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_DCT_ENCRYPTION=0
+
+# other options
+GLOBAL_CFLAGS += -DCHIP_HAVE_CONFIG_H

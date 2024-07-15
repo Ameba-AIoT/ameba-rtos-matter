@@ -1,0 +1,123 @@
+include $(MATTER_INCLUDE)
+
+# Ameba Matter Common Include folder list
+# -------------------------------------------------------------------
+
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/api
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth/bt_matter_adapter
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include/mbedtls
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/port
+
+# Include folder list
+# -------------------------------------------------------------------
+
+INCLUDES += -I$(SDKROOTDIR)/project/realtek_amebaz2_v0_example/inc
+
+INCLUDES += -I$(SDKROOTDIR)/component/common/api
+INCLUDES += -I$(SDKROOTDIR)/component/common/api/at_cmd
+INCLUDES += -I$(SDKROOTDIR)/component/common/api/platform
+INCLUDES += -I$(SDKROOTDIR)/component/common/api/wifi
+INCLUDES += -I$(SDKROOTDIR)/component/common/api/wifi/rtw_wpa_supplicant/src
+INCLUDES += -I$(SDKROOTDIR)/component/common/api/wifi/rtw_wpa_supplicant/src/crypto
+INCLUDES += -I$(SDKROOTDIR)/component/common/api/network/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/application
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/mqtt/MQTTClient
+INCLUDES += -I$(SDKROOTDIR)/component/common/example
+INCLUDES += -I$(SDKROOTDIR)/component/common/file_system
+INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/dct
+INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/fatfs
+INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/fatfs/r0.10c/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/ftl
+INCLUDES += -I$(SDKROOTDIR)/component/common/utilities
+INCLUDES += -I$(SDKROOTDIR)/component/common/mbed/hal
+INCLUDES += -I$(SDKROOTDIR)/component/common/mbed/hal_ext
+INCLUDES += -I$(SDKROOTDIR)/component/common/mbed/targets/hal/rtl8710c
+INCLUDES += -I$(SDKROOTDIR)/component/common/network
+INCLUDES += -I$(SDKROOTDIR)/component/common/network/coap/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/network/libcoap/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/network/http2/nghttp2-1.31.0/includes
+INCLUDES += -I$(SDKROOTDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include/lwip
+INCLUDES += -I$(SDKROOTDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek
+INCLUDES += -I$(SDKROOTDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek/freertos
+INCLUDES += -I$(SDKROOTDIR)/component/common/network/ssl/ssl_ram_map/rom
+INCLUDES += -I$(SDKROOTDIR)/component/common/drivers/wlan/realtek/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/drivers/wlan/realtek/src/osdep
+INCLUDES += -I$(SDKROOTDIR)/component/common/drivers/wlan/realtek/src/core/option
+INCLUDES += -I$(SDKROOTDIR)/component/common/test
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/inc
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/inc/app
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/inc/bluetooth/gap
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/inc/bluetooth/profile
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/inc/bluetooth/profile/client
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/inc/bluetooth/profile/server
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/inc/os
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/inc/platform
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/inc/stack
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/board/amebaz2/lib
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/board/amebaz2/src
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/board/amebaz2/src/data_uart
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/board/amebaz2/src/hci
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/board/amebaz2/src/os
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/board/amebaz2/src/vendor_cmd
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/ble_central
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/ble_peripheral
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/ble_scatternet
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_fuzz_test
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_ota_central_client
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_datatrans
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/cmd
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/common
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/gap
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/inc
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/inc/amebaz2
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/model
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/model/realtek
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/platform
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/profile
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/lib/utility
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/provisioner
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/device
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/api/common
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/api/provisioner
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/api/device
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh/api
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh_provisioner_rtk_demo
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh_provisioner_rtk_demo/inc
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh_device_rtk_demo
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh_multiple_profile/device_multiple_profile
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh_multiple_profile/provisioner_multiple_profile
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh_multiple_profile/bt_mesh_device_matter
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_mesh_test
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/src/mcu/module/data_uart_cmd
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/src/app/hrp/gap
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/board/common/inc
+INCLUDES += -I$(SDKROOTDIR)/component/common/bluetooth/realtek/sdk/example/bt_airsync_config
+INCLUDES += -I$(SDKROOTDIR)/component/common/media/rtp_codec
+INCLUDES += -I$(SDKROOTDIR)/component/common/media/mmfv2
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/airsync/1.0.4
+
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/cmsis/rtl8710c/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/cmsis/rtl8710c/lib/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/fwlib/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/fwlib/lib/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/cmsis/cmsis-core/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/app/rtl_printf/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/app/shell
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/app/stdio_port
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/misc/utilities/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/mbed-drivers/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/misc/platform
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/misc/driver
+INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/misc/os
+
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/include
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/portable/GCC/ARM_RTL8710C
+INCLUDES += -I$(SDKROOTDIR)/component/os/os_dep/include
