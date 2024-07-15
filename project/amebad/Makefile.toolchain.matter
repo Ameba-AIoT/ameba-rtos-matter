@@ -1,0 +1,8 @@
+#*****************************************************************************#
+#                              TOOLCHAIN DIRECTORY                            #
+#*****************************************************************************#
+
+ifeq ($(COMPILEOS),$(LINUX_OS))
+ASDK_TOOLCHAIN   = $(TOOLCHAINDIR)/linux/asdk-10.3.1/linux/newlib
+ASDK_TOOLCHAIN_R = ../toolchain/linux/asdk-10.3.1/linux/newlib
+endif

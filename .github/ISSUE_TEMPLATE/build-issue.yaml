@@ -1,0 +1,38 @@
+name: "Build Issue"
+description: Build issue
+title: "[Build] "
+labels: ["build issue", "needs triage"]
+body:
+    - type: textarea
+      id: repro
+      attributes:
+          label: Build issue(s)
+          description: "What are the build issues?"
+          value: |
+              1.
+              2.
+              3.
+              ...
+      validations:
+          required: true
+    - type: input
+      attributes:
+          label: Github SDK version
+          description: Indicate the commit ID for the GitHub SDK that is associated with the build issue.
+      validations:
+          required: true
+    - type: dropdown
+      attributes:
+          label: Integrated Circuit (IC)
+          description: Indicate the ICs that are affected.
+          multiple: true
+          options:
+            - AmebaZ2 (RTL8710C)
+            - AmebaD (RTL8721D)
+            - other
+    - type: textarea
+      attributes:
+          label: Other Inputs
+          description: Other inputs (e.g., Links, References, Images), if applicable.
+      validations:
+          required: false
