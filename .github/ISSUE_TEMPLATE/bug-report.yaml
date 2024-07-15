@@ -1,0 +1,57 @@
+name: "Bug Report"
+description: Create an issue for bug
+title: "[Bug] "
+labels: [bug, "needs triage"]
+body:
+    - type: textarea
+      id: repro
+      attributes:
+          label: Reproduction steps
+          description: "How is the issue produced? Please list reproduction steps step by step."
+          placeholder: |
+              Please list reproduction steps step by step.
+              1.
+              2.
+              3.
+              ...
+      validations:
+          required: true
+    - type: textarea
+      id: expected_outcome
+      attributes:
+          label: Expected Outcome
+          description: "What did you expect to happen?"
+          placeholder: |
+              Describe what you expected to see or the result you anticipated.
+      validations:
+          required: true
+    - type: textarea
+      id: actual_outcome
+      attributes:
+          label: Actual Outcome
+          description: "What actually happened?"
+          placeholder: |
+              Describe what actually happened when you followed the reproduction steps.
+      validations:
+          required: true
+    - type: input
+      attributes:
+          label: Github SDK version
+          description: Indicate the commit ID for the GitHub SDK where the bug was encountered.
+      validations:
+          required: true
+    - type: dropdown
+      attributes:
+          label: Integrated Circuit (IC)
+          description: Which IC is affected by the bug?
+          multiple: true
+          options:
+            - AmebaZ2 (RTL8710C)
+            - AmebaD (RTL8721D)
+            - other
+    - type: textarea
+      attributes:
+          label: Other Inputs
+          description: Other inputs (e.g., Links, References, Images), if applicable.
+      validations:
+          required: false
