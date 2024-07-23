@@ -44,22 +44,12 @@ INFO_DIR=$(TARGET)/Debug/info
 
 CHIP_ENABLE_CHIPOBLE = $(shell grep 'CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE' $(MATTER_INCLUDE) | cut -d'=' -f3)
 CHIP_ENABLE_IPV4 = $(shell grep 'INET_CONFIG_ENABLE_IPV4' $(MATTER_INCLUDE) | cut -d'=' -f3)
-CHIP_ENABLE_SHELL = $(shell grep 'CONFIG_ENABLE_CHIP_SHELL' $(MATTER_INCLUDE) | cut -d'=' -f3)
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'CONFIG_ENABLE_OTA_REQUESTOR' $(MATTER_INCLUDE) | cut -d'=' -f3)
 
 # Include folder list
 # -------------------------------------------------------------------
 
 include $(MATTER_INCLUDE_HDR)
-
-# Ameba Matter Include folder list
-# -------------------------------------------------------------------
-
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth/bt_matter_adapter
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/include
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/port
 
 # Matter(CHIP) Include folder list
 # -------------------------------------------------------------------

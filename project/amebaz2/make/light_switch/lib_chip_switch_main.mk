@@ -48,21 +48,12 @@ INFO_DIR=$(TARGET)/Debug/info
 # -------------------------------------------------------------------
 
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
+CHIP_ENABLE_SHELL = $(shell grep 'chip_build_libshell' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 
 # Include folder list
 # -------------------------------------------------------------------
 
 include $(MATTER_INCLUDE_HDR)
-
-# Ameba Matter Include folder list
-# -------------------------------------------------------------------
-
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/api
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth/bt_matter_adapter
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/include
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/port
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
@@ -180,7 +171,9 @@ include $(MATTER_INCLUDE)
 CFLAGS += -DCHIP_PROJECT=1
 
 # Matter Shell Flags
+ifeq ($(CHIP_ENABLE_SHELL), true)
 CFLAGS += -DCONFIG_ENABLE_CHIP_SHELL=1
+endif
 
 # Others
 CFLAGS += -DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\"lib/address_resolve/AddressResolve_DefaultImpl.h\"

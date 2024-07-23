@@ -281,16 +281,30 @@ void matter_wifi_autoreconnect_hdl(rtw_security_t security_type,
 
 void matter_set_autoreconnect(uint8_t mode)
 {
-    int ret = 0;
+    size_t ssidLen = 0;
+    unsigned char buf[32];
+    const char kWiFiSSIDKeyName[] = "wifi-ssid";
 
-#if defined(CONFIG_AUTO_RECONNECT) && CONFIG_AUTO_RECONNECT
-    ret = wifi_set_autoreconnect(mode);
-    if ((ret == RTW_SUCCESS) && (mode != 0) && matter_wifi_trigger)
+    memset(buf, 0, sizeof(buf));
+
+    //if wifi-ssid exist in NVS, it has been commissioned before, CHIP will do autoreconnection
+    s32 ret = getPref_bin_new(kWiFiSSIDKeyName, kWiFiSSIDKeyName, buf, sizeof(buf), &ssidLen);
+    if (ret != DCT_SUCCESS)
     {
-        p_wlan_autoreconnect_hdl = matter_wifi_autoreconnect_hdl;
-    }
+        if(mode == RTW_AUTORECONNECT_DISABLE)
+        {
+            p_wlan_autoreconnect_hdl = NULL;
+        }
+        else
+        {
+            p_wlan_autoreconnect_hdl = matter_wifi_autoreconnect_hdl;
+        }
+#if defined(CONFIG_PLATFORM_8710C)
+        rltk_wlan_set_autoreconnect(WLAN0_NAME, mode, AUTO_RECONNECT_COUNT, AUTO_RECONNECT_INTERVAL);
+#elif defined(CONFIG_PLATFORM_8721D)
+        wext_set_autoreconnect(WLAN0_NAME, mode, AUTO_RECONNECT_COUNT, AUTO_RECONNECT_INTERVAL);
 #endif
-
+    }
     return;
 }
 
@@ -429,6 +443,11 @@ int matter_wifi_on(rtw_mode_t mode)
 
 int matter_wifi_set_mode(rtw_mode_t mode)
 {
+    if (wifi_mode == mode)
+    {
+        return 0;
+    }
+
     return wifi_set_mode(mode);
 }
 

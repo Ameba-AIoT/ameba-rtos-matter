@@ -16,6 +16,8 @@ static void example_matter_task_thread(void *pvParameters)
         vTaskDelay(500);
     }
 
+    wifi_set_autoreconnect(0); //Disable default autoreconnect
+
 #if defined(CONFIG_PLATFORM_8710C)
     matter_timer_init(); //Currently 8721D cannot use this implementation
 #endif

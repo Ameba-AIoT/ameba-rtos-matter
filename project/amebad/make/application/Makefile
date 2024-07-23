@@ -14,7 +14,7 @@ PROTOBUFDIR = $(BASEDIR)/component/common/application/matter/protobuf
 NANOPBDIR   = $(BASEDIR)/component/common/application/matter/protobuf/nanopb
 EXAMPLEDIR  = $(BASEDIR)/component/common/application/matter/example
 CHIPTESTDIR = $(BASEDIR)/component/common/application/matter/example/chiptest
-LWIPDIR     = $(BASEDIR)/component/common/network/lwip/lwip_v2.1.2
+LWIPDIR     = $(BASEDIR)/component/common/application/matter/lwip
 
 vpath %.c $(DIR) $(shell find $(DIR) -type d) $(LWIPDIR) $(shell find $(LWIPDIR) -type d)
 
@@ -48,7 +48,7 @@ CSRC += $(PROTOBUFDIR)/ameba_factory.pb.c \
         $(NANOPBDIR)/pb_encode.c
 
 # Matter LwIP
-CSRC += $(LWIPDIR)/port/realtek/hooks/lwip_default_hooks.c
+CSRC += $(LWIPDIR)/hooks/lwip_default_hooks.c
 
 # Matter Mbedtls
 CSRC += $(MBEDDIR)/net_sockets.c

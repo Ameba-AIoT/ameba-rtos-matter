@@ -13,26 +13,32 @@ MATTER_TOOLDIR        = $(MATTER_DIR)/tools
 MATTER_TOOLCHAINDIR   = $(MATTER_TOOLDIR)/toolchain
 
 #*****************************************************************************#
+#                              VERSION CONTROL                                #
+#*****************************************************************************#
+
+LWIP_VERSION          = lwip_v2.1.2
+MBEDTLS_VERSION       = mbedtls-2.28.1
+
+#*****************************************************************************#
 #                              INCLUDE DIRECTORY                              #
 #*****************************************************************************#
 
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/lwip_v2.1.2/src/include
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/lwip_v2.1.2/src/include/lwip
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/lwip_v2.1.2/src/include/netif
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/lwip_v2.1.2/port/realtek
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/lwip_v2.1.2/port/realtek/include
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/lwip_v2.1.2/port/realtek/freertos
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include/lwip
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include/netif
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek
+IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek/freertos
 
 IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/include
+IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/lwip/include
 IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/mbedtls
+IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include
+IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include/mbedtls
+IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library
 IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/port
 IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/protobuf
 IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/protobuf/nanopb
 IFLAGS               += -I$(BASEDIR)/component/common/application/matter/example
-
-IFLAGS               += -I$(BASEDIR)/component/common/network/ssl/mbedtls-2.28.1/include
-IFLAGS               += -I$(BASEDIR)/component/common/network/ssl/mbedtls-2.28.1/library
-IFLAGS               += -I$(BASEDIR)/component/common/network/ssl/mbedtls-2.28.1/include/mbedtls
 
 ifeq ($(CONFIG_BT_EN), y)
 IFLAGS               += -I$(BASEDIR)/component/common/application/matter/common/bluetooth
@@ -108,4 +114,3 @@ GLOBAL_CFLAGS += -DCONFIG_ENABLE_DCT_ENCRYPTION=0
 
 # other options
 GLOBAL_CFLAGS += -DCHIP_HAVE_CONFIG_H
-

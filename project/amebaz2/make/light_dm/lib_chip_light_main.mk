@@ -54,16 +54,9 @@ CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DI
 
 include $(MATTER_INCLUDE_HDR)
 
-# Ameba Matter Include folder list
+# Ameba Matter Porting Layer Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/api
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth/bt_matter_adapter
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/include
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/port
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/include
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/driver
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/example/light_dm

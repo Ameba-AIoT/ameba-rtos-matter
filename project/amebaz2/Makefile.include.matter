@@ -19,6 +19,14 @@ MATTER_INCLUDE_TOOLCHAIN = $(MATTER_BUILDDIR)/Makefile.include.toolchain
 include $(MATTER_INCLUDE_TOOLCHAIN)
 
 # -------------------------------------------------------------------
+# Version control
+# -------------------------------------------------------------------
+
+FREERTOS_VERSION   = freertos_v10.0.1
+LWIP_VERSION       = lwip_v2.1.2
+MBEDTLS_VERSION    = mbedtls-2.28.1
+
+# -------------------------------------------------------------------
 # CHIP options
 # -------------------------------------------------------------------
 
@@ -60,9 +68,6 @@ CFLAGS += -DCHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1
 
 # Chip IPv4 
 CFLAGS += -DINET_CONFIG_ENABLE_IPV4=0
-
-# Matter Shell Flags
-CFLAGS += -DCONFIG_ENABLE_CHIP_SHELL=1
 
 # LwIP options
 CFLAGS += -DFD_SETSIZE=10
