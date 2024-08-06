@@ -46,7 +46,6 @@ GLOBAL_CFLAGS += -I$(CHIPDIR)/src/system
 GLOBAL_CFLAGS += -I$(CHIPDIR)/third_party/nlassert/repo/include
 GLOBAL_CFLAGS += -I$(CHIPDIR)/third_party/nlio/repo/include
 GLOBAL_CFLAGS += -I$(CHIPDIR)/third_party/nlunit-test/repo/src
-GLOBAL_CFLAGS += -I$(BASEDIR)/component/common/bluetooth/realtek/sdk/example/bt_matter_adapter
 
 #*****************************************************************************#
 #                              RULES TO GENERATE TARGETS                      #

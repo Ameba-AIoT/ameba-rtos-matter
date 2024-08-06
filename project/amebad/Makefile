@@ -2,9 +2,9 @@
 #                              BASIC CONFIGURATION                            #
 #*****************************************************************************#
 
-ROOT_DIR                 = $(shell pwd)/../../../../..
-ABS_ROOTDIR              = $(ROOT_DIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/asdk
-MAKE_INCLUDE_GEN         = $(ABS_ROOTDIR)/Makefile.include.gen
+MATTER_ROOTDIR           = $(shell pwd)/../../../../..
+MAIN_ROOTDIR             = $(MATTER_ROOTDIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/asdk
+MAKE_INCLUDE_GEN         = $(MAIN_ROOTDIR)/Makefile.include.gen
 
 include $(MAKE_INCLUDE_GEN)
 
