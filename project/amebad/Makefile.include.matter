@@ -9,7 +9,7 @@ HP_TOOLCHAINDIR       = $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEAS
 LP_TOOLCHAINDIR       = $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp/toolchain
 MATTER_DIR            = $(BASEDIR)/component/common/application/matter
 MATTER_BUILDDIR       = $(MATTER_DIR)/project/amebad
-MATTER_EXAMPLEDIR     = $(MATTER_DIR)/example
+MATTER_EXAMPLEDIR     = $(MATTER_DIR)/examples
 MATTER_TOOLDIR        = $(MATTER_DIR)/tools
 MATTER_TOOLCHAINDIR   = $(MATTER_TOOLDIR)/toolchain
 
@@ -30,6 +30,12 @@ IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSIO
 IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek
 IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek/freertos
 
+IFLAGS               += -I$(MATTER_DIR)/api
+IFLAGS               += -I$(MATTER_DIR)/common/bluetooth/bt_matter_adapter
+IFLAGS               += -I$(MATTER_DIR)/core
+IFLAGS               += -I$(MATTER_DIR)/drivers/device
+IFLAGS               += -I$(MATTER_DIR)/drivers/matter_consoles
+IFLAGS               += -I$(MATTER_DIR)/drivers/matter_drivers
 IFLAGS               += -I$(MATTER_DIR)/common/include
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/include
 IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
@@ -39,7 +45,7 @@ IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/librar
 IFLAGS               += -I$(MATTER_DIR)/common/port
 IFLAGS               += -I$(MATTER_DIR)/common/protobuf
 IFLAGS               += -I$(MATTER_DIR)/common/protobuf/nanopb
-IFLAGS               += -I$(MATTER_DIR)/example
+IFLAGS               += -I$(MATTER_DIR)/examples
 
 ifeq ($(CONFIG_BT_EN), y)
 IFLAGS               += -I$(MATTER_DIR)/common/bluetooth

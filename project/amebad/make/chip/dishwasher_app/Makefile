@@ -7,7 +7,7 @@ include $(MAKE_INCLUDE_GEN)
 #*****************************************************************************#
 SHELL := /bin/bash
 
-OUTPUT_DIR = $(BASEDIR)/component/common/application/matter/example/dishwasher/build/chip
+OUTPUT_DIR = $(MATTER_EXAMPLEDIR)/dishwasher/build/chip
 
 #*****************************************************************************#
 #                              BUILD DEFINITIONS                              #

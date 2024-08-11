@@ -13,7 +13,7 @@ INCLUDES += -I../../../component/common/application/matter/common/mbedtls/$(MBED
 INCLUDES += -I../../../component/common/application/matter/common/port
 INCLUDES += -I../../../component/common/application/matter/common/protobuf
 INCLUDES += -I../../../component/common/application/matter/common/protobuf/nanopb
-INCLUDES += -I../../../component/common/application/matter/example
+INCLUDES += -I../../../component/common/application/matter/examples
 
 # Source file list
 # -------------------------------------------------------------------
@@ -42,8 +42,8 @@ SRC_C += ../../../component/common/application/matter/common/protobuf/nanopb/pb_
 SRC_C += ../../../component/common/application/matter/common/protobuf/nanopb/pb_common.c  # The nanopb common parts
 
 #matter - app - example
-SRC_C += ../../../component/common/application/matter/example/matter_example_entry.c
-SRC_C += ../../../component/common/application/matter/example/chiptest/example_matter.c
+SRC_C += ../../../component/common/application/matter/examples/matter_example_entry.c
+SRC_C += ../../../component/common/application/matter/examples/chiptest/example_matter.c
 
 #matter - common - lwip
 SRC_C += ../../../component/common/application/matter/common/lwip/hooks/lwip_default_hooks.c
