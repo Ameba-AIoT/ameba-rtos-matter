@@ -10,7 +10,7 @@ AMEBAZ2_TOOLDIR     = $(SDKROOTDIR)/component/soc/realtek/8710c/misc/iar_utility
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
-MATTER_EXAMPLEDIR   = $(MATTER_DIR)/example
+MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
 OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/aircon/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
 
@@ -58,9 +58,7 @@ include $(MATTER_INCLUDE_HDR)
 # Ameba Matter Porting Layer Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/driver
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/example/aircon
+INCLUDES += -I$(MATTER_EXAMPLEDIR)/aircon
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
@@ -132,10 +130,10 @@ SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_ota_ini
 endif
 
 # aircon-app source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/fan_driver.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/temp_hum_sensor_driver.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/aircon/example_matter_aircon.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/aircon/matter_drivers.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/fan_driver.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/temp_hum_sensor_driver.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/aircon/example_matter_aircon.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/aircon/matter_drivers.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
 
@@ -223,17 +221,17 @@ prerequirement:
 $(SRC_OO): %_$(TARGET).oo : %.cpp | prerequirement
 	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -MM -MT $@ -MF $(OBJ_DIR)/$(notdir $(patsubst %.oo,%.d,$@))
-	cp $@ $(OBJ_DIR)/$(notdir $@)
-	cp $*_$(TARGET).ii $(INFO_DIR)
-	cp $*_$(TARGET).s $(INFO_DIR)
+	mv $@ $(OBJ_DIR)/$(notdir $@)
+	mv $*_$(TARGET).ii $(INFO_DIR)
+	mv $*_$(TARGET).s $(INFO_DIR)
 	chmod 777 $(OBJ_DIR)/$(notdir $@)
 
 $(SRC_O): %_$(TARGET).o : %.c | prerequirement
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -MM -MT $@ -MF $(OBJ_DIR)/$(notdir $(patsubst %.o,%.d,$@))
-	cp $@ $(OBJ_DIR)/$(notdir $@)
-	cp $*_$(TARGET).i $(INFO_DIR)
-	cp $*_$(TARGET).s $(INFO_DIR)
+	mv $@ $(OBJ_DIR)/$(notdir $@)
+	mv $*_$(TARGET).i $(INFO_DIR)
+	mv $*_$(TARGET).s $(INFO_DIR)
 	chmod 777 $(OBJ_DIR)/$(notdir $@)
 
 -include $(DEPENDENCY_LIST)

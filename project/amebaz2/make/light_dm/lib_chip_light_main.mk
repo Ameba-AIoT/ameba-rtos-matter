@@ -57,9 +57,7 @@ include $(MATTER_INCLUDE_HDR)
 # Ameba Matter Porting Layer Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/driver
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/example/light_dm
+INCLUDES += -I$(MATTER_EXAMPLEDIR)/light_dm
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
@@ -138,9 +136,9 @@ SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_data_mo
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_data_model_presets.cpp
 
 # light-dm-app source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/led_driver.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/light_dm/example_matter_light.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/light_dm/matter_drivers.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/led_driver.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/light_dm/example_matter_light.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/light_dm/matter_drivers.cpp
 
 #lib_version
 VER_C += $(TARGET)_version.c

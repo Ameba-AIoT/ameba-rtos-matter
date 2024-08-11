@@ -92,7 +92,6 @@ IFLAGS += -I$(CODEGEN_DIR)/zap-generated
 IFLAGS += -I$(CHIPDIR)/examples/light-switch-app/light-switch-common
 IFLAGS += -I$(CHIPDIR)/examples/light-switch-app/ameba/main/include
 IFLAGS += -I$(CHIPDIR)/examples/light-switch-app/ameba/build/chip/gen/include
-IFLAGS += -I$(BASEDIR)/component/common/application/matter/api
 
 #*****************************************************************************#
 #                              SOURCE FILE LIST                               #

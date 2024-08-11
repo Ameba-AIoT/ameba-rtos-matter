@@ -10,7 +10,7 @@ AMEBAZ2_TOOLDIR     = $(SDKROOTDIR)/component/soc/realtek/8710c/misc/iar_utility
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
-MATTER_EXAMPLEDIR   = $(MATTER_DIR)/example
+MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
 OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/bridge_dm/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
 
@@ -58,9 +58,7 @@ include $(MATTER_INCLUDE_HDR)
 # Ameba Matter Porting Layer Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/driver
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/example/bridge_dm
+INCLUDES += -I$(MATTER_EXAMPLEDIR)/bridge_dm
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
@@ -136,9 +134,9 @@ SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_data_mo
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_data_model_presets.cpp
 
 # bridge-dm-app source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/bridge_dm_driver.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/bridge_dm/example_matter_bridge.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/bridge_dm/matter_drivers.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/bridge_dm_driver.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/bridge_dm/example_matter_bridge.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/bridge_dm/matter_drivers.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
 

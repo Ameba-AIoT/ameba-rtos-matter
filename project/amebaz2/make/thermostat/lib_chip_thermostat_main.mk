@@ -10,7 +10,7 @@ AMEBAZ2_TOOLDIR     = $(SDKROOTDIR)/component/soc/realtek/8710c/misc/iar_utility
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
-MATTER_EXAMPLEDIR   = $(MATTER_DIR)/example
+MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
 OUTPUT_DIR          = $(CHIPDIR)/examples/thermostat/ameba/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
 
@@ -58,9 +58,7 @@ include $(MATTER_INCLUDE_HDR)
 # Ameba Matter Porting Layer Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/driver
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/example/thermostat
+INCLUDES += -I$(MATTER_EXAMPLEDIR)/thermostat
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
@@ -134,10 +132,10 @@ SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_ota_ini
 endif
 
 # thermostat-app source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/thermostat.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/thermostat_ui.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/thermostat/example_matter_thermostat.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/thermostat/matter_drivers.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/thermostat_driver.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/thermostat_ui_driver.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/thermostat/example_matter_thermostat.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/thermostat/matter_drivers.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
 

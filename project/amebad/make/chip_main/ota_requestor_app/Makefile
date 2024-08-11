@@ -90,7 +90,6 @@ IFLAGS += -I$(CHIPDIR)/examples/ota-requestor-app/ota-requestor-common
 IFLAGS += -I$(CHIPDIR)/examples/ota-requestor-app/ota-requestor-common/include
 IFLAGS += -I$(CHIPDIR)/examples/ota-requestor-app/ameba/main/include
 IFLAGS += -I$(CHIPDIR)/examples/ota-requestor-app/ameba/build/chip/gen/include
-IFLAGS += -I$(BASEDIR)/component/common/application/matter/api
 
 #*****************************************************************************#
 #                              SOURCE FILE LIST                               #
