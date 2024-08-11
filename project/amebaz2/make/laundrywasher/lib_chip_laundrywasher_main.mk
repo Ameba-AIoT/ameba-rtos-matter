@@ -10,7 +10,7 @@ AMEBAZ2_TOOLDIR     = $(SDKROOTDIR)/component/soc/realtek/8710c/misc/iar_utility
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
-MATTER_EXAMPLEDIR   = $(MATTER_DIR)/example
+MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
 OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/laundrywasher/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
 
@@ -58,9 +58,7 @@ include $(MATTER_INCLUDE_HDR)
 # Ameba Matter Porting Layer Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/driver
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/example/laundrywasher
+INCLUDES += -I$(MATTER_EXAMPLEDIR)/laundrywasher
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
@@ -79,7 +77,6 @@ INCLUDES += -I$(CHIPDIR)/third_party/nlassert/repo/include
 INCLUDES += -I$(CHIPDIR)/third_party/nlio/repo/include
 INCLUDES += -I$(CHIPDIR)/third_party/nlunit-test/repo/src
 INCLUDES += -I$(CHIPDIR)/zzz_generated/app-common
-INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/all-clusters-common/include
 INCLUDES += -I$(OUTPUT_DIR)/gen/include
 INCLUDES += -I$(CODEGENDIR)
 
@@ -137,9 +134,9 @@ SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_ota_ini
 endif
 
 # laundrywasher-app source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/laundrywasher/example_matter_laundrywasher.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/washer_driver.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/laundrywasher/matter_drivers.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/washer_driver.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/laundrywasher/example_matter_laundrywasher.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/laundrywasher/matter_drivers.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
 
