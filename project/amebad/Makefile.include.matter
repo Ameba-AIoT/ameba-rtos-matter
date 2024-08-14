@@ -30,6 +30,7 @@ IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSIO
 IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek
 IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek/freertos
 
+IFLAGS               += -I$(MATTER_DIR)/common/atcmd
 IFLAGS               += -I$(MATTER_DIR)/common/include
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/include
 IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
