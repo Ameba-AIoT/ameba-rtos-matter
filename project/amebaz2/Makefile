@@ -247,8 +247,8 @@ light_port: toolchain_matter  $(LIGHTING_FILE)
 
 .PHONY: light_switch
 light_switch: toolchain_matter $(LIGHT_SWITCH_FILE)
-	$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_switch_core.mk all
-	$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_switch_main.mk all
+	$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_light_switch_core.mk all
+	$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_light_switch_main.mk all
 
 .PHONY: microwaveoven_port
 microwaveoven_port: toolchain_matter  $(MICROWAVEOVEN_FILE)
@@ -283,7 +283,7 @@ clean_matter_libs:
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light/lib_chip_light_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light_dm/lib_chip_light_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light_port/lib_chip_light_main.mk clean
-	@$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_switch_main.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_light_switch_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/microwaveoven/lib_chip_microwaveoven_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/otar/lib_chip_otar_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_main.mk clean
@@ -299,7 +299,7 @@ clean_matter_libs:
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light/lib_chip_light_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light_dm/lib_chip_light_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light_port/lib_chip_light_core.mk clean
-	@$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_switch_core.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_light_switch_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/microwaveoven/lib_chip_microwaveoven_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/otar/lib_chip_otar_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_core.mk clean

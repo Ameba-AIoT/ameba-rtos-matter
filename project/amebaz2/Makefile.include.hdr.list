@@ -14,7 +14,7 @@ INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/port
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/device
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/matter_console
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/matter_consoles
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers
 
 # Include folder list

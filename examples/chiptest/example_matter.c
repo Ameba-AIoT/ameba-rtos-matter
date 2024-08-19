@@ -8,7 +8,7 @@
 
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
 extern void ChipTest(void);
-
+extern void AppTaskInit(void);
 static void example_matter_task_thread(void *pvParameters)
 {
     while (!(wifi_is_up(RTW_STA_INTERFACE) || wifi_is_up(RTW_AP_INTERFACE)))
@@ -22,6 +22,7 @@ static void example_matter_task_thread(void *pvParameters)
     matter_timer_init(); //Currently 8721D cannot use this implementation
 #endif
     ChipTest();
+    AppTaskInit();
 
     vTaskDelete(NULL);
     return;

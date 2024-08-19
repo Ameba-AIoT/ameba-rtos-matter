@@ -28,16 +28,9 @@ using namespace chip::DeviceLayer;
 
 using chip::Protocols::InteractionModel::Status;
 
-static std::unique_ptr<OccupancySensingAttrAccess>
-    gAttrAccess[MATTER_DM_OCCUPANCY_SENSING_CLUSTER_SERVER_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
-
+#if 0
 void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
 {
-    VerifyOrDie(!gAttrAccess[endpointId]);
-
-    gAttrAccess[endpointId] = std::make_unique<OccupancySensingAttrAccess>(
-        BitMask<OccupancySensing::Feature, uint32_t>(OccupancySensing::Feature::kPassiveInfrared));
-
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits = {
         .holdTimeMin     = 1,
         .holdTimeMax     = 300,
@@ -45,13 +38,12 @@ void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
     };
 
     uint16_t holdTime = 10;
+    SetHoldTimeLimits(endpointId, holdTimeLimits);
+    SetHoldTime(endpointId, holdTime);
+}
+#endif
 
-    if (gAttrAccess[endpointId])
-    {
-        gAttrAccess[endpointId]->Init();
-
-        SetHoldTimeLimits(endpointId, holdTimeLimits);
-
-        SetHoldTime(endpointId, holdTime);
-    }
+HalOccupancySensorType halOccupancyGetSensorType(EndpointId endpoint)
+{
+    return HAL_OCCUPANCY_SENSOR_TYPE_ULTRASONIC;
 }
