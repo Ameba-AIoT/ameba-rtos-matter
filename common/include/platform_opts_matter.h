@@ -55,7 +55,7 @@
  * MATTER KVS2, for key length large than 64 (Fabric1 ~ FabricF)
  * Uses DCT2, set flash address MATTER_KVS_BEGIN_ADDR2
  ****************************************************************/
-#define MATTER_KVS_MODULE_NUM2                  6                       // max number of module
+#define MATTER_KVS_MODULE_NUM2                  10                      // max number of module
 #define MATTER_KVS_VARIABLE_NAME_SIZE2          32                      // max size of the variable name
 #define MATTER_KVS_VARIABLE_VALUE_SIZE2         400+4                   // max size of the variable value, +4 so it can store 400 bytes variable
                                                                         // max value number in moudle = floor(4024 / (32 + 400 + 4)) = 9
@@ -94,7 +94,7 @@
 #define BT_FTL_BKUP_ADDR                        (0x400000 - 0x4000)     // 0x3FC000
 #define UART_SETTING_SECTOR                     (0x400000 - 0x5000)     // 0x3FB000
 #define MATTER_KVS_BEGIN_ADDR                   (0x400000 - 0x13000)    // 0x3ED000 ~ 0x3FB000 : 56K
-#define MATTER_KVS_BEGIN_ADDR2                  (0x400000 - 0x1A000)    // 0x3E6000 ~ 0x3ED000 : 24K
+#define MATTER_KVS_BEGIN_ADDR2                  (0x400000 - 0x1E000)    // 0x3E6000 ~ 0x3ED000 : 24K
 
 #elif defined(CONFIG_PLATFORM_8721D)
 

@@ -1,0 +1,75 @@
+name: build amebad matter
+
+on:
+    pull_request:
+    
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Free Disk Space (Ubuntu)
+              uses: jlumbroso/free-disk-space@main
+              with:
+                  # this might remove tools that are actually needed,
+                  # if set to "true" but frees about 6 GB
+                  tool-cache: false
+
+                  # all of these default to true, but feel free to set to
+                  # "false" if necessary for your workflow
+                  android: true
+                  dotnet: true
+                  haskell: true
+                  large-packages: false
+                  docker-images: true
+                  swap-storage: true
+
+            - name: checkout connectedhomeip master branch
+              uses: actions/checkout@v3
+              with:
+                  repository: project-chip/connectedhomeip
+                  ref: master
+                  submodules: recursive
+                  path: connectedhomeip
+
+            - name: checkout ambd_matter main branch
+              uses: actions/checkout@v3
+              with:
+                  ref: ${{ github.event.pull_request.head.sha }}
+                  path: ambd_matter
+
+            - name: checkout ameba-rtos-matter main branch
+              uses: actions/checkout@v3
+              with:
+                  repository: Ameba-AIoT/ameba-rtos-matter
+                  ref: main
+                  submodules: recursive
+                  path: ambd_matter/component/common/application/matter
+
+            - name: Build all-clusters-app
+              run: |
+                    echo "Setting up build environment"
+                    cd connectedhomeip
+                    source scripts/bootstrap.sh
+                    source scripts/activate.sh
+                    cd ../ambd_matter/project/realtek_amebaD_v0_example/GCC-RELEASE/
+                    echo "Building matter libraries"
+                    make all_clusters
+                    echo "Building firmware image"
+                    make is_matter
+                    echo "Build all-clusters-app completed"
+                    make clean_matter
+                    
+            - name: Build lighting-app
+              run: |
+                    echo "Setting up build environment"
+                    cd connectedhomeip
+                    source scripts/bootstrap.sh
+                    source scripts/activate.sh
+                    cd ../ambd_matter/project/realtek_amebaD_v0_example/GCC-RELEASE/
+                    echo "Building matter libraries"
+                    make light
+                    echo "Building firmware image"
+                    make is_matter
+                    echo "Build lighting-app completed"
+                    make clean_matter

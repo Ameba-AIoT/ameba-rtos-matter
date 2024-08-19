@@ -69,6 +69,12 @@ int matter_blemgr_start_adv(void)
 {
     bool result = 0;
 
+    uint8_t adv_stop_flag = ble_matter_adapter_judge_adv_stop(matter_adv_id);
+    if (!adv_stop_flag)
+    {
+        matter_multi_adv_stop_by_id(&matter_adv_id);
+    }
+
     result = matter_multi_adv_start_by_id(&matter_adv_id, matter_adv_data, matter_adv_data_length, NULL, 0, 1); // the last parameter 0: Matter 1: Customer
     if (result == 1)
     {
@@ -109,9 +115,9 @@ int matter_blemgr_stop_adv(void)
 
 int matter_blemgr_config_adv(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t *adv_data, uint8_t adv_data_length)
 {
-    matter_adv_interval = adv_int_max;
     matter_adv_int_min = adv_int_min;
     matter_adv_int_max = adv_int_max;
+    matter_adv_interval = adv_int_min + 10;
     matter_adv_data_length = adv_data_length;
     memcpy(matter_adv_data, adv_data, adv_data_length);
 

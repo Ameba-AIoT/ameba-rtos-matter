@@ -132,7 +132,7 @@ endif
 # dishwasher-app source files
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/dishwasher_driver.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/matter_dishwasher_mode.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/matter_operational_state.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/matter_operational_state_delegate_impl.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/dishwasher/example_matter_dishwasher.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/dishwasher/matter_drivers.cpp
 

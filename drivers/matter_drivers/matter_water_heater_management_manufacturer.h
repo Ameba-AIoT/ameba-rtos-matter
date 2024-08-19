@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include <matter_water_heater_management.h>
+#include <matter_device_energy_management_delegate_impl.h>
+#include <matter_water_heater_management_delegate.h>
 #include <matter_water_heater_management_instance.h>
 
 namespace chip {

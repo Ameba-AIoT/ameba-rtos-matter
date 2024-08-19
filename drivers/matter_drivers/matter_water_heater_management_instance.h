@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <matter_water_heater_management.h>
+#include <matter_water_heater_management_delegate.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
