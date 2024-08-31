@@ -9,6 +9,7 @@ HP_TOOLCHAINDIR       = $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEAS
 LP_TOOLCHAINDIR       = $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp/toolchain
 MATTER_DIR            = $(BASEDIR)/component/common/application/matter
 MATTER_BUILDDIR       = $(MATTER_DIR)/project/amebad
+MATTER_DRIVER         = $(MATTER_DIR)/drivers/matter_drivers
 MATTER_EXAMPLEDIR     = $(MATTER_DIR)/examples
 MATTER_TOOLDIR        = $(MATTER_DIR)/tools
 MATTER_TOOLCHAINDIR   = $(MATTER_TOOLDIR)/toolchain

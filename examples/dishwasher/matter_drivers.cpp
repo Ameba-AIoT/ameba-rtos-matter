@@ -1,8 +1,8 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <dishwasher_driver.h>
-#include <matter_dishwasher_mode.h>
-#include <matter_operational_state.h>
+#include <dishwasher_mode/ameba_dishwasher_mode.h>
+#include <operational_state/ameba_operational_state_delegate_impl.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>

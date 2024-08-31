@@ -18,9 +18,9 @@
 
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
-#include "matter_operational_state_delegate_impl.h"
-#include "matter_oven_operational_state_delegate.h"
-#include "matter_rvc_operational_state_delegate_impl.h"
+#include "operational_state/ameba_operational_state_delegate_impl.h"
+#include "oven_operational_state/ameba_oven_operational_state_delegate.h"
+#include "rvc_operational_state/ameba_rvc_operational_state_delegate_impl.h"
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
