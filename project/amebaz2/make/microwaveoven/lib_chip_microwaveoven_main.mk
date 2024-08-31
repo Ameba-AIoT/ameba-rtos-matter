@@ -10,6 +10,7 @@ AMEBAZ2_TOOLDIR     = $(SDKROOTDIR)/component/soc/realtek/8710c/misc/iar_utility
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
+MATTER_DRIVER       = $(MATTER_DIR)/drivers/matter_drivers
 MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
 OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/microwaveoven/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
@@ -134,7 +135,7 @@ endif
 
 # microwaveoven-app source files
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/microwaveoven_driver.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/matter_microwave_oven_device.cpp
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven/ameba_microwave_oven_device.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/microwaveoven/example_matter_microwave_oven.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/microwaveoven/matter_drivers.cpp
 

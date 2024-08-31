@@ -145,7 +145,7 @@ endif
 
 # microwaveoven-app src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/driver/device/microwaveoven_driver.cpp
-CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/matter_drivers/matter_microwave_oven_device.cpp
+CPPSRC += $(MATTER_DRIVER)/microwave_oven/ameba_microwave_oven_device.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/microwaveoven/example_matter_microwave_oven.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/microwaveoven/matter_drivers.cpp
 

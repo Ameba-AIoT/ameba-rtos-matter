@@ -1,7 +1,7 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <refrigerator_driver.h>
-#include <matter_tcc_mode.h>
+#include <refrigerator_mode/ameba_tcc_mode.h>
 
 #include <gpio_api.h>
 #include <gpio_irq_api.h>

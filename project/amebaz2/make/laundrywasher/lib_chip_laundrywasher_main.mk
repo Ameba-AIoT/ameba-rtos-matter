@@ -10,6 +10,7 @@ AMEBAZ2_TOOLDIR     = $(SDKROOTDIR)/component/soc/realtek/8710c/misc/iar_utility
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
+MATTER_DRIVER       = $(MATTER_DIR)/drivers/matter_drivers
 MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
 OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/laundrywasher/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
@@ -122,10 +123,6 @@ SRC_CPP += $(CODEGENDIR)/zap-generated/IMClusterCommandHandler.cpp
 SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
 SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
 
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp
-
 # porting layer source files
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_core.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_interaction.cpp
@@ -135,6 +132,9 @@ endif
 
 # laundrywasher-app source files
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/washer_driver.cpp
+SRC_CPP += $(MATTER_DRIVER)/laundry_washer_controls/ameba_laundry_washer_controls_delegate_impl.cpp
+SRC_CPP += $(MATTER_DRIVER)/laundry_washer_mode/ameba_laundry_washer_mode.cpp
+SRC_CPP += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate_impl.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/laundrywasher/example_matter_laundrywasher.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/laundrywasher/matter_drivers.cpp
 

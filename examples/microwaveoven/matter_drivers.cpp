@@ -1,7 +1,7 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <microwaveoven_driver.h>
-#include <matter_microwave_oven_device.h>
+#include <microwave_oven/ameba_microwave_oven_device.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>

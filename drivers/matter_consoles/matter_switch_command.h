@@ -19,7 +19,7 @@
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
 #include <app/clusters/switch-server/switch-server.h>
-#include <matter_switch.h>
+#include <switch/ameba_switch.h>
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>

@@ -18,11 +18,11 @@
 #include <CHIPDeviceManager.h>
 
 #include <matter_command.h>
-#include <matter_microwave_oven_device.h>
-#include <matter_valve_control_delegate.h>
-#include <matter_water_heater_management_main.h>
-#include <matter_modes_manager.h>
-#include <matter_temperature_levels.h>
+#include <microwave_oven/ameba_microwave_oven_device.h>
+#include <valve_control/ameba_valve_control_delegate.h>
+#include <water_heater_management/ameba_water_heater_management_main.h>
+#include <mode_select/ameba_modes_manager.h>
+#include <temperature_levels/ameba_temperature_levels.h>
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
@@ -49,6 +49,7 @@ extern "C" void AppTaskInit(void)
 #endif
 
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
+    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     app::Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     app::Clusters::WaterHeaterManagement::WhmApplicationInit();
     MatterMicrowaveOvenServerInit();
