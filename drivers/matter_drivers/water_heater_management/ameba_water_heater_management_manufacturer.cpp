@@ -44,7 +44,8 @@ CHIP_ERROR WhmManufacturer::Init()
     }
 
     dg->SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1));
-    dg->SetColdWaterTemperature(2000);
+    dg->SetHeatDemand(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1));
+    dg->SetEstimatedHeatRequired(10000);
 
     return CHIP_NO_ERROR;
 }
@@ -64,30 +65,38 @@ BitMask<WaterHeaterHeatSourceBitmap> WhmManufacturer::DetermineHeatingSources()
     }
 
     // A list of valid heaterTypes
-    BitMask<WaterHeaterHeatSourceBitmap> waterHeaterTypeValues[] = {
-        BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1),
-        BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement2),
-        BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kHeatPump),
-        BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kBoiler),
-        BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kOther),
+    uint8_t waterHeaterTypeValues[] = {
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kImmersionElement1),
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kImmersionElement2),
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kHeatPump),
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kBoiler),
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kOther),
+    };
+
+    // The corresponding list of valid headerDemands
+    uint8_t waterHeaterDemandValues[] = {
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kImmersionElement1),
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kImmersionElement2),
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kHeatPump),
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kBoiler),
+        static_cast<uint8_t>(WaterHeaterHeatSourceBitmap::kOther),
     };
 
     // Iterate across the valid waterHeaterTypes seeing which heating sources are available based on heaterTypes.
     // Set the corresponding bit in the heaterDemand bitmap.
-    BitMask<WaterHeaterHeatSourceBitmap> waterHeaterTypes = dg->GetHeaterTypes();
+    BitMask<WaterHeaterHeatSourceBitmap> heaterTypes = dg->GetHeaterTypes();
 
-    BitMask<WaterHeaterHeatSourceBitmap> waterHeaterDemand;
-
-    for (auto & waterHeaterType : waterHeaterTypeValues)
+    uint8_t heaterDemandMask = 0;
+    for (uint16_t idx = 0; idx < static_cast<uint16_t>(sizeof(waterHeaterTypeValues) / sizeof(waterHeaterTypeValues[0])); idx++)
     {
         // Is this heating source being used?
-        if (waterHeaterTypes.Has(waterHeaterType))
+        if (heaterTypes.Raw() & waterHeaterTypeValues[idx])
         {
-            waterHeaterDemand.Set(waterHeaterType);
+            heaterDemandMask |= waterHeaterDemandValues[idx];
         }
     }
 
-    return waterHeaterDemand;
+    return BitMask<WaterHeaterHeatSourceBitmap>(heaterDemandMask);
 }
 
 Status WhmManufacturer::TurnHeatingOn(bool emergencyBoost)
@@ -164,11 +173,7 @@ void SetTestEventTrigger_BasicInstallationTestEvent()
     // Simulate installation in a 100L tank full of water at 20C, with a target temperature of 60C, in OFF mode
     dg->SetTankVolume(100);
     dg->SetTargetWaterTemperature(6000);
-
-    // kImmersionElement2 will be used in addition to kImmersionElement1 when emergencyBoost is specified
-    // in the BoostStarted command.
-    dg->SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1,
-                                                            WaterHeaterHeatSourceBitmap::kImmersionElement2));
+    dg->SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap>(WaterHeaterHeatSourceBitmap::kImmersionElement1));
     dg->DrawOffHotWater(100, 2000);
 }
 

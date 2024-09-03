@@ -104,8 +104,8 @@ public:
      * SHALL be rejected with appropriate error.
      */
     Protocols::InteractionModel::Status HandleBoost(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
-                                                    Optional<int16_t> temporarySetpoint, Optional<Percent> targetPercentage,
-                                                    Optional<Percent> targetReheat) override;
+                                                    Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
+                                                    Optional<chip::Percent> targetReheat) override;
 
     /**
      * @brief Delegate should implement a handler to cancel a boost command.
@@ -121,7 +121,7 @@ public:
     BitMask<WaterHeaterHeatSourceBitmap> GetHeaterTypes() override;
     BitMask<WaterHeaterHeatSourceBitmap> GetHeatDemand() override;
     uint16_t GetTankVolume() override;
-    Energy_mWh GetEstimatedHeatRequired() override;
+    int64_t GetEstimatedHeatRequired() override;
     Percent GetTankPercentage() override;
     BoostStateEnum GetBoostState() override;
 
@@ -130,7 +130,7 @@ public:
     void SetHeaterTypes(BitMask<WaterHeaterHeatSourceBitmap> heaterTypes);
     void SetHeatDemand(BitMask<WaterHeaterHeatSourceBitmap> heatDemand);
     void SetTankVolume(uint16_t tankVolume);
-    void SetEstimatedHeatRequired(Energy_mWh estimatedHeatRequired);
+    void SetEstimatedHeatRequired(int64_t estimatedHeatRequired);
     void SetTankPercentage(Percent tankPercentage);
     void SetBoostState(BoostStateEnum boostState);
 
@@ -152,22 +152,19 @@ public:
      *
      * @param waterTemperature  The water temperature in 100th's Celsius
      */
-    void SetWaterTemperature(int16_t waterTemperature);
+    void SetWaterTemperature(uint16_t waterTemperature);
 
     /**
      * @brief Set the target water temperature of the tank
      *
      * @param targetWaterTemperature  The water temperature in 100th's Celsius
      */
-    void SetTargetWaterTemperature(int16_t targetWaterTemperature);
+    void SetTargetWaterTemperature(uint16_t targetWaterTemperature);
 
     /**
-     * @brief Determine whether the heating sources need to be turned on or off or left unchanged.
-     *
-     * @return Success if the heating was successfully turned on or off or left unchanged otherwise an error
-     *         code is returned if turning the heating on or off failed.
+     * @brief Determine whether the heating sources need to be turned on or off
      */
-    Protocols::InteractionModel::Status ChangeHeatingIfNecessary();
+    Protocols::InteractionModel::Status CheckIfHeatNeedsToBeTurnedOnOrOff();
 
     /**
      * @brief Static timer callback for when Boost timer expires.
@@ -197,34 +194,9 @@ public:
      * @param replacedWaterTemperature  The temperature of the
      * percentageReplaced water.
      */
-    void DrawOffHotWater(Percent percentageReplaced, int16_t replacedWaterTemperature);
-
-    /**
-     * Set the temperature of the cold water that fills the tank as the hot water
-     * is drawn off.
-     *
-     * @param coldWaterTemperature  The cold water temperature in 100th of a C
-     */
-    void SetColdWaterTemperature(int16_t coldWaterTemperature);
+    void DrawOffHotWater(chip::Percent percentageReplaced, uint16_t replacedWaterTemperature);
 
 private:
-    /**
-     * Return the target temperature.
-     * If a boost command is in progress and has a mBoostTemporarySetpoint value use that as the
-     * target temperature otherwise use the temperature set via SetTargetWaterTemperature().
-     *
-     * @return the target temperature
-     */
-    int16_t GetActiveTargetWaterTemperature() const;
-
-    /**
-     * @brief Calculate the percentage of the water in the tank at the target
-     *        temperature.
-     *
-     * @return  Percentage of water at the target temperature
-     */
-    uint8_t CalculateTankPercentage() const;
-
     /**
      * @brief Determine whether heating needs to be turned on or off or left as
      * is.
@@ -251,13 +223,13 @@ private:
     WhmManufacturer * mpWhmManufacturer;
 
     // Target water temperature in 100ths of a C
-    int16_t mTargetWaterTemperature;
+    uint16_t mTargetWaterTemperature;
 
     // Actual water temperature in 100ths of a C
-    int16_t mWaterTemperature;
+    uint16_t mWaterTemperature;
 
-    // The cold water temperature in 100ths of a C
-    int16_t mColdWaterTemperature;
+    // The % of water at temperature mReplacedWaterTemperature
+    uint16_t mReplacedWaterTemperature;
 
     // Boost command parameters
 
@@ -281,7 +253,7 @@ private:
     // amount of water that SHALL be heated by this Boost command before the
     // heater is switched off. This field is optional, however it SHALL be
     // included if the TargetReheat field is included.
-    Optional<Percent> mBoostTargetPercentage;
+    Optional<chip::Percent> mBoostTargetPercentage;
 
     // If the tank supports the TankPercent feature, and the heating by this
     // Boost command has ceased because the TargetPercentage of the water in the
@@ -294,7 +266,7 @@ private:
     // heat back up to 80% of hot water. If this field and the OneShot field
     // were both omitted, heating would begin again after any water draw which
     // reduced the TankPercentage below 80%.
-    Optional<Percent> mBoostTargetReheat;
+    Optional<chip::Percent> mBoostTargetReheat;
 
     // Track whether the water temperature has reached the water temperature
     // specified in the boost command. Used in conjunction with the boost
@@ -327,7 +299,7 @@ private:
     // taking the specific heat capacity of water (4182 J/kg °C) and by knowing
     // the current temperature of the water, the tank volume and target
     // temperature.
-    Energy_mWh mEstimatedHeatRequired;
+    int64_t mEstimatedHeatRequired;
 
     // This attribute SHALL indicate an approximate level of hot water stored in
     // the tank, which may help consumers understand the amount of hot water
