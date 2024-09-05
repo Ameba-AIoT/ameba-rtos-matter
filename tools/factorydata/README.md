@@ -26,14 +26,14 @@ Follow this guide to generate and use your own factory data instead of using tes
 
 ### Prerequisites (Window)
 
-To use the Factory Data Tools in Window, ensure the follow software is installed in you Cygwin  Environment:
+To use the Factory Data Tools in Window, ensure the following softwares are installed:
 1. Unzip 6.0-16 or above
 2. Zip 3.0-1 or above
 3. Python3 3.9.16 or above
 
 #### Firmware Configuration
 
-Ensure your firmware is built with `CONFIG_ENABLE_AMEBA_FACTORY_DATA` enabled in the `Makefile.matter.lib`.
+Ensure your firmware is built with `CONFIG_ENABLE_AMEBA_FACTORY_DATA` enabled in the `Makefile.include.matter`.
 
 ### Generating your own Certificates and Keys
 
@@ -164,7 +164,7 @@ After running the script successfully, ameba_factory.bin should be generated in 
 
 If you want to encrypt the factorydata, pass in `factorydata-key`, if you want to use an IV for encryption, pass in `factorydata-iv` as well
 
-Make sure that you have enabled `CONFIG_ENABLE_FACTORY_DATA_ENCRYPTION` in `project/amebad/Makefile.include.matter.hp.gen` when building the firmware
+Make sure that you have enabled `CONFIG_ENABLE_FACTORY_DATA_ENCRYPTION` in `Makefile.include.matter` when building the firmware
 
 Make sure that in `DecodeFactory` in `matter_utils.c`, you have implemented a way to retrieve the key and iv for runtime factorydata decryption (By default, it is using a hardcoded key and iv)
 
@@ -172,9 +172,9 @@ If you don't want to encrypt the factorydata, don't pass in the key and iv
 
 ### Flashing the Factory Data Binary File
 
-Flash the binary file using Image_Tool_Linux
+Flash the binary file using Image_Tool_Linux or Windows Image Tool
 
-    cd ambd_matter/tools/AmebaD/Image_Tool_Linux
+    cd /path/to/Image_Tool_Linux
 
     ./flash.sh <serial port> <path to factorydata bin> <address>
 
