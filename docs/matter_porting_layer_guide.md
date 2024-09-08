@@ -36,6 +36,7 @@ This structure and approach simplify the process of building and extending Matte
  - [Bridge App](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
  - [Bridge App with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
  - [Fan](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/fan/README.md) - Fan device type implementation
+ - [Generic Switch](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/fan/README.md) - Generic Switch device type implementation
  - [Laundry Washer](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/laundrywasher/README.md) - Dishwasher device type implementation
  - [Dimmable Light](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
  - [Dimmable Light with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity

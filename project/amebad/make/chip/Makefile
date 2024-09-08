@@ -42,6 +42,7 @@ clean: CLEAN_OBJS
 	make -C bridge_app_dm clean
 	make -C dishwasher_app clean
 	make -C fan_app clean
+	make -C generic_switch_app clean
 	make -C laundrywasher_app clean
 	make -C lighting_app clean
 	make -C light_switch_app clean

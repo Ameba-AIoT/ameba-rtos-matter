@@ -12,6 +12,8 @@
 #include <dishwasher/example_matter_dishwasher.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_FAN) && (CONFIG_EXAMPLE_MATTER_FAN == 1)
 #include <fan/example_matter_fan.h>
+#elif defined(CONFIG_EXAMPLE_MATTER_GENERIC_SWITCH) && (CONFIG_EXAMPLE_MATTER_GENERIC_SWITCH == 1)
+#include <generic_switch/example_matter_generic_switch.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER) && (CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER == 1)
 #include <laundrywasher/example_matter_laundrywasher.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_LIGHT) && (CONFIG_EXAMPLE_MATTER_LIGHT == 1)
@@ -40,6 +42,8 @@ void matter_example_entry(void)
     example_matter_dishwasher();
 #elif defined(CONFIG_EXAMPLE_MATTER_FAN) && (CONFIG_EXAMPLE_MATTER_FAN == 1)
     example_matter_fan();
+#elif defined(CONFIG_EXAMPLE_MATTER_GENERIC_SWITCH) && (CONFIG_EXAMPLE_MATTER_GENERIC_SWITCH == 1)
+    example_matter_generic_switch();
 #elif defined(CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER) && (CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER == 1)
     example_matter_laundrywasher();
 #elif defined(CONFIG_EXAMPLE_MATTER_LIGHT) && (CONFIG_EXAMPLE_MATTER_LIGHT == 1)

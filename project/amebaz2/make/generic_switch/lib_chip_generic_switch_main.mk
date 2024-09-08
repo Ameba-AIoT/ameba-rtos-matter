@@ -2,7 +2,7 @@ SHELL = /bin/bash
 
 OS := $(shell uname)
 
-# Initialize tool chain
+# Directory
 # -------------------------------------------------------------------
 
 SDKROOTDIR         := $(shell pwd)/../../..
@@ -11,7 +11,7 @@ CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
 MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
-OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/fan/build/chip
+OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/generic_switch/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
 
 MATTER_INCLUDE      = $(MATTER_BUILDDIR)/Makefile.include.matter
@@ -56,10 +56,10 @@ CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DI
 
 include $(MATTER_INCLUDE_HDR)
 
-# Ameba Matter Porting Layer Include folder list
+# Ameba Matter Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(MATTER_EXAMPLEDIR)/fan
+INCLUDES += -I$(MATTER_EXAMPLEDIR)/generic_switch
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
@@ -130,10 +130,11 @@ ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_ota_initializer.cpp
 endif
 
-# fan-app source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/fan_driver.cpp
-SRC_CPP += $(MATTER_EXAMPLEDIR)/fan/example_matter_fan.cpp
-SRC_CPP += $(MATTER_EXAMPLEDIR)/fan/matter_drivers.cpp
+# aircon-app source files
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/switch/ameba_switch.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/switch_driver.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/generic_switch/example_matter_generic_switch.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/generic_switch/matter_drivers.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_log_api.cpp

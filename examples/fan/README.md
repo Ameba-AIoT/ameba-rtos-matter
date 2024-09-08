@@ -101,4 +101,3 @@ Refer to this [guide](https://github.com/ambiot/ambd_matter/blob/main/tools/Ameb
     make clean
 
 </details>
-

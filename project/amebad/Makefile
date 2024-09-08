@@ -36,6 +36,8 @@ DISHWASHER_PORT_FILE     = $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cl
 DISHWASHER_PORT_ZAP      = $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.zap
 FAN_PORT_FILE            = $(MATTER_EXAMPLEDIR)/fan/build/chip/codegen/cluster-file.txt
 FAN_PORT_ZAP             = $(MATTER_EXAMPLEDIR)/fan/fan-app.zap
+GENERIC_SWITCH_FILE      = $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/cluster-file.txt
+GENERIC_SWITCH_ZAP       = $(MATTER_EXAMPLEDIR)/generic_switch/generic-switch-app.zap
 LAUNDRYWASHER_PORT_FILE  = $(MATTER_EXAMPLEDIR)/laundrywasher/build/chip/codegen/cluster-file.txt
 LAUNDRYWASHER_PORT_ZAP   = $(MATTER_EXAMPLEDIR)/laundrywasher/laundrywasher-app.zap
 MICROWAVEOVEN_PORT_FILE  = $(MATTER_EXAMPLEDIR)/microwaveoven/build/chip/codegen/cluster-file.txt
@@ -73,6 +75,10 @@ dishwasher_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $
 fan_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(FAN_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/fan_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/fan_app_port all
+
+generic_switch_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(GENERIC_SWITCH_FILE)
+	make -C $(MATTER_BUILDDIR)/make/chip/generic_switch_app all
+	make -C $(MATTER_BUILDDIR)/make/chip_main/generic_switch_app_port all
 
 laundrywasher_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(LAUNDRYWASHER_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/laundrywasher_app all
@@ -181,6 +187,15 @@ $(BRIDGE_DM_FILE): $(BRIDGE_DM_ZAP)
 	python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $(MATTER_EXAMPLEDIR)/bridge_dm/bridge-app.zap > $(MATTER_EXAMPLEDIR)/bridge_dm/build/chip/codegen/cluster-file.txt
 	python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $(MATTER_EXAMPLEDIR)/bridge_dm/build/chip/codegen/cluster-file.txt --chip_path $(CHIPDIR)
 
+$(DISHWASHER_PORT_FILE): $(DISHWASHER_PORT_ZAP)
+	@ rm -f $(RAM_OBJS_LIST)
+	mkdir -p $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/zap-generated
+	python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json --output-dir $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/zap-generated $^
+	python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/app-templates.json --output-dir $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/zap-generated $^
+	python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.matter
+	python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.zap > $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cluster-file.txt
+	python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cluster-file.txt --chip_path $(CHIPDIR)
+
 $(FAN_PORT_FILE): $(FAN_PORT_ZAP)
 	@ rm -f $(RAM_OBJS_LIST)
 	mkdir -p $(MATTER_EXAMPLEDIR)/fan/build/chip/codegen/zap-generated
@@ -190,14 +205,14 @@ $(FAN_PORT_FILE): $(FAN_PORT_ZAP)
 	python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $(MATTER_EXAMPLEDIR)/fan/fan-app.zap > $(MATTER_EXAMPLEDIR)/fan/build/chip/codegen/cluster-file.txt
 	python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $(MATTER_EXAMPLEDIR)/fan/build/chip/codegen/cluster-file.txt --chip_path $(CHIPDIR)
 
-$(DISHWASHER_PORT_FILE): $(DISHWASHER_PORT_ZAP)
+$(GENERIC_SWITCH_FILE): $(GENERIC_SWITCH_ZAP)
 	@ rm -f $(RAM_OBJS_LIST)
-	mkdir -p $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/zap-generated
-	python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json --output-dir $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/zap-generated $^
-	python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/app-templates.json --output-dir $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/zap-generated $^
-	python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.matter
-	python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.zap > $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cluster-file.txt
-	python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cluster-file.txt --chip_path $(CHIPDIR)
+	@mkdir -p $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/zap-generated
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json --output-dir $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/zap-generated  $^
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/app-templates.json --output-dir $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/zap-generated $^
+	@python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/generic_switch/generic-switch-app.matter
+	@python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $(MATTER_EXAMPLEDIR)/generic_switch/generic-switch-app.zap > $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/cluster-file.txt
+	@python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/cluster-file.txt --chip_path $(CHIPDIR)
 
 $(LAUNDRYWASHER_PORT_FILE): $(LAUNDRYWASHER_PORT_ZAP)
 	@ rm -f $(RAM_OBJS_LIST)

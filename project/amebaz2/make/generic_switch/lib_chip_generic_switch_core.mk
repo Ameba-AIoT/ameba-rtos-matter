@@ -11,7 +11,7 @@ CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
 MATTER_EXAMPLEDIR   = $(MATTER_DIR)/example
-OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/fan/build/chip
+OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/generic_switch/build/chip
 
 MATTER_INCLUDE      = $(MATTER_BUILDDIR)/Makefile.include.matter
 MATTER_INCLUDE_HDR  = $(MATTER_BUILDDIR)/Makefile.include.hdr.list
@@ -99,9 +99,10 @@ CHIP_CXXFLAGS += $(CFLAGS)
 CHIP_CXXFLAGS += $(INCLUDES)
 
 #*****************************************************************************#
-#                            RULES TO GENERATE TARGETS                        #
+#                        RULES TO GENERATE TARGETS                            #
 #*****************************************************************************#
 
+# Define the Rules to build the core targets
 all: GENERATE_NINJA
 
 GENERATE_NINJA:
@@ -110,8 +111,8 @@ GENERATE_NINJA:
 	mkdir -p $(OUTPUT_DIR) && \
 	echo > $(OUTPUT_DIR)/args.gn && \
 	echo "import(\"//args.gni\")" >> $(OUTPUT_DIR)/args.gn && \
-	echo target_cflags_c  = [$(foreach word,$(CHIP_CFLAGS),\"$(word)\",)] | sed -e 's/=\"/=\\"/g;s/\"\"/\\"\"/g;' >> $(OUTPUT_DIR)/args.gn && \
-	echo target_cflags_cc = [$(foreach word,$(CHIP_CXXFLAGS),\"$(word)\",)] | sed -e 's/=\"/=\\"/g;s/\"\"/\\"\"/g;' >> $(OUTPUT_DIR)/args.gn && \
+	echo target_cflags_c  = [$(foreach word,$(CHIP_CFLAGS),\"$(word)\",)] | sed -e 's/=\"/=\\"/g;s/\"\"/\\"\"/g;'  >> $(OUTPUT_DIR)/args.gn && \
+	echo target_cflags_cc = [$(foreach word,$(CHIP_CXXFLAGS),\"$(word)\",)] | sed -e 's/=\"/=\\"/g;s/\"\"/\\"\"/g;'   >> $(OUTPUT_DIR)/args.gn && \
 	echo ameba_ar = \"arm-none-eabi-ar\" >> $(OUTPUT_DIR)/args.gn && \
 	echo ameba_cc = \"arm-none-eabi-gcc\" >> $(OUTPUT_DIR)/args.gn && \
 	echo ameba_cxx = \"arm-none-eabi-c++\" >> $(OUTPUT_DIR)/args.gn && \
@@ -120,7 +121,7 @@ GENERATE_NINJA:
 	if [ $(CHIP_ENABLE_CHIPOBLE) -eq 0 ]; then echo chip_config_network_layer_ble = "false" >> $(OUTPUT_DIR)/args.gn; else echo chip_config_network_layer_ble = "true" >> $(OUTPUT_DIR)/args.gn; fi && \
 	if [ $(CHIP_ENABLE_IPV4) -eq 0 ]; then echo chip_inet_config_enable_ipv4 = "false" >> $(OUTPUT_DIR)/args.gn; else echo chip_inet_config_enable_ipv4 = "true" >> $(OUTPUT_DIR)/args.gn; fi && \
 	echo chip_support_enable_storage_api_audit = "false" >> $(OUTPUT_DIR)/args.gn && \
-	echo chip_use_transitional_commissionable_data_provider = "true" >> $(OUTPUT_DIR)/args.gn && \
+	echo chip_use_transitional_commissionable_data_provider = "false" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_logging = "true" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_error_logging  = "true" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_progress_logging  = "true" >> $(OUTPUT_DIR)/args.gn && \
@@ -132,12 +133,11 @@ GENERATE_NINJA:
 	cp -f $(OUTPUT_DIR)/lib/* $(SDKROOTDIR)/component/soc/realtek/8710c/misc/bsp/lib/common/GCC
 
 #*****************************************************************************#
-#                            CLEAN GENERATED FILES                            #
+#              CLEAN GENERATED FILES                                          #
 #*****************************************************************************#
-
 .PHONY: clean
 clean:
 	echo "RM $(OUTPUT_DIR)"
 	rm -rf $(OUTPUT_DIR)
-	rm -rf $(MATTER_EXAMPLEDIR)/fan/build
-	rm -rf $(MATTER_EXAMPLEDIR)/fan/fan-app.matter
+	rm -rf $(MATTER_EXAMPLEDIR)/generic_switch/build
+	rm -rf $(MATTER_EXAMPLEDIR)/generic_switch/generic-switch-app.matter
