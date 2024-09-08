@@ -29,6 +29,7 @@ extern "C" {
 #include <wifi_structures.h>
 
 #include <matter_dcts.h>
+#include <matter_fs.h>
 #include <matter_lwip.h>
 #include <matter_ota.h>
 #include <matter_timers.h>

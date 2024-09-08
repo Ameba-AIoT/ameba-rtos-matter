@@ -62,6 +62,73 @@ void fATmattershell(void *arg)
     }
 }
 
+#if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
+extern int requires_bdx;
+void fATcrash(void *arg)
+{
+    printf("!@#$ FORCE CRASHING CORE !@#$\n");
+    requires_bdx = 1;
+    ((void (*)(void))2)();
+    return;
+}
+
+void fATcrashbdx(void *arg)
+{
+    printf("!@#$ FORCE CRASHING CORE !@#$\n");
+    requires_bdx = 0;
+    ((void (*)(void))2)();
+    return;
+}
+
+void fATuserlog(void *arg)
+{
+    if (!arg) {
+        printf("[$$$$]Usage: $$$$=[size]\n\r");
+        printf("      Set more than 1024 to trigger bdx transfer\n\r");
+        return;
+    }
+    size_t dataSize = (size_t)atoi((const char *)arg);
+    u8 *data = (u8 *)malloc(dataSize * sizeof(u8));
+    if (data == NULL)
+    {
+        return;
+    }
+    const char *logMessage = "Hello World";
+    strncpy((char *)data, logMessage, 11);
+    data[sizeof(data) - 1] = '\0';
+    matter_insert_user_log(data, dataSize);
+    if (data)
+    {
+        free(data);
+    }
+    return;
+}
+
+void fATnetworklog(void *arg)
+{
+    if (!arg) {
+        printf("[^^^^]Usage: ^^^^=[size]\n\r");
+        printf("      Set more than 1024 to trigger bdx transfer\n\r");
+        return;
+    }
+    size_t dataSize = (size_t)atoi((const char *)arg);
+    u8 *data = (u8 *)malloc(dataSize * sizeof(u8));
+    if (data == NULL)
+    {
+        return;
+    }
+    const char *logMessage = "No Error Found";
+    strncpy((char *)data, logMessage, 14);
+    data[sizeof(data) - 1] = '\0';
+    matter_insert_network_log(data, dataSize);
+    if (data)
+    {
+        free(data);
+    }
+    return;
+}
+#endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
+
 log_item_t at_matter_items[] = {
 #ifndef CONFIG_INIC_NO_FLASH
 #if ATCMD_VER == ATVER_1
@@ -69,6 +136,12 @@ log_item_t at_matter_items[] = {
     {"ATM%", fATchipapp1, {NULL,NULL}},
     {"ATM^", fATchipapp2, {NULL,NULL}},
     {"ATMS", fATmattershell, {NULL,NULL}},
+#if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
+    {"@@@@", fATcrash},
+    {"####", fATcrashbdx},
+    {"$$$$", fATuserlog},
+    {"^^^^", fATnetworklog},
+#endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
 #endif // end of #if ATCMD_VER == ATVER_1
 #endif
 };
