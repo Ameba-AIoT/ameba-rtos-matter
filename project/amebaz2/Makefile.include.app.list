@@ -3,7 +3,8 @@ include $(MATTER_INCLUDE)
 # Matter Include file list
 # -------------------------------------------------------------------
 
-INCLUDES += -I../../../component/common/application/matter/common/bluetooth/
+INCLUDES += -I../../../component/common/application/matter/api
+INCLUDES += -I../../../component/common/application/matter/common/bluetooth
 INCLUDES += -I../../../component/common/application/matter/common/include
 INCLUDES += -I../../../component/common/application/matter/common/lwip/include
 INCLUDES += -I../../../component/common/application/matter/common/mbedtls
@@ -13,6 +14,9 @@ INCLUDES += -I../../../component/common/application/matter/common/mbedtls/$(MBED
 INCLUDES += -I../../../component/common/application/matter/common/port
 INCLUDES += -I../../../component/common/application/matter/common/protobuf
 INCLUDES += -I../../../component/common/application/matter/common/protobuf/nanopb
+INCLUDES += -I../../../component/common/application/matter/drivers/device
+INCLUDES += -I../../../component/common/application/matter/drivers/matter_consoles
+INCLUDES += -I../../../component/common/application/matter/drivers/matter_drivers
 INCLUDES += -I../../../component/common/application/matter/examples
 
 # Source file list
@@ -26,6 +30,7 @@ SRC_C += ../../../component/common/application/matter/common/bluetooth/matter_bl
 
 #matter - app - port
 SRC_C += ../../../component/common/application/matter/common/port/matter_dcts.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_fs.c
 SRC_C += ../../../component/common/application/matter/common/port/matter_lwip.c
 SRC_C += ../../../component/common/application/matter/common/port/matter_ota.c
 SRC_C += ../../../component/common/application/matter/common/port/matter_timers.c

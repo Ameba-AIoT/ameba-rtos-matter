@@ -62,6 +62,14 @@ void fATmattershell(void *arg)
     }
 }
 
+#if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
+void fATcrash(void *arg)
+{
+    printf("!@#$ FORCE CRASHING CORE !@#$\n");
+    ((void (*)(void))2)();
+}
+#endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
+
 log_item_t at_matter_items[] = {
 #ifndef CONFIG_INIC_NO_FLASH
 #if ATCMD_VER == ATVER_1
@@ -69,6 +77,9 @@ log_item_t at_matter_items[] = {
     {"ATM%", fATchipapp1, {NULL,NULL}},
     {"ATM^", fATchipapp2, {NULL,NULL}},
     {"ATMS", fATmattershell, {NULL,NULL}},
+#if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
+    {"@@@@", fATcrash},
+#endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
 #endif // end of #if ATCMD_VER == ATVER_1
 #endif
 };
