@@ -43,6 +43,7 @@ DIR += $(CODEGEN_DIR)/zap-generated
 DIR += $(CHIPDIR)/examples/ota-requestor-app/ota-requestor-common
 DIR += $(CHIPDIR)/examples/ota-requestor-app/ameba/main
 DIR += $(BASEDIR)/component/common/application/matter/api
+DIR += $(BASEDIR)/component/common/application/matter/core
 
 vpath %.cpp $(DIR) $(shell find $(DIR) -type d)
 vpath %.c $(DIR) $(shell find $(DIR) -type d)
@@ -144,6 +145,7 @@ CPPSRC += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
 endif
 
 CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

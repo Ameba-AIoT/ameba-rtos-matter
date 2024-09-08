@@ -11,6 +11,10 @@
 #include <diagnostic_logs/ameba_logging_redirect_wrapper.h>
 #endif
 
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+extern void matter_op_hours_wrapper(void);
+#endif
+
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
 extern void ChipTest(void);
 extern void AppTaskInit(void);
@@ -46,6 +50,10 @@ static void example_matter_task_thread(void *pvParameters)
 
     ChipTest();
     AppTaskInit();
+
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+    matter_op_hours_wrapper();
+#endif
 
     vTaskDelete(NULL);
     return;

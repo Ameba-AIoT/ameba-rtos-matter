@@ -134,8 +134,6 @@ CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
 
 CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
 
-CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
-
 # porting layer src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_core.cpp
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_interaction.cpp
@@ -148,6 +146,9 @@ CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/fan_driv
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/temp_hum_sensor_driver.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/aircon/example_matter_aircon.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/aircon/matter_drivers.cpp
+
+CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

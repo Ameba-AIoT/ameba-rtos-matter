@@ -44,6 +44,7 @@ DIR += $(CHIPDIR)/examples/platform/ameba/shell
 DIR += $(CHIPDIR)/examples/platform/ameba/test_event_trigger
 DIR += $(CHIPDIR)/examples/all-clusters-app/ameba/main
 DIR += $(BASEDIR)/component/common/application/matter/api
+DIR += $(BASEDIR)/component/common/application/matter/core
 DIR += $(BASEDIR)/component/common/application/matter/drivers/device
 DIR += $(BASEDIR)/component/common/application/matter/drivers/matter_consoles
 DIR += $(BASEDIR)/component/common/application/matter/drivers/matter_drivers
@@ -207,6 +208,7 @@ CPPSRC += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
 CPPSRC += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
 
 CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

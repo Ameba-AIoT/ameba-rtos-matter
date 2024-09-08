@@ -43,6 +43,7 @@ DIR += $(CODEGEN_DIR)/zap-generated
 DIR += $(CHIPDIR)/examples/air-purifier-app/air-purifier-common
 DIR += $(CHIPDIR)/examples/air-purifier-app/ameba/main
 DIR += $(BASEDIR)/component/common/application/matter/api
+DIR += $(BASEDIR)/component/common/application/matter/core
 DIR += $(BASEDIR)/component/common/application/matter/drivers/device
 DIR += $(BASEDIR)/component/common/application/matter/drivers/matter_consoles
 DIR += $(BASEDIR)/component/common/application/matter/drivers/matter_drivers
@@ -149,6 +150,7 @@ CPPSRC += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
 endif
 
 CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

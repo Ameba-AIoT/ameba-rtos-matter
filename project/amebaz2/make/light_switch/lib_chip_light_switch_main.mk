@@ -136,6 +136,8 @@ SRC_CPP += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_log_api.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_device_utils.cpp
+
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_diagnosticlogs_provider_delegate_impl.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_logging_faultlog.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_logging_redirect_handler.cpp

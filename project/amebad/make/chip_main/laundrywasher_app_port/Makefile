@@ -136,8 +136,6 @@ CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
 
 CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
 
-CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
-
 # porting layer src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_core.cpp
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_interaction.cpp
@@ -152,6 +150,9 @@ CPPSRC += $(MATTER_DRIVER)/laundry_washer_mode/ameba_laundry_washer_mode.cpp
 CPPSRC += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate_impl.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/laundrywasher/example_matter_laundrywasher.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/laundrywasher/matter_drivers.cpp
+
+CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

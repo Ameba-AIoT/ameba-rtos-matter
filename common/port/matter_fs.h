@@ -1,6 +1,5 @@
 #include <platform_opts.h>
 #include <platform_stdlib.h>
-#include <lfs.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +21,7 @@ int matter_fs_close(void);
  * @brief Returns the current initialization status of the LFS.
  * @return 1 if initialized, 0 if not initialized
  */
-int matter_fs_get_init();
+int matter_fs_get_init(void);
 
 /**
  * @brief Opens a file in the LFS.

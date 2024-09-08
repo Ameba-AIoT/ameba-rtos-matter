@@ -44,6 +44,7 @@ DIR += $(CHIPDIR)/examples/platform/ameba/shell
 DIR += $(CHIPDIR)/examples/light-switch-app/light-switch-common
 DIR += $(CHIPDIR)/examples/light-switch-app/ameba/main
 DIR += $(BASEDIR)/component/common/application/matter/api
+DIR += $(BASEDIR)/component/common/application/matter/core
 
 vpath %.cpp $(DIR) $(shell find $(DIR) -type d)
 vpath %.c $(DIR) $(shell find $(DIR) -type d)
@@ -148,6 +149,7 @@ endif
 CPPSRC += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
 
 CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

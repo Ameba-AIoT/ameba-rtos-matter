@@ -49,6 +49,10 @@
 #include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
 #endif
 
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+#include <matter_device_utils.h>
+#endif
+
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::DeviceLayer;
@@ -209,6 +213,10 @@ CHIP_ERROR matter_core_init(void)
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
+
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+    matter_op_hours();
+#endif
 
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();

@@ -136,8 +136,6 @@ CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attribute
 
 CPPSRC += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
 
-CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
-
 # porting layer src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_core.cpp
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_interaction.cpp
@@ -149,6 +147,9 @@ endif
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/fan_driver.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/fan/example_matter_fan.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/fan/matter_drivers.cpp
+
+CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

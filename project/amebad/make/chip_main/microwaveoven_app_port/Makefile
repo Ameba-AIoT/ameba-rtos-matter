@@ -134,8 +134,6 @@ CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
 
 CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
 
-CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
-
 # porting layer src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_core.cpp
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_interaction.cpp
@@ -148,6 +146,9 @@ CPPSRC += $(BASEDIR)/component/common/application/matter/driver/device/microwave
 CPPSRC += $(MATTER_DRIVER)/microwave_oven/ameba_microwave_oven_device.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/microwaveoven/example_matter_microwave_oven.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/microwaveoven/matter_drivers.cpp
+
+CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

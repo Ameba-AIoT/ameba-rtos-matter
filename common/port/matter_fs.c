@@ -1,10 +1,10 @@
 #include <platform_opts.h>
+
+#if defined(CONFIG_ENABLE_AMEBA_LFS) && (CONFIG_ENABLE_AMEBA_LFS == 1)
 #include <matter_fs.h>
 #include <matter/api/matter_log_api.h>
 #include <lfs.h>
 #include <littlefs_adapter.h>
-
-#if defined(CONFIG_ENABLE_AMEBA_LFS) && (CONFIG_ENABLE_AMEBA_LFS == 1)
 
 #ifdef __cplusplus
 extern "C" {

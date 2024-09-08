@@ -137,8 +137,6 @@ CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
 
 CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
 
-CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
-
 # porting layer src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_core.cpp
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_interaction.cpp
@@ -151,6 +149,9 @@ CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/thermost
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/thermostat_ui_driver.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/thermostat/example_matter_thermostat.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/thermostat/matter_drivers.cpp
+
+CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #
