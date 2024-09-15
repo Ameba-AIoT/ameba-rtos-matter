@@ -2,12 +2,18 @@
 #include <stdint.h>
 
 #include <matter_core.h>
+#include <matter_events.h>
+#include <matter_interaction.h>
 #include <matter_ota_initializer.h>
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG)
 #include <matter_fs.h>
 #include <diagnostic_logs/ameba_logging_faultlog.h>
 #include <diagnostic_logs/ameba_logging_redirect_handler.h>
 #endif
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER)
+#include <matter_fabric_observer.h>
+#endif
+
 #include <DeviceInfoProviderImpl.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -135,6 +141,39 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
         ChipLogProgress(DeviceLayer, "Commissioning Complete");
         chip::DeviceLayer::Internal::AmebaUtils::SetCurrentProvisionedNetwork();
         break;
+
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER)
+    case DeviceEventType::kEvent_CommissioningSessionEstablishmentStarted:
+        ChipLogProgress(DeviceLayer, "Commissioning Session has been established");
+        break;
+    case DeviceEventType::kEvent_CommissioningSessionStarted:
+        ChipLogProgress(DeviceLayer, "Commissioning Session started");
+        break;
+    case DeviceEventType::kEvent_CommissioningSessionEstablishmentError:
+        ChipLogProgress(DeviceLayer, "Commissioning Session established error");
+        break;
+    case DeviceEventType::kEvent_CommissioningSessionStopped:
+        ChipLogProgress(DeviceLayer, "Commissioning Session stopped");
+        break;
+    case DeviceEventType::kEvent_CommissioningWindowOpened:
+        ChipLogProgress(DeviceLayer, "Commissioning Window is opened");
+        break;
+    case DeviceEventType::kEvent_CommissioningWindowClosed:
+        ChipLogProgress(DeviceLayer, "Commissioning Window is closed");
+        break;
+    case DeviceEventType::kEvent_FabricWillBeRemoved:
+        ChipLogProgress(DeviceLayer, "Fabric removing");
+        break;
+    case DeviceEventType::kEvent_FabricRemoved:
+        ChipLogProgress(DeviceLayer, "Fabric removed successfully");
+        break;
+    case DeviceEventType::kEvent_FabricCommitted:
+        ChipLogProgress(DeviceLayer, "Fabric info committed");
+        break;
+    case DeviceEventType::kEvent_FabricUpdated:
+        ChipLogProgress(DeviceLayer, "Fabric info updated");
+        break;
+#endif /* CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER */
     }
 }
 
@@ -150,6 +189,11 @@ void matter_core_init_server(intptr_t context)
     static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;
     VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
+#endif
+
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER)
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
 #endif
 
     chip::Server::GetInstance().Init(initParams);

@@ -27,6 +27,9 @@
 // Ameba General Diagnostic Total Operational Hours Support
 #define CONFIG_ENABLE_AMEBA_OPHOURS             1
 
+// Ameba Fabric Observer
+#define CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER     0
+
 #if defined(CONFIG_EXAMPLE_MATTER) && (CONFIG_EXAMPLE_MATTER == 1)
 #undef CONFIG_EXAMPLE_WLAN_FAST_CONNECT
 #undef CONFIG_FAST_DHCP

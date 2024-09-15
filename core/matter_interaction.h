@@ -13,6 +13,11 @@
 #include <platform/CHIPDeviceLayer.h>
 
 /**
+ * @brief  Post an event.
+ */
+void PostEvent(uint16_t eventType);
+
+/**
  * @brief  Post a downlink event using interrupt.
  */
 void PostDownlinkEvent(const AppEvent *aEvent);

@@ -18,6 +18,18 @@ TaskHandle_t DownlinkTaskHandle;
 uint8_t uplink_init = 0;
 uint8_t downlink_init = 0;
 
+void PostEvent(uint16_t eventType)
+{
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = eventType;
+    CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post event for event type:%x, err:%" CHIP_ERROR_FORMAT, eventType, error.Format());
+    }
+}
+
 void PostDownlinkEvent(const AppEvent *aEvent)
 {
     if (DownlinkEventQueue != NULL)

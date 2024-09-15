@@ -6,6 +6,7 @@
   * Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
   *
 ********************************************************************************/
+
 #pragma once
 
 #include <platform/CHIPDeviceLayer.h>
@@ -65,3 +66,59 @@ struct AppEvent
     } value;
     EventHandler mHandler;
 };
+
+namespace chip {
+namespace DeviceLayer {
+namespace DeviceEventType {
+
+/**
+ * Enumerates for Fabric Event
+ */
+enum
+{
+    /**
+     * Indicating the Commissioning session has been established
+     */
+    kEvent_CommissioningSessionEstablishmentStarted = kRange_PublicPlatformSpecific + 0x1000,
+    /**
+     * Indicating that Commissioning session has started
+     */
+    kEvent_CommissioningSessionStarted,
+    /**
+     * Indicating the established Commissioning session encountered an error
+     */
+    kEvent_CommissioningSessionEstablishmentError,
+    /**
+     * Indicating that Commissioning session has stopped
+     */
+    kEvent_CommissioningSessionStopped,
+    /**
+     * Indicating that Commissioning window is now opened
+     */
+    kEvent_CommissioningWindowOpened,
+    /**
+     * Indicating that Commissioning window is now closed
+     */
+    kEvent_CommissioningWindowClosed,
+    /**
+     * Indicating that a fabric is about to be removed
+     */
+    kEvent_FabricWillBeRemoved,
+    /**
+     * Indicating that a fabric is removed
+     */
+    kEvent_FabricRemoved,
+    /**
+     * Indicating that a fabric in Fabric Table is persisted to storage, by CommitPendingFabricData
+     */
+    kEvent_FabricCommitted,
+    /**
+     * Indicating that operational credentials are changed, which may not be persistent
+     * Can be used to affect what is needed for UpdateNOC prior to commit
+     */
+    kEvent_FabricUpdated,
+};
+
+} // DeviceEventType
+} // DeviceLayer
+} // chip
