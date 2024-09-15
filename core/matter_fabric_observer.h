@@ -16,7 +16,7 @@
 using namespace ::chip;
 using namespace ::chip::app;
 
-#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER)
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
 
 class AmebaObserver : public AppDelegate, public FabricTable::Delegate
 {

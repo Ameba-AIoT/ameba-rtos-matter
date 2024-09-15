@@ -10,6 +10,7 @@
 #ifndef __PLATFORM_OPTS_MATTER_H__
 #define __PLATFORM_OPTS_MATTER_H__
 
+// Ameba Matter Example
 #define CONFIG_EXAMPLE_MATTER                   1
 #define CONFIG_EXAMPLE_MATTER_CHIPTEST          1
 #define CONFIG_EXAMPLE_MATTER_AIRCON            0
@@ -29,6 +30,9 @@
 
 // Ameba Fabric Observer
 #define CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER     0
+
+// Ameba mDNS Filter
+#define CONFIG_ENABLE_AMEBA_MDNS_FILTER         0
 
 #if defined(CONFIG_EXAMPLE_MATTER) && (CONFIG_EXAMPLE_MATTER == 1)
 #undef CONFIG_EXAMPLE_WLAN_FAST_CONNECT
@@ -145,7 +149,7 @@
 #define CONFIG_ENABLE_AMEBA_DLOG    1
 #endif
 
-#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG==1)
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
 #define CONFIG_ENABLE_AMEBA_LFS     1
 #else
 #define CONFIG_ENABLE_AMEBA_LFS     0

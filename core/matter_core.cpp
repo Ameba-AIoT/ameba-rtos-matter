@@ -5,13 +5,19 @@
 #include <matter_events.h>
 #include <matter_interaction.h>
 #include <matter_ota_initializer.h>
-#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG)
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
 #include <matter_fs.h>
 #include <diagnostic_logs/ameba_logging_faultlog.h>
 #include <diagnostic_logs/ameba_logging_redirect_handler.h>
 #endif
-#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER)
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
 #include <matter_fabric_observer.h>
+#endif
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+#include <matter_device_utils.h>
+#endif
+#if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
+#include <matter_mdns_filter.h>
 #endif
 
 #include <DeviceInfoProviderImpl.h>
@@ -55,10 +61,6 @@
 #include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
 #endif
 
-#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
-#include <matter_device_utils.h>
-#endif
-
 using namespace ::chip;
 using namespace ::chip::app;
 using namespace ::chip::DeviceLayer;
@@ -84,6 +86,11 @@ app::Clusters::NetworkCommissioning::Instance
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+
+#if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
+constexpr size_t kMaxPendingMdnsPackets = 10u;
+chip::Inet::DropIfTooManyQueuedPacketsFilter sMdnsPacketFilter(kMaxPendingMdnsPackets);
+#endif
 
 void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t arg)
 {
@@ -142,7 +149,7 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
         chip::DeviceLayer::Internal::AmebaUtils::SetCurrentProvisionedNetwork();
         break;
 
-#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER)
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
     case DeviceEventType::kEvent_CommissioningSessionEstablishmentStarted:
         ChipLogProgress(DeviceLayer, "Commissioning Session has been established");
         break;
@@ -191,12 +198,17 @@ void matter_core_init_server(intptr_t context)
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
 #endif
 
-#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER)
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
 #endif
 
     chip::Server::GetInstance().Init(initParams);
+
+#if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
+    chip::Inet::UDPEndPointImplLwIP::SetQueueFilter(&sMdnsPacketFilter);
+#endif
+
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     // TODO: Use our own DeviceInfoProvider
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
