@@ -46,6 +46,7 @@ clean: CLEAN_OBJS
 	make -C microwaveoven_app_port clean
 	make -C ota_requestor_app clean
 	make -C refrigerator_app_port clean
+	make -C temperature_sensor_app_port clean
 	make -C thermostat_app_port clean
 
 -include $(DEPS)

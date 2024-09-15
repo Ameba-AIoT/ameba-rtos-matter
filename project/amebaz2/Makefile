@@ -64,6 +64,8 @@ MICROWAVEOVEN_FILE  = $(MATTER_EXAMPLEDIR)/microwaveoven/build/chip/codegen/clus
 MICROWAVEOVEN_ZAP   = $(MATTER_EXAMPLEDIR)/microwaveoven/microwaveoven-app.zap
 REFRIGERATOR_FILE	= $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/cluster-file.txt
 REFRIGERATOR_ZAP	= $(MATTER_EXAMPLEDIR)/refrigerator/refrigerator-app.zap
+TEMP_SENSOR_FILE	= $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/cluster-file.txt
+TEMP_SENSOR_ZAP		= $(MATTER_EXAMPLEDIR)/temperature_sensor/temp-sensor-app.zap
 
 #*****************************************************************************#
 #                      RULES TO MAKE MATTER DIRS                              #
@@ -184,6 +186,14 @@ $(REFRIGERATOR_FILE): $(REFRIGERATOR_ZAP)
 	@python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $^ > $@
 	@python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $@ --chip_path $(CHIPDIR)
 
+$(TEMP_SENSOR_FILE): $(TEMP_SENSOR_ZAP)
+	@mkdir -p $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/zap-generated
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json -z $(CHIPDIR)/src/app/zap-templates/zcl/zcl.json --output-dir $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/zap-generated  $^
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/app-templates.json -z $(CHIPDIR)/src/app/zap-templates/zcl/zcl.json --output-dir $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/zap-generated $^
+	@python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/temperature_sensor/temp-sensor-app.matter
+	@python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $^ > $@
+	@python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $@ --chip_path $(CHIPDIR)
+
 $(THERMOSTAT_FILE): $(THERMOSTAT_ZAP)
 	@mkdir -p $(CHIPDIR)/examples/thermostat/ameba/build/chip/codegen/zap-generated
 	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json --output-dir examples/thermostat/ameba/build/chip/codegen/zap-generated  $^
@@ -280,6 +290,11 @@ refrigerator_port: toolchain_matter $(REFRIGERATOR_FILE)
 	$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_core.mk all
 	$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_main.mk all
 
+.PHONY: temp_sensor_port
+temp_sensor_port: toolchain_matter $(TEMP_SENSOR_FILE)
+	$(MAKE) -f $(MATTER_MAKEDIR)/temperature_sensor/lib_chip_temp_sensor_core.mk all
+	$(MAKE) -f $(MATTER_MAKEDIR)/temperature_sensor/lib_chip_temp_sensor_main.mk all
+
 .PHONY: thermostat_port
 thermostat_port: toolchain_matter $(THERMOSTAT_FILE)
 	$(MAKE) -f $(MATTER_MAKEDIR)/thermostat/lib_chip_thermostat_core.mk all
@@ -303,6 +318,7 @@ clean_matter_libs:
 	@$(MAKE) -f $(MATTER_MAKEDIR)/microwaveoven/lib_chip_microwaveoven_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/otar/lib_chip_otar_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_main.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/temperature_sensor/lib_chip_temp_sensor_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/thermostat/lib_chip_thermostat_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/all_clusters/lib_chip.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/aircon/lib_chip_aircon_core.mk clean
@@ -321,4 +337,5 @@ clean_matter_libs:
 	@$(MAKE) -f $(MATTER_MAKEDIR)/otar/lib_chip_otar_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/thermostat/lib_chip_thermostat_core.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/temperature_sensor/lib_chip_temp_sensor_core.mk clean
 	rm -rf $(MATTER_BUILDDIR)/lib_main*

@@ -44,6 +44,8 @@ MICROWAVEOVEN_PORT_FILE  = $(MATTER_EXAMPLEDIR)/microwaveoven/build/chip/codegen
 MICROWAVEOVEN_PORT_ZAP   = $(MATTER_EXAMPLEDIR)/microwaveoven/microwaveoven-app.zap
 REFRIGERATOR_PORT_FILE   = $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/cluster-file.txt
 REFRIGERATOR_PORT_ZAP    = $(MATTER_EXAMPLEDIR)/refrigerator/refrigerator-app.zap
+TEMP_SENSOR_FILE         = $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/cluster-file.txt
+TEMP_SENSOR_ZAP          = $(MATTER_EXAMPLEDIR)/temperature_sensor/temp-sensor-app.zap
 
 #*****************************************************************************#
 #                              MATTER MAKE DEFINES                            #
@@ -107,6 +109,10 @@ microwaveoven_port: build_target_folder copy_ld_img2 check_toolchain build_info.
 refrigerator_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(REFRIGERATOR_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/refrigerator_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/refrigerator_app_port all
+
+temp_sensor_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(TEMP_SENSOR_FILE)
+	make -C $(MATTER_BUILDDIR)/make/chip/temperature_sensor_app all
+	make -C $(MATTER_BUILDDIR)/make/chip_main/temperature_sensor_app_port all
 
 thermostat_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(THERMOSTAT_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/thermostat_app all
@@ -240,6 +246,15 @@ $(REFRIGERATOR_PORT_FILE): $(REFRIGERATOR_PORT_ZAP)
 	python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/refrigerator/refrigerator-app.matter
 	python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $(MATTER_EXAMPLEDIR)/refrigerator/refrigerator-app.zap > $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/cluster-file.txt
 	python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/cluster-file.txt --chip_path $(CHIPDIR)
+
+$(TEMP_SENSOR_FILE): $(TEMP_SENSOR_ZAP)
+	@ rm -f $(RAM_OBJS_LIST)
+	@mkdir -p $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/zap-generated
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json --output-dir $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/zap-generated  $^
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/app-templates.json --output-dir $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/zap-generated $^
+	@python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/temperature_sensor/temp-sensor-app.matter
+	@python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $(MATTER_EXAMPLEDIR)/temperature_sensor/temp-sensor-app.zap > $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/cluster-file.txt
+	@python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/cluster-file.txt --chip_path $(CHIPDIR)
 
 copy_gen_files_light_dm:
 	cp $(MATTER_EXAMPLEDIR)/light_dm/endpoint_config.h $(CHIPDIR)/examples/lighting-app/ameba/build/chip/codegen/zap-generated

@@ -22,6 +22,8 @@
 #include <microwaveoven/example_matter_microwave_oven.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_REFRIGERATOR) && (CONFIG_EXAMPLE_MATTER_REFRIGERATOR == 1)
 #include <refrigerator/example_matter_refrigerator.h>
+#elif defined(CONFIG_EXAMPLE_MATTER_TEMP_SENSOR) && (CONFIG_EXAMPLE_MATTER_TEMP_SENSOR == 1)
+#include <temperature_sensor/example_matter_temp_sensor.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_THERMOSTAT) && (CONFIG_EXAMPLE_MATTER_THERMOSTAT == 1)
 #include <thermostat/example_matter_thermostat.h>
 #endif
@@ -52,6 +54,8 @@ void matter_example_entry(void)
     example_matter_microwaveoven();
 #elif defined(CONFIG_EXAMPLE_MATTER_REFRIGERATOR) && (CONFIG_EXAMPLE_MATTER_REFRIGERATOR == 1)
     example_matter_refrigerator();
+#elif defined(CONFIG_EXAMPLE_MATTER_TEMP_SENSOR) && (CONFIG_EXAMPLE_MATTER_TEMP_SENSOR == 1)
+    example_matter_temp_sensor();
 #elif defined(CONFIG_EXAMPLE_MATTER_THERMOSTAT) && (CONFIG_EXAMPLE_MATTER_THERMOSTAT == 1)
     example_matter_thermostat();
 #endif

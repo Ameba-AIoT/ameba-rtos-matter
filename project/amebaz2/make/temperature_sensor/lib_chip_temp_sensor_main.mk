@@ -11,7 +11,7 @@ CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
 MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
-OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/aircon/build/chip
+OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
 
 MATTER_INCLUDE      = $(MATTER_BUILDDIR)/Makefile.include.matter
@@ -59,7 +59,7 @@ include $(MATTER_INCLUDE_HDR)
 # Ameba Matter Porting Layer Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(MATTER_EXAMPLEDIR)/aircon
+INCLUDES += -I$(MATTER_EXAMPLEDIR)/temperature_sensor
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
@@ -130,11 +130,9 @@ ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_ota_initializer.cpp
 endif
 
-# aircon-app source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/room_aircon_driver.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/temp_hum_sensor_driver.cpp
-SRC_CPP += $(MATTER_EXAMPLEDIR)/aircon/example_matter_aircon.cpp
-SRC_CPP += $(MATTER_EXAMPLEDIR)/aircon/matter_drivers.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/temp_sensor_driver.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/temperature_sensor/example_matter_temp_sensor.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/temperature_sensor/matter_drivers.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_log_api.cpp
@@ -229,17 +227,17 @@ prerequirement:
 $(SRC_OO): %_$(TARGET).oo : %.cpp | prerequirement
 	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
 	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -MM -MT $@ -MF $(OBJ_DIR)/$(notdir $(patsubst %.oo,%.d,$@))
-	mv $@ $(OBJ_DIR)/$(notdir $@)
-	mv $*_$(TARGET).ii $(INFO_DIR)
-	mv $*_$(TARGET).s $(INFO_DIR)
+	cp $@ $(OBJ_DIR)/$(notdir $@)
+	cp $*_$(TARGET).ii $(INFO_DIR)
+	cp $*_$(TARGET).s $(INFO_DIR)
 	chmod 777 $(OBJ_DIR)/$(notdir $@)
 
 $(SRC_O): %_$(TARGET).o : %.c | prerequirement
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -MM -MT $@ -MF $(OBJ_DIR)/$(notdir $(patsubst %.o,%.d,$@))
-	mv $@ $(OBJ_DIR)/$(notdir $@)
-	mv $*_$(TARGET).i $(INFO_DIR)
-	mv $*_$(TARGET).s $(INFO_DIR)
+	cp $@ $(OBJ_DIR)/$(notdir $@)
+	cp $*_$(TARGET).i $(INFO_DIR)
+	cp $*_$(TARGET).s $(INFO_DIR)
 	chmod 777 $(OBJ_DIR)/$(notdir $@)
 
 -include $(DEPENDENCY_LIST)

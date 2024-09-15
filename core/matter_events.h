@@ -33,6 +33,12 @@ struct AppEvent
         kEventType_Downlink_Refrigerator_Mode,
         kEventType_Downlink_Refrigerator_Alarm_State,
 
+        /*Relative Humidity Measurement Cluster*/
+        kEventType_Downlink_RelativeHumidityMeasurement_SetValue,
+
+        /*Temperature Measurement Cluster*/
+        kEventType_Downlink_TemperatureMeasurement_SetValue,
+
         /*Switch Cluster Event*/
         kEventType_Downlink_SwitchLatched,
         kEventType_Downlink_SwitchInitialPress,

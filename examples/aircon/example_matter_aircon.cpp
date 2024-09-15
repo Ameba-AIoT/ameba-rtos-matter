@@ -23,6 +23,7 @@ static void example_matter_aircon_task(void *pvParameters)
     ChipLogProgress(DeviceLayer, "Matter Room Air-Conditioner Example!");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::EndpointId endpoint = 1;
 
     initPref();     // init NVS
 
@@ -32,34 +33,22 @@ static void example_matter_aircon_task(void *pvParameters)
         ChipLogProgress(DeviceLayer, "matter_core_start failed!");
     }
 
-    err = matter_driver_fan_init();
+    err = matter_driver_room_aircon_init();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "matter_driver_fan_init failed!");
     }
 
-    err = matter_driver_fan_set_startup_value();
+    err = matter_interaction_start_downlink();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "matter_driver_fan_set_startup_value failed!");
-    }
-
-    err = matter_driver_temphumsensor_init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "matter_driver_temphumsensor_init failed!");
-    }
-
-    err = matter_driver_temphumsensor_start();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(DeviceLayer, "matter_driver_temphumsensor_start failed!");
+        ChipLogProgress(DeviceLayer, "matter_interaction_start_downlink failed!\n");
     }
 
     err = matter_interaction_start_uplink();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "matter_interaction_start_uplink failed!");
+        ChipLogProgress(DeviceLayer, "matter_interaction_start_uplink failed!\n");
     }
 
     vTaskDelete(NULL);
@@ -72,4 +61,5 @@ extern "C" void example_matter_aircon(void)
         ChipLogProgress(DeviceLayer, "%s xTaskCreate(example_matter_aircon_task) failed", __FUNCTION__);
     }
 }
+
 #endif /* CONFIG_EXAMPLE_MATTER_AIRCON */
