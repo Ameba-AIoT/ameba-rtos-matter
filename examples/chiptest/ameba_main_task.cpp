@@ -40,7 +40,7 @@ app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesMana
 app::Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 } // namespace
 
-extern "C" void AppTaskInit(void)
+void AppTaskInit(void)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
