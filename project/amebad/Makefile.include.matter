@@ -18,7 +18,9 @@ MATTER_TOOLCHAINDIR   = $(MATTER_TOOLDIR)/toolchain
 #*****************************************************************************#
 
 LWIP_VERSION          = lwip_v2.1.2
+ifeq ($(MBEDTLS_MATTER_ENABLE), y)
 MBEDTLS_VERSION       = mbedtls-2.28.1
+endif
 
 #*****************************************************************************#
 #                              INCLUDE DIRECTORY                              #
@@ -33,9 +35,11 @@ IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSIO
 IFLAGS               += -I$(MATTER_DIR)/common/include
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/include
 IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
+ifeq ($(MBEDTLS_MATTER_ENABLE), y)
 IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/include
 IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/include/mbedtls
 IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/library
+endif
 IFLAGS               += -I$(MATTER_DIR)/common/port
 IFLAGS               += -I$(MATTER_DIR)/common/protobuf
 IFLAGS               += -I$(MATTER_DIR)/common/protobuf/nanopb
@@ -91,7 +95,7 @@ GLOBAL_CFLAGS += -DFD_SETSIZE=10
 GLOBAL_CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
 
 # Mbedtls options
-GLOBAL_CFLAGS += -DMBEDTLS_CONFIG_FILE=\"mbedtls_config.h\"
+GLOBAL_CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
 
 # matter ota options
 GLOBAL_CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1

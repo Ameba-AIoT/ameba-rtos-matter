@@ -1703,6 +1703,7 @@
  */
 #define MBEDTLS_SSL_SERVER_NAME_INDICATION
 
+#if (MBEDTLS_VERSION_NUMBER < 0x03000000)
 /**
  * \def MBEDTLS_SSL_TRUNCATED_HMAC
  *
@@ -1711,6 +1712,7 @@
  * Comment this macro to disable support for truncated HMAC in SSL
  */
 #define MBEDTLS_SSL_TRUNCATED_HMAC
+#endif
 
 /**
  * \def MBEDTLS_SSL_TRUNCATED_HMAC_COMPAT
@@ -3523,7 +3525,9 @@
 #include MBEDTLS_USER_CONFIG_FILE
 #endif
 
+#if (MBEDTLS_VERSION_NUMBER < 0x03000000)
 #include <check_config.h>
+#endif
 
 #endif /* CONFIG_MATTER */
 #endif /* MBEDTLS_CONFIG_H */
