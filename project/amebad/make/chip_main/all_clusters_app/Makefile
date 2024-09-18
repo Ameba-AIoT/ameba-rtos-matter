@@ -66,6 +66,7 @@ CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DI
 GLOBAL_CFLAGS += -DCHIP_PROJECT=1
 GLOBAL_CFLAGS += -DSTD_PRINTF=1
 GLOBAL_CFLAGS += -DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\"lib/address_resolve/AddressResolve_DefaultImpl.h\"
+GLOBAL_CFLAGS += -DCHIP_AMEBA_APP_TASK=1
 
 # matter blemgr adapter options
 ifeq ($(CONFIG_BLE_MATTER_ADAPTER),y)
