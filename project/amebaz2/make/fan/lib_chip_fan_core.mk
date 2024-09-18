@@ -1,5 +1,7 @@
 SHELL = /bin/bash
 
+OS := $(shell uname)
+
 # Directory
 # -------------------------------------------------------------------
 
@@ -13,8 +15,6 @@ OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/fan/build/chip
 
 MATTER_INCLUDE      = $(MATTER_BUILDDIR)/Makefile.include.matter
 MATTER_INCLUDE_HDR  = $(MATTER_BUILDDIR)/Makefile.include.hdr.list
-
-OS := $(shell uname)
 
 # Initialize tool chain
 # -------------------------------------------------------------------
@@ -43,6 +43,7 @@ INFO_DIR=$(TARGET)/Debug/info
 # Build Definition
 # -------------------------------------------------------------------
 
+CHIP_ENABLE_AMEBA_DLOG = $(shell grep "#define CONFIG_ENABLE_AMEBA_DLOG" $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
 CHIP_ENABLE_CHIPOBLE = $(shell grep 'CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE' $(MATTER_INCLUDE) | cut -d'=' -f3)
 CHIP_ENABLE_IPV4 = $(shell grep 'INET_CONFIG_ENABLE_IPV4' $(MATTER_INCLUDE) | cut -d'=' -f3)
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'CONFIG_ENABLE_OTA_REQUESTOR' $(MATTER_INCLUDE) | cut -d'=' -f3)

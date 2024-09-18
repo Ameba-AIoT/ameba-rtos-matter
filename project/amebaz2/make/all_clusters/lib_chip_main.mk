@@ -10,6 +10,7 @@ AMEBAZ2_TOOLDIR     = $(SDKROOTDIR)/component/soc/realtek/8710c/misc/iar_utility
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
+MATTER_DRIVER       = $(MATTER_DIR)/drivers/matter_drivers
 OUTPUT_DIR          = $(CHIPDIR)/examples/all-clusters-app/ameba/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
 
@@ -47,6 +48,7 @@ INFO_DIR=$(TARGET)/Debug/info
 # Build Definition
 # -------------------------------------------------------------------
 
+CHIP_ENABLE_AMEBA_DLOG = $(shell grep "#define CONFIG_ENABLE_AMEBA_DLOG" $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 CHIP_ENABLE_SHELL = $(shell grep 'chip_build_libshell' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 
@@ -74,11 +76,9 @@ INCLUDES += -I$(CHIPDIR)/third_party/nlunit-test/repo/src
 INCLUDES += -I$(CHIPDIR)/zzz_generated/app-common
 INCLUDES += -I$(CHIPDIR)/zzz_generated/all-clusters-app
 INCLUDES += -I$(CHIPDIR)/zzz_generated/all-clusters-app/zap-generated
-INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/all-clusters-common
-INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/all-clusters-common/include
 INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/ameba/main/include
 INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/ameba/build/chip/gen/include
-INCLUDES += -I$(CHIPDIR)/examples/microwave-oven-app/microwave-oven-common/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/examples/chiptest
 INCLUDES += -I$(CODEGENDIR)
 
 # Source file list
@@ -124,32 +124,59 @@ SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attribut
 SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
 
 # all-clusters-app clusters source files
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/air-quality-instance.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/concentration-measurement-instances.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/dishwasher-alarm-stub.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/dishwasher-mode.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/fan-stub.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/laundry-dryer-controls-delegate-impl.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/laundry-washer-controls-delegate-impl.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/laundry-washer-mode.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/oven-modes.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/oven-operational-state-delegate.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/resource-monitoring-delegates.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/rvc-operational-state-delegate-impl.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/rvc-modes.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/static-supported-temperature-levels.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/smco-stub.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/tcc-mode.cpp
-SRC_CPP += $(CHIPDIR)/examples/microwave-oven-app/microwave-oven-common/src/microwave-oven-device.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_consoles/matter_command.cpp
+SRC_CPP += $(MATTER_DRIVER)/action/ameba_bridged_actions_stubs.cpp
+SRC_CPP += $(MATTER_DRIVER)/air_quality/ameba_air_quality_instance.cpp
+SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_concentration_measurement_instances.cpp
+SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_delegate_impl.cpp
+SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_manager.cpp
+SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_mode.cpp
+SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_stub.cpp
+SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_energy_time_utils.cpp
+SRC_CPP += $(MATTER_DRIVER)/dishwasher_alarm/ameba_dishwasher_alarm_stubs.cpp
+SRC_CPP += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode.cpp
+SRC_CPP += $(MATTER_DRIVER)/electrical_energy_measurement/ameba_electrical_energy_measurement_stubs.cpp
+SRC_CPP += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement.cpp
+SRC_CPP += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement_stubs.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_charging_targets_mem_manager.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_delegate_impl.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manager.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manufacturer_impl.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_mode.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_stub.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_targets_store.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_preference_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/fan/ameba_fan_stubs.cpp
+SRC_CPP += $(MATTER_DRIVER)/laundry_dryer_controls/ameba_laundry_dryer_controls_delegate_impl.cpp
+SRC_CPP += $(MATTER_DRIVER)/laundry_washer_controls/ameba_laundry_washer_controls_delegate_impl.cpp
+SRC_CPP += $(MATTER_DRIVER)/laundry_washer_mode/ameba_laundry_washer_mode.cpp
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven/ameba_microwave_oven_device.cpp
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven/ameba_microwave_oven_mode.cpp
+SRC_CPP += $(MATTER_DRIVER)/mode_select/ameba_modes_manager.cpp
+SRC_CPP += $(MATTER_DRIVER)/occupancy_sensing/ameba_occupancy_sensing.cpp
+SRC_CPP += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate_impl.cpp
+SRC_CPP += $(MATTER_DRIVER)/oven_mode/ameba_oven_modes.cpp
+SRC_CPP += $(MATTER_DRIVER)/oven_operational_state/ameba_oven_operational_state_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/power_topology/ameba_power_topology_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/power_topology/ameba_power_topology_stub.cpp
+SRC_CPP += $(MATTER_DRIVER)/resource_monitoring/ameba_resource_monitoring_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/refrigerator_mode/ameba_tcc_mode.cpp
+SRC_CPP += $(MATTER_DRIVER)/rvc_modes/ameba_rvc_modes.cpp
+SRC_CPP += $(MATTER_DRIVER)/rvc_operational_state/ameba_rvc_operational_state_delegate_impl.cpp
+SRC_CPP += $(MATTER_DRIVER)/smoke_co_alarm/ameba_smco_stub.cpp
+SRC_CPP += $(MATTER_DRIVER)/switch/ameba_switch.cpp
+SRC_CPP += $(MATTER_DRIVER)/temperature_levels/ameba_temperature_levels.cpp
+SRC_CPP += $(MATTER_DRIVER)/valve_control/ameba_valve_control_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_instance.cpp
+SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_main.cpp
+SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_manufacturer.cpp
+SRC_CPP += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/examples/chiptest/ameba_main_task.cpp
 
 # all-clusters-app ameba source files
 SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/ameba/main/chipinterface.cpp
 SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/ameba/main/BindingHandler.cpp
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/ameba/main/ManualOperationCommand.cpp
 SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/ameba/main/DeviceCallbacks.cpp
 SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/ameba/main/SmokeCOAlarmManager.cpp
 SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
@@ -163,6 +190,13 @@ SRC_CPP += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
 SRC_CPP += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_log_api.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_device_utils.cpp
+
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_diagnosticlogs_provider_delegate_impl.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_logging_faultlog.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_logging_redirect_handler.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_logging_redirect_wrapper.cpp
 
 #lib_version
 VER_C += $(TARGET)_version.c
@@ -200,6 +234,7 @@ CFLAGS += -DV8M_STKOVF
 include $(MATTER_INCLUDE)
 
 CFLAGS += -DCHIP_PROJECT=1
+CFLAGS += -DCHIP_AMEBA_APP_TASK=1
 
 # Matter Shell Flags
 ifeq ($(CHIP_ENABLE_SHELL), true)

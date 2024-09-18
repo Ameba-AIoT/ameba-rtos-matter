@@ -43,6 +43,10 @@ DIR += $(CODEGEN_DIR)/zap-generated
 DIR += $(CHIPDIR)/examples/air-purifier-app/air-purifier-common
 DIR += $(CHIPDIR)/examples/air-purifier-app/ameba/main
 DIR += $(BASEDIR)/component/common/application/matter/api
+DIR += $(BASEDIR)/component/common/application/matter/core
+DIR += $(BASEDIR)/component/common/application/matter/drivers/device
+DIR += $(BASEDIR)/component/common/application/matter/drivers/matter_consoles
+DIR += $(BASEDIR)/component/common/application/matter/drivers/matter_drivers
 
 vpath %.cpp $(DIR) $(shell find $(DIR) -type d)
 vpath %.c $(DIR) $(shell find $(DIR) -type d)
@@ -90,7 +94,6 @@ IFLAGS += -I$(CHIPDIR)/examples/air-purifier-app/air-purifier-common
 IFLAGS += -I$(CHIPDIR)/examples/air-purifier-app/air-purifier-common/include
 IFLAGS += -I$(CHIPDIR)/examples/air-purifier-app/ameba/main/include
 IFLAGS += -I$(CHIPDIR)/examples/air-purifier-app/ameba/build/chip/gen/include
-IFLAGS += -I$(BASEDIR)/component/common/application/matter/api
 
 #*****************************************************************************#
 #                              SOURCE FILE LIST                               #
@@ -147,6 +150,7 @@ CPPSRC += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
 endif
 
 CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

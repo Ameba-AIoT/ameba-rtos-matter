@@ -10,17 +10,29 @@
 #ifndef __PLATFORM_OPTS_MATTER_H__
 #define __PLATFORM_OPTS_MATTER_H__
 
+// Ameba Matter Example
 #define CONFIG_EXAMPLE_MATTER                   1
 #define CONFIG_EXAMPLE_MATTER_CHIPTEST          1
 #define CONFIG_EXAMPLE_MATTER_AIRCON            0
 #define CONFIG_EXAMPLE_MATTER_BRIDGE            0
 #define CONFIG_EXAMPLE_MATTER_DISHWASHER        0
 #define CONFIG_EXAMPLE_MATTER_FAN               0
+#define CONFIG_EXAMPLE_MATTER_GENERIC_SWITCH    0
 #define CONFIG_EXAMPLE_MATTER_LIGHT             0
 #define CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER    0
 #define CONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN    0
 #define CONFIG_EXAMPLE_MATTER_REFRIGERATOR      0
+#define CONFIG_EXAMPLE_MATTER_TEMP_SENSOR       0
 #define CONFIG_EXAMPLE_MATTER_THERMOSTAT        0
+
+// Ameba General Diagnostic Total Operational Hours Support
+#define CONFIG_ENABLE_AMEBA_OPHOURS             1
+
+// Ameba Fabric Observer
+#define CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER     0
+
+// Ameba mDNS Filter
+#define CONFIG_ENABLE_AMEBA_MDNS_FILTER         0
 
 #if defined(CONFIG_EXAMPLE_MATTER) && (CONFIG_EXAMPLE_MATTER == 1)
 #undef CONFIG_EXAMPLE_WLAN_FAST_CONNECT
@@ -55,7 +67,7 @@
  * MATTER KVS2, for key length large than 64 (Fabric1 ~ FabricF)
  * Uses DCT2, set flash address MATTER_KVS_BEGIN_ADDR2
  ****************************************************************/
-#define MATTER_KVS_MODULE_NUM2                  6                       // max number of module
+#define MATTER_KVS_MODULE_NUM2                  10                      // max number of module
 #define MATTER_KVS_VARIABLE_NAME_SIZE2          32                      // max size of the variable name
 #define MATTER_KVS_VARIABLE_VALUE_SIZE2         400+4                   // max size of the variable value, +4 so it can store 400 bytes variable
                                                                         // max value number in moudle = floor(4024 / (32 + 400 + 4)) = 9
@@ -94,7 +106,7 @@
 #define BT_FTL_BKUP_ADDR                        (0x400000 - 0x4000)     // 0x3FC000
 #define UART_SETTING_SECTOR                     (0x400000 - 0x5000)     // 0x3FB000
 #define MATTER_KVS_BEGIN_ADDR                   (0x400000 - 0x13000)    // 0x3ED000 ~ 0x3FB000 : 56K
-#define MATTER_KVS_BEGIN_ADDR2                  (0x400000 - 0x1A000)    // 0x3E6000 ~ 0x3ED000 : 24K
+#define MATTER_KVS_BEGIN_ADDR2                  (0x400000 - 0x1E000)    // 0x3E6000 ~ 0x3ED000 : 24K
 
 #elif defined(CONFIG_PLATFORM_8721D)
 
@@ -125,5 +137,52 @@
 #define MATTER_KVS_BEGIN_ADDR2                  0x003B6000              // 20K (4*5)
 
 #endif /* CONFIG_PLATFORM_87XXX */
+
+/**
+ * CONFIG_ENABLE_AMEBA_DLOG==1: to support diagnosic logs.
+ * CONFIG_ENABLE_AMEBA_LFS==1: to enable Matter LittleFS.
+ * CONFIG_ENABLE_AMEBA_SHORT_LOGGING==1: file name and line number will NOT be stored,
+ * and reduce flash usage. On default this is disabled.
+ */
+
+#if defined(CONFIG_PLATFORM_8710C)
+#define CONFIG_ENABLE_AMEBA_DLOG    1
+#endif
+
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
+#define CONFIG_ENABLE_AMEBA_LFS     1
+#else
+#define CONFIG_ENABLE_AMEBA_LFS     0
+#endif
+
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
+#define CONFIG_ENABLE_AMEBA_SHORT_LOGGING   0
+#if defined(CONFIG_ENABLE_AMEBA_SHORT_LOGGING) && (CONFIG_ENABLE_AMEBA_SHORT_LOGGING == 0)
+#define CONFIG_AMEBA_LOG_FILENAME_MAXSZ     32
+#endif /* CONFIG_ENABLE_AMEBA_SHORT_LOGGING */
+
+#define RETAIN_NLOGS_WHEN_FULL      40 // most recent N logs will be kept, the rest cleared
+
+#undef SECTOR_SIZE_FLASH
+#undef FAULT_FLASH_SECTOR_SIZE
+#define SECTOR_SIZE_FLASH           4096
+#define FAULT_FLASH_SECTOR_SIZE     (SECTOR_SIZE_FLASH)
+#define USER_LOG_FILENAME           "user.log"
+#define NET_LOG_FILENAME            "net.log"
+#define CRASH_LOG_FILENAME          "crash.log"
+#endif /* CONFIG_ENABLE_AMEBA_DLOG */
+
+#if defined(CONFIG_ENABLE_AMEBA_LFS) && (CONFIG_ENABLE_AMEBA_LFS == 1)
+#define CONFIG_USE_FLASHCFG 1
+#define LFS_DEVICE_SIZE             (0x20000)
+#define LFS_FLASH_BASE_ADDR         (MATTER_KVS_BEGIN_ADDR2 - LFS_DEVICE_SIZE)
+#define LFS_NUM_BLOCKS              (LFS_DEVICE_SIZE / SECTOR_SIZE_FLASH)
+
+// redefine fault message redirection flash address
+#undef FAULT_LOG1
+#undef FAULT_LOG2
+#define FAULT_LOG1                  (LFS_FLASH_BASE_ADDR - 0x1000)
+#define FAULT_LOG2                  (LFS_FLASH_BASE_ADDR - 0x2000)
+#endif /* CONFIG_ENABLE_AMEBA_LFS */
 
 #endif /* __PLATFORM_OPTS_MATTER_H__ */

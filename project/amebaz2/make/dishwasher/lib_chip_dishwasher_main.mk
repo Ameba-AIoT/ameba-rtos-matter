@@ -10,7 +10,8 @@ AMEBAZ2_TOOLDIR     = $(SDKROOTDIR)/component/soc/realtek/8710c/misc/iar_utility
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
-MATTER_EXAMPLEDIR   = $(MATTER_DIR)/example
+MATTER_DRIVER       = $(MATTER_DIR)/drivers/matter_drivers
+MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
 OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/dishwasher/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
 
@@ -48,6 +49,7 @@ INFO_DIR=$(TARGET)/Debug/info
 # Build Definition
 # -------------------------------------------------------------------
 
+CHIP_ENABLE_AMEBA_DLOG = $(shell grep "#define CONFIG_ENABLE_AMEBA_DLOG" $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 
 # Include folder list
@@ -58,9 +60,7 @@ include $(MATTER_INCLUDE_HDR)
 # Ameba Matter Porting Layer Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/driver
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/example/dishwasher
+INCLUDES += -I$(MATTER_EXAMPLEDIR)/dishwasher
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
@@ -79,8 +79,6 @@ INCLUDES += -I$(CHIPDIR)/third_party/nlassert/repo/include
 INCLUDES += -I$(CHIPDIR)/third_party/nlio/repo/include
 INCLUDES += -I$(CHIPDIR)/third_party/nlunit-test/repo/src
 INCLUDES += -I$(CHIPDIR)/zzz_generated/app-common
-INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/all-clusters-common
-INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/all-clusters-common/include
 INCLUDES += -I$(OUTPUT_DIR)/gen/include
 INCLUDES += -I$(CODEGENDIR)
 
@@ -126,8 +124,6 @@ SRC_CPP += $(CODEGENDIR)/zap-generated/IMClusterCommandHandler.cpp
 SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
 SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
 
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/operational-state-delegate-impl.cpp
-
 # porting layer source files
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_core.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_interaction.cpp
@@ -136,12 +132,20 @@ SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_ota_ini
 endif
 
 # dishwasher-app source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/dishwasher_driver.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/dishwasher_mode.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/dishwasher/example_matter_dishwasher.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/dishwasher/matter_drivers.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/dishwasher_driver.cpp
+SRC_CPP += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode.cpp
+SRC_CPP += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate_impl.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/dishwasher/example_matter_dishwasher.cpp
+SRC_CPP += $(MATTER_EXAMPLEDIR)/dishwasher/matter_drivers.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_log_api.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_device_utils.cpp
+
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_diagnosticlogs_provider_delegate_impl.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_logging_faultlog.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_logging_redirect_handler.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_logging_redirect_wrapper.cpp
 
 #lib_version
 VER_C += $(TARGET)_version.c

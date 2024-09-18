@@ -6,7 +6,7 @@ SDKROOTDIR         := $(shell pwd)/../../..
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
-MATTER_EXAMPLEDIR   = $(MATTER_DIR)/example
+MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
 MATTER_MAKEDIR      = $(MATTER_BUILDDIR)/make
 MATTER_TOOLDIR      = $(MATTER_DIR)/tools
 MATTER_TOOLCHAINDIR = $(MATTER_DIR)/tools/toolchain
@@ -103,3 +103,10 @@ CFLAGS += -DCONFIG_ENABLE_DCT_ENCRYPTION=0
 
 # Ameba platform PRNG options
 CFLAGS += -DCONFIG_ENABLE_MATTER_PRNG=0
+
+ifeq ($(CHIP_ENABLE_AMEBA_DLOG), 1)
+# Ameba Diagnostic Logs Support
+CFLAGS += -DCHIP_CONFIG_ERROR_SOURCE=1
+CFLAGS += -DCHIP_CONFIG_ERROR_FORMAT_AS_STRING=1
+CFLAGS += -DCHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER=1
+endif

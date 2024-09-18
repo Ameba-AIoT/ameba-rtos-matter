@@ -43,6 +43,7 @@ DIR += $(CODEGEN_DIR)/zap-generated
 DIR += $(CHIPDIR)/examples/lighting-app/lighting-common
 DIR += $(CHIPDIR)/examples/lighting-app/ameba/main
 DIR += $(BASEDIR)/component/common/application/matter/api
+DIR += $(BASEDIR)/component/common/application/matter/core
 
 vpath %.cpp $(DIR) $(shell find $(DIR) -type d)
 vpath %.c $(DIR) $(shell find $(DIR) -type d)
@@ -89,7 +90,6 @@ IFLAGS += -I$(CODEGEN_DIR)/zap-generated
 IFLAGS += -I$(CHIPDIR)/examples/lighting-app/lighting-common
 IFLAGS += -I$(CHIPDIR)/examples/lighting-app/ameba/main/include
 IFLAGS += -I$(CHIPDIR)/examples/lighting-app/ameba/build/chip/gen/include
-IFLAGS += -I$(BASEDIR)/component/common/application/matter/api
 
 #*****************************************************************************#
 #                              SOURCE FILE LIST                               #
@@ -144,6 +144,7 @@ CPPSRC += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
 endif
 
 CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

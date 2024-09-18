@@ -30,21 +30,23 @@ CORE_TARGETS: $(OBJS)
 #              CLEAN GENERATED FILES                                          #
 #*****************************************************************************#
 clean: CLEAN_OBJS 
-	make -C all_clusters_app clean
+	make -C aircon_app_port clean
 	make -C air_purifier_app clean
-	make -C aircon_port clean
-	make -C bridge_port clean
-	make -C bridge_dm_app clean
-	make -C dishwasher_port clean
-	make -C fan_port clean
-	make -C laundrywasher_port clean
+	make -C all_clusters_app clean
+	make -C bridge_app_port clean
+	make -C bridge_app_port_dm clean
+	make -C dishwasher_app_port clean
+	make -C fan_app_port clean
+	make -C generic_switch_app_port clean
+	make -C laundrywasher_app_port clean
 	make -C lighting_app clean
+	make -C lighting_app_port clean
+	make -C lighting_app_port_dm clean
 	make -C light_switch_app clean
-	make -C lighting_dm_app clean
-	make -C lighting_port clean
-	make -C microwaveoven_port clean
+	make -C microwaveoven_app_port clean
 	make -C ota_requestor_app clean
-	make -C thermostat_port clean
-	make -C refrigerator_port clean
+	make -C refrigerator_app_port clean
+	make -C temperature_sensor_app_port clean
+	make -C thermostat_app_port clean
 
 -include $(DEPS)
