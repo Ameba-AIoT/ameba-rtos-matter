@@ -28,7 +28,8 @@ using namespace chip::DeviceLayer;
 
 using chip::Protocols::InteractionModel::Status;
 
-#if 0
+Instance * gOccupancySensingCluster = nullptr;
+
 void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
 {
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type holdTimeLimits = {
@@ -38,10 +39,18 @@ void emberAfOccupancySensingClusterInitCallback(EndpointId endpointId)
     };
 
     uint16_t holdTime = 10;
-    SetHoldTimeLimits(endpointId, holdTimeLimits);
-    SetHoldTime(endpointId, holdTime);
+
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(gOccupancySensingCluster == nullptr);
+    chip::BitMask<Feature, uint32_t> occupancySensingFeatures(Feature::kUltrasonic);
+    gOccupancySensingCluster = new Instance(occupancySensingFeatures);
+
+    if (gOccupancySensingCluster) {
+        gOccupancySensingCluster->Init();
+        SetHoldTimeLimits(endpointId, holdTimeLimits);
+        SetHoldTime(endpointId, holdTime);
+    }
 }
-#endif
 
 HalOccupancySensorType halOccupancyGetSensorType(EndpointId endpoint)
 {

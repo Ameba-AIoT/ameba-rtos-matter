@@ -31,8 +31,7 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
     VerifyOrDie(!gAttrAccess);
 
     gAttrAccess = std::make_unique<ElectricalEnergyMeasurementAttrAccess>(
-        BitMask<Feature, uint32_t>(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
-                                   Feature::kPeriodicEnergy),
+        BitMask<Feature, uint32_t>(Feature::kImportedEnergy, Feature::kCumulativeEnergy),
         BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
 
     if (gAttrAccess)

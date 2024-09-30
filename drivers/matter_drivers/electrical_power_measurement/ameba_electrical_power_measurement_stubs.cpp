@@ -35,8 +35,7 @@ void emberAfElectricalPowerMeasurementClusterInitCallback(chip::EndpointId endpo
     {
         gEPMInstance = std::make_unique<ElectricalPowerMeasurementInstance>(
             endpointId, *gEPMDelegate,
-            BitMask<Feature, uint32_t>(Feature::kDirectCurrent, Feature::kAlternatingCurrent, Feature::kPolyphasePower,
-                                       Feature::kHarmonics, Feature::kPowerQuality),
+            BitMask<Feature, uint32_t>(Feature::kDirectCurrent),
             BitMask<OptionalAttributes, uint32_t>(
                 OptionalAttributes::kOptionalAttributeRanges, OptionalAttributes::kOptionalAttributeVoltage,
                 OptionalAttributes::kOptionalAttributeActiveCurrent, OptionalAttributes::kOptionalAttributeReactiveCurrent,

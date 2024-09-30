@@ -45,6 +45,9 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
 {
     chipEpoch = 0;
 
+#if 1
+    return CHIP_NO_ERROR;
+#else
     System::Clock::Milliseconds64 cTMs;
     CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
 
@@ -69,6 +72,7 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
     }
 
     return CHIP_NO_ERROR;
+#endif
 }
 
 /**

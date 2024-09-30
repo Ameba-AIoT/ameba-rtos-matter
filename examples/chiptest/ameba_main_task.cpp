@@ -27,6 +27,7 @@
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #include <test_event_trigger/AmebaTestEventTriggerDelegate.h>
+#include <app/server/Server.h>
 #endif
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 
@@ -54,9 +55,9 @@ void AppTaskInit(void)
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
     static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;
-    app::chip::Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sSmokeCOTestEventTriggerHandler);
+    Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sSmokeCOTestEventTriggerHandler);
 
     static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
-    app::chip::Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
+    Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
 #endif
 }
