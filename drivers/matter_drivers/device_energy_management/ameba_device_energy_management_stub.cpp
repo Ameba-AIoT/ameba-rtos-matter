@@ -49,7 +49,7 @@ void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointI
     /* Manufacturer may optionally not support all features, commands & attributes */
     gInstance = std::make_unique<DeviceEnergyManagementManager>(
         endpointId, *gDelegate,
-        BitMask<DeviceEnergyManagement::Feature, uint32_t>(0));
+        BitMask<DeviceEnergyManagement::Feature, uint32_t>(1));
 
     if (!gInstance)
     {

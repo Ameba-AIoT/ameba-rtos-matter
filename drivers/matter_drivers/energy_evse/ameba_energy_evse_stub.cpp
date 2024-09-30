@@ -45,7 +45,7 @@ void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpointId)
     {
         gInstance = std::make_unique<EnergyEvseManager>(
             endpointId, *gDelegate,
-            BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kRfid),
+            BitMask<EnergyEvse::Feature, uint32_t>(0),
             BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                   OptionalAttributes::kSupportsRandomizationWindow,
                                                   OptionalAttributes::kSupportsApproximateEvEfficiency),
