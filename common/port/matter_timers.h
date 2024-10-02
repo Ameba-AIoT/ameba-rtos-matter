@@ -55,6 +55,21 @@ uint64_t ameba_get_clock_time(void);
  */
 void matter_timer_init(void);
 
+#if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
+/*
+ * @brief  Get SNTP Current Time and write it to the DCT if SNTP server is reachable.
+ *         If not reachable, retain the last known epoch time written in DCT if available
+ * @param  current_sec : Pointer to be set as current epoch in seconds.
+ * @param  current_usec: Pointer to be set as the remaining micro seconds.
+ */
+void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec);
+
+/*
+ * @brief  Initialize the system clock timer using SNTP when the Matter application starts running.
+ */
+void matter_sntp_init(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

@@ -98,6 +98,9 @@ CFLAGS += -DCONFIG_ENABLE_AMEBA_CRYPTO=0
 # Ameba platform TestEvent Trigger EnableKey
 CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
 
+# matter timer
+CFLAGS += -DCONFIG_ENABLE_AMEBA_SNTP=1
+
 # Ameba platform dct options
 CFLAGS += -DCONFIG_ENABLE_DCT_ENCRYPTION=0
 

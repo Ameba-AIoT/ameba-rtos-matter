@@ -238,6 +238,43 @@ void matter_timer_init(void)
     gtimer_start_periodical(&matter_rtc_timer, US_OVERFLOW_MAX, (void *)matter_timer_rtc_callback, (uint32_t) &matter_rtc_timer);
 }
 
+#if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
+void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
+{
+    unsigned int update_tick = 0, retry = 0;
+    time_t update_sec = 0, update_usec = 0;
+    char* secKey  = "last-known-sntp-sec";
+    char* uSecKey = "last-known-sntp-usec";
+
+    sntp_get_lasttime(&update_sec, &update_usec, &update_tick);
+
+    if(update_tick) { //if sntp server is reachable, write to the dct
+        time_t tick_diff_sec, tick_diff_ms;
+        unsigned int current_tick = xTaskGetTickCount();
+
+        tick_diff_sec = (current_tick - update_tick) / configTICK_RATE_HZ;
+        tick_diff_ms = (current_tick - update_tick) % configTICK_RATE_HZ / portTICK_RATE_MS;
+        update_sec += tick_diff_sec;
+        update_usec += (tick_diff_ms * 1000);
+        *current_sec = update_sec + update_usec / 1000000;
+        *current_usec = update_usec % 1000000;
+        setPref_new(NULL,  secKey,  current_sec, sizeof(time_t));
+        setPref_new(NULL, uSecKey, current_usec, sizeof(time_t));
+    }
+    else //if the sntp is not reachable yet, use the last known epoch time if available
+    {
+        getPref_u64_new(NULL,  secKey,  current_sec);
+        getPref_u64_new(NULL, uSecKey, current_usec);
+    }
+}
+
+void matter_sntp_init(void)
+{
+    sntp_stop();
+    sntp_init();
+}
+#endif
+
 #ifdef __cplusplus
 }
 #endif
