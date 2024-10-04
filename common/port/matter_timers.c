@@ -37,6 +37,7 @@ extern void vTaskDelay(const TickType_t xTicksToDelay);
 static gtimer_t matter_rtc_timer;
 static uint64_t current_us = 0;
 static volatile uint32_t rtc_counter = 0;
+static bool matter_sntp_rtc_sync = FALSE;
 
 BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 {
@@ -192,7 +193,7 @@ void matter_rtc_init(void)
     rtc_init();
 }
 
-long long matter_rtc_read(void)
+time_t matter_rtc_read(void)
 {
     if (rtc_isenabled() == 0)
     {
@@ -202,7 +203,7 @@ long long matter_rtc_read(void)
     return rtc_read();
 }
 
-void matter_rtc_write(long long time)
+void matter_rtc_write(time_t time)
 {
     if (rtc_isenabled() == 0)
     {
@@ -239,6 +240,11 @@ void matter_timer_init(void)
 }
 
 #if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
+bool matter_sntp_rtc_is_sync(void)
+{
+    return matter_sntp_rtc_sync;
+}
+
 void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 {
     unsigned int update_tick = 0, retry = 0;
@@ -248,7 +254,7 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
     sntp_get_lasttime(&update_sec, &update_usec, &update_tick);
 
-    if(update_tick) { //if sntp server is reachable, write to the dct
+    if(update_tick) { //if sntp server is reachable, write to the dct and rtc
         time_t tick_diff_sec, tick_diff_ms;
         unsigned int current_tick = xTaskGetTickCount();
 
@@ -260,6 +266,9 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
         *current_usec = update_usec % 1000000;
         setPref_new(NULL,  secKey,  current_sec, sizeof(time_t));
         setPref_new(NULL, uSecKey, current_usec, sizeof(time_t));
+
+        matter_rtc_write(*current_sec);
+        matter_sntp_rtc_sync = TRUE;
     }
     else //if the sntp is not reachable yet, use the last known epoch time if available
     {
