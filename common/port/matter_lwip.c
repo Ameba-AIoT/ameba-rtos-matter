@@ -11,6 +11,8 @@ extern "C" {
 
 extern struct netif xnetif[NET_IF_NUM];
 
+#define IPV6_WAIT_TIMEOUT 30
+
 void matter_lwip_dhcp(void)
 {
     netif_set_link_up(&xnetif[0]);
@@ -82,6 +84,24 @@ uint8_t *matter_LwIP_GetIPv6_global(uint8_t idx)
     return ipv6_addr;
 #endif
 }
+
+void matter_check_valid_ipv6(void)
+{
+    int timeout = 0;
+
+    while (!ip6_addr_isvalid(netif_ip6_addr_state(&xnetif[0], 0)))
+    {
+        timeout++;
+        if (timeout > IPV6_WAIT_TIMEOUT) {
+            return; // return after 3s
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+
+    wifi_indication(WIFI_EVENT_DHCP6_DONE, NULL, 0, 0);
+}
+
 #endif // LWIP_IPV6
 
 #ifdef __cplusplus
