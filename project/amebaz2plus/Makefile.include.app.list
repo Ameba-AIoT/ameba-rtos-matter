@@ -1,0 +1,142 @@
+include $(MATTER_INCLUDE)
+
+# Matter Include file list
+# -------------------------------------------------------------------
+
+INCLUDES += -I../../../component/common/application/matter/common/bluetooth/
+INCLUDES += -I../../../component/common/application/matter/common/include
+INCLUDES += -I../../../component/common/application/matter/common/lwip/include
+INCLUDES += -I../../../component/common/application/matter/common/mbedtls
+INCLUDES += -I../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include
+INCLUDES += -I../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include/mbedtls
+INCLUDES += -I../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library
+INCLUDES += -I../../../component/common/application/matter/common/port
+INCLUDES += -I../../../component/common/application/matter/common/protobuf
+INCLUDES += -I../../../component/common/application/matter/common/protobuf/nanopb
+INCLUDES += -I../../../component/common/application/matter/example
+
+# Source file list
+# -------------------------------------------------------------------
+
+#matter - app - atcmd
+SRC_C += ../../../component/common/application/matter/common/atcmd/atcmd_matter.c
+
+#matter - app - bluetooth
+SRC_C += ../../../component/common/application/matter/common/bluetooth/matter_blemgr_common.c
+
+#matter - app - port
+SRC_C += ../../../component/common/application/matter/common/port/matter_dcts.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_lwip.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_ota.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_timers.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_utils.c
+SRC_C += ../../../component/common/application/matter/common/port/matter_wifis.c
+
+#matter - app - mbedtls
+SRC_C += ../../../component/common/application/matter/common/mbedtls/net_sockets.c
+
+#matter - app - protobuf
+SRC_C += ../../../component/common/application/matter/common/protobuf/ameba_factory.pb.c
+SRC_C += ../../../component/common/application/matter/common/protobuf/nanopb/pb_encode.c  # The nanopb encoder
+SRC_C += ../../../component/common/application/matter/common/protobuf/nanopb/pb_decode.c  # The nanopb decoder
+SRC_C += ../../../component/common/application/matter/common/protobuf/nanopb/pb_common.c  # The nanopb common parts
+
+#matter - app - example
+SRC_C += ../../../component/common/application/matter/example/matter_example_entry.c
+SRC_C += ../../../component/common/application/matter/example/chiptest/example_matter.c
+
+#matter - common - lwip
+SRC_C += ../../../component/common/application/matter/common/lwip/hooks/lwip_default_hooks.c
+
+#matter - common - mbedtls
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/aes.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/aesni.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/arc4.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/aria.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/asn1parse.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/asn1write.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/base64.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/bignum.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/blowfish.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/camellia.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ccm.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/certs.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/chacha20.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/chachapoly.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/cipher.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/cipher_wrap.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/cmac.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/constant_time.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ctr_drbg.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/debug.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/des.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/dhm.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ecdh.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ecdsa.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ecjpake.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ecp.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ecp_curves.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/entropy.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/entropy_poll.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/error.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/gcm.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/havege.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/hkdf.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/hmac_drbg.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/md2.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/md4.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/md5.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/md.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/memory_buffer_alloc.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/nist_kw.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/oid.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/padlock.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/pem.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/pk.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/pkcs11.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/pkcs12.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/pkcs5.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/pkparse.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/pk_wrap.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/pkwrite.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/platform.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/platform_util.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/poly1305.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ripemd160.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/rsa.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/rsa_internal.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/sha1.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/sha256.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/sha512.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ssl_cache.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ssl_ciphersuites.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ssl_cli.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ssl_cookie.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ssl_msg.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ssl_srv.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ssl_ticket.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/ssl_tls.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/threading.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/timing.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/version.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/version_features.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/x509.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/x509_create.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/x509_crl.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/x509_crt.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/x509_csr.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/x509write_crt.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/x509write_csr.c
+SRC_C += ../../../component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library/xtea.c
+
+# Libraries
+# -------------------------------------------------------------------
+
+LIBFLAGS += -Wl,--start-group -L../../../component/soc/realtek/8710c/misc/bsp/lib/common/GCC -Wl,--whole-archive -l_main -Wl,--no-whole-archive -lCHIP -Wl,--end-group # --whole-archive forces linker to override weak functions with strong ones
+
+
+# Compile options
+# -------------------------------------------------------------------
+
+# Required for Matter OTA AT command
+CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1

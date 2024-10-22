@@ -1,7 +1,9 @@
 #include <platform_opts.h>
+#if defined(CONFIG_PLATFORM_8721D)
+#include <atcmd_matter.h>
+#endif
 
 #if defined(CONFIG_EXAMPLE_MATTER) && (CONFIG_EXAMPLE_MATTER == 1)
-
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && (CONFIG_EXAMPLE_MATTER_CHIPTEST == 1)
 #include <chiptest/example_matter.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_AIRCON) && (CONFIG_EXAMPLE_MATTER_AIRCON == 1)
@@ -34,6 +36,10 @@
  */
 void matter_example_entry(void)
 {
+#if defined(CONFIG_PLATFORM_8721D)
+    matter_shell_init();
+#endif
+
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && (CONFIG_EXAMPLE_MATTER_CHIPTEST == 1)
     example_matter_task();
 #elif defined(CONFIG_EXAMPLE_MATTER_AIRCON) && (CONFIG_EXAMPLE_MATTER_AIRCON == 1)

@@ -19,7 +19,7 @@
   "package": [
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../../../connectedhomeip/src/app/zap-templates/zcl/zcl-with-test-extensions.json",
+      "path": "../../../src/app/zap-templates/zcl/zcl-with-test-extensions.json",
       "type": "zcl-properties",
       "category": "matter",
       "version": 1,
@@ -27,7 +27,7 @@
     },
     {
       "pathRelativity": "relativeToZap",
-      "path": "../../../../../../connectedhomeip/src/app/zap-templates/app-templates.json",
+      "path": "../../../src/app/zap-templates/app-templates.json",
       "type": "gen-templates-json",
       "category": "matter",
       "version": "chip-v1"
