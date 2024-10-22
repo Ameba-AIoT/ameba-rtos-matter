@@ -60,29 +60,44 @@ public:
     /**
      * @brief This function records the start time and provided energy meter values as part of the new session.
      *
+     * @param endpointId            - The endpoint to report the update on
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StartSession(int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StartSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+
+    /**
+     * @brief This function updates the session information at the unplugged event
+     *
+     * @param endpointId            - The endpoint to report the update on
+     * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
+     * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
+     */
+    void StopSession(EndpointId endpointId, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
      * @brief This function updates the session Duration to allow read attributes to return latest values
+     *
+     * @param endpointId            - The endpoint to report the update on
      */
-    void RecalculateSessionDuration();
+    void RecalculateSessionDuration(EndpointId endpointId);
 
     /**
      * @brief This function updates the EnergyCharged meter value
      *
+     * @param endpointId            - The endpoint to report the update on
      * @param chargingMeterValue    - The value of the energy meter (charging) in mWh
      */
-    void UpdateEnergyCharged(int64_t chargingMeterValue);
+    void UpdateEnergyCharged(EndpointId endpointId, int64_t chargingMeterValue);
 
     /**
      * @brief This function updates the EnergyDischarged meter value
      *
+     * @param endpointId            - The endpoint to report the update on
      * @param dischargingMeterValue - The value of the energy meter (discharging) in mWh
      */
-    void UpdateEnergyDischarged(int64_t dischargingMeterValue);
+    void UpdateEnergyDischarged(EndpointId endpointId, int64_t dischargingMeterValue);
+
 
     /* Public members - represent attributes in the cluster */
     DataModel::Nullable<uint32_t> mSessionID;

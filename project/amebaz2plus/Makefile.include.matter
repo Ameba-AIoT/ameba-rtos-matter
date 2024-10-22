@@ -1,0 +1,105 @@
+# -------------------------------------------------------------------
+# Directory Definition
+# -------------------------------------------------------------------
+
+SDKROOTDIR         := $(shell pwd)/../../..
+CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
+MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
+MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2plus
+MATTER_EXAMPLEDIR   = $(MATTER_DIR)/example
+MATTER_MAKEDIR      = $(MATTER_BUILDDIR)/make
+MATTER_TOOLDIR      = $(MATTER_DIR)/tools
+MATTER_TOOLCHAINDIR = $(MATTER_DIR)/tools/toolchain
+
+# -------------------------------------------------------------------
+# Toolchain Definition
+# -------------------------------------------------------------------
+MATTER_INCLUDE_TOOLCHAIN = $(MATTER_BUILDDIR)/Makefile.include.toolchain
+
+include $(MATTER_INCLUDE_TOOLCHAIN)
+
+# -------------------------------------------------------------------
+# Version control
+# -------------------------------------------------------------------
+
+FREERTOS_VERSION   = freertos_v10.0.1
+LWIP_VERSION       = lwip_v2.1.3
+MBEDTLS_VERSION    = mbedtls-2.28.1
+
+# -------------------------------------------------------------------
+# CHIP options
+# -------------------------------------------------------------------
+
+# CPP standards and language
+CPPFLAGS += -std=gnu++17
+CPPFLAGS += -fno-rtti
+
+# Compile Warnings
+CFLAGS += -Wno-deprecated-declarations
+CFLAGS += -Wno-format
+CFLAGS += -Wno-format-nonliteral
+CFLAGS += -Wno-format-security
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-unused-function
+CFLAGS += -Wno-unused-but-set-variable
+CFLAGS += -Wno-unused-variable
+CFLAGS += -Wno-unused-label
+CFLAGS += -Wno-unused-parameter
+
+# Chip device options
+CFLAGS += -DCHIP_DEVICE_LAYER_TARGET=Ameba
+CFLAGS += -DCHIP_DEVICE_LAYER_NONE=0
+
+# Chip System options
+CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
+CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=0
+CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS=0
+CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_LWIP=1
+CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_SOCKETS=0
+CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=0
+CFLAGS += -DCHIP_SYSTEM_CONFIG_POSIX_LOCKING=0
+CFLAGS += -DCHIP_SHELL_MAX_TOKENS=11
+
+# Matter OTA Flags
+CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1
+
+# Chip BLE options
+CFLAGS += -DCHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1
+
+# Chip IPv4 
+CFLAGS += -DINET_CONFIG_ENABLE_IPV4=0
+
+# LwIP options
+CFLAGS += -DFD_SETSIZE=10
+CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
+
+# Mbedtls options
+CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
+
+# other options
+CFLAGS += -DCHIP_HAVE_CONFIG_H
+
+# -------------------------------------------------------------------
+# Ameba plaftorm matter options
+# -------------------------------------------------------------------
+CFLAGS += -DCONFIG_MATTER=1
+
+# Ameba platform blemgr adapter
+CFLAGS += -DCONFIG_BT=1
+CFLAGS += -DCONFIG_MATTER_BLEMGR_ADAPTER=1
+
+# Ameba platform factory data options
+CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
+CFLAGS += -DCONFIG_ENABLE_FACTORY_DATA_ENCRYPTION=0
+
+# Ameba platform additional secure feature
+CFLAGS += -DCONFIG_ENABLE_AMEBA_CRYPTO=0
+
+# Ameba platform TestEvent Trigger EnableKey
+CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
+
+# Ameba platform dct options
+CFLAGS += -DCONFIG_ENABLE_DCT_ENCRYPTION=0
+
+# Ameba platform PRNG options
+CFLAGS += -DCONFIG_ENABLE_MATTER_PRNG=0

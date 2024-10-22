@@ -159,6 +159,7 @@ CPPSRC += $(MATTER_DRIVER)/electrical_energy_measurement/ameba_electrical_energy
 CPPSRC += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement.cpp
 CPPSRC += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement_stubs.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_charging_targets_mem_manager.cpp
+CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_fake_readings.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_delegate_impl.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manager.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manufacturer_impl.cpp

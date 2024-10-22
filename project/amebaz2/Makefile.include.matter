@@ -74,7 +74,7 @@ CFLAGS += -DFD_SETSIZE=10
 CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
 
 # Mbedtls options
-CFLAGS += -DMBEDTLS_CONFIG_FILE=\"mbedtls_config.h\"
+CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
 
 # other options
 CFLAGS += -DCHIP_HAVE_CONFIG_H

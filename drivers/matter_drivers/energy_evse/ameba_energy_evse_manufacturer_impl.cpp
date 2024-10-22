@@ -22,6 +22,7 @@
 #include <energy_evse/ameba_energy_evse_manufacturer_impl.h>
 #include <energy_evse/ameba_energy_evse_delegate_impl.h>
 #include <energy_evse/ameba_energy_evse_manager.h>
+#include <energy_evse/ameba_fake_readings.h>
 
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
@@ -68,6 +69,11 @@ CHIP_ERROR EVSEManufacturer::Init()
 
     /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
     dem->SetESAState(ESAStateEnum::kOnline);
+    dem->SetESAType(ESATypeEnum::kEvse);
+
+    // Set the abs min and max power
+    dem->SetAbsMinPower(1200000); // 1.2KW
+    dem->SetAbsMaxPower(7600000); // 7.6KW
 
     /*
      * This is an example implementation for manufacturers to consider
@@ -546,6 +552,13 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
     return CHIP_NO_ERROR;
 }
 
+void EVSEManufacturer::UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent)
+{
+    FakeReadings::GetInstance().SetCurrent(maximumChargeCurrent);
+    // Note we have to divide by 1000 to make ma * mv = mW
+    FakeReadings::GetInstance().SetPower((FakeReadings::GetInstance().GetVoltage() * maximumChargeCurrent) / 1000);
+}
+
 /**
  * @brief    Main Callback handler - to be implemented by Manufacturer
  *
@@ -568,6 +581,7 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
         ChipLogProgress(AppServer, "EVSE callback - maxChargeCurrent changed to %ld",
                         static_cast<long>(cb->ChargingCurrent.maximumChargeCurrent));
         pClass->ComputeChargingSchedule();
+        pClass->UpdateEVFakeReadings(cb->ChargingCurrent.maximumChargeCurrent);
         break;
     case EVSECallbackType::EnergyMeterReadingRequested:
         ChipLogProgress(AppServer, "EVSE callback - EnergyMeterReadingRequested");

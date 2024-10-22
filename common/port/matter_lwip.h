@@ -73,8 +73,15 @@ uint8_t *matter_LwIP_GetIPv6_linklocal(uint8_t idx);
  * @return  Pointer to the IPv6 Global address.
  */
 uint8_t *matter_LwIP_GetIPv6_global(uint8_t idx);
+
+/**
+ * @brief Waits for a valid IPv6 address to be assigned.
+ */
+void matter_check_valid_ipv6(void);
+
 #endif // LWIP_IPV6
 #endif // LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
+
 
 #ifdef __cplusplus
 }

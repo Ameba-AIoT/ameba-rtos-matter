@@ -29,6 +29,11 @@ extern "C" {
 #define LWIP_IPV6                       1
 
 #if LWIP_IPV6
+#if defined(CONFIG_PLATFORM_8710C)
+#undef LWIP_IPV6_DHCP6
+#define LWIP_IPV6_DHCP6             1
+#endif /* defined(CONFIG_PLATFORM_8710C) */
+
 #undef LWIP_IPV6_ND
 #define LWIP_IPV6_ND                1
 
@@ -43,9 +48,6 @@ extern "C" {
 
 #undef LWIP_ICMP6
 #define LWIP_ICMP6                  1
-
-#undef LWIP_IPV6_DHCP6
-#define LWIP_IPV6_DHCP6             1
 
 #undef MEMP_NUM_MLD6_GROUP
 #define MEMP_NUM_MLD6_GROUP         6
