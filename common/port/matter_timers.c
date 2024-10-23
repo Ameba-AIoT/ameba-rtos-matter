@@ -249,8 +249,6 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 {
     unsigned int update_tick = 0, retry = 0;
     time_t update_sec = 0, update_usec = 0;
-    char* secKey  = "last-known-sntp-sec";
-    char* uSecKey = "last-known-sntp-usec";
 
     sntp_get_lasttime(&update_sec, &update_usec, &update_tick);
 
@@ -264,16 +262,13 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
         update_usec += (tick_diff_ms * 1000);
         *current_sec = update_sec + update_usec / 1000000;
         *current_usec = update_usec % 1000000;
-        setPref_new(NULL,  secKey,  current_sec, sizeof(time_t));
-        setPref_new(NULL, uSecKey, current_usec, sizeof(time_t));
 
         matter_rtc_write(*current_sec);
         matter_sntp_rtc_sync = TRUE;
     }
     else //if the sntp is not reachable yet, use the last known epoch time if available
     {
-        getPref_u64_new(NULL,  secKey,  current_sec);
-        getPref_u64_new(NULL, uSecKey, current_usec);
+        *current_sec = matter_rtc_read();
     }
 }
 
