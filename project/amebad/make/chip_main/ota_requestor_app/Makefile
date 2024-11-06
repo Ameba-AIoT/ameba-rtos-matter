@@ -87,6 +87,7 @@ IFLAGS += -I$(CHIPDIR)/zzz_generated
 IFLAGS += -I$(CHIPDIR)/zzz_generated/app-common
 IFLAGS += -I$(CODEGEN_DIR)
 IFLAGS += -I$(CODEGEN_DIR)/zap-generated
+IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/ameba/main/include #to get AmebaObserver.h
 IFLAGS += -I$(CHIPDIR)/examples/ota-requestor-app/ota-requestor-common
 IFLAGS += -I$(CHIPDIR)/examples/ota-requestor-app/ota-requestor-common/include
 IFLAGS += -I$(CHIPDIR)/examples/ota-requestor-app/ameba/main/include
