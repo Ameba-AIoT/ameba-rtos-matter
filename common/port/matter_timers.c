@@ -37,6 +37,7 @@ extern void vTaskDelay(const TickType_t xTicksToDelay);
 static gtimer_t matter_rtc_timer;
 static uint64_t current_us = 0;
 static volatile uint32_t rtc_counter = 0;
+static bool matter_sntp_rtc_sync = FALSE;
 
 BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 {
@@ -192,7 +193,7 @@ void matter_rtc_init(void)
     rtc_init();
 }
 
-long long matter_rtc_read(void)
+time_t matter_rtc_read(void)
 {
     if (rtc_isenabled() == 0)
     {
@@ -202,7 +203,7 @@ long long matter_rtc_read(void)
     return rtc_read();
 }
 
-void matter_rtc_write(long long time)
+void matter_rtc_write(time_t time)
 {
     if (rtc_isenabled() == 0)
     {
@@ -237,6 +238,46 @@ void matter_timer_init(void)
 #endif
     gtimer_start_periodical(&matter_rtc_timer, US_OVERFLOW_MAX, (void *)matter_timer_rtc_callback, (uint32_t) &matter_rtc_timer);
 }
+
+#if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
+bool matter_sntp_rtc_is_sync(void)
+{
+    return matter_sntp_rtc_sync;
+}
+
+void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
+{
+    unsigned int update_tick = 0, retry = 0;
+    time_t update_sec = 0, update_usec = 0;
+
+    sntp_get_lasttime(&update_sec, &update_usec, &update_tick);
+
+    if(update_tick) { //if sntp server is reachable, write to the dct and rtc
+        time_t tick_diff_sec, tick_diff_ms;
+        unsigned int current_tick = xTaskGetTickCount();
+
+        tick_diff_sec = (current_tick - update_tick) / configTICK_RATE_HZ;
+        tick_diff_ms = (current_tick - update_tick) % configTICK_RATE_HZ / portTICK_RATE_MS;
+        update_sec += tick_diff_sec;
+        update_usec += (tick_diff_ms * 1000);
+        *current_sec = update_sec + update_usec / 1000000;
+        *current_usec = update_usec % 1000000;
+
+        matter_rtc_write(*current_sec);
+        matter_sntp_rtc_sync = TRUE;
+    }
+    else //if the sntp is not reachable yet, use the last known epoch time if available
+    {
+        *current_sec = matter_rtc_read();
+    }
+}
+
+void matter_sntp_init(void)
+{
+    sntp_stop();
+    sntp_init();
+}
+#endif
 
 #ifdef __cplusplus
 }
