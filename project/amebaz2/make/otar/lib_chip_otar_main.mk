@@ -73,6 +73,7 @@ INCLUDES += -I$(CHIPDIR)/third_party/nlassert/repo/include
 INCLUDES += -I$(CHIPDIR)/third_party/nlio/repo/include
 INCLUDES += -I$(CHIPDIR)/third_party/nlunit-test/repo/src
 INCLUDES += -I$(CHIPDIR)/zzz_generated/app-common
+INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/ameba/main/include #to get AmebaObserver.h
 INCLUDES += -I$(CHIPDIR)/examples/ota-requestor-app/ameba/build/chip/gen/include
 INCLUDES += -I$(CHIPDIR)/examples/ota-requestor-app/ameba/main/include
 INCLUDES += -I$(CODEGENDIR)
