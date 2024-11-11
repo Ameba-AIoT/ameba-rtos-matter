@@ -48,6 +48,7 @@ INFO_DIR=$(TARGET)/Debug/info
 # Build Definition
 # -------------------------------------------------------------------
 
+CHIP_ENABLE_AMEBA_DLOG = $(shell grep "\#define CONFIG_ENABLE_AMEBA_DLOG " $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 
 # Include folder list
@@ -135,6 +136,12 @@ SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/fan/example
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/example/fan/matter_drivers.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_log_api.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/diagnostic_logs/ameba_diagnosticlogs_provider_delegate_impl.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/diagnostic_logs/ameba_logging_faultlog.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/diagnostic_logs/ameba_logging_insert_logs.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/diagnostic_logs/ameba_logging_redirect_handler.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/driver/diagnostic_logs/ameba_logging_redirect_wrapper.cpp
 
 #lib_version
 VER_C += $(TARGET)_version.c

@@ -3,6 +3,11 @@
 
 #include <matter_core.h>
 #include <matter_ota_initializer.h>
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG)
+#include <matter_fs.h>
+#include <diagnostic_logs/ameba_logging_faultlog.h>
+#include <diagnostic_logs/ameba_logging_redirect_handler.h>
+#endif
 #include <DeviceInfoProviderImpl.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -171,12 +176,23 @@ void matter_core_init_server(intptr_t context)
 CHIP_ERROR matter_core_init(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
+    err = ChipError(0, NULL, 0);
+    auto & instance = AmebaLogRedirectHandler::GetInstance();
+#endif
     err = Platform::MemoryInit();
     SuccessOrExit(err);
 
     // Initialize the CHIP stack.
     err = PlatformMgr().InitChipStack();
     SuccessOrExit(err);
+
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
+    if(instance.GetAmebaLogSubsystemInited())
+    {
+        instance.RegisterAmebaErrorFormatter(); // only register the custom error formatter if the log subsystem was inited.
+    }
+#endif
 
     err = mFactoryDataProvider.Init();
     if (err != CHIP_NO_ERROR)
@@ -212,6 +228,22 @@ exit:
 
 CHIP_ERROR matter_core_start(void)
 {
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
+    fault_handler_override(matter_fault_log, matter_bt_log);
+    int res = matter_fs_init();
+
+    /* init flash fs and read existing fault log into fs */
+    if(res == 0)
+    {
+        ChipLogProgress(DeviceLayer, "Matter FlashFS Initialized");
+        matter_read_last_fault_log();
+    }
+
+    // register log redirection
+    auto & instance = AmebaLogRedirectHandler::GetInstance();
+    instance.InitAmebaLogSubsystem();
+#endif
+
     wifi_set_autoreconnect(0); //Disable default autoreconnect
 #if defined(CONFIG_PLATFORM_8710C)
     matter_timer_init(); //currently 8721D cannot use this implementation
