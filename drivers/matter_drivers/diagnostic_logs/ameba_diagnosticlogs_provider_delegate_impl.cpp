@@ -178,7 +178,7 @@ CHIP_ERROR AmebaDiagnosticLogsProvider::CollectLog(LogSessionHandle sessionHandl
     int filesize = matter_fs_fsize(fp); // Get the filesize
     VerifyOrReturnError(filesize >= 0, CHIP_ERROR_INTERNAL);
 
-    int count = min<int>(filesize, outBuffer.size()); // Clamp the size we want to read
+    int count = std::min<int>(filesize, outBuffer.size()); // Clamp the size we want to read
     uint bytesRead = 0;
 
     ChipLogProgress(DeviceLayer, "Cur/max: %d / %d", matter_fs_ftell(fp), filesize);

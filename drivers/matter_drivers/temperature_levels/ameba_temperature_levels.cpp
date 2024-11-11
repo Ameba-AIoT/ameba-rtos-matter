@@ -19,7 +19,6 @@
 #include <app/util/config.h>
 #include <temperature_levels/ameba_temperature_levels.h>
 
-using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TemperatureControl;

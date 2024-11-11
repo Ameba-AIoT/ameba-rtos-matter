@@ -1,7 +1,6 @@
 #include <app/util/config.h>
 #include <mode_select/ameba_modes_manager.h>
 
-using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ModeSelect;

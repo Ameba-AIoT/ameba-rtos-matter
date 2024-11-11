@@ -23,8 +23,8 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-void WhmApplicationInit();
-void WhmApplicationShutdown();
+CHIP_ERROR WhmApplicationInit();
+CHIP_ERROR WhmApplicationShutdown();
 
 } // namespace WaterHeaterManagement
 } // namespace Clusters

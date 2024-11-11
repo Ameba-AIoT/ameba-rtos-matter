@@ -139,6 +139,7 @@ SRC_CPP += $(MATTER_DRIVER)/electrical_energy_measurement/ameba_electrical_energ
 SRC_CPP += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement.cpp
 SRC_CPP += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement_stubs.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_charging_targets_mem_manager.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_fake_readings.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_delegate_impl.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manager.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manufacturer_impl.cpp
