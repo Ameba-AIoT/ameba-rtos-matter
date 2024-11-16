@@ -27,12 +27,6 @@ endif
 #                              INCLUDE DIRECTORY                              #
 #*****************************************************************************#
 
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include/lwip
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include/netif
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek
-IFLAGS               += -I$(BASEDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek/freertos
-
 IFLAGS               += -I$(MATTER_DIR)/api
 IFLAGS               += -I$(MATTER_DIR)/core
 IFLAGS               += -I$(MATTER_DIR)/drivers/device
@@ -41,7 +35,12 @@ IFLAGS               += -I$(MATTER_DIR)/drivers/matter_drivers
 
 IFLAGS               += -I$(MATTER_DIR)/common/atcmd
 IFLAGS               += -I$(MATTER_DIR)/common/include
-IFLAGS               += -I$(MATTER_DIR)/common/lwip/include
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include/lwip
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include/netif
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/include
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/freertos
 IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
 ifeq ($(MBEDTLS_MATTER_ENABLE), y)
 IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/include

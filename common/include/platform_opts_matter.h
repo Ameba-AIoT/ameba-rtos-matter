@@ -25,6 +25,12 @@
 #define CONFIG_EXAMPLE_MATTER_TEMP_SENSOR       0
 #define CONFIG_EXAMPLE_MATTER_THERMOSTAT        0
 
+/** CONFIG_ENABLE_AMEBA_CRYPTO is declared and enabled in Makefile.include.matter
+ */
+#if defined(CONFIG_ENABLE_AMEBA_CRYPTO) && CONFIG_ENABLE_AMEBA_CRYPTO
+#define CONFIG_MATTER_SECURE                    1
+#endif
+
 // Ameba General Diagnostic Total Operational Hours Support
 #define CONFIG_ENABLE_AMEBA_OPHOURS             1
 
@@ -84,12 +90,6 @@
 #undef CONFIG_USE_AZURE_EMBEDDED_C
 #define CONFIG_USE_AZURE_EMBEDDED_C             0
 
-/** CONFIG_ENABLE_AMEBA_CRYPTO is declared and enabled in Makefile.include.matter
- */
-#if defined(CONFIG_ENABLE_AMEBA_CRYPTO) && CONFIG_ENABLE_AMEBA_CRYPTO
-#define CONFIG_MATTER_SECURE                    1
-#endif
-
 /* Matter layout */
 #undef FAST_RECONNECT_DATA
 #undef BT_FTL_PHY_ADDR0
@@ -144,45 +144,43 @@
  * CONFIG_ENABLE_AMEBA_SHORT_LOGGING==1: file name and line number will NOT be stored,
  * and reduce flash usage. On default this is disabled.
  */
+#define CONFIG_ENABLE_AMEBA_DLOG                0
 
-#if defined(CONFIG_PLATFORM_8710C)
-#define CONFIG_ENABLE_AMEBA_DLOG    1
-#endif
-
-#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
-#define CONFIG_ENABLE_AMEBA_LFS     1
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG==1)
+#define CONFIG_ENABLE_AMEBA_LFS                 1
+#define CONFIG_ENABLE_AMEBA_DLOG_TEST           1
 #else
-#define CONFIG_ENABLE_AMEBA_LFS     0
+#define CONFIG_ENABLE_AMEBA_LFS                 0
 #endif
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
-#define CONFIG_ENABLE_AMEBA_SHORT_LOGGING   0
+#define CONFIG_ENABLE_AMEBA_SHORT_LOGGING       0
 #if defined(CONFIG_ENABLE_AMEBA_SHORT_LOGGING) && (CONFIG_ENABLE_AMEBA_SHORT_LOGGING == 0)
-#define CONFIG_AMEBA_LOG_FILENAME_MAXSZ     32
+#define CONFIG_AMEBA_LOG_FILENAME_MAXSZ         32
 #endif /* CONFIG_ENABLE_AMEBA_SHORT_LOGGING */
 
-#define RETAIN_NLOGS_WHEN_FULL      40 // most recent N logs will be kept, the rest cleared
+#define RETAIN_NLOGS_WHEN_FULL                  40 // most recent N logs will be kept, the rest cleared
 
 #undef SECTOR_SIZE_FLASH
 #undef FAULT_FLASH_SECTOR_SIZE
-#define SECTOR_SIZE_FLASH           4096
-#define FAULT_FLASH_SECTOR_SIZE     (SECTOR_SIZE_FLASH)
-#define USER_LOG_FILENAME           "user.log"
-#define NET_LOG_FILENAME            "net.log"
-#define CRASH_LOG_FILENAME          "crash.log"
+#define SECTOR_SIZE_FLASH                       4096
+#define FAULT_FLASH_SECTOR_SIZE                 (SECTOR_SIZE_FLASH)
+#define USER_LOG_FILENAME                       "user.log"
+#define NET_LOG_FILENAME                        "net.log"
+#define CRASH_LOG_FILENAME                      "crash.log"
 #endif /* CONFIG_ENABLE_AMEBA_DLOG */
 
 #if defined(CONFIG_ENABLE_AMEBA_LFS) && (CONFIG_ENABLE_AMEBA_LFS == 1)
 #define CONFIG_USE_FLASHCFG 1
-#define LFS_DEVICE_SIZE             (0x20000)
-#define LFS_FLASH_BASE_ADDR         (MATTER_KVS_BEGIN_ADDR2 - LFS_DEVICE_SIZE)
-#define LFS_NUM_BLOCKS              (LFS_DEVICE_SIZE / SECTOR_SIZE_FLASH)
+#define LFS_DEVICE_SIZE                         (0x20000)
+#define LFS_FLASH_BASE_ADDR                     (MATTER_KVS_BEGIN_ADDR2 - LFS_DEVICE_SIZE)
+#define LFS_NUM_BLOCKS                          (LFS_DEVICE_SIZE / SECTOR_SIZE_FLASH)
 
 // redefine fault message redirection flash address
 #undef FAULT_LOG1
 #undef FAULT_LOG2
-#define FAULT_LOG1                  (LFS_FLASH_BASE_ADDR - 0x1000)
-#define FAULT_LOG2                  (LFS_FLASH_BASE_ADDR - 0x2000)
+#define FAULT_LOG1                              (LFS_FLASH_BASE_ADDR - 0x1000)
+#define FAULT_LOG2                              (LFS_FLASH_BASE_ADDR - 0x2000)
 #endif /* CONFIG_ENABLE_AMEBA_LFS */
 
 #endif /* __PLATFORM_OPTS_MATTER_H__ */

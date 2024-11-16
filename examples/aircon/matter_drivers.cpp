@@ -21,6 +21,8 @@ using chip::Protocols::InteractionModel::Status;
 #define DHT_DATA_PIN    PA_19
 #elif defined(CONFIG_PLATFORM_8721D)
 #define PWM_PIN         PB_5
+#define FAN_PIN         PB_4
+#define DHT_DATA_PIN    PA_12
 #endif
 
 MatterRoomAirCon aircon;

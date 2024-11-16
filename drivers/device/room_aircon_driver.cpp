@@ -25,9 +25,10 @@ void MatterRoomAirCon::FanControl::Init(PinName pin)
     mPwm_obj = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
 
     pwmout_init(mPwm_obj, pin);
+#if defined(CONFIG_PLATFORM_8710C)
     pwmout_period_us(mPwm_obj, 20000);
     pwmout_start(mPwm_obj);
-
+#endif
     mMode = 0;
     mPercent = 0;
 }
@@ -102,8 +103,10 @@ void MatterRoomAirCon::Thermostat::Init(PinName pin)
     mPwm_obj = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
 
     pwmout_init(mPwm_obj, pin);
+#if defined(CONFIG_PLATFORM_8710C)
     pwmout_period_us(mPwm_obj, 20000);
     pwmout_start(mPwm_obj);
+#endif
 }
 
 void MatterRoomAirCon::Thermostat::deInit(void)

@@ -11,6 +11,7 @@ RUN set -x \
     python3-venv \
     python3-dev \
     python3-pip \
+    wget \
     bzip2 \
     libgirepository1.0-dev \
     libcairo2-dev \

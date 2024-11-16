@@ -50,6 +50,7 @@ void fATchipapp2(void *arg)
 #endif
 }
 
+#if defined(CONFIG_PLATFORM_8710C)
 void fATmattershell(void *arg)
 {
     if (arg != NULL)
@@ -61,29 +62,162 @@ void fATmattershell(void *arg)
         printf("No arguments provided for matter shell\n");
     }
 }
+#elif defined(CONFIG_PLATFORM_8721D)
+void fATmattershell(u16 argc, u8 *argv[])
+{
+    if (argc > 0)
+    {
+        if ((strcmp((char *)argv[0], "switch") == 0) || (strcmp((char *)argv[0], "manual") == 0))
+        {
+            size_t total_length = 0;
+            for (uint16_t i = 0; i < argc; i++) {
+                total_length += strlen((char *)argv[i]) + 1;
+            }
+            char *concatenated = (char *)malloc(total_length);
+            if (concatenated == NULL) {
+                printf("Failed to allocate memory\r\n");
+                return;
+            }
+            concatenated[0] = '\0';
+            for (uint16_t i = 0; i < argc; i++) {
+                strcat(concatenated, (char *)argv[i]);
+                if (i < argc - 1) {
+                    strcat(concatenated, " ");
+                }
+            }
+
+            if (shell_queue != NULL)
+            {
+                xQueueSend(shell_queue, concatenated, pdMS_TO_TICKS(10));
+            }
+            free(concatenated);
+        }
+        else
+        {
+            printf("Enter ATMS switch/manual for more options\r\n");
+        }
+    }
+    else
+    {
+        printf("Enter ATMS switch/manual for more options\r\n");
+    }
+}
+#endif /* defined(CONFIG_PLATFORM_8710C) */
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
+extern int requires_bdx;
 void fATcrash(void *arg)
 {
     printf("!@#$ FORCE CRASHING CORE !@#$\n");
+    requires_bdx = 1;
     ((void (*)(void))2)();
+    return;
+}
+
+void fATcrashbdx(void *arg)
+{
+    printf("!@#$ FORCE CRASHING CORE !@#$\n");
+    requires_bdx = 0;
+    ((void (*)(void))2)();
+    return;
+}
+
+void fATuserlog(void *arg)
+{
+    if (!arg) {
+        printf("[$$$$]Usage: $$$$=[size]\n\r");
+        printf("      Set more than 1024 to trigger bdx transfer\n\r");
+        return;
+    }
+    size_t dataSize = (size_t)atoi((const char *)arg);
+    u8 *data = (u8 *)malloc(dataSize * sizeof(u8));
+    if (data == NULL)
+    {
+        return;
+    }
+    const char *logMessage = "Hello World";
+    strncpy((char *)data, logMessage, 11);
+    data[sizeof(data) - 1] = '\0';
+    matter_insert_user_log(data, dataSize);
+    if (data)
+    {
+        free(data);
+    }
+    return;
+}
+
+void fATnetworklog(void *arg)
+{
+    if (!arg) {
+        printf("[^^^^]Usage: ^^^^=[size]\n\r");
+        printf("      Set more than 1024 to trigger bdx transfer\n\r");
+        return;
+    }
+    size_t dataSize = (size_t)atoi((const char *)arg);
+    u8 *data = (u8 *)malloc(dataSize * sizeof(u8));
+    if (data == NULL)
+    {
+        return;
+    }
+    const char *logMessage = "No Error Found";
+    strncpy((char *)data, logMessage, 14);
+    data[sizeof(data) - 1] = '\0';
+    matter_insert_network_log(data, dataSize);
+    if (data)
+    {
+        free(data);
+    }
+    return;
 }
 #endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
 
 #if defined(CONFIG_PLATFORM_8710C)
+
+static u32 fATmatterhelp(void *arg);
+
 log_item_t at_matter_items[] = {
 #ifndef CONFIG_INIC_NO_FLASH
 #if ATCMD_VER == ATVER_1
-    {"ATM$", fATchipapp, {NULL,NULL}},
-    {"ATM%", fATchipapp1, {NULL,NULL}},
-    {"ATM^", fATchipapp2, {NULL,NULL}},
-    {"ATMS", fATmattershell, {NULL,NULL}},
+    {"ATM$", fATchipapp, {NULL, NULL}},
+    {"ATM%", fATchipapp1, {NULL, NULL}},
+    {"ATM^", fATchipapp2, {NULL, NULL}},
+    {"ATMH", fATmatterhelp, {NULL, NULL}},
+    {"ATMS", fATmattershell, {NULL, NULL}},
 #if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
-    {"@@@@", fATcrash},
+    {"ATMW", fATcrash, {NULL, NULL}},
+    {"ATMX", fATcrashbdx, {NULL, NULL}},
+    {"ATMY", fATuserlog, {NULL, NULL}},
+    {"ATMZ", fATnetworklog, {NULL, NULL}},
 #endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
 #endif // end of #if ATCMD_VER == ATVER_1
 #endif
 };
+
+const char *matter_help_str[] = {
+    "factory reset. (Usage: ATM$)",
+    "matter ota query image. (Usage: ATM%)",
+    "matter ota apply update. (Usage: ATM^)",
+    "matter help. (Usage: ATMH)",
+    "matter client console. (Usage: ATMS=switch / ATMS=manual)",
+#if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
+    "create a crash without bdx transfer. (Usage: ATMW)",
+    "create a crash with bdx transfer. (Usage: ATMX)",
+    "insert user logs into diagnostic logs, specify the size of the logs to write. (Usage: ATMY=size)",
+    "insert network logs into diagnostic logs, specify the size of the logs to write. (Usage: ATMZ=size)",
+#endif
+};
+
+static u32 fATmatterhelp(void *arg)
+{
+    int index;
+    printf("\r\nMatter AT Commands List\r\n\r\n");
+
+    for (index = 0; index < (sizeof(at_matter_items) / sizeof(at_matter_items[0])); index++)
+    {
+        printf("    %s : %s\n", at_matter_items[index].log_cmd, matter_help_str[index]);
+    }
+    printf("\r\n");
+}
 
 void at_matter_init(void)
 {
@@ -97,83 +231,36 @@ log_module_init(at_matter_init);
 
 #elif defined(CONFIG_PLATFORM_8721D)
 
+static u32 fATmatterhelp(u16 argc, u8 *argv[]);
 void matter_shell_init(void)
 {
     shell_queue = xQueueCreate(3, 256); // backlog 3 commands max
 }
 
-static u32 matter_commands(u16 argc, u8 *argv[])
+CMD_TABLE_DATA_SECTION
+const COMMAND_TABLE matter_atcmd[] = {
+    {(const u8 *)"ATM$", 0, fATchipapp,      (const u8 *)"ATM$ : factory reset. (Usage: ATM$)"},
+    {(const u8 *)"ATM%", 0, fATchipapp1,     (const u8 *)"ATM% : matter ota query image. (Usage: ATM%)"},
+    {(const u8 *)"ATM^", 0, fATchipapp2,     (const u8 *)"ATM^ : matter ota apply update. (Usage: ATM^)"},
+    {(const u8 *)"ATMH", 1, fATmatterhelp,   (const u8 *)"ATMH : matter help. (Usage: ATMH)"},
+    {(const u8 *)"ATMS", 11, fATmattershell, (const u8 *)"ATMS : matter client console. (Usage: ATMS switch / ATMS manual)"},
+};
+
+static u32 fATmatterhelp(u16 argc, u8 *argv[])
 {
-    if (argc > 0)
+    u32 index;
+    printf("\r\nMatter AT Commands List\r\n\r\n");
+    for(index = 0 ; index < (sizeof(matter_atcmd) / sizeof(COMMAND_TABLE)); index++)
     {
-        // Perform command-specific actions based on the argument
-        if (strcmp((char *)argv[0], "factoryreset") == 0)
+        if( matter_atcmd[index].msg )
         {
-            fATchipapp((void *) argv[0]);
-        }
-        else if (strcmp((char *)argv[0], "queryimage") == 0)
-        {
-            fATchipapp1((void *) argv[0]);
-        }
-        else if (strcmp((char *)argv[0], "applyupdate") == 0)
-        {
-            fATchipapp2((void *) argv[0]);
-        }
-        else if ((strcmp((char *)argv[0], "switch") == 0) || (strcmp((char *)argv[0], "manual") == 0))
-        {
-            size_t total_length = 0;
-            for (uint16_t i = 0; i < argc; i++) {
-                total_length += strlen((char *)argv[i]) + 1;
-            }
-
-            char *concatenated = (char *)malloc(total_length);
-            if (concatenated == NULL) {
-                perror("Failed to allocate memory");
-                return -1;
-            }
-
-            concatenated[0] = '\0';
-            for (uint16_t i = 0; i < argc; i++) {
-                strcat(concatenated, (char *)argv[i]);
-                if (i < argc - 1) {
-                    strcat(concatenated, " ");
-                }
-            }
-            fATmattershell(concatenated);
-            free(concatenated);
-        }
-        else
-        {
-            printf("Invalid command\n");
-            goto exit;
+            printf("    %s\n",matter_atcmd[index].msg);
         }
     }
-    else
-    {
-        goto exit;
-    }
-
-    return 0;
-
-exit:
-    {
-        printf("\r\nMatter AT Commands List:\n\t%s\n\t%s\n\t%s\n\t%s\r\n\r\n",
-                "ATmatter factoryreset : to factory reset the matter application",
-                "ATmatter queryimage   : query image for matter ota requestor app",
-                "ATmatter applyupdate  : apply update for matter ota requestor app",
-                "ATmatter switch       : to show other matter commands");
-    }
-
+    printf("\r\n");
     return 0;
 }
 
-CMD_TABLE_DATA_SECTION
-const COMMAND_TABLE matter_atcmd[] = {
-    {
-        (const u8 *)"ATmatter", 3, matter_commands, (const u8 *)"\tmatter atcmd:\n"
-        "\t\t matter atcmd\n"
-    }
-};
 #endif
 
 #endif /* CONFIG_MATTER */

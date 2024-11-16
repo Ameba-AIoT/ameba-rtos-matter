@@ -29,6 +29,8 @@
 #ifndef MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
 
+#include <mbedtls/version.h>
+
 #if defined(CONFIG_MATTER) && CONFIG_MATTER
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_DEPRECATE)
 #define _CRT_SECURE_NO_DEPRECATE 1
@@ -38,6 +40,7 @@
 #include <rom_ssl_ram_map.h>
 #define RTL_HW_CRYPTO
 #define SUPPORT_HW_SW_CRYPTO
+//#define SUPPORT_HW_SSL_HMAC_SHA256
 #endif
 
 /**

@@ -56,12 +56,16 @@ DISHWASHER_FILE		= $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cluster-fi
 DISHWASHER_ZAP		= $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.zap
 FAN_FILE			= $(MATTER_EXAMPLEDIR)/fan/build/chip/codegen/cluster-file.txt
 FAN_ZAP				= $(MATTER_EXAMPLEDIR)/fan/fan-app.zap
+GENERIC_SWITCH_FILE	= $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/cluster-file.txt
+GENERIC_SWITCH_ZAP	= $(MATTER_EXAMPLEDIR)/generic_switch/generic-switch-app.zap
 LAUNDRYWASHER_FILE	= $(MATTER_EXAMPLEDIR)/laundrywasher/build/chip/codegen/cluster-file.txt
 LAUNDRYWASHER_ZAP	= $(MATTER_EXAMPLEDIR)/laundrywasher/laundrywasher-app.zap
-REFRIGERATOR_FILE	= $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/cluster-file.txt
-REFRIGERATOR_ZAP	= $(MATTER_EXAMPLEDIR)/refrigerator/refrigerator-app.zap
 MICROWAVEOVEN_FILE  = $(MATTER_EXAMPLEDIR)/microwaveoven/build/chip/codegen/cluster-file.txt
 MICROWAVEOVEN_ZAP   = $(MATTER_EXAMPLEDIR)/microwaveoven/microwaveoven-app.zap
+REFRIGERATOR_FILE	= $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/cluster-file.txt
+REFRIGERATOR_ZAP	= $(MATTER_EXAMPLEDIR)/refrigerator/refrigerator-app.zap
+TEMP_SENSOR_FILE	= $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/cluster-file.txt
+TEMP_SENSOR_ZAP		= $(MATTER_EXAMPLEDIR)/temperature_sensor/temp-sensor-app.zap
 
 #*****************************************************************************#
 #                      RULES TO MAKE MATTER DIRS                              #
@@ -150,6 +154,14 @@ $(FAN_FILE): $(FAN_ZAP)
 	@python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $^ > $@
 	@python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $@ --chip_path $(CHIPDIR)
 
+$(GENERIC_SWITCH_FILE): $(GENERIC_SWITCH_ZAP)
+	@mkdir -p $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/zap-generated
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json -z $(CHIPDIR)/src/app/zap-templates/zcl/zcl.json --output-dir $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/zap-generated  $^
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/app-templates.json -z $(CHIPDIR)/src/app/zap-templates/zcl/zcl.json --output-dir $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen/zap-generated $^
+	@python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/generic_switch/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/generic_switch/generic-switch-app.matter
+	@python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $^ > $@
+	@python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $@ --chip_path $(CHIPDIR)
+
 $(LAUNDRYWASHER_FILE): $(LAUNDRYWASHER_ZAP)
 	@mkdir -p $(MATTER_EXAMPLEDIR)/laundrywasher/build/chip/codegen/zap-generated
 	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json -z $(CHIPDIR)/src/app/zap-templates/zcl/zcl.json --output-dir $(MATTER_EXAMPLEDIR)/laundrywasher/build/chip/codegen/zap-generated  $^
@@ -171,6 +183,14 @@ $(REFRIGERATOR_FILE): $(REFRIGERATOR_ZAP)
 	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json -z $(CHIPDIR)/src/app/zap-templates/zcl/zcl.json --output-dir $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/zap-generated  $^
 	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/app-templates.json -z $(CHIPDIR)/src/app/zap-templates/zcl/zcl.json --output-dir $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/zap-generated $^
 	@python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/refrigerator/refrigerator-app.matter
+	@python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $^ > $@
+	@python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $@ --chip_path $(CHIPDIR)
+
+$(TEMP_SENSOR_FILE): $(TEMP_SENSOR_ZAP)
+	@mkdir -p $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/zap-generated
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json -z $(CHIPDIR)/src/app/zap-templates/zcl/zcl.json --output-dir $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/zap-generated  $^
+	@python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/app-templates.json -z $(CHIPDIR)/src/app/zap-templates/zcl/zcl.json --output-dir $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen/zap-generated $^
+	@python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/temperature_sensor/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/temperature_sensor/temp-sensor-app.matter
 	@python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $^ > $@
 	@python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $@ --chip_path $(CHIPDIR)
 
@@ -225,6 +245,11 @@ fan_port: toolchain_matter  $(FAN_FILE)
 	$(MAKE) -f $(MATTER_MAKEDIR)/fan/lib_chip_fan_core.mk all
 	$(MAKE) -f $(MATTER_MAKEDIR)/fan/lib_chip_fan_main.mk all
 
+.PHONY: generic_switch
+generic_switch_port: toolchain_matter $(GENERIC_SWITCH_FILE)
+	$(MAKE) -f $(MATTER_MAKEDIR)/generic_switch/lib_chip_generic_switch_core.mk all
+	$(MAKE) -f $(MATTER_MAKEDIR)/generic_switch/lib_chip_generic_switch_main.mk all
+
 .PHONY: laundrywasher_port
 laundrywasher_port: toolchain_matter  $(LAUNDRYWASHER_FILE)
 	$(MAKE) -f $(MATTER_MAKEDIR)/laundrywasher/lib_chip_laundrywasher_core.mk all
@@ -247,8 +272,8 @@ light_port: toolchain_matter  $(LIGHTING_FILE)
 
 .PHONY: light_switch
 light_switch: toolchain_matter $(LIGHT_SWITCH_FILE)
-	$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_switch_core.mk all
-	$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_switch_main.mk all
+	$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_light_switch_core.mk all
+	$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_light_switch_main.mk all
 
 .PHONY: microwaveoven_port
 microwaveoven_port: toolchain_matter  $(MICROWAVEOVEN_FILE)
@@ -265,12 +290,18 @@ refrigerator_port: toolchain_matter  $(REFRIGERATOR_FILE)
 	$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_core.mk all
 	$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_main.mk all
 
+.PHONY: temp_sensor_port
+temp_sensor_port: toolchain_matter $(TEMP_SENSOR_FILE)
+	$(MAKE) -f $(MATTER_MAKEDIR)/temperature_sensor/lib_chip_temp_sensor_core.mk all
+	$(MAKE) -f $(MATTER_MAKEDIR)/temperature_sensor/lib_chip_temp_sensor_main.mk all
+
 .PHONY: thermostat_port
 thermostat_port: toolchain_matter $(THERMOSTAT_FILE)
 	$(MAKE) -f $(MATTER_MAKEDIR)/thermostat/lib_chip_thermostat_core.mk all
 	$(MAKE) -f $(MATTER_MAKEDIR)/thermostat/lib_chip_thermostat_main.mk all
 
 .PHONY: clean_matter_libs
+clean_matter_libs:
 clean_matter_libs:
 	@$(MAKE) -f $(MATTER_MAKEDIR)/all_clusters/lib_chip_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/aircon/lib_chip_aircon_main.mk clean
@@ -279,14 +310,16 @@ clean_matter_libs:
 	@$(MAKE) -f $(MATTER_MAKEDIR)/chef/lib_chip_chef_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/dishwasher/lib_chip_dishwasher_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/fan/lib_chip_fan_main.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/generic_switch/lib_chip_generic_switch_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/laundrywasher/lib_chip_laundrywasher_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light/lib_chip_light_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light_dm/lib_chip_light_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light_port/lib_chip_light_main.mk clean
-	@$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_switch_main.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_light_switch_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/microwaveoven/lib_chip_microwaveoven_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/otar/lib_chip_otar_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_main.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/temperature_sensor/lib_chip_temp_sensor_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/thermostat/lib_chip_thermostat_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/all_clusters/lib_chip.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/aircon/lib_chip_aircon_core.mk clean
@@ -295,13 +328,15 @@ clean_matter_libs:
 	@$(MAKE) -f $(MATTER_MAKEDIR)/chef/lib_chip_chef_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/dishwasher/lib_chip_dishwasher_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/fan/lib_chip_fan_core.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/generic_switch/lib_chip_generic_switch_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/laundrywasher/lib_chip_laundrywasher_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light/lib_chip_light_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light_dm/lib_chip_light_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/light_port/lib_chip_light_core.mk clean
-	@$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_switch_core.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/light_switch/lib_chip_light_switch_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/microwaveoven/lib_chip_microwaveoven_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/otar/lib_chip_otar_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/refrigerator/lib_chip_refrigerator_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKEDIR)/thermostat/lib_chip_thermostat_core.mk clean
+	@$(MAKE) -f $(MATTER_MAKEDIR)/temperature_sensor/lib_chip_temp_sensor_core.mk clean
 	rm -rf $(MATTER_BUILDDIR)/lib_main*

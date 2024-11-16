@@ -28,6 +28,7 @@
 
 #include "common.h"
 
+#include "device_lock.h"
 #if defined(MBEDTLS_SSL_TLS_C)
 
 #if defined(MBEDTLS_PLATFORM_C)
@@ -1371,6 +1372,15 @@ int mbedtls_ssl_decrypt_buf( mbedtls_ssl_context const *ssl,
             /* Calculate expected MAC. */
             MBEDTLS_SSL_DEBUG_BUF( 4, "MAC'd meta-data", add_data,
                                    add_data_len );
+
+#if defined(SUPPORT_HW_SSL_HMAC_SHA256)
+            int is_sha256 = 0;
+            if(transform->md_ctx_dec.md_info == mbedtls_md_info_from_type(MBEDTLS_MD_SHA256)) {
+                is_sha256 = 1;
+                device_mutex_lock(RT_DEV_LOCK_CRYPTO);
+            }
+#endif
+
             ret = mbedtls_md_hmac_update( &transform->md_ctx_dec, add_data,
                                           add_data_len );
             if( ret != 0 )
@@ -1382,7 +1392,17 @@ int mbedtls_ssl_decrypt_buf( mbedtls_ssl_context const *ssl,
             ret = mbedtls_md_hmac_finish( &transform->md_ctx_dec, mac_expect );
             if( ret != 0 )
                 goto hmac_failed_etm_enabled;
+#if defined(SUPPORT_HW_SSL_HMAC_SHA256)
+            if(is_sha256)
+                ((mbedtls_sha256_context *) transform->md_ctx_dec.md_ctx)->ssl_hmac = 1;
+#endif
             ret = mbedtls_md_hmac_reset( &transform->md_ctx_dec );
+#if defined(SUPPORT_HW_SSL_HMAC_SHA256)
+            if(is_sha256) {
+                is_sha256 = 0
+                device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
+            }
+#endif
             if( ret != 0 )
                 goto hmac_failed_etm_enabled;
 
@@ -1402,6 +1422,12 @@ int mbedtls_ssl_decrypt_buf( mbedtls_ssl_context const *ssl,
             auth_done++;
 
         hmac_failed_etm_enabled:
+#if defined(SUPPORT_HW_SSL_HMAC_SHA256)
+            if(is_sha256) {
+                is_sha256 = 0
+                device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
+            }
+#endif
             mbedtls_platform_zeroize( mac_expect, transform->maclen );
             if( ret != 0 )
             {
@@ -1898,6 +1924,20 @@ int mbedtls_ssl_fetch_input( mbedtls_ssl_context *ssl, size_t nb_want )
         return( MBEDTLS_ERR_SSL_BAD_INPUT_DATA );
     }
 
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1)
+#if defined(__ICCARM__)
+    mbedtls_ssl_recv_t __cmse_nonsecure_call *ns_f_recv =
+        cmse_nsfptr_create((mbedtls_ssl_recv_t __cmse_nonsecure_call *) ssl->f_recv);
+    mbedtls_ssl_recv_timeout_t __cmse_nonsecure_call *ns_f_recv_timeout =
+        cmse_nsfptr_create((mbedtls_ssl_recv_timeout_t __cmse_nonsecure_call *) ssl->f_recv_timeout);
+#else
+    mbedtls_ssl_recv_t __attribute__((cmse_nonsecure_call)) *ns_f_recv =
+        cmse_nsfptr_create((mbedtls_ssl_recv_t __attribute__((cmse_nonsecure_call)) *) ssl->f_recv);
+    mbedtls_ssl_recv_timeout_t __attribute__((cmse_nonsecure_call)) *ns_f_recv_timeout =
+        cmse_nsfptr_create((mbedtls_ssl_recv_timeout_t __attribute__((cmse_nonsecure_call)) *) ssl->f_recv_timeout);
+#endif
+#endif
+
 #if defined(MBEDTLS_SSL_PROTO_DTLS)
     if( ssl->conf->transport == MBEDTLS_SSL_TRANSPORT_DATAGRAM )
     {
@@ -1982,10 +2022,19 @@ int mbedtls_ssl_fetch_input( mbedtls_ssl_context *ssl, size_t nb_want )
             MBEDTLS_SSL_DEBUG_MSG( 3, ( "f_recv_timeout: %lu ms", (unsigned long) timeout ) );
 
             if( ssl->f_recv_timeout != NULL )
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1)
+                ret = ns_f_recv_timeout( ssl->p_bio, ssl->in_hdr, len,
+                                                                    timeout );
+#else
                 ret = ssl->f_recv_timeout( ssl->p_bio, ssl->in_hdr, len,
                                                                     timeout );
+#endif
             else
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1)
+                ret = ns_f_recv( ssl->p_bio, ssl->in_hdr, len );
+#else
                 ret = ssl->f_recv( ssl->p_bio, ssl->in_hdr, len );
+#endif
 
             MBEDTLS_SSL_DEBUG_RET( 2, "ssl->f_recv(_timeout)", ret );
 
@@ -2052,14 +2101,25 @@ int mbedtls_ssl_fetch_input( mbedtls_ssl_context *ssl, size_t nb_want )
             {
                 if( ssl->f_recv_timeout != NULL )
                 {
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1)
+                    ret = ns_f_recv_timeout( ssl->p_bio,
+                                               ssl->in_hdr + ssl->in_left, len,
+                                               ssl->conf->read_timeout );
+#else
                     ret = ssl->f_recv_timeout( ssl->p_bio,
                                                ssl->in_hdr + ssl->in_left, len,
                                                ssl->conf->read_timeout );
+#endif
                 }
                 else
                 {
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1)
+                    ret = ns_f_recv( ssl->p_bio,
+                                       ssl->in_hdr + ssl->in_left, len );
+#else
                     ret = ssl->f_recv( ssl->p_bio,
                                        ssl->in_hdr + ssl->in_left, len );
+#endif
                 }
             }
 
@@ -2122,7 +2182,16 @@ int mbedtls_ssl_flush_output( mbedtls_ssl_context *ssl )
                        mbedtls_ssl_out_hdr_len( ssl ) + ssl->out_msglen, ssl->out_left ) );
 
         buf = ssl->out_hdr - ssl->out_left;
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1)
+#if defined(__ICCARM__)
+        mbedtls_ssl_send_t __cmse_nonsecure_call *ns_f_send = cmse_nsfptr_create((mbedtls_ssl_send_t __cmse_nonsecure_call *) ssl->f_send);
+#else
+        mbedtls_ssl_send_t __attribute__((cmse_nonsecure_call)) *ns_f_send = cmse_nsfptr_create((mbedtls_ssl_send_t __attribute__((cmse_nonsecure_call)) *) ssl->f_send);
+#endif
+        ret = ns_f_send( ssl->p_bio, buf, ssl->out_left );
+#else
         ret = ssl->f_send( ssl->p_bio, buf, ssl->out_left );
+#endif
 
         MBEDTLS_SSL_DEBUG_RET( 2, "ssl->f_send", ret );
 
@@ -3452,7 +3521,16 @@ static int ssl_handle_possible_reconnect( mbedtls_ssl_context *ssl )
         /* Don't check write errors as we can't do anything here.
          * If the error is permanent we'll catch it later,
          * if it's not, then hopefully it'll work next time. */
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1)
+#if defined(__ICCARM__)
+        mbedtls_ssl_send_t __cmse_nonsecure_call *ns_f_send = cmse_nsfptr_create((mbedtls_ssl_send_t __cmse_nonsecure_call *) ssl->f_send);
+#else
+        mbedtls_ssl_send_t __attribute__((cmse_nonsecure_call)) *ns_f_send = cmse_nsfptr_create((mbedtls_ssl_send_t __attribute__((cmse_nonsecure_call)) *) ssl->f_send);
+#endif
+        send_ret = ns_f_send( ssl->p_bio, ssl->out_buf, len );
+#else
         send_ret = ssl->f_send( ssl->p_bio, ssl->out_buf, len );
+#endif
         MBEDTLS_SSL_DEBUG_RET( 2, "ssl->f_send", send_ret );
         (void) send_ret;
 
