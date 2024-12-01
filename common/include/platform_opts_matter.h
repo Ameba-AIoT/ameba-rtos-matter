@@ -41,6 +41,7 @@
 #define CONFIG_ENABLE_AMEBA_MDNS_FILTER         0
 
 #if defined(CONFIG_EXAMPLE_MATTER) && (CONFIG_EXAMPLE_MATTER == 1)
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #undef CONFIG_EXAMPLE_WLAN_FAST_CONNECT
 #undef CONFIG_FAST_DHCP
 #define CONFIG_EXAMPLE_WLAN_FAST_CONNECT        0
@@ -49,10 +50,19 @@
 #else
 #define CONFIG_FAST_DHCP                        0
 #endif /* CONFIG_EXAMPLE_WLAN_FAST_CONNECT */
+#elif defined(CONFIG_PLATFORM_8735B)
+#undef ENABLE_FAST_CONNECT
+#define ENABLE_FAST_CONNECT                     0
+#undef CONFIG_FAST_DHCP
+#if ENABLE_FAST_CONNECT
+#define CONFIG_FAST_DHCP                        1
+#else
+#define CONFIG_FAST_DHCP                        0
+#endif /* ENABLE_FAST_CONNECT */
+#endif /* defined(CONFIG_PLATFORM_8XXX) */
 #endif /* CONFIG_EXAMPLE_MATTER */
 
-#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
-
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D) || defined(CONFIG_PLATFORM_8735B)
 /* DCT size : module size is 4k, module number is 4, the total module number is 4 + 0*4 = 4, the size is 4*4 = 16k,
  *            if backup enabled, the total module number is 4 + 1*4 = 8, the size is 4*8 = 32k;
  *            if wear leveling enabled, the total module number is 4 + 2*4 + 3*4 = 24, the size is 96k
@@ -77,12 +87,6 @@
 #define MATTER_KVS_VARIABLE_NAME_SIZE2          32                      // max size of the variable name
 #define MATTER_KVS_VARIABLE_VALUE_SIZE2         400+4                   // max size of the variable value, +4 so it can store 400 bytes variable
                                                                         // max value number in moudle = floor(4024 / (32 + 400 + 4)) = 9
-
-/*****************************************************************
- * Matter Factory Data: last 4KB of external flash
- ****************************************************************/
-#define MATTER_FACTORY_DATA                     (0x3FF000)
-
 #endif
 
 #if defined(CONFIG_PLATFORM_8710C)
@@ -107,6 +111,7 @@
 #define UART_SETTING_SECTOR                     (0x400000 - 0x5000)     // 0x3FB000
 #define MATTER_KVS_BEGIN_ADDR                   (0x400000 - 0x13000)    // 0x3ED000 ~ 0x3FB000 : 56K
 #define MATTER_KVS_BEGIN_ADDR2                  (0x400000 - 0x1E000)    // 0x3E6000 ~ 0x3ED000 : 24K
+#define MATTER_FACTORY_DATA                     (0x3FF000)
 
 #elif defined(CONFIG_PLATFORM_8721D)
 
@@ -135,6 +140,14 @@
 #define FAST_RECONNECT_DATA                     0x001CB000              // 1K
 #define MATTER_KVS_BEGIN_ADDR                   0x001CC000              // 96K (4*24), DCT begin address of flash, ex: 0x100000 = 1M
 #define MATTER_KVS_BEGIN_ADDR2                  0x003B6000              // 20K (4*5)
+#define MATTER_FACTORY_DATA                     0x3FF000
+
+#elif defined(CONFIG_PLATFORM_8735B)
+
+// move to top of file
+#define MATTER_KVS_BEGIN_ADDR                   (USER_DATA_BASE + 0x65000) //Store Matter DCT data(max size: 64K, 0xF65000~0xF75000), 56K/64K
+#define MATTER_KVS_BEGIN_ADDR2                  (USER_DATA_BASE + 0x75000) //Store Matter DCT data(max size: 32K, 0xF75000~0xF7D000), 24K/32K
+#define MATTER_FACTORY_DATA                     (USER_DATA_BASE + 0x7D000) //last 4KB of external flash - TODO : write protection is supported in this region
 
 #endif /* CONFIG_PLATFORM_87XXX */
 

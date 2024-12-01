@@ -11,6 +11,10 @@
 #include <platform_stdlib.h>
 #include <pwmout_api.h>
 
+#if defined(CONFIG_PLATFORM_8735B)
+#undef ECDSA
+#endif
+
 class MatterLED
 {
 public:

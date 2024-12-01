@@ -17,10 +17,6 @@
 
 #include <platform_opts_bt.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stddef.h>
 #include <stdarg.h>
 #include <cmsis_compiler.h>
@@ -35,6 +31,14 @@ extern "C" {
 #include <matter_timers.h>
 #include <matter_utils.h>
 #include <matter_wifis.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(CHIP_PROJECT) && defined(CONFIG_PLATFORM_8735B)
+#undef bind
+#endif
 
 #if defined(CONFIG_BT_MESH_DEVICE_MATTER) && CONFIG_BT_MESH_DEVICE_MATTER
 /** @brief  Config local address type: 0-pulic address, 1-static random address */

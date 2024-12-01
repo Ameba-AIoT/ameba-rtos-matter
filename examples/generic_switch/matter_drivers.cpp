@@ -21,6 +21,9 @@ using chip::Protocols::InteractionModel::Status;
 #define GPIO_IRQ_PIN         PA_19
 #elif defined(CONFIG_PLATFORM_8721D)
 #define GPIO_IRQ_PIN         PB_5
+#elif defined(CONFIG_PLATFORM_8735B)
+#undef ECDSA
+#define GPIO_IRQ_PIN         PE_0
 #endif
 
 MatterSwitch swtch;

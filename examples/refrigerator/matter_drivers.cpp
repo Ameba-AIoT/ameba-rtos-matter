@@ -28,6 +28,10 @@ using chip::Protocols::InteractionModel::Status;
 #elif defined(CONFIG_PLATFORM_8721D)
 #define GPIO_IRQ_LEVEL_PIN    PA_28
 #define GPIO_LED_PIN          PB_4
+#elif defined(CONFIG_PLATFORM_8735B)
+#undef ECDSA
+#define GPIO_LED_PIN          PE_0
+#define GPIO_IRQ_LEVEL_PIN    PA_3
 #endif
 
 MatterRefrigerator refrigerator;

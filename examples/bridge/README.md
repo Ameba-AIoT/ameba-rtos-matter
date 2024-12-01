@@ -106,39 +106,9 @@ Enable `CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_BRIDGE` in `platform_o
 Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
 
 ### Setup the Build Environment
-  
+
     cd connectedhomeip
     source scripts/activate.sh
-  
-<details>
-  <summary>Building with AmebaZ2</summary>
-
-### AmebaZ2 (RTL8710C)
-
-#### Build Matter Libraries
-
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
-    make bridge_port
-
-#### Build the Final Firmware
-
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
-    make is_matter
-
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambz2_matter/blob/main/tools/AmebaZ2/Image_Tool_Linux/README.md) to flash the image with the Linux Image Tool
-
-#### Clean Matter Libraries
-
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
-    make clean_matter_libs
-
-#### Clean Ameba Matter application
-
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
-    make clean_matter
-
-</details>
 
 <details>
   <summary>Building with AmebaD</summary>
@@ -147,22 +117,19 @@ Refer to this [guide](https://github.com/ambiot/ambz2_matter/blob/main/tools/Ame
 
 #### Build Matter Libraries
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make -C asdk bridge_port
-    
+
 #### Build the Final Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
     make all
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make all
-    
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambd_matter/blob/main/tools/AmebaD/Image_Tool_Linux/README.txt) to flash the image with the Linux Image Tool
 
 #### Clean Matter Libraries and Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make clean
 
 </details>

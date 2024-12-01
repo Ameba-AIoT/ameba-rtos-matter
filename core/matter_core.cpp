@@ -1,6 +1,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#if defined(CONFIG_PLATFORM_8735B)
+#include <mbedtls_memory.h>
+#include <mbedtls/platform.h>
+#endif
 #include <matter_core.h>
 #include <matter_events.h>
 #include <matter_interaction.h>
@@ -292,6 +296,10 @@ exit:
 
 CHIP_ERROR matter_core_start(void)
 {
+#if defined(CONFIG_PLATFORM_8735B)
+    mbedtls_platform_set_calloc_free(app_mbedtls_calloc_func, vPortFree);
+#endif
+
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
     fault_handler_override(matter_fault_log, matter_bt_log);
     int res = matter_fs_init();
@@ -308,8 +316,12 @@ CHIP_ERROR matter_core_start(void)
     instance.InitAmebaLogSubsystem();
 #endif
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     wifi_set_autoreconnect(0); //Disable default autoreconnect
     matter_timer_init();
+#elif defined(CONFIG_PLATFORM_8735B)
+    rtw_wx_set_autoreconnect(0,0,0);
+#endif
 
     return matter_core_init();
 }

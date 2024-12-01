@@ -1,5 +1,5 @@
 #include <platform_opts.h>
-#include <platform/platform_stdlib.h>
+#include <platform_stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +29,8 @@ extern int FreeRTOS_errno;
 #elif defined(CONFIG_PLATFORM_8721D)
 #define MATTER_SW_RTC_TIMER_ID     TIMER2
 int FreeRTOS_errno = 0;
+#elif defined(CONFIG_PLATFORM_8735B)
+extern int FreeRTOS_errno;
 #endif
 
 #define errno FreeRTOS_errno
@@ -41,6 +43,7 @@ static volatile uint64_t last_current_us = 0;
 static uint64_t last_global_us = 0;
 static bool matter_sntp_rtc_sync = FALSE;
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 {
     BOOL xReturn = FALSE;
@@ -57,6 +60,7 @@ BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 
     return xReturn;
 }
+#endif
 
 #if defined(CONFIG_PLATFORM_8721D)
 int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *const pxResult)
@@ -144,6 +148,7 @@ int _nanosleep(const struct timespec *rqtp, struct timespec *rmtp)
     return iStatus;
 }
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 void __clock_gettime(struct timespec *tp)
 {
     unsigned int update_tick = 0;
@@ -164,6 +169,7 @@ void __clock_gettime(struct timespec *tp)
     tp->tv_sec = current_sec;
     tp->tv_nsec = current_usec * 1000;
 }
+#endif
 
 time_t _time(time_t *tloc)
 {
@@ -245,6 +251,7 @@ uint64_t ameba_get_clock_time(void)
     return global_us;
 }
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 static void matter_timer_rtc_callback(void)
 {
     rtc_counter++;
@@ -261,6 +268,7 @@ void matter_timer_init(void)
 #endif
     gtimer_start_periodical(&matter_rtc_timer, US_OVERFLOW_MAX, (void *)matter_timer_rtc_callback, (uint32_t) &matter_rtc_timer);
 }
+#endif
 
 #if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
 bool matter_sntp_rtc_is_sync(void)

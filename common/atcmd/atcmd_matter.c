@@ -50,7 +50,7 @@ void fATchipapp2(void *arg)
 #endif
 }
 
-#if defined(CONFIG_PLATFORM_8710C)
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8735B)
 void fATmattershell(void *arg)
 {
     if (arg != NULL)
@@ -171,7 +171,7 @@ void fATnetworklog(void *arg)
 }
 #endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
 
-#if defined(CONFIG_PLATFORM_8710C)
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8735B)
 
 static u32 fATmatterhelp(void *arg);
 

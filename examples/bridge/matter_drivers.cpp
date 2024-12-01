@@ -29,6 +29,10 @@ using chip::Protocols::InteractionModel::Status;
 #elif defined(CONFIG_PLATFORM_8721D)
 #define PWM_PIN         PB_5
 #define GPIO_IRQ_PIN    PA_12
+#elif defined(CONFIG_PLATFORM_8735B)
+#undef ECDSA
+#define PWM_PIN         PE_0
+#define GPIO_IRQ_PIN    PA_3
 #endif
 
 MatterBridge ALight1;

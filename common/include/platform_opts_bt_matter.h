@@ -13,7 +13,6 @@
 #if CONFIG_BT
 
 #if defined(CONFIG_PLATFORM_8710C)
-
 /* Matter BLE Configuration */
 #define CONFIG_BLE_MATTER_ADAPTER                1  /* Matter BLE Peripheral Adapter must be enabled for Matter advertising */
 #define CONFIG_BLE_MATTER_MULTI_ADV_ON           0  /* Matter BLE + Customer BLE */
@@ -31,8 +30,11 @@
     (!CONFIG_BT_MESH_DEVICE_MATTER && CONFIG_BT_MESH_DEVICE_MULTIPLE_PROFILE)
     #error "Please enable both CONFIG_BT_MESH_DEVICE_MATTER & CONFIG_BT_MESH_DEVICE_MULTIPLE_PROFILE"
 #endif
-
 #endif /* CONFIG_PLATFORM_8710C */
+
+#if defined(CONFIG_PLATFORM_8735B)
+#define CONFIG_BT_MATTER_ADAPTER                    1
+#endif /* CONFIG_PLATFORM_8735B */
 
 #endif /* CONFIG_BT */
 

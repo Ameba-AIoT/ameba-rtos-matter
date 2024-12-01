@@ -11,7 +11,14 @@
 using namespace ::chip::app;
 using chip::Protocols::InteractionModel::Status;
 
-#define SENSOR_PIN PA_19
+#if defined(CONFIG_PLATFORM_8710C)
+#define SENSOR_PIN      PA_19
+#elif defined(CONFIG_PLATFORM_8721D)
+#define SENSOR_PIN      PB_5
+#elif defined(CONFIG_PLATFORM_8735B)
+#undef ECDSA
+#define SENSOR_PIN      PE_0
+#endif
 
 MatterTemperatureSensor tempSensor;
 

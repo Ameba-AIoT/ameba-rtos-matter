@@ -1,0 +1,231 @@
+include $(MATTER_INCLUDE)
+
+# Include folder list
+# -------------------------------------------------------------------
+
+INCLUDES =
+INCLUDES += -I$(SDKROOTDIR)/project/realtek_amebapro2_v0_example/inc
+
+INCLUDES += -I$(SDKROOTDIR)/component/at_cmd
+INCLUDES += -I$(SDKROOTDIR)/component/mbed/hal
+INCLUDES += -I$(SDKROOTDIR)/component/mbed/hal_ext
+INCLUDES += -I$(SDKROOTDIR)/component/mbed/targets/hal/rtl8735b
+INCLUDES += -I$(SDKROOTDIR)/component/mbed/api
+INCLUDES += -I$(SDKROOTDIR)/component/stdlib
+
+# freertos
+INCLUDES += -I$(SDKROOTDIR)/component/os/os_dep/include
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/include
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/portable/GCC/ARM_CM33/non_secure
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/portable/GCC/ARM_CM33/secure
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/freertos_posix/lib/include/FreeRTOS_POSIX
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/freertos_posix/lib/include
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/freertos_posix/lib/FreeRTOS-Plus-POSIX/include/portable/realtek/rtl8735b
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/freertos_posix/lib/FreeRTOS-Plus-POSIX/include
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/freertos_posix/lib/include/private
+
+# lwip
+INCLUDES += -I$(SDKROOTDIR)/component/lwip/api
+INCLUDES += -I$(SDKROOTDIR)/component/lwip/$(LWIP_VERSION)/src/include
+INCLUDES += -I$(SDKROOTDIR)/component/lwip/$(LWIP_VERSION)/src/include/lwip
+INCLUDES += -I$(SDKROOTDIR)/component/lwip/$(LWIP_VERSION)/port/realtek
+INCLUDES += -I$(SDKROOTDIR)/component/lwip/$(LWIP_VERSION)/port/realtek/freertos
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/common/lwip/$(LWIP_VERSION)/port/realtek/include
+
+# ssl
+INCLUDES += -I$(SDKROOTDIR)/component/ssl
+INCLUDES += -I$(SDKROOTDIR)/component/ssl/$(MBEDTLS_VERSION)/include
+INCLUDES += -I$(SDKROOTDIR)/component/ssl/$(MBEDTLS_VERSION)/include/mbedtls
+INCLUDES += -I$(SDKROOTDIR)/component/ssl/$(MBEDTLS_VERSION)/library
+INCLUDES += -I$(SDKROOTDIR)/component/ssl/ssl_ram_map/rom
+
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/cmsis/cmsis-core/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/cmsis/cmsis-dsp/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/cmsis/rtl8735b/lib/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/cmsis/rtl8735b/include
+
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/include
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/source/ram_ns/halmac
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/source/ram_ns/halmac/halmac_88xx
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/source/ram_ns/halmac/halmac_88xx/halmac_8822b
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/source/ram_ns/halmac/halmac_88xx/halmac_8735b
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/source/ram_ns/halmac/halmac_88xx/halmac_8821c
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/source/ram_ns/halmac/halmac_88xx/halmac_8195b
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/source/ram_ns/halmac/halmac_88xx_v1
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/source/ram_ns/halmac/halmac_88xx_v1/halmac_8814b
+
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/misc/utilities/include
+
+# soc - 8735b - app
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/app/stdio_port
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/app/xmodem/rom
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/app/shell
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/app/shell/rom_ns
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/app/rtl_printf/include
+
+INCLUDES += -I$(SDKROOTDIR)/component/sdio/sd_host/inc
+
+# file_system
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/dct
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/fatfs
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/fatfs/r0.14
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/ftl
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/ftl_common
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/fwfs
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/littlefs
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/littlefs/r2.41
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/system_data
+INCLUDES += -I$(SDKROOTDIR)/component/file_system/vfs
+
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/misc/platform
+
+# bluetooth
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/driver
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/driver/hci
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/driver/inc
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/driver/inc/hci
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/driver/platform/amebapro2/inc
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/os/osif
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/app
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/bluetooth/gap
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/bluetooth/profile
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/bluetooth/profile/client
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/bluetooth/profile/server
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/framework/bt
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/framework/remote
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/framework/sys
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/os
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/platform
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/inc/stack
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/src/ble/privacy
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/platform/amebapro2/inc
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/platform/amebapro2/lib
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/platform/amebapro2/src/vendor_cmd
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/platform/common/inc
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/ble_central
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/ble_matter_adapter
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/ble_peripheral
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/ble_scatternet
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/bt_beacon
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/bt_config
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/bt_airsync_config
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/bt_mesh/provisioner
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/bt_mesh/device
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/bt_mesh_multiple_profile/provisioner_multiple_profile
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/bt_mesh_multiple_profile/device_multiple_profile
+INCLUDES += -I$(SDKROOTDIR)/component/bluetooth/rtk_stack/example/bt_mesh_test
+
+# network
+INCLUDES += -I$(SDKROOTDIR)/component/network
+INCLUDES += -I$(SDKROOTDIR)/component/network/cJSON
+INCLUDES += -I$(SDKROOTDIR)/component/network/coap/include
+INCLUDES += -I$(SDKROOTDIR)/component/network/mqtt/MQTTClient
+INCLUDES += -I$(SDKROOTDIR)/component/network/mqtt/MQTTPacket
+INCLUDES += -I$(SDKROOTDIR)/component/network/tftp
+INCLUDES += -I$(SDKROOTDIR)/component/network/ftp
+
+# nn
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/nn
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/nn/model_itp
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/nn/nn_api
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/nn/nn_postprocess
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/nn/nn_preprocess
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/nn/run_facerecog
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/nn/run_itp
+
+INCLUDES += -I$(SDKROOTDIR)/component/application/qr_code_scanner/inc
+
+# audio
+INCLUDES += -I$(SDKROOTDIR)/component/audio/3rdparty/AEC
+INCLUDES += -I$(SDKROOTDIR)/component/audio/3rdparty/AEC/AEC
+INCLUDES += -I$(SDKROOTDIR)/component/audio/3rdparty/faac/libfaac
+INCLUDES += -I$(SDKROOTDIR)/component/audio/3rdparty/faac/include
+INCLUDES += -I$(SDKROOTDIR)/component/audio/3rdparty/haac
+INCLUDES += -I$(SDKROOTDIR)/component/audio/3rdparty/libopusenc-0.2.1/include
+INCLUDES += -I$(SDKROOTDIR)/component/audio/3rdparty/opus-1.3.1/include
+INCLUDES += -I$(SDKROOTDIR)/component/audio/3rdparty/speex/speex
+
+INCLUDES += -I$(SDKROOTDIR)/component/example/media_framework/inc
+
+# media
+INCLUDES += -I$(SDKROOTDIR)/component/media/framework
+INCLUDES += -I$(SDKROOTDIR)/component/media/mmfv2
+INCLUDES += -I$(SDKROOTDIR)/component/media/muxer
+INCLUDES += -I$(SDKROOTDIR)/component/media/rtp_codec
+INCLUDES += -I$(SDKROOTDIR)/component/media/samples
+INCLUDES += -I$(SDKROOTDIR)/component/media/3rdparty/fmp4/libmov/include
+INCLUDES += -I$(SDKROOTDIR)/component/media/3rdparty/fmp4/libflv/include
+
+# video
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/cmsis/voe/rom
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/video
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/video/osd
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/video/semihost
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/video/voe_bin
+
+INCLUDES += -I$(SDKROOTDIR)/component/video/driver/common
+INCLUDES += -I$(SDKROOTDIR)/component/video/driver/RTL8735B
+INCLUDES += -I$(SDKROOTDIR)/component/video/osd2
+INCLUDES += -I$(SDKROOTDIR)/component/video/eip
+INCLUDES += -I$(SDKROOTDIR)/component/video/md
+
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/misc/driver
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/misc/driver/xmodem
+
+# usb
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/device
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/device/class/ethernet/inc
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/device/class/ethernet/src
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/device/core/inc
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/device/class/vendor/inc
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/host/storage/inc
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/host/storage/inc/quirks
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/host/storage/inc/scatterlist
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/host/storage/inc/scsi
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/host/vendor_spec
+INCLUDES += -I$(SDKROOTDIR)/component/soc/8735b/fwlib/rtl8735b/lib/source/ram/usb_otg/inc
+
+INCLUDES += -I$(SDKROOTDIR)/component/usb
+INCLUDES += -I$(SDKROOTDIR)/component/usb/common_new
+INCLUDES += -I$(SDKROOTDIR)/component/usb/host_new
+INCLUDES += -I$(SDKROOTDIR)/component/usb/host_new/cdc_ecm
+INCLUDES += -I$(SDKROOTDIR)/component/usb/host_new/core
+INCLUDES += -I$(SDKROOTDIR)/component/usb/device_new/core
+INCLUDES += -I$(SDKROOTDIR)/component/usb/usb_class/device/class
+INCLUDES += -I$(SDKROOTDIR)/component/usb/usb_class/device
+INCLUDES += -I$(SDKROOTDIR)/component/usb/usb_class/host/uvc/inc
+
+# wifi
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/api
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/driver/include
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/driver/src/core/option
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/driver/src/osdep
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/driver/src/phl
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/driver/src/hal
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/driver/src/hal/halmac
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/driver/src/hci
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/driver/src/hal/phydm
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/driver/src/hal/phydm/rtl8735b
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/wifi_config
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/wifi_fast_connect
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/wpa_supplicant/src
+INCLUDES += -I$(SDKROOTDIR)/component/wifi/wpa_supplicant/wpa_supplicant
+
+# Ameba Matter Common Include folder list
+# -------------------------------------------------------------------
+
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/api
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/common/bluetooth
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/common/bluetooth/bt_matter_adapter
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/common/include
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/common/mbedtls
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/common/port
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/core
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/drivers/device
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/drivers/matter_consoles
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/drivers/matter_drivers
+INCLUDES += -I$(SDKROOTDIR)/component/application/matter/examples

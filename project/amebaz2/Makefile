@@ -245,7 +245,7 @@ fan_port: toolchain_matter $(FAN_FILE)
 	$(MAKE) -f $(MATTER_MAKEDIR)/fan/lib_chip_fan_core.mk all
 	$(MAKE) -f $(MATTER_MAKEDIR)/fan/lib_chip_fan_main.mk all
 
-.PHONY: generic_switch
+.PHONY: generic_switch_port
 generic_switch_port: toolchain_matter $(GENERIC_SWITCH_FILE)
 	$(MAKE) -f $(MATTER_MAKEDIR)/generic_switch/lib_chip_generic_switch_core.mk all
 	$(MAKE) -f $(MATTER_MAKEDIR)/generic_switch/lib_chip_generic_switch_main.mk all

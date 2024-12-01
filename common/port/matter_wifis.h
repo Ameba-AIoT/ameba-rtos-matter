@@ -26,20 +26,24 @@ extern "C" {
  *               Other Variables
  ******************************************************/
 extern u32 apNum;
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 extern uint32_t rtw_join_status;
+#endif
 extern rtw_mode_t wifi_mode;
 
 /******************************************************
  *               WiFi Security
  ******************************************************/
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #define RTW_SECURITY_WPA_WPA2_MIXED    RTW_SECURITY_WPA_WPA2_MIXED_PSK
+#endif
 
 /******************************************************
  *               WiFi Connection Status
  ******************************************************/
 #define JOIN_HANDSHAKE_DONE            (uint32_t)(1 << 7)
 
-#if defined(CONFIG_PLATFORM_8721D)
+#if defined(CONFIG_PLATFORM_8721D) || defined(CONFIG_PLATFORM_8735B)
 #define IW_ENCODE_ALG_NONE             0
 #define IW_ENCODE_ALG_WEP              1
 #define IW_ENCODE_ALG_TKIP             2

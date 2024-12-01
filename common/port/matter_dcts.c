@@ -1,5 +1,5 @@
 #include <platform_opts.h>
-#include <platform/platform_stdlib.h>
+#include <platform_stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {

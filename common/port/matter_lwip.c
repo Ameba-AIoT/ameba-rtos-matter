@@ -1,5 +1,5 @@
 #include <platform_opts.h>
-#include <platform/platform_stdlib.h>
+#include <platform_stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,17 +28,29 @@ void matter_lwip_releaseip(void)
 
 unsigned char *matter_LwIP_GetIP(uint8_t idx)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     return LwIP_GetIP(&xnetif[idx]);
+#elif defined(CONFIG_PLATFORM_8735B)
+    return LwIP_GetIP(0);
+#endif
 }
 
 unsigned char *matter_LwIP_GetGW(uint8_t idx)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     return LwIP_GetGW(&xnetif[idx]);
+#elif defined(CONFIG_PLATFORM_8735B)
+    return LwIP_GetGW(0);
+#endif
 }
 
 uint8_t *matter_LwIP_GetMASK(uint8_t idx)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     return LwIP_GetMASK(&xnetif[idx]);
+#elif defined(CONFIG_PLATFORM_8735B)
+    return LwIP_GetMASK(0);
+#endif
 }
 
 #if LWIP_IPV6

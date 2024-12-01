@@ -1,10 +1,10 @@
 #include <FreeRTOS.h>
 #include <task.h>
-#include <platform/platform_stdlib.h>
+#include <platform_stdlib.h>
 #include <platform_opts.h>
 #include <basic_types.h>
 #include <wifi_constants.h>
-#include <wifi/wifi_conf.h>
+#include <wifi_conf.h>
 
 #include <chip_porting.h>
 #include <matter_core.h>
@@ -40,7 +40,11 @@ EmberAfDeviceType gBridgedOnOffDeviceTypes[] = {
 
 static void example_matter_bridge_task(void *pvParameters)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     while (!(wifi_is_up(RTW_STA_INTERFACE) || wifi_is_up(RTW_AP_INTERFACE)))
+#elif defined(CONFIG_PLATFORM_8735B)
+    while( !wifi_is_running(WLAN0_IDX) )
+#endif
     {
         vTaskDelay(500);
     }

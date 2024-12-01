@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-#include <platform/platform_stdlib.h>
+#include <platform_stdlib.h>
 #include <platform_opts.h>
 
 /* Core Options */
@@ -29,36 +29,38 @@ extern "C" {
 #define LWIP_IPV6                       1
 
 #if LWIP_IPV6
-#if defined(CONFIG_PLATFORM_8710C)
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8735B)
 #undef LWIP_IPV6_DHCP6
-#define LWIP_IPV6_DHCP6             1
+#define LWIP_IPV6_DHCP6                 1
 #endif /* defined(CONFIG_PLATFORM_8710C) */
 
 #undef LWIP_IPV6_ND
-#define LWIP_IPV6_ND                1
+#define LWIP_IPV6_ND                    1
 
 #undef LWIP_IPV6_SCOPES
-#define LWIP_IPV6_SCOPES            0
+#define LWIP_IPV6_SCOPES                0
 
 #undef LWIP_IPV6_MLD
-#define LWIP_IPV6_MLD               1
+#define LWIP_IPV6_MLD                   1
 
 #undef LWIP_IPV6_AUTOCONFIG
-#define LWIP_IPV6_AUTOCONFIG        1
+#define LWIP_IPV6_AUTOCONFIG            1
 
 #undef LWIP_ICMP6
-#define LWIP_ICMP6                  1
+#define LWIP_ICMP6                      1
 
 #undef MEMP_NUM_MLD6_GROUP
-#define MEMP_NUM_MLD6_GROUP         6
+#define MEMP_NUM_MLD6_GROUP             6
 #endif /* LWIP_IPV6 */
 
 /* Memory Options */
 #undef LWIP_PBUF_FROM_CUSTOM_POOLS
 #define LWIP_PBUF_FROM_CUSTOM_POOLS     0
 
+#if !defined(CONFIG_PLATFORM_8735B)
 #undef PBUF_POOL_SIZE
 #define PBUF_POOL_SIZE                  40
+#endif
 
 #undef PBUF_POOL_BUFSIZE
 #define PBUF_POOL_BUFSIZE               1500

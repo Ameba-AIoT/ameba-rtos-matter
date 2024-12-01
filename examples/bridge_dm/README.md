@@ -19,39 +19,37 @@ Enable `CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_BRIDGE` in `platform_o
 Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
 
 ### Setup the Build Environment
-  
+
     cd connectedhomeip
     source scripts/activate.sh
 
 <details>
-  <summary>Building with AmebaZ2</summary>
+  <summary>Building with AmebaZ2/AmebaZ2Plus</summary>
 
-### AmebaZ2 (RTL8710C)
+### AmebaZ2/AmebaZ2Plus (RTL8710C)
 
 #### Build Matter Libraries
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+**Navigate to `realtek_amebaz2_v0_example` for AmebaZ2 or `realtek_amebaz2plus_v0_example` for AmebaZ2Plus**
+
+    cd ameba-rtos-z2/project/realtek_amebaX_v0_example/GCC-RELEASE/
     make bridge_dm
 
 #### Build the Final Firmware
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd ameba-rtos-z2/project/realtek_amebaX_v0_example/GCC-RELEASE/
     make is_matter
-
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambz2_matter/blob/main/tools/AmebaZ2/Image_Tool_Linux/README.md) to flash the image with the Linux Image Tool
 
 #### Clean Matter Libraries
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd ameba-rtos-z2/project/realtek_amebaX_v0_example/GCC-RELEASE/
     make clean_matter_libs
 
 #### Clean Ameba Matter application
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd ameba-rtos-z2/project/realtek_amebaX_v0_example/GCC-RELEASE/
     make clean_matter
 
-  </div>
 </details>
 
 <details>
@@ -65,29 +63,26 @@ To run this example without error, you need to enable PSRAM.
 In `rtl8721dhp_intfcfg.c`, set the below configurations
 
     PSRAMCFG_TypeDef psram_dev_config = {
-      .psram_dev_enable = TRUE,			//enable psram
-      .psram_dev_cal_enable = TRUE,			//enable psram calibration function
+      .psram_dev_enable = TRUE,         //enable psram
+      .psram_dev_cal_enable = TRUE,     //enable psram calibration function
       .psram_dev_retention = TRUE,
     }
 
 #### Build Matter Libraries
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make -C asdk bridge_dm
     
 #### Build the Final Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
     make all
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make all
-    
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambd_matter/blob/main/tools/AmebaD/Image_Tool_Linux/README.txt) to flash the image with the Linux Image Tool
 
 #### Clean Matter Libraries and Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make clean
 
 </details>

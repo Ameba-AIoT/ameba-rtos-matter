@@ -13,6 +13,8 @@ This general guide provides an overview of the Matter integration process and se
 
 - [AmebaD Building Guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/amebad_general_build.md) - Step-by-step instructions for building Matter on AmebaD.
 
+- [AmebaD Building Guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/amebapro2/v1.4/docs/amebapro2_general_build.md) - Step-by-step instructions for building Matter on AmebaD.
+
 **Notes**: For AmebaZ2plus, please refer to the AmebaZ2 Building Guide.
 
 ## Building Different Applications
@@ -41,6 +43,15 @@ make -C asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port
      generic_switch_port / laundrywasher_port / light / light_dm / light_port / light_switch /
      microwaveoven_port / refrigerator_port / temp_sensor_port / thermostat_port
 ```
+
+#### AmebaPro2 (RTL8732B) Commands:
+
+```
+make -C asdk all_clusters / air_purifier / aircon_port / dishwasher_port / fan_port /
+     generic_switch_port / laundrywasher_port / light / light_port / light_switch /
+     microwaveoven_port / refrigerator_port / temp_sensor_port / thermostat_port
+```
+
 ### Matter Application Types
 
 There are two different types of Matter applications:

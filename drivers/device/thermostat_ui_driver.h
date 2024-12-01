@@ -9,6 +9,7 @@
 #pragma once
 
 #include <platform_stdlib.h>
+#include <pwmout_api.h>
 
 class MatterThermostatUI
 {

@@ -34,9 +34,9 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
     source scripts/activate.sh
 
 <details>
-  <summary>Building with AmebaZ2</summary>
+  <summary>Building with AmebaZ2/AmebaZ2Plus</summary>
 
-### AmebaZ2 (RTL8710C)
+### AmebaZ2/AmebaZ2Plus (RTL8710C)
 
 #### GPIO Pin Configuration
 
@@ -46,25 +46,24 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
 
 #### Build Matter Libraries
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+**Navigate to `realtek_amebaz2_v0_example` for AmebaZ2 or `realtek_amebaz2plus_v0_example` for AmebaZ2Plus**
+
+    cd ameba-rtos-z2/project/realtek_amebaX_v0_example/GCC-RELEASE/
     make fan_port
 
 #### Build the Final Firmware
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd ameba-rtos-z2/project/realtek_amebaX_v0_example/GCC-RELEASE/
     make is_matter
-
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambz2_matter/blob/main/tools/AmebaZ2/Image_Tool_Linux/README.md) to flash the image with the Linux Image Tool
 
 #### Clean Matter Libraries
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd ameba-rtos-z2/project/realtek_amebaX_v0_example/GCC-RELEASE/
     make clean_matter_libs
 
 #### Clean Ameba Matter application
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd ameba-rtos-z2/project/realtek_amebaX_v0_example/GCC-RELEASE/
     make clean_matter
 
 </details>
@@ -82,22 +81,53 @@ Refer to this [guide](https://github.com/ambiot/ambz2_matter/blob/main/tools/Ame
 
 #### Build Matter Libraries
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make -C asdk fan_port
     
 #### Build the Final Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
     make all
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make all
-    
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambd_matter/blob/main/tools/AmebaD/Image_Tool_Linux/README.txt) to flash the image with the Linux Image Tool
 
 #### Clean Matter Libraries and Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make clean
+
+</details>
+
+<details>
+  <summary>Building with AmebaPro2</summary>
+
+### AmebaPro2 (RTL8732B)
+
+Please contact Realtek to obtain the sdk.
+
+#### GPIO Pin Configuration
+
+| Peripheral | Pin   |
+| ---------- | ----- |
+| Fan        | PE_0  |
+  
+#### Build Matter Libraries
+
+    cd sdk/project/realtek_amebapro2_v0_example/GCC-RELEASE
+    make fan_port
+
+#### Build the Final Firmware
+
+Please open a **NEW** terminal
+
+    cd sdk/project/realtek_amebapro2_v0_example/GCC-RELEASE
+    mkdir build_matter ; cd build_matter
+    cmake .. -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DEXAMPLE=matter
+    cmake --build . --target flash -j
+
+#### Clean Matter Libraries
+
+    cd sdk/project/realtek_amebapro2_v0_example/GCC-RELEASE
+    make clean_matter_libs
 
 </details>

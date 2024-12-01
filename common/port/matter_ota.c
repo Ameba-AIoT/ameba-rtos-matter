@@ -1,5 +1,5 @@
 #include <platform_opts.h>
-#include <platform/platform_stdlib.h>
+#include <platform_stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,6 +24,8 @@ static flash_t matter_ota_flash;
 #define MATTER_OTA_SIGNATURE_SIZE 8
 #define MATTER_OTA_HEADER_SIZE (32 + MATTER_OTA_SIGNATURE_SIZE)
 update_ota_target_hdr targetHeader;
+#elif defined(CONFIG_PLATFORM_8735B)
+#define MATTER_OTA_HEADER_SIZE 32
 #endif
 
 bool matter_ota_first_sector_written = false;

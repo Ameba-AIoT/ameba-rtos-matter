@@ -22,6 +22,9 @@ using chip::Protocols::InteractionModel::Status;
 #define PWM_PIN         PA_23
 #elif defined(CONFIG_PLATFORM_8721D)
 #define PWM_PIN         PB_5
+#elif defined(CONFIG_PLATFORM_8735B)
+#undef ECDSA
+#define PWM_PIN         PE_0
 #endif
 
 MatterWasher washer;
