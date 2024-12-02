@@ -52,6 +52,10 @@ Navigate to the `ameba-rtos-z2` directory:
 
     chmod u+x matter_setup.sh ; ./matter_setup.sh amebaz2
 
+    cd component/common/application/matter
+
+    git checkout release/v1.4
+
 ## Build CHIP library by GN and Final Firmware
 
 In this context, we will demostrate building of all-clusters-app.

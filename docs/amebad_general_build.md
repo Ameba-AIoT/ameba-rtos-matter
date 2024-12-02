@@ -52,6 +52,10 @@ Navigate to the `ameba-rtos-d` directory:
 
     chmod u+x matter_setup.sh ; ./matter_setup.sh amebad
 
+    cd component/common/application/matter
+
+    git checkout release/v1.4
+
 ## Build CHIP library by GN and Final Firmware
 
 In this context, we will demostrate building of all-clusters-app.
