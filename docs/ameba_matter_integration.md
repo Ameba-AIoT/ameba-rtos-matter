@@ -14,6 +14,8 @@ Navigate to `sdk/component/common/application/matter`:
 ```bash
     cd sdk
     git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/common/application/matter
+    cd component/common/application/matter
+    git checkout release/v1.4
 ```
 
 ### Method 2: Add Repository as a Submodule
@@ -24,6 +26,8 @@ Navigate to `sdk/component/common/application/matter`:
 ```bash
     cd sdk
     git submodule add https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/common/application/matter
+    cd component/common/application/matter
+    git checkout release/v1.4
 ```
 
 Ensure to checkout to the respective branch/tag.
