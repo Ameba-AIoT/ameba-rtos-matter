@@ -16,11 +16,6 @@ km4_toolchain:
 	$(MKDIR) -p $(HP_TOOLCHAINDIR)/linux
 	tar -jxvf $(MATTER_TOOLCHAINDIR)/asdk-10.3.1-linux-newlib-build-3682-x86_64.tar.bz2 -C $(HP_TOOLCHAINDIR)/linux/
 
-km0_toolchain:
-	if [ ! -f $(MATTER_TOOLCHAINDIR)/asdk-10.3.1-linux-newlib-build-3682-x86_64.tar.bz2 ] ; then cat $(MATTER_TOOLCHAINDIR)/asdk-10.3.1-linux-newlib-build-3682-x86_64.tar.bz2.part* > $(MATTER_TOOLCHAINDIR)/asdk-10.3.1-linux-newlib-build-3682-x86_64.tar.bz2; fi;\
-	$(MKDIR) -p $(LP_TOOLCHAINDIR)/linux
-	tar -jxvf $(MATTER_TOOLCHAINDIR)/asdk-10.3.1-linux-newlib-build-3682-x86_64.tar.bz2 -C $(LP_TOOLCHAINDIR)/linux/
-
 #*****************************************************************************#
 #                              GENERATE OBJECT FILES                          #
 #*****************************************************************************#

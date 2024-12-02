@@ -143,7 +143,7 @@ endif
 
 # refrigerator-app src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/refrigerator_driver.cpp
-CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/matter_drivers/matter_tcc_mode.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/matter_drivers/refrigerator_mode/ameba_tcc_mode.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/refrigerator/example_matter_refrigerator.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/refrigerator/matter_drivers.cpp
 

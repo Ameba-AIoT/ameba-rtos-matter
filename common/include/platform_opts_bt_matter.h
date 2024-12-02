@@ -16,8 +16,10 @@
 
 /* Matter BLE Configuration */
 #define CONFIG_BLE_MATTER_ADAPTER                1  /* Matter BLE Peripheral Adapter must be enabled for Matter advertising */
-#define CONFIG_BT_MESH_DEVICE_MATTER             0  /* Matter BLE Peripheral + Mesh */ 
 #define CONFIG_BLE_MATTER_MULTI_ADV_ON           0  /* Matter BLE + Customer BLE */
+
+#undef CONFIG_BT_MESH_DEVICE_MATTER
+#define CONFIG_BT_MESH_DEVICE_MATTER             0  /* Matter BLE Peripheral + Mesh */
 
 /* Matter Mesh Configuration */
 #if defined(CONFIG_BT_MESH_DEVICE_MATTER) && CONFIG_BT_MESH_DEVICE_MATTER

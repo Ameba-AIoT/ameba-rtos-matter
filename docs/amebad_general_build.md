@@ -17,16 +17,16 @@ Create and enter new directory
 
 To check out this repository:
 
-    git clone https://github.com/ambiot/ambd_matter.git
+    git clone https://github.com/Ameba-AIoT/ameba-rtos-d.git
 
 To check out Matter repository:
 
     git clone https://github.com/project-chip/connectedhomeip.git
     
-Make sure ambd_matter and connectedhomeip are on the same directory level
+Make sure ameba-rtos-d and connectedhomeip are on the same directory level
 
     dev/
-    ├── ambd_matter
+    ├── ameba-rtos-d
     └── connectedhomeip
 
 ## Set Matter Build Environment
@@ -46,11 +46,11 @@ Make sure ambd_matter and connectedhomeip are on the same directory level
 
 ## Set Ameba Build Environment
 
-Navigate to the `ambd_matter` directory:
+Navigate to the `ameba-rtos-d` directory:
 
-    cd ambd_matter
+    cd ameba-rtos-d
 
-    git submodule update --init --recursive
+    chmod u+x matter_setup.sh ; ./matter_setup.sh amebad
 
 ## Build CHIP library by GN and Final Firmware
 
@@ -60,11 +60,7 @@ In this context, we will demostrate building of all-clusters-app.
 
 Navigate to the `project_lp` directory:
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp/
-
-Enter menuconfig to enable Matter configurations. Select `Enable Matter` under `Matter Config` and save the configuration when done.
-
-    make menuconfig
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp/
 
 Build the `project_lp`:
 
@@ -74,10 +70,12 @@ Build the `project_lp`:
 
 Navigate to the `project_hp` directory:
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/
 
-Ensure `Enable Matter` is selected under `Matter Config`.
-If you want to support Matter BLE, under `CONFIG BT`, select `BT_Matter_Adapter` and save the configuration.
+Enable Matter configurations using `menuconfig`
+- Navigate to `CONFIG BT`, select `Enable BT` and select `BT_Matter_Adapter`.
+- In the `SSL Config` section under the `MBEDTLS version`, select `MBEDTLS_MATTER_DEFINED`.
+- In the `Matter Config` section, select `Enable Matter`.
 
     make menuconfig
 
@@ -89,7 +87,7 @@ Start building the Matter libraries with:
 
 Ensure the same menuconfig settings as described in `Make Matter Libraries` and continue building the `project_hp` images.
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/
+    cd ameba-rtos-d/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/
 
 Build `project_hp`:
 
@@ -101,12 +99,10 @@ Build `project_hp`:
 
 ## Flash Image
 
-The generated image is found in the ambz2_matter sdk `project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin/flash_is.bin`
-
 Method 1:
 
-- Find more detail in [application_note](https://github.com/ambiot/ambd_matter/blob/main/doc/AN0400%20Ameba-D%20Application%20Note.pdf)
+- Find more detail in AN0400 Chapter 8.
 
 Method 2 (using image tool and flashing script):
 
-- Follow the Image Tool [README](https://github.com/ambiot/ambd_matter/blob/main/tools/AmebaD/Image_Tool_Linux/README.txt)
+- Follow the Image Tool README in ameba-rtos-matter/tools/Image_Tool/AmebaX

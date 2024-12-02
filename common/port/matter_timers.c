@@ -19,6 +19,7 @@ extern "C" {
 #define MICROSECONDS_PER_SECOND    ( 1000000LL )                                   /**< Microseconds per second. */
 #define NANOSECONDS_PER_SECOND     ( 1000000000LL )                                /**< Nanoseconds per second. */
 #define NANOSECONDS_PER_TICK       ( NANOSECONDS_PER_SECOND / configTICK_RATE_HZ ) /**< Nanoseconds per FreeRTOS tick. */
+#define HOUR_PER_MILLISECOND       ( 3600 * 1000 )
 
 #define US_OVERFLOW_MAX            (0xFFFFFFFF)
 
@@ -35,11 +36,10 @@ int FreeRTOS_errno = 0;
 extern void vTaskDelay(const TickType_t xTicksToDelay);
 
 static gtimer_t matter_rtc_timer;
-static uint64_t current_us = 0;
 static volatile uint32_t rtc_counter = 0;
-static bool matter_sntp_rtc_sync = FALSE;
-static uint64_t last_current_us = 0;
+static volatile uint64_t last_current_us = 0;
 static uint64_t last_global_us = 0;
+static bool matter_sntp_rtc_sync = FALSE;
 
 BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 {
@@ -48,8 +48,8 @@ BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
     if (pxTimespec != NULL)
     {
         /* Verify 0 <= tv_nsec < 1000000000. */
-        if ((pxTimespec->tv_nsec >= 0 ) &&
-            (pxTimespec->tv_nsec < NANOSECONDS_PER_SECOND))
+        if ((pxTimespec->tv_nsec >= 0) &&
+                (pxTimespec->tv_nsec < NANOSECONDS_PER_SECOND))
         {
             xReturn = TRUE;
         }
@@ -59,7 +59,6 @@ BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 }
 
 #if defined(CONFIG_PLATFORM_8721D)
-bool UTILS_ValidateTimespec(const struct timespec *const pxTimespec);
 int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *const pxResult)
 {
     int iStatus = 0;
@@ -67,11 +66,11 @@ int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *c
     long lNanoseconds = 0;
 
     /* Check parameters. */
-    if ((pxTimespec == NULL ) || ( pxResult == NULL))
+    if ((pxTimespec == NULL) || (pxResult == NULL))
     {
         iStatus = EINVAL;
     }
-    else if ((iStatus == 0 ) && ( UTILS_ValidateTimespec( pxTimespec ) == FALSE))
+    else if ((iStatus == 0) && (UTILS_ValidateTimespec(pxTimespec) == FALSE))
     {
         iStatus = EINVAL;
     }
@@ -79,16 +78,16 @@ int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *c
     if (iStatus == 0)
     {
         /* Convert timespec.tv_sec to ticks. */
-        llTotalTicks = ( int64_t ) configTICK_RATE_HZ * ( pxTimespec->tv_sec );
+        llTotalTicks = (int64_t) configTICK_RATE_HZ * (pxTimespec->tv_sec);
 
         /* Convert timespec.tv_nsec to ticks. This value does not have to be checked
          * for overflow because a valid timespec has 0 <= tv_nsec < 1000000000 and
          * NANOSECONDS_PER_TICK > 1. */
-        lNanoseconds = pxTimespec->tv_nsec / ( long ) NANOSECONDS_PER_TICK +                  /* Whole nanoseconds. */
-                       ( long ) ( pxTimespec->tv_nsec % ( long ) NANOSECONDS_PER_TICK != 0 ); /* Add 1 to round up if needed. */
+        lNanoseconds = pxTimespec->tv_nsec / (long) NANOSECONDS_PER_TICK +                    /* Whole nanoseconds. */
+                       (long)(pxTimespec->tv_nsec % (long) NANOSECONDS_PER_TICK != 0);        /* Add 1 to round up if needed. */
 
         /* Add the nanoseconds to the total ticks. */
-        llTotalTicks += ( int64_t ) lNanoseconds;
+        llTotalTicks += (int64_t) lNanoseconds;
 
         /* Check for overflow */
         if (llTotalTicks < 0)
@@ -98,10 +97,10 @@ int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *c
         else
         {
             /* check if TickType_t is 32 bit or 64 bit */
-            uint32_t ulTickTypeSize = sizeof( TickType_t );
+            uint32_t ulTickTypeSize = sizeof(TickType_t);
 
             /* check for downcast overflow */
-            if (ulTickTypeSize == sizeof( uint32_t))
+            if (ulTickTypeSize == sizeof(uint32_t))
             {
                 if (llTotalTicks > UINT_MAX)
                 {
@@ -111,7 +110,7 @@ int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *c
         }
 
         /* Write result. */
-        *pxResult = ( TickType_t ) llTotalTicks;
+        *pxResult = (TickType_t) llTotalTicks;
     }
 
     return iStatus;
@@ -124,10 +123,10 @@ int _nanosleep(const struct timespec *rqtp, struct timespec *rmtp)
     TickType_t xSleepTime = 0;
 
     /* Silence warnings about unused parameters. */
-    ( void ) rmtp;
+    (void) rmtp;
 
     /* Check rqtp. */
-    if (UTILS_ValidateTimespec( rqtp ) == FALSE)
+    if (UTILS_ValidateTimespec(rqtp) == FALSE)
     {
         errno = EINVAL;
         iStatus = -1;
@@ -136,9 +135,9 @@ int _nanosleep(const struct timespec *rqtp, struct timespec *rmtp)
     if (iStatus == 0)
     {
         /* Convert rqtp to ticks and delay. */
-        if (UTILS_TimespecToTicks( rqtp, &xSleepTime ) == 0)
+        if (UTILS_TimespecToTicks(rqtp, &xSleepTime) == 0)
         {
-            vTaskDelay( xSleepTime );
+            vTaskDelay(xSleepTime);
         }
     }
 
@@ -163,7 +162,7 @@ void __clock_gettime(struct timespec *tp)
     current_usec = update_usec % 1000000;
 
     tp->tv_sec = current_sec;
-    tp->tv_nsec = current_usec*1000;
+    tp->tv_nsec = current_usec * 1000;
 }
 
 time_t _time(time_t *tloc)
@@ -217,9 +216,8 @@ void matter_rtc_write(time_t time)
 
 uint64_t ameba_get_clock_time(void)
 {
+    uint64_t global_us = 0, current_us = 0;
 #if defined(CONFIG_PLATFORM_8710C)
-    uint64_t current_us = 0;
-    uint64_t global_us = 0;
     // Read current timer value in microseconds
     current_us = gtimer_read_us(&matter_rtc_timer);
     // Check if the timer has wrapped around
@@ -236,17 +234,23 @@ uint64_t ameba_get_clock_time(void)
     }
 
     last_global_us = global_us;
-
-    return global_us;
 #elif defined(CONFIG_PLATFORM_8721D)
-    return ((xTaskGetTickCount()) * configTICK_RATE_HZ);
+    uint32_t current_tick = 0;
+    current_tick = gtimer_read_tick(&matter_rtc_timer);
+    current_us = (uint64_t) current_tick * 1000000 / 32768;
+    global_us = ((uint64_t)rtc_counter * US_OVERFLOW_MAX) + (current_us);
+#else
+    global_us = (((uint64_t)xTaskGetTickCount()) * configTICK_RATE_HZ);
 #endif
+    return global_us;
 }
 
 static void matter_timer_rtc_callback(void)
 {
     rtc_counter++;
+#if defined(CONFIG_PLATFORM_8710C)
     last_current_us = 0;
+#endif
 }
 
 void matter_timer_init(void)
@@ -271,7 +275,8 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
     sntp_get_lasttime(&update_sec, &update_usec, &update_tick);
 
-    if(update_tick) { //if sntp server is reachable, write to the dct and rtc
+    if (update_tick)  //if sntp server is reachable, write to the dct and rtc
+    {
         time_t tick_diff_sec, tick_diff_ms;
         unsigned int current_tick = xTaskGetTickCount();
 

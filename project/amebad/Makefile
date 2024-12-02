@@ -50,71 +50,71 @@ TEMP_SENSOR_ZAP          = $(MATTER_EXAMPLEDIR)/temperature_sensor/temp-sensor-a
 #*****************************************************************************#
 #                              MATTER MAKE DEFINES                            #
 #*****************************************************************************#
-all_clusters: build_target_folder copy_ld_img2 check_toolchain build_info.h $(ALL_CLUSTERS_FILE)
+all_clusters: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(ALL_CLUSTERS_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/all_clusters_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/all_clusters_app all
 
-aircon_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(AIRCON_PORT_FILE)
+aircon_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(AIRCON_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/aircon_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/aircon_app_port all
 
-air_purifier: build_target_folder copy_ld_img2 check_toolchain build_info.h $(AIR_PURIFIER_FILE)
+air_purifier: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(AIR_PURIFIER_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/air_purifier_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/air_purifier_app all
 
-bridge_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(BRIDGE_PORT_FILE)
+bridge_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(BRIDGE_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/bridge_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/bridge_app_port all
 
-bridge_dm: build_target_folder copy_ld_img2 check_toolchain build_info.h $(BRIDGE_DM_FILE) copy_gen_files_bridge_dm
+bridge_dm: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(BRIDGE_DM_FILE) copy_gen_files_bridge_dm
 	make -C $(MATTER_BUILDDIR)/make/chip/bridge_app_dm all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/bridge_app_port_dm all
 
-dishwasher_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(DISHWASHER_PORT_FILE)
+dishwasher_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(DISHWASHER_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/dishwasher_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/dishwasher_app_port all
 
-fan_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(FAN_PORT_FILE)
+fan_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(FAN_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/fan_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/fan_app_port all
 
-generic_switch_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(GENERIC_SWITCH_FILE)
+generic_switch_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(GENERIC_SWITCH_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/generic_switch_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/generic_switch_app_port all
 
-laundrywasher_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(LAUNDRYWASHER_PORT_FILE)
+laundrywasher_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LAUNDRYWASHER_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/laundrywasher_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/laundrywasher_app_port all
 
-light: build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHTING_FILE)
+light: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHTING_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/lighting_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/lighting_app all
 
-light_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHTING_FILE)
+light_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHTING_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/lighting_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/lighting_app_port all
 
-light_dm: build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHTING_FILE) copy_gen_files_light_dm 
+light_dm: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHTING_FILE) copy_gen_files_light_dm 
 	make -C $(MATTER_BUILDDIR)/make/chip/lighting_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/lighting_app_port_dm all
 
-light_switch: build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHT_SWITCH_FILE)
+light_switch: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHT_SWITCH_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/light_switch_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/light_switch_app all
 
-microwaveoven_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(MICROWAVEOVEN_PORT_FILE)
+microwaveoven_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(MICROWAVEOVEN_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/microwaveoven_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/microwaveoven_app_port all
 
-refrigerator_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(REFRIGERATOR_PORT_FILE)
+refrigerator_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(REFRIGERATOR_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/refrigerator_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/refrigerator_app_port all
 
-temp_sensor_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(TEMP_SENSOR_FILE)
+temp_sensor_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(TEMP_SENSOR_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/temperature_sensor_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/temperature_sensor_app_port all
 
-thermostat_port: build_target_folder copy_ld_img2 check_toolchain build_info.h $(THERMOSTAT_PORT_FILE)
+thermostat_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(THERMOSTAT_PORT_FILE)
 	make -C $(MATTER_BUILDDIR)/make/chip/thermostat_app all
 	make -C $(MATTER_BUILDDIR)/make/chip_main/thermostat_app_port all
 
@@ -263,3 +263,16 @@ copy_gen_files_light_dm:
 copy_gen_files_bridge_dm:
 	cp $(MATTER_EXAMPLEDIR)/bridge_dm/endpoint_config.h $(MATTER_EXAMPLEDIR)/bridge_dm/build/chip/codegen/zap-generated
 	cp $(MATTER_EXAMPLEDIR)/bridge_dm/gen_config.h $(MATTER_EXAMPLEDIR)/bridge_dm/build/chip/codegen/zap-generated
+
+#*****************************************************************************#
+#                              CREATE SYMBOLIC LINK                           #
+#*****************************************************************************#
+create_lwip_symlink:
+	@echo "Checking if symbolic link for lwip needs to be created..."
+	@if [ ! -d "$(MATTER_ROOTDIR)/component/common/network/lwip" ] || \
+	    [ ! -e "$(MATTER_ROOTDIR)/component/common/network/lwip/lwip_v2.1.2" ]; then \
+		echo "Creating symbolic link for lwip..."; \
+		ln -sf $(MATTER_DIR)/common/lwip/lwip_v2.1.2 $(MATTER_ROOTDIR)/component/common/network/lwip; \
+	else \
+		echo "Symbolic link already exists"; \
+	fi

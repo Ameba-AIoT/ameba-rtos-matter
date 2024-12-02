@@ -71,7 +71,8 @@ using namespace ::chip::DeviceLayer;
 // DeferredAttribute object describes a deferred attribute, but also holds a buffer with a value to
 // be written, so it must live so long as the DeferredAttributePersistenceProvider object.
 
-DeferredAttribute gDeferredAttributeArray[] = {
+DeferredAttribute gDeferredAttributeArray[] =
+{
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::LevelControl::Id, Clusters::LevelControl::Attributes::CurrentLevel::Id)),
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentHue::Id)),
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentSaturation::Id)),
@@ -148,7 +149,6 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
         ChipLogProgress(DeviceLayer, "Commissioning Complete");
         chip::DeviceLayer::Internal::AmebaUtils::SetCurrentProvisionedNetwork();
         break;
-
 #if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
     case DeviceEventType::kEvent_CommissioningSessionEstablishmentStarted:
         ChipLogProgress(DeviceLayer, "Commissioning Session has been established");
@@ -238,7 +238,7 @@ CHIP_ERROR matter_core_init(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
     err = ChipError(0, NULL, 0);
-    auto & instance = AmebaLogRedirectHandler::GetInstance();
+    auto &instance = AmebaLogRedirectHandler::GetInstance();
 #endif
     err = Platform::MemoryInit();
     SuccessOrExit(err);
@@ -248,7 +248,7 @@ CHIP_ERROR matter_core_init(void)
     SuccessOrExit(err);
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
-    if(instance.GetAmebaLogSubsystemInited())
+    if (instance.GetAmebaLogSubsystemInited())
     {
         instance.RegisterAmebaErrorFormatter(); // only register the custom error formatter if the log subsystem was inited.
     }
@@ -297,20 +297,19 @@ CHIP_ERROR matter_core_start(void)
     int res = matter_fs_init();
 
     /* init flash fs and read existing fault log into fs */
-    if(res == 0)
+    if (res == 0)
     {
         ChipLogProgress(DeviceLayer, "Matter FlashFS Initialized");
         matter_read_last_fault_log();
     }
 
     // register log redirection
-    auto & instance = AmebaLogRedirectHandler::GetInstance();
+    auto &instance = AmebaLogRedirectHandler::GetInstance();
     instance.InitAmebaLogSubsystem();
 #endif
 
     wifi_set_autoreconnect(0); //Disable default autoreconnect
-#if defined(CONFIG_PLATFORM_8710C)
-    matter_timer_init(); //currently 8721D cannot use this implementation
-#endif
+    matter_timer_init();
+
     return matter_core_init();
 }

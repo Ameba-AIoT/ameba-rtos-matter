@@ -1,5 +1,6 @@
 #include "cmsis.h"
 #include "platform_stdlib.h"
+#include "platform_opts_matter.h"
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE
 #else

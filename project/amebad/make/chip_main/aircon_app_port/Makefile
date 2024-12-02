@@ -142,7 +142,7 @@ CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_ota_initial
 endif
 
 # aircon-app source files
-CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/fan_driver.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/room_aircon_driver.cpp
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/temp_hum_sensor_driver.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/aircon/example_matter_aircon.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/aircon/matter_drivers.cpp

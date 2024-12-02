@@ -5,20 +5,6 @@
 Realtek’s Matter platform solution has both Wi-Fi and BLE working on a single SoC. Initial development of Realtek does not
 support Thread or Ethernet, and developers can decide whether to support BLE as Matter provides IP (Wi-Fi) commissioning.
 Theoretically speaking, the support of Wi-Fi is mandatory.
-The following diagram is a simplified model of Realtek’s Matter application.
-
-         +------------------------+
-         |       Matter App       |
-         +------------------------+
-         | Wi-Fi Interface        |
-         | BLE Interface          |
-         |                        |
-         | (IP Commissioning)     |
-         +------------------------+
-         | Realtek SoC            |
-         +------------------------+
-         | Hardware Components    |
-         +------------------------+
 
 ## Getting Started
 
@@ -34,4 +20,4 @@ Before starting with Matter integration, ensure you have fulfilled the prerequis
 
 ### Getting Repository and Building Matter for Supported ICs
 
-To begin building Matter for specific ICs, refer to the detailed instructions provided in the [Matter Building Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_building_guide.md). Each supported IC has its own building method documented there.
+To begin building Matter for specific ICs, refer to the detailed instructions provided in the [Matter Building Guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/matter_building_guide.md). Each supported IC has its own building method documented there.

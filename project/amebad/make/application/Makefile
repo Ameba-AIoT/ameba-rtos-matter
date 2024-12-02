@@ -6,15 +6,15 @@ include $(MAKE_INCLUDE_GEN)
 #                              VARIABLES                                      #
 #*****************************************************************************#
 DIR         = $(BASEDIR)/component/common/application/matter
-BTDIR       = $(BASEDIR)/component/common/application/matter/bluetooth
+BTDIR       = $(BASEDIR)/component/common/application/matter/common/bluetooth
 ATCMDDIR    = $(BASEDIR)/component/common/application/matter/common/atcmd
-MBEDDIR     = $(BASEDIR)/component/common/application/matter/mbedtls
-PORTDIR     = $(BASEDIR)/component/common/application/matter/port
-PROTOBUFDIR = $(BASEDIR)/component/common/application/matter/protobuf
-NANOPBDIR   = $(BASEDIR)/component/common/application/matter/protobuf/nanopb
+LWIPDIR     = $(BASEDIR)/component/common/application/matter/common/lwip
+MBEDDIR     = $(BASEDIR)/component/common/application/matter/common/mbedtls
+PORTDIR     = $(BASEDIR)/component/common/application/matter/common/port
+PROTOBUFDIR = $(BASEDIR)/component/common/application/matter/common/protobuf
+NANOPBDIR   = $(BASEDIR)/component/common/application/matter/common/protobuf/nanopb
 EXAMPLEDIR  = $(BASEDIR)/component/common/application/matter/example
 CHIPTESTDIR = $(BASEDIR)/component/common/application/matter/example/chiptest
-LWIPDIR     = $(BASEDIR)/component/common/application/matter/lwip
 
 vpath %.c $(DIR) $(shell find $(DIR) -type d) $(LWIPDIR) $(shell find $(LWIPDIR) -type d)
 
@@ -48,7 +48,7 @@ CSRC += $(PROTOBUFDIR)/ameba_factory.pb.c \
         $(NANOPBDIR)/pb_encode.c
 
 # Matter LwIP
-CSRC += $(LWIPDIR)/hooks/lwip_default_hooks.c
+CSRC += $(LWIPDIR)/lwip_v2.1.2/port/realtek/hooks/lwip_default_hooks.c
 
 # Matter Mbedtls
 CSRC += $(MBEDDIR)/net_sockets.c

@@ -7,11 +7,20 @@ INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/api
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth/bt_matter_adapter
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/src/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/src/include/lwip
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/port/realtek
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/port/realtek/include
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/port/realtek/freertos
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include/mbedtls
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/port
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/device
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/matter_consoles
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers
 
 # Include folder list
 # -------------------------------------------------------------------
@@ -33,6 +42,8 @@ INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/dct
 INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/fatfs
 INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/fatfs/r0.10c/include
 INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/ftl
+INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/littlefs
+INCLUDES += -I$(SDKROOTDIR)/component/common/file_system/littlefs/r2.9.1
 INCLUDES += -I$(SDKROOTDIR)/component/common/utilities
 INCLUDES += -I$(SDKROOTDIR)/component/common/mbed/hal
 INCLUDES += -I$(SDKROOTDIR)/component/common/mbed/hal_ext
@@ -41,10 +52,6 @@ INCLUDES += -I$(SDKROOTDIR)/component/common/network
 INCLUDES += -I$(SDKROOTDIR)/component/common/network/coap/include
 INCLUDES += -I$(SDKROOTDIR)/component/common/network/libcoap/include
 INCLUDES += -I$(SDKROOTDIR)/component/common/network/http2/nghttp2-1.31.0/includes
-INCLUDES += -I$(SDKROOTDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include
-INCLUDES += -I$(SDKROOTDIR)/component/common/network/lwip/$(LWIP_VERSION)/src/include/lwip
-INCLUDES += -I$(SDKROOTDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek
-INCLUDES += -I$(SDKROOTDIR)/component/common/network/lwip/$(LWIP_VERSION)/port/realtek/freertos
 INCLUDES += -I$(SDKROOTDIR)/component/common/network/ssl/ssl_ram_map/rom
 INCLUDES += -I$(SDKROOTDIR)/component/common/drivers/wlan/realtek/include
 INCLUDES += -I$(SDKROOTDIR)/component/common/drivers/wlan/realtek/src/osdep
@@ -118,6 +125,12 @@ INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/misc/driver
 INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/misc/os
 
 INCLUDES += -I$(SDKROOTDIR)/component/os/freertos
+ifeq ($(FREERTOS_VERSION), freertos_v10.0.1)
 INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/include
 INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/portable/GCC/ARM_RTL8710C
+else ifeq ($(FREERTOS_VERSION), freertos_v10.2.0)
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/include
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/portable/GCC/RTL8710C/secure
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/portable/GCC/RTL8710C/non_secure
+endif
 INCLUDES += -I$(SDKROOTDIR)/component/os/os_dep/include

@@ -12,8 +12,8 @@ Navigate to `sdk/component/common/application/matter`:
 2. Clone the repository `ameba-rtos-matter` from GitHub:
 
 ```bash
-    cd sdk/component/common/application/matter
-    git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git
+    cd sdk
+    git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/common/application/matter
 ```
 
 ### Method 2: Add Repository as a Submodule
@@ -37,5 +37,5 @@ Ensure to checkout to the respective branch/tag.
 ```bash
     cd sdk
     mkdir third_party ; cd third_party
-    ln -s ../connectedhomeip connectedhomeip
+    ln -s ../../connectedhomeip connectedhomeip
 ```

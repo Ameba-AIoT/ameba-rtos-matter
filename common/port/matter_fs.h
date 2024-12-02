@@ -1,5 +1,6 @@
 #include <platform_opts.h>
 #include <platform_stdlib.h>
+#include <lfs.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -98,6 +99,14 @@ int matter_fs_fsize(void* fp);
  * @return int 0 for success; otherwise, non-zero for failure.
  */
 int matter_fs_fclear(void* fp);
+
+/**
+ * @brief Removes a file from the filesystem.
+ *
+ * @param path The path of the file to be removed.
+ * @return int 0 for success; otherwise, a non-zero error code indicating the type of failure.
+ */
+int matter_fs_remove(const char *path);
 
 #ifdef __cplusplus
 }

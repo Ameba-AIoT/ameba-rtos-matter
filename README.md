@@ -16,6 +16,10 @@ Welcome to the `ameba-rtos-matter` repository, your go-to resource for Realtek's
 
 Learn how to integrate Realtek's Matter solution with the Ameba RTOS platform. Explore the integration details [here](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/ameba_matter_integration.md)
 
+## Important Notice
+
+Please read the [Important Notice](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_important_notice.md) for important updates and announcements.
+
 ## Supported Integrated Circuits (ICs)
 
 Feel free to explore our curated list of supported ICs below to find the best match for your project.
@@ -31,40 +35,40 @@ Checkout the [Application Notes](https://github.com/Ameba-AIoT/ameba-rtos-matter
 
 2. [Building Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_building_guide.md) - Detailed instructions and guidelines for building Matter-compliant devices using the Ameba Matter solutions.
 
-3. [Supported Device Types](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_supported_device_types.md) - Comprehensive list detailing the types of devices compatible with Ameba Matter.
+3. [Supported Device Types](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/ameba_supported_device_types.md) - Comprehensive list detailing the types of devices compatible with Ameba Matter.
 
-4. [Commissioning and Control](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_commissioning_and_control_guide.md) - Focuses on commissioning procedures and control mechanisms within the Ameba Matter ecosystem.
+4. [AT Command Guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/matter_device_at_commands.md) - AT commands for Matter.
 
-5. [Factory Data Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/tools/factorydata/README.md) - Information about Matter factory data.
+5. [Commissioning and Control](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_commissioning_and_control_guide.md) - Focuses on commissioning procedures and control mechanisms within the Ameba Matter ecosystem.
 
-6. [Tools Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_tools_guide.md) - Overview of tools available for Matter development.
+6. [Matter Certification Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_certification_guide.md) - Guide for Matter Certification.
 
-7. [OTA Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/tools/ota/README.md) - Guide for Over-The-Air (OTA) updates in Matter implementations.
+7. [Factory Data Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/tools/factorydata/README.md) - Information about Matter factory data.
+
+8. [OTA Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/tools/ota/README.md) - Guide for Over-The-Air (OTA) updates in Matter implementations.
+
+9. [Tools Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_tools_guide.md) - Overview of tools available for Matter development.
 
 ## Release History
 
-| Matter Version | SDK Tags                                                         | SDK Commit |
-|:--------------:|:----------------------------------------------------------------:|:----------:|
-| Matter v1.0    | [v1.0.0.2](https://github.com/ambiot/ambz2_matter/tree/v1.0.0.2) | 0895759    |
-| Matter v1.1    | [v1.1.0.1](https://github.com/ambiot/ambz2_matter/tree/v1.1.0.1) | 049eece    |
-| Matter v1.2    | [v1.2.0.1](https://github.com/ambiot/ambz2_matter/tree/v1.2.0.1) | 0d9c1cc    |
-| Matter v1.3    |                |               |
+**Matter v1.3 and earlier version** is associated with the following SDKs:
+- AmebaZ2 SDK: [ambz2_matter](https://github.com/ambiot/ambz2_matter)
+- AmebaD SDK: [ambd_matter](https://github.com/ambiot/ambd_matter)
 
-## Important Notice
+| Matter Version | ameba version      | connectedhomeip version |
+|----------------|--------------------|-------------------------|
+| Matter v1.0    | (TAG) v1.0.0.2     | (TAG) v1.0.0.2          |
+| Matter v1.1    | (TAG) v1.1.0.1     | (TAG) v1.1.0.1          |
+| Matter v1.2    | (TAG) v1.2.0.1     | (TAG) v1.2.0.1          |
+| Matter v1.3    | (TAG) v1.3-release | (SHA) 70d9a614          |
 
-### For v1.3.0.0 onwards, all-clusters-app.zap location change
+Starting from **Matter v1.4**, we have moved to these new repositories:
+- AmebaZ2 SDK: [ameba-rtos-z2](https://github.com/Ameba-AIoT/ameba-rtos-z2)
+- AmebaD SDK: [ameba-rtos-d](https://github.com/Ameba-AIoT/ameba-rtos-d)
 
-If you need to change all-clusters-app.zap, please change it in the following directory:
-
-    component/common/application/matter/example/chiptest/all-clusters-app.zap
-
-This is because we have added files required for all our supported clusters into build and the default all-clusters-app.zap in connectedhomeip does not include some clusters supported by us. Therefore, there will be build errors.
-
-The only solution is to add Ameba's all-clusters-app.zap.
-
-In project/amebaX/Makefile, the default all-clusters-app.zap in connectedhomeip will be replaced by Ameba's all-clusters-app.zap
-
-    @cp $(MATTER_DIR)/example/chiptest/all-clusters-app.zap $(ALL_CLUSTERS_ZAP)
+| Matter Version | ameba-rtos-matter version | connectedhomeip version |
+|----------------|---------------------------|-------------------------|
+| Matter v1.4    | (Branch) release/v1.4     | (Branch) v1.4-branch    |
 
 ## Directory Structure Overview
 
