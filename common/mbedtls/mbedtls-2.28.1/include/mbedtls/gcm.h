@@ -76,6 +76,10 @@ typedef struct mbedtls_gcm_context
     int mode;                             /*!< The operation to perform:
                                                #MBEDTLS_GCM_ENCRYPT or
                                                #MBEDTLS_GCM_DECRYPT. */
+#ifdef RTL_HW_CRYPTO
+    unsigned int keybytes;
+    unsigned char key[32];
+#endif
 }
 mbedtls_gcm_context;
 
