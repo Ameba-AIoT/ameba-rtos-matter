@@ -56,7 +56,6 @@ BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 }
 
 #if defined(CONFIG_PLATFORM_8721D)
-bool UTILS_ValidateTimespec(const struct timespec *const pxTimespec);
 int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *const pxResult)
 {
     int iStatus = 0;
