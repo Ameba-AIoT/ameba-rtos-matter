@@ -1332,20 +1332,8 @@ static int ssl_populate_transform( mbedtls_ssl_transform *transform,
                                           mac_enc, mac_key_len );
             if( ret != 0 )
                 goto end;
-#if defined(SUPPORT_HW_SSL_HMAC_SHA256)
-            int is_sha256 = 0;
-            if(transform->md_ctx_dec.md_info == mbedtls_md_info_from_type(MBEDTLS_MD_SHA256)) {
-                is_sha256 = 1;
-                ((mbedtls_sha256_context *) transform->md_ctx_dec.md_ctx)->ssl_hmac = 1;
-                device_mutex_lock(RT_DEV_LOCK_CRYPTO);
-            }
-#endif
             ret = mbedtls_md_hmac_starts( &transform->md_ctx_dec,
                                           mac_dec, mac_key_len );
-#if defined(SUPPORT_HW_SSL_HMAC_SHA256)
-            if(is_sha256)
-                device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
-#endif
             if( ret != 0 )
                 goto end;
         }
@@ -4017,9 +4005,9 @@ int mbedtls_ssl_setup( mbedtls_ssl_context *ssl,
     ssl->in_buf_len = in_buf_len;
 #endif
 #if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1)
-    ssl->in_buf = mbedtls_calloc( 1, in_buf_len );
+    ssl->in_buf = ns_calloc( 1, len );
 #else
-    if( ssl->in_buf == NULL )
+    ssl->in_buf = mbedtls_calloc( 1, in_buf_len );
 #endif
     if( ssl->in_buf == NULL )
     {

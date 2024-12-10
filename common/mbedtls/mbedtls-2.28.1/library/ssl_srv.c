@@ -3692,12 +3692,37 @@ curve_matching_done:
          * after the call to ssl_prepare_server_key_exchange.
          * ssl_write_server_key_exchange also takes care of incrementing
          * ssl->out_msglen. */
+#if defined(CONFIG_BUILD_NONSECURE) && (CONFIG_BUILD_NONSECURE == 1) && defined(CONFIG_SSL_CLIENT_PRIVATE_IN_TZ) && (CONFIG_SSL_CLIENT_PRIVATE_IN_TZ == 1)
+        struct secure_mbedtls_pk_sign_param {
+            mbedtls_pk_context *ctx;
+            mbedtls_md_type_t md_alg;
+            unsigned char *hash;
+            size_t hash_len;
+            unsigned char *sig;
+            size_t *sig_len;
+            int (*f_rng)(void *, unsigned char *, size_t);
+            void *p_rng;
+        } param = {
+            mbedtls_ssl_own_key( ssl ),
+            md_alg,
+            hash,
+            hashlen,
+            ssl->out_msg + ssl->out_msglen + 2,
+            signature_len,
+            ssl->conf->f_rng,
+            ssl->conf->p_rng,
+        };
+
+        extern int NS_ENTRY secure_mbedtls_pk_sign(struct secure_mbedtls_pk_sign_param *param);
+        if( ( ret = secure_mbedtls_pk_sign( &param ) ) != 0 )
+#else
         if( ( ret = mbedtls_pk_sign( mbedtls_ssl_own_key( ssl ),
                                      md_alg, hash, hashlen,
                                      ssl->out_msg + ssl->out_msglen + 2,
                                      signature_len,
                                      ssl->conf->f_rng,
                                      ssl->conf->p_rng ) ) != 0 )
+#endif
         {
             MBEDTLS_SSL_DEBUG_RET( 1, "mbedtls_pk_sign", ret );
             return( ret );
