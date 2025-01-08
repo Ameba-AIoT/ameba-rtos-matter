@@ -1408,7 +1408,7 @@ int mbedtls_ssl_decrypt_buf( mbedtls_ssl_context const *ssl,
             ret = mbedtls_md_hmac_reset( &transform->md_ctx_dec );
 #if defined(SUPPORT_HW_SSL_HMAC_SHA256)
             if(is_sha256) {
-                is_sha256 = 0
+                is_sha256 = 0;
                 device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
             }
 #endif
@@ -1433,7 +1433,7 @@ int mbedtls_ssl_decrypt_buf( mbedtls_ssl_context const *ssl,
         hmac_failed_etm_enabled:
 #if defined(SUPPORT_HW_SSL_HMAC_SHA256)
             if(is_sha256) {
-                is_sha256 = 0
+                is_sha256 = 0;
                 device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
             }
 #endif
