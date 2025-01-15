@@ -4,8 +4,8 @@ include $(MATTER_INCLUDE)
 # -------------------------------------------------------------------
 
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/api
+INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth/bt_matter_adapter
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/include
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls
 INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include

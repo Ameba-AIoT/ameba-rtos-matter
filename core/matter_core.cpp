@@ -3,11 +3,16 @@
 
 #include <matter_core.h>
 #include <matter_ota_initializer.h>
-#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG)
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
 #include <matter_fs.h>
 #include <diagnostic_logs/ameba_logging_faultlog.h>
 #include <diagnostic_logs/ameba_logging_redirect_handler.h>
 #endif
+
+#if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
+#include <matter_mdns_filter.h>
+#endif /* CONFIG_ENABLE_AMEBA_MDNS_FILTER */
+
 #include <DeviceInfoProviderImpl.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -149,6 +154,12 @@ void matter_core_init_server(intptr_t context)
 #endif
 
     chip::Server::GetInstance().Init(initParams);
+
+#if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
+    static chip::Inet::AmebaEndpointQueueFilter sEndpointQueueFilter;
+    chip::Inet::UDPEndPointImpl::SetQueueFilter(&sEndpointQueueFilter);
+#endif /* CONFIG_ENABLE_AMEBA_MDNS_FILTER */
+
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     // TODO: Use our own DeviceInfoProvider
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
