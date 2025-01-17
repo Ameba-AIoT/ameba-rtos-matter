@@ -121,6 +121,12 @@ INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/misc/driver
 INCLUDES += -I$(SDKROOTDIR)/component/soc/realtek/8710c/misc/os
 
 INCLUDES += -I$(SDKROOTDIR)/component/os/freertos
+ifeq ($(FREERTOS_VERSION), freertos_v10.0.1)
 INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/include
 INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/portable/GCC/ARM_RTL8710C
+else ifeq ($(FREERTOS_VERSION), freertos_v10.2.0)
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/include
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/portable/GCC/RTL8710C/secure
+INCLUDES += -I$(SDKROOTDIR)/component/os/freertos/$(FREERTOS_VERSION)/Source/portable/GCC/RTL8710C/non_secure
+endif
 INCLUDES += -I$(SDKROOTDIR)/component/os/os_dep/include
