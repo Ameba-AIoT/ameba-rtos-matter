@@ -43,6 +43,7 @@ INFO_DIR=$(TARGET)/Debug/info
 # -------------------------------------------------------------------
 
 CHIP_ENABLE_AMEBA_DLOG = $(shell grep "\#define CONFIG_ENABLE_AMEBA_DLOG " $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
+CHIP_ENABLE_AMEBA_TC = $(shell grep '\#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION ' $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
 CHIP_ENABLE_CHIPOBLE = $(shell grep 'CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE' $(MATTER_INCLUDE) | cut -d'=' -f3)
 CHIP_ENABLE_IPV4 = $(shell grep 'INET_CONFIG_ENABLE_IPV4' $(MATTER_INCLUDE) | cut -d'=' -f3)
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'CONFIG_ENABLE_OTA_REQUESTOR' $(MATTER_INCLUDE) | cut -d'=' -f3)
@@ -125,6 +126,7 @@ GENERATE_NINJA:
 	echo chip_error_logging  = "true" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_progress_logging  = "true" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_detail_logging = "false" >> $(OUTPUT_DIR)/args.gn && \
+	if [ $(CHIP_ENABLE_AMEBA_TC) -eq 0 ]; then echo chip_terms_and_conditions_required = "false" >> $(OUTPUT_DIR)/args.gn; else echo chip_terms_and_conditions_required = "true" >> $(OUTPUT_DIR)/args.gn; fi && \
 	sed -i 's/chip_build_tests\ =\ true/chip_build_tests\ =\ false/g' $(CHIPDIR)/config/ameba/args.gni && \
 	mkdir -p $(CHIPDIR)/config/ameba/components/chip && \
 	cd $(CHIPDIR)/config/ameba/components/chip && gn gen --check --fail-on-unused-args $(OUTPUT_DIR) && \

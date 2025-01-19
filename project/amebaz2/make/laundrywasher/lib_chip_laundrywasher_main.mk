@@ -50,6 +50,7 @@ INFO_DIR=$(TARGET)/Debug/info
 # -------------------------------------------------------------------
 
 CHIP_ENABLE_AMEBA_DLOG = $(shell grep "\#define CONFIG_ENABLE_AMEBA_DLOG " $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
+CHIP_ENABLE_AMEBA_TC = $(shell grep '\#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION ' $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 
 # Include folder list
@@ -116,6 +117,10 @@ SRC_CPP += $(CHIPDIR)/src/app/util/persistence/DeferredAttributePersistenceProvi
 
 SRC_CPP += $(CHIPDIR)/src/app/reporting/Engine.cpp
 SRC_CPP += $(CHIPDIR)/src/app/reporting/reporting.cpp
+ifeq ($(CHIP_ENABLE_AMEBA_TC), 1)
+SRC_CPP += $(CHIPDIR)/src/app/server/DefaultTermsAndConditionsProvider.cpp
+SRC_CPP += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
+endif
 
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp

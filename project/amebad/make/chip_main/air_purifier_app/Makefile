@@ -56,6 +56,7 @@ vpath %.c $(DIR) $(shell find $(DIR) -type d)
 #                              BUILD DEFINITIONS                              #
 #*****************************************************************************#
 
+CHIP_ENABLE_AMEBA_TC = $(shell grep '\#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION ' $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 
 #*****************************************************************************#
@@ -130,6 +131,11 @@ CPPSRC += $(CHIPDIR)/src/app/util/persistence/DefaultAttributePersistenceProvide
 
 CPPSRC += $(CHIPDIR)/src/app/reporting/Engine.cpp
 CPPSRC += $(CHIPDIR)/src/app/reporting/reporting.cpp
+
+ifeq ($(CHIP_ENABLE_AMEBA_TC), 1)
+CPPSRC += $(CHIPDIR)/src/app/server/DefaultTermsAndConditionsProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
+endif
 
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp
