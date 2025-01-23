@@ -7,7 +7,7 @@ extern "C" {
 
 /**
  * @brief Inserts user log data into the logging system.
- * 
+ *
  * @param data Pointer to the data to be logged.
  * @param data_len Length of the data in bytes.
  */
@@ -15,11 +15,20 @@ _WEAK void matter_insert_user_log(uint8_t* data, uint32_t data_len);
 
 /**
  * @brief Inserts network log data into the logging system.
- * 
+ *
  * @param data Pointer to the network log data to be logged.
  * @param data_len Length of the data in bytes.
  */
 _WEAK void matter_insert_network_log(uint8_t* data, uint32_t data_len);
+
+
+/**
+ * @brief Inserts crash log data into the logging system.
+ *
+ * @param data Pointer to the crash log data to be logged.
+ * @param data_len Length of the data in bytes.
+ */
+_WEAK void matter_insert_crash_log(uint8_t* data, uint32_t data_len);
 
 #ifdef __cplusplus
 }

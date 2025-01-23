@@ -281,6 +281,7 @@ void matter_wifi_autoreconnect_hdl(rtw_security_t security_type,
 
 void matter_set_autoreconnect(uint8_t mode)
 {
+#if defined(CONFIG_AUTO_RECONNECT) && CONFIG_AUTO_RECONNECT
     size_t ssidLen = 0;
     unsigned char buf[32];
     const char kWiFiSSIDKeyName[] = "wifi-ssid";
@@ -305,6 +306,7 @@ void matter_set_autoreconnect(uint8_t mode)
         wext_set_autoreconnect(WLAN0_NAME, mode, AUTO_RECONNECT_COUNT, AUTO_RECONNECT_INTERVAL);
 #endif
     }
+#endif /* CONFIG_AUTO_RECONNECT */
     return;
 }
 
