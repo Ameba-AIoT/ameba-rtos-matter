@@ -21,13 +21,11 @@ extern "C" {
 #define NANOSECONDS_PER_TICK       ( NANOSECONDS_PER_SECOND / configTICK_RATE_HZ ) /**< Nanoseconds per FreeRTOS tick. */
 #define HOUR_PER_MILLISECOND       ( 3600 * 1000 )
 
-#define US_OVERFLOW_MAX            (0xFFFFFFFF)
+#define US_OVERFLOW_MAX            (0xFFFFFFFFUL * 1000000 / configTICK_RATE_HZ)
 
 #if defined(CONFIG_PLATFORM_8710C)
-#define MATTER_SW_RTC_TIMER_ID     TIMER5
 extern int FreeRTOS_errno;
 #elif defined(CONFIG_PLATFORM_8721D)
-#define MATTER_SW_RTC_TIMER_ID     TIMER2
 int FreeRTOS_errno = 0;
 #endif
 
@@ -35,10 +33,8 @@ int FreeRTOS_errno = 0;
 
 extern void vTaskDelay(const TickType_t xTicksToDelay);
 
-static gtimer_t matter_rtc_timer;
-static volatile uint32_t rtc_counter = 0;
-static volatile uint64_t last_current_us = 0;
-static uint64_t last_global_us = 0;
+static uint64_t current_us = 0;
+static uint32_t tick_count = 0;
 static bool matter_sntp_rtc_sync = FALSE;
 
 BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
@@ -216,50 +212,18 @@ void matter_rtc_write(time_t time)
 
 uint64_t ameba_get_clock_time(void)
 {
-    uint64_t global_us = 0, current_us = 0;
-#if defined(CONFIG_PLATFORM_8710C)
-    // Read current timer value in microseconds
-    current_us = gtimer_read_us(&matter_rtc_timer);
-    // Check if the timer has wrapped around
-    if (current_us < last_current_us)
-    {
-        // Timer wrapped around, increment global_us and adjust last_global_us
-        global_us = last_global_us + 1;
-    }
-    else
-    {
-        // Calculate global_us based on the rtc_counter and current_us
-        global_us = ((uint64_t)rtc_counter * US_OVERFLOW_MAX) + current_us;
-        last_current_us = current_us;
+    uint64_t global_us = 0, current_ticks;
+
+    current_ticks = (uint64_t)xTaskGetTickCount() * 1000000 / configTICK_RATE_HZ;
+
+    if (current_ticks < current_us) {
+        tick_count++;
     }
 
-    last_global_us = global_us;
-#elif defined(CONFIG_PLATFORM_8721D)
-    uint32_t current_tick = 0;
-    current_tick = gtimer_read_tick(&matter_rtc_timer);
-    current_us = (uint64_t) current_tick * 1000000 / 32768;
-    global_us = ((uint64_t)rtc_counter * US_OVERFLOW_MAX) + (current_us);
-#else
-    global_us = (((uint64_t)xTaskGetTickCount()) * configTICK_RATE_HZ);
-#endif
+    current_us = current_ticks;
+    global_us = ((uint64_t)tick_count * US_OVERFLOW_MAX) + current_us;
+
     return global_us;
-}
-
-static void matter_timer_rtc_callback(void)
-{
-    rtc_counter++;
-#if defined(CONFIG_PLATFORM_8710C)
-    last_current_us = 0;
-#endif
-}
-
-void matter_timer_init(void)
-{
-    gtimer_init(&matter_rtc_timer, MATTER_SW_RTC_TIMER_ID);
-#if defined(CONFIG_PLATFORM_8710C)
-    hal_timer_set_cntmode(&matter_rtc_timer.timer_adp, 0); //use count up
-#endif
-    gtimer_start_periodical(&matter_rtc_timer, US_OVERFLOW_MAX, (void *)matter_timer_rtc_callback, (uint32_t) &matter_rtc_timer);
 }
 
 #if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
