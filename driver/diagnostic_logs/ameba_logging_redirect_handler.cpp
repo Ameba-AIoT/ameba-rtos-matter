@@ -36,50 +36,50 @@ AmebaLogRedirectHandler::AmebaLogRedirectHandler() { }
 
 AmebaLogRedirectHandler::~AmebaLogRedirectHandler() { }
 
-static bool ClearLogStrategy(void* fp)
+bool ClearLogStrategy(void* fp)
 {
     lfs_file_t* lfs_fp = (lfs_file_t*)fp;
-
     // Step 1: Seek to the most recent N logs
     int pos = matter_fs_ftell(lfs_fp);
-    int region_size = sizeof(amebalog_t) * RETAIN_NLOGS_WHEN_FULL;
+    int region_size = 0x400; //retain only 1KB
     int pos_to_read_from = pos - region_size;
 
     // Ensure the position is not negative
-    if (pos_to_read_from < 0)
-    {
+    if (pos_to_read_from < 0) {
         pos_to_read_from = 0;
     }
 
-    if (matter_fs_fseek(lfs_fp, pos_to_read_from, LFS_SEEK_SET) != 0)
-    {
+    if (matter_fs_fseek(lfs_fp, pos_to_read_from, LFS_SEEK_SET) < 0) {
+        ChipLogError(DeviceLayer, "ClearLogStrategy Seek Failed");
         return false;
     }
 
     // Step 2: Read into temp buffer
     void* tmp = malloc(region_size);
-    if (tmp == NULL)
-    {
+    if (tmp == NULL) {
         return false;
     }
 
     uint out_num = 0;
-    if (matter_fs_fread(lfs_fp, pos_to_read_from, region_size, tmp, region_size, &out_num) != 0)
-    {
+    if (matter_fs_fread(lfs_fp, pos_to_read_from, region_size, tmp, region_size, &out_num) < 0) {
+        ChipLogError(DeviceLayer, "ClearLogStrategy Read Failed");
         free(tmp);
         return false;
     }
 
-    // Step 3: Truncate the file
-    if (matter_fs_fclear(lfs_fp) != 0)
-    {
-        free(tmp);
+    if (matter_fs_fclose(lfs_fp) < 0) {
+        ChipLogError(DeviceLayer, "ClearLogStrategy Close Failed");
+        return false;
+    }
+
+    if (matter_fs_fopen(USER_LOG_FILENAME, fp, LFS_O_RDWR | LFS_O_CREAT | LFS_O_TRUNC) < 0) {
+        ChipLogError(DeviceLayer, "ClearLogStrategy Open Failed");
         return false;
     }
 
     // Step 4: Rewrite the copied contents back
-    if (matter_fs_fwrite(lfs_fp, tmp, region_size, &out_num) != 0)
-    {
+    if (matter_fs_fwrite(lfs_fp, tmp, region_size, &out_num) < 0) {
+        ChipLogError(DeviceLayer, "ClearLogStrategy Re-Write Failed");
         free(tmp);
         return false;
     }
@@ -114,14 +114,12 @@ static bool ClearLogStrategy(void* fp)
 bool AmebaErrorFormatter(char* buf, uint16_t bufSize, CHIP_ERROR err)
 {
     // Bypass all custom handling if the log subsystem was not Inited
-    if (AmebaLogRedirectHandler::GetAmebaLogSubsystemInited() == false)
-    {
+    if (AmebaLogRedirectHandler::GetAmebaLogSubsystemInited() == false) {
         return false;
     }
 
     // Bypass file operations if the filesystem was not initialized
-    if (matter_fs_get_init() == false)
-    {
+    if (matter_fs_get_init() == false) {
         return false;
     }
 
@@ -130,8 +128,7 @@ bool AmebaErrorFormatter(char* buf, uint16_t bufSize, CHIP_ERROR err)
         err.IsPart(chip::ChipError::SdkPart::kBLE) ||
         err.IsPart(chip::ChipError::SdkPart::kInet) ||
         err.IsRange(chip::ChipError::Range::kPlatform)
-    ))
-    {
+    )) {
         return false;
     }
 
@@ -145,14 +142,14 @@ bool AmebaErrorFormatter(char* buf, uint16_t bufSize, CHIP_ERROR err)
     log.ErrorPart   = (uint8_t)err.GetSdkCode();
     log.ErrorValue  = (uint8_t)err.GetValue();
 
-#if defined(CONFIG_ENABLE_AMEBA_SHORT_LOGGING) && (CONFIG_ENABLE_AMEBA_SHORT_LOGGING == 0)
+#if defined(CONFIG_ENABLE_AMEBA_SHORT_LOGGING) && (CONFIG_ENABLE_AMEBA_SHORT_LOGGING == 0) && \
+    defined(CHIP_CONFIG_ERROR_SOURCE) && (CHIP_CONFIG_ERROR_SOURCE==1)
 
     auto path_cstr = err.GetFile();
     int namelen = 0;
 
     // set error filename. can be nullptr, in that case the filename is empty
-    if (path_cstr != nullptr)
-    {
+    if (path_cstr != nullptr) {
         std::string path = err.GetFile();
         std::string base_filename = path.substr(path.find_last_of("/\\") + 1);
         namelen = (base_filename.length() > CONFIG_AMEBA_LOG_FILENAME_MAXSZ) ? CONFIG_AMEBA_LOG_FILENAME_MAXSZ : base_filename.length();
@@ -168,26 +165,21 @@ bool AmebaErrorFormatter(char* buf, uint16_t bufSize, CHIP_ERROR err)
 
     // Write directly to FS
     auto fp = app::Clusters::DiagnosticLogs::AmebaDiagnosticLogsProvider::GetFpNetdiagLog();
-    if (fp == nullptr)
-    {
+    if (fp == nullptr) {
         ChipLogError(DeviceLayer, "File pointer is null");
         return false;
     }
 
     uint numWrite = 0;
     int status = matter_fs_fwrite(fp, &log, log.LogLen, &numWrite);
-    if (status < 0)
-    {
-        if (status == LFS_ERR_NOSPC)
-        {
+    if (status < 0) {
+        if (status == LFS_ERR_NOSPC) {
             // No space left on device, attempt clear strategy
-            if (ClearLogStrategy(fp) == false)
-            {
+            if (ClearLogStrategy(fp) == false) {
                 ChipLogError(DeviceLayer, "Failed to execute log clear strategy");
                 return false;
             }
-            else
-            {
+            else {
                 // Retry writing after clearing
                 int status = matter_fs_fwrite(fp, &log, log.LogLen, &numWrite);
                 if (status < 0)
@@ -197,13 +189,11 @@ bool AmebaErrorFormatter(char* buf, uint16_t bufSize, CHIP_ERROR err)
                 }
             }
         }
-        else
-        {
+        else {
             ChipLogError(DeviceLayer, "Error writing log to file: %d", status);
         }
     }
-    else
-    {
+    else {
         ChipLogProgress(DeviceLayer, "fs wrote %d bytes", numWrite);
     }
 
@@ -220,8 +210,7 @@ bool AmebaErrorFormatter(char* buf, uint16_t bufSize, CHIP_ERROR err)
 void AmebaLogRedirectHandler::AmebaEarlyError(char* buf, uint16_t bufSize, CHIP_ERROR err)
 {
     // bypass all custom handling if the log subsystem was not initialized
-    if (AmebaLogRedirectHandler::GetAmebaLogSubsystemInited() == true)
-    {
+    if (AmebaLogRedirectHandler::GetAmebaLogSubsystemInited() == true) {
         AmebaErrorFormatter(buf, bufSize, err);
     }
 
@@ -246,8 +235,7 @@ static void AmebaLogRedirect(const char* module, uint8_t category, const char* m
 
 void AmebaLogRedirectHandler::RegisterAmebaLogRedirect(void) 
 {
-    if (this->bAmebaLogRedirected)
-    {
+    if (this->bAmebaLogRedirected) {
         return;
     }
 
@@ -262,8 +250,7 @@ ErrorFormatter AmebaLogRedirectHandler::sAmebaErrorFormatter = { AmebaErrorForma
 
 void AmebaLogRedirectHandler::RegisterAmebaErrorFormatter(void)
 {
-    if (this->bAmebaLogRedirected)
-    {
+    if (this->bAmebaLogRedirected) {
         return;
     }
 
