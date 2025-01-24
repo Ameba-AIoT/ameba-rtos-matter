@@ -21,11 +21,6 @@ void matter_fault_log(char *msg, int len);
  */
 void matter_bt_log(char *msg, int len);
 
-/**
- * @brief  Reads the last crash logs from LFS
- */
-void matter_read_last_fault_log(void);
-
 #ifdef __cplusplus
 }
 #endif

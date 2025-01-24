@@ -129,18 +129,26 @@ void fATuserlog(void *arg)
         printf("      Set more than 1024 to trigger bdx transfer\n\r");
         return;
     }
+
     size_t dataSize = (size_t)atoi((const char *)arg);
     u8 *data = (u8 *)malloc(dataSize * sizeof(u8));
-    if (data == NULL)
-    {
+    if (data == NULL) {
         return;
     }
-    const char *logMessage = "Hello World";
-    strncpy((char *)data, logMessage, 11);
-    data[sizeof(data) - 1] = '\0';
+
+    const char *logMessage = "UserLogTesting";
+    size_t logMessageLength = strlen(logMessage);
+
+    size_t i;
+    for (i = 0; i < dataSize; i++) {
+        data[i] = logMessage[i % logMessageLength];
+    }
+
+    data[dataSize - 1] = '\0';
+
     matter_insert_user_log(data, dataSize);
-    if (data)
-    {
+
+    if (data) {
         free(data);
     }
     return;
@@ -153,16 +161,26 @@ void fATnetworklog(void *arg)
         printf("      Set more than 1024 to trigger bdx transfer\n\r");
         return;
     }
+
     size_t dataSize = (size_t)atoi((const char *)arg);
     u8 *data = (u8 *)malloc(dataSize * sizeof(u8));
     if (data == NULL)
     {
         return;
     }
-    const char *logMessage = "No Error Found";
-    strncpy((char *)data, logMessage, 14);
-    data[sizeof(data) - 1] = '\0';
+
+    const char *logMessage = "NetworkLogTesting";
+    size_t logMessageLength = strlen(logMessage);
+
+    size_t i;
+    for (i = 0; i < dataSize; i++) {
+        data[i] = logMessage[i % logMessageLength];
+    }
+
+    data[dataSize - 1] = '\0';
+
     matter_insert_network_log(data, dataSize);
+
     if (data)
     {
         free(data);

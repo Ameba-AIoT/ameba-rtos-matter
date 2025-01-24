@@ -36,10 +36,11 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
+#define SUPPORT_HW_SW_CRYPTO
+
 #if defined(CONFIG_PLATFORM_8710C)
 #include <rom_ssl_ram_map.h>
 #define RTL_HW_CRYPTO
-#define SUPPORT_HW_SW_CRYPTO
 //#define SUPPORT_HW_SSL_HMAC_SHA256
 #endif
 

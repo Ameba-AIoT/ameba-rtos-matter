@@ -35,13 +35,8 @@ static void example_matter_task_thread(void *pvParameters)
     if (res == 0)
     {
         printf("\nMatter FlashFS Initialized\n");
-        matter_read_last_fault_log();
     }
-#endif
 
-    matter_timer_init();
-
-#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
     // register log redirection: C wrapper version
     ameba_logging_redirect_wrapper_init();
 #endif
