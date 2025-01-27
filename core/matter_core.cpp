@@ -300,7 +300,6 @@ CHIP_ERROR matter_core_start(void)
     if (res == 0)
     {
         ChipLogProgress(DeviceLayer, "Matter FlashFS Initialized");
-        matter_read_last_fault_log();
     }
 
     // register log redirection
@@ -309,7 +308,6 @@ CHIP_ERROR matter_core_start(void)
 #endif
 
     wifi_set_autoreconnect(0); //Disable default autoreconnect
-    matter_timer_init();
 
     return matter_core_init();
 }

@@ -23,6 +23,8 @@ typedef struct __attribute__((__packed__)) AmebaLog {
 #endif
 } amebalog_t;
 
+bool ClearLogStrategy(void* fp);
+
 class AmebaLogRedirectHandler
 {
 public:

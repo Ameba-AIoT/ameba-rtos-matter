@@ -159,8 +159,6 @@
 #define CONFIG_AMEBA_LOG_FILENAME_MAXSZ         32
 #endif /* CONFIG_ENABLE_AMEBA_SHORT_LOGGING */
 
-#define RETAIN_NLOGS_WHEN_FULL                  40 // most recent N logs will be kept, the rest cleared
-
 #undef SECTOR_SIZE_FLASH
 #undef FAULT_FLASH_SECTOR_SIZE
 #define SECTOR_SIZE_FLASH                       4096
@@ -175,12 +173,6 @@
 #define LFS_DEVICE_SIZE                         (0x20000)
 #define LFS_FLASH_BASE_ADDR                     (MATTER_KVS_BEGIN_ADDR2 - LFS_DEVICE_SIZE)
 #define LFS_NUM_BLOCKS                          (LFS_DEVICE_SIZE / SECTOR_SIZE_FLASH)
-
-// redefine fault message redirection flash address
-#undef FAULT_LOG1
-#undef FAULT_LOG2
-#define FAULT_LOG1                              (LFS_FLASH_BASE_ADDR - 0x1000)
-#define FAULT_LOG2                              (LFS_FLASH_BASE_ADDR - 0x2000)
 #endif /* CONFIG_ENABLE_AMEBA_LFS */
 
 #endif /* __PLATFORM_OPTS_MATTER_H__ */
