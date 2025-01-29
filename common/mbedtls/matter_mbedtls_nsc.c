@@ -117,7 +117,11 @@ int NS_ENTRY matter_hash_sha256(const uint8_t * msg, size_t msg_size, uint8_t * 
     }
 
     // Calculate the SHA-256 hash for the input message
+#if defined(MBEDTLS_VERSION_NUMBER) && (MBEDTLS_VERSION_NUMBER>=0x03010000)
+    return mbedtls_sha256(msg, msg_size, out_buf, 0);
+#else
     return mbedtls_sha256_ret(msg, msg_size, out_buf, 0);
+#endif
 }
 
 /**

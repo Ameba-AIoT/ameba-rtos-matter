@@ -6,7 +6,7 @@ include $(MAKE_INCLUDE_GEN)
 #*****************************************************************************#
 #                               VARIABLES	                              #
 #*****************************************************************************#
-DIR = $(BASEDIR)/component/common/network/ssl/mbedtls-2.28.1
+DIR = $(BASEDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)
 MATTER_MBEDTLSDIR = $(BASEDIR)/component/common/application/matter/common/mbedtls
 
 MODULE_IFLAGS += -DCONFIG_BUILD_SECURE=1
