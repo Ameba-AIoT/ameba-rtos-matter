@@ -32,6 +32,7 @@
 #include "mbedtls/error.h"
 
 #include <string.h>
+#include <limits.h>
 
 #if (CONFIG_MATTER) && (CONFIG_ENABLE_MATTER_PRNG)
 #include <crypto_api.h>

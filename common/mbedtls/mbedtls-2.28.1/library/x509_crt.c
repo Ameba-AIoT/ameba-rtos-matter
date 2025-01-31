@@ -39,6 +39,7 @@
 #include "mbedtls/platform_util.h"
 
 #include <string.h>
+#include <limits.h>
 
 #include "device_lock.h"
 
