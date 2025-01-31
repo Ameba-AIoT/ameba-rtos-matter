@@ -49,6 +49,7 @@
 #include "mbedtls/constant_time.h"
 
 #include <string.h>
+#include <limits.h>
 
 #if defined(MBEDTLS_USE_PSA_CRYPTO)
 #include "mbedtls/psa_util.h"
