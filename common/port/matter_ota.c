@@ -257,7 +257,7 @@ static void matter_ota_abort_task(void *pvParameters)
         }
     }
 #endif
-
+    matter_ota_first_sector_written = false;
     vTaskDelete(NULL);
 }
 
