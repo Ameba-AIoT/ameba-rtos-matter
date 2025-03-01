@@ -59,6 +59,7 @@ include $(MATTER_INCLUDE_HDR)
 # -------------------------------------------------------------------
 
 INCLUDES += -I$(CHIPDIR)/examples/platform/ameba
+INCLUDES += -I$(CHIPDIR)/examples/platform/ameba/observer
 INCLUDES += -I$(CHIPDIR)/examples/providers
 INCLUDES += -I$(CHIPDIR)/src
 INCLUDES += -I$(CHIPDIR)/src/app
@@ -88,12 +89,13 @@ SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
 SRC_CPP = 
 SRC_CPP += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
 
+SRC_CPP += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
+SRC_CPP += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
 SRC_CPP += $(CHIPDIR)/src/app/icd/server/ICDMonitoringTable.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server/AclStorage.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server/DefaultAclStorage.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server/EchoHandler.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server/Dnssd.cpp
-SRC_CPP += $(CHIPDIR)/src/app/server/OnboardingCodesUtil.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server/Server.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server/CommissioningWindowManager.cpp
 
@@ -101,24 +103,32 @@ SRC_CPP += $(CHIPDIR)/src/app/util/attribute-storage.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/attribute-table.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/binding-table.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/DataModelHandler.cpp
-SRC_CPP += $(CHIPDIR)/src/app/util/ember-compatibility-functions.cpp
-SRC_CPP += $(CHIPDIR)/src/app/util/ember-global-attribute-access-interface.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/ember-io-storage.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/generic-callback-stubs.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/util.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/privilege-storage.cpp
+SRC_CPP += $(CHIPDIR)/src/app/util/persistence/AttributePersistenceProvider.cpp
+SRC_CPP += $(CHIPDIR)/src/app/util/persistence/DefaultAttributePersistenceProvider.cpp
 
 SRC_CPP += $(CHIPDIR)/src/app/reporting/Engine.cpp
 SRC_CPP += $(CHIPDIR)/src/app/reporting/reporting.cpp
 
-SRC_CPP += $(shell cat $(CODEGENDIR)/cluster-file.txt)
+SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
+SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp
+SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp
+SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp
+SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/EmberMetadata.cpp
+SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/Instance.cpp
 
-SRC_CPP += $(CODEGENDIR)/app/callback-stub.cpp
-SRC_CPP += $(CODEGENDIR)/app/cluster-init-callback.cpp
-SRC_CPP += $(CODEGENDIR)/zap-generated/IMClusterCommandHandler.cpp
+SRC_CPP += $(CHIPDIR)/src/setup_payload/OnboardingCodesUtil.cpp
 
 SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
 SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
+
+SRC_CPP += $(shell cat $(CODEGENDIR)/cluster-file.txt)
+SRC_CPP += $(CODEGENDIR)/app/callback-stub.cpp
+SRC_CPP += $(CODEGENDIR)/app/cluster-init-callback.cpp
+SRC_CPP += $(CODEGENDIR)/zap-generated/IMClusterCommandHandler.cpp
 
 # ota-requestor-app ameba source files
 SRC_CPP += $(CHIPDIR)/examples/ota-requestor-app/ameba/main/chipinterface.cpp

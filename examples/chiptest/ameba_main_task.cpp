@@ -18,6 +18,7 @@
 #include <CHIPDeviceManager.h>
 
 #include <matter_command.h>
+#include <device_energy_management/ameba_energy_management_common_main.h>
 #include <microwave_oven/ameba_microwave_oven_device.h>
 #include <valve_control/ameba_valve_control_delegate.h>
 #include <water_heater_management/ameba_water_heater_management_main.h>
@@ -34,6 +35,9 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
+using namespace chip::app::Clusters::WaterHeaterManagement;
 
 namespace {
 app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
@@ -50,7 +54,7 @@ void AppTaskInit(void)
     app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
     app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
     app::Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
-    app::Clusters::WaterHeaterManagement::WhmApplicationInit();
+    WaterHeaterApplicationInit();
     MatterMicrowaveOvenServerInit();
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
