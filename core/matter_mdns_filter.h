@@ -51,14 +51,7 @@ public:
         // Drop all non-matter mDNS packets
         if(pktInfo.DestPort == 5353 && PayloadContainsComparison(pktPayload) == false)
         {
-            ChipLogProgress(DeviceLayer, "Not Matter mDNS...");
-            return FilterOutcome::kDropPacket;
-        }
-
-        // Drop all IPv4 mDNS packets
-        if(pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == 5353)
-        {
-            ChipLogProgress(DeviceLayer, "IPv4 MDNS packet dropped...");
+            ChipLogDetail(DeviceLayer, "Not Matter mDNS...");
             return FilterOutcome::kDropPacket;
         }
 
