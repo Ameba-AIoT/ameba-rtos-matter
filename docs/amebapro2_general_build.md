@@ -21,7 +21,7 @@ To check out this repository:
 
 To check out Matter repository:
 
-    git clone https://github.com/project-chip/connectedhomeip
+    git clone https://github.com/Ameba-AIoT/connectedhomeip.git
 
 Make sure amebapro2_sdk and connectedhomeip are on the same directory level
 
@@ -32,7 +32,7 @@ Make sure amebapro2_sdk and connectedhomeip are on the same directory level
 ## Set Matter Build Environment
 
     > Find more details to setup linux build environment
-    > https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md
+    > https://github.com/Ameba-AIoT/connectedhomeip/blob/master/docs/guides/BUILDING.md
 
     cd connectedhomeip
 
@@ -50,11 +50,9 @@ Navigate to the `amebapro2_sdk` directory:
 
     cd amebapro2_sdk
 
-    git clone -b release/amebapro2/v1.4 https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/application/matter
+    chmod u+x matter_setup.sh
 
-    mkdir third_party ; cd third_party
-
-    ln -s ../../connectedhomeip .
+    ./matter_setup.sh
 
 ## Build CHIP library by GN and Final Firmware
 
@@ -96,7 +94,7 @@ First, export amebapro2 toolchain:
 
 Now let's build the firmware:
 ```
-    cd sdk-ameba-v9.6a/project/realtek_amebapro2_v0_example/GCC-RELEASE
+    cd amebapro2_sdk/project/realtek_amebapro2_v0_example/GCC-RELEASE
 
     mkdir build_matter ; cd build_matter
 

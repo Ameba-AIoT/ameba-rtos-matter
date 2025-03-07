@@ -98,7 +98,7 @@ static void handleSwitch(void *pvParameters)
         pressDuration = us_ticker_read() - pressStartTime;
 #if defined(CONFIG_PLATFORM_8710C)
         if (gpio_irq_read(&gpio_btn) && pressDuration > 2000000)
-#elif defined(CONFIG_PLATFORM_8721D)
+#elif defined(CONFIG_PLATFORM_8721D) || defined(CONFIG_PLATFORM_8735B)
         if ((irq_rise == 0) && pressDuration > 2000000)
 #endif
         {
