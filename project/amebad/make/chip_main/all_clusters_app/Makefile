@@ -30,6 +30,7 @@ OUTPUT_DIR = $(CHIPDIR)/examples/all-clusters-app/ameba/build/chip
 CODEGEN_DIR = $(OUTPUT_DIR)/codegen
 
 DIR = $(SRCDIR)
+DIR += $(CHIPDIR)/src
 DIR += $(CHIPDIR)/src/app
 DIR += $(CHIPDIR)/src/app/server
 DIR += $(CHIPDIR)/src/lib/dnssd/minimal_mdns/responders
@@ -81,6 +82,7 @@ GLOBAL_CFLAGS += -DCONFIG_ENABLE_CHIP_SHELL=1
 #*****************************************************************************#
 
 IFLAGS += -I$(CHIPDIR)/examples/platform/ameba
+IFLAGS += -I$(CHIPDIR)/examples/platform/ameba/observer
 IFLAGS += -I$(CHIPDIR)/examples/providers
 IFLAGS += -I$(CHIPDIR)/src/
 IFLAGS += -I$(CHIPDIR)/src/app/
@@ -109,58 +111,64 @@ CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
 
 CPPSRC += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
 
+CPPSRC += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
+CPPSRC += $(CHIPDIR)/src/app/icd/server/ICDMonitoringTable.cpp
 CPPSRC += $(CHIPDIR)/src/app/server/AclStorage.cpp
 CPPSRC += $(CHIPDIR)/src/app/server/DefaultAclStorage.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/Server.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/Dnssd.cpp
 CPPSRC += $(CHIPDIR)/src/app/server/EchoHandler.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/OnboardingCodesUtil.cpp
+CPPSRC += $(CHIPDIR)/src/app/server/Dnssd.cpp
+CPPSRC += $(CHIPDIR)/src/app/server/Server.cpp
 CPPSRC += $(CHIPDIR)/src/app/server/CommissioningWindowManager.cpp
 
-CPPSRC += $(CHIPDIR)/src/app/icd/server/ICDMonitoringTable.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/attribute-storage.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/attribute-table.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/binding-table.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/DataModelHandler.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/ember-compatibility-functions.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/ember-global-attribute-access-interface.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/ember-io-storage.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/generic-callback-stubs.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/util.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/privilege-storage.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/persistence/AttributePersistenceProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/persistence/DefaultAttributePersistenceProvider.cpp
 
 CPPSRC += $(CHIPDIR)/src/app/reporting/Engine.cpp
 CPPSRC += $(CHIPDIR)/src/app/reporting/reporting.cpp
 
-CPPSRC += $(CHIPDIR)/src/lib/dnssd/minimal_mdns/responders/IP.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberMetadata.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/Instance.cpp
 
-CPPSRC += $(shell cat $(CODEGEN_DIR)/cluster-file.txt)
-
-CPPSRC += $(CODEGEN_DIR)/app/callback-stub.cpp
-CPPSRC += $(CODEGEN_DIR)/app/cluster-init-callback.cpp
-CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
+CPPSRC += $(CHIPDIR)/src/setup_payload/OnboardingCodesUtil.cpp
 
 CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
 CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
 
+CPPSRC += $(shell cat $(CODEGEN_DIR)/cluster-file.txt)
+CPPSRC += $(CODEGEN_DIR)/app/callback-stub.cpp
+CPPSRC += $(CODEGEN_DIR)/app/cluster-init-callback.cpp
+CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
+
 # all-clusters-app clusters source files
-CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/matter_consoles/matter_command.cpp
+CPPSRC += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_consoles/matter_command.cpp
 CPPSRC += $(MATTER_DRIVER)/action/ameba_bridged_actions_stubs.cpp
 CPPSRC += $(MATTER_DRIVER)/air_quality/ameba_air_quality_instance.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_concentration_measurement_instances.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_delegate_impl.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_manager.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_mode.cpp
-CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_stub.cpp
+CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_energy_management_common_main.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_energy_time_utils.cpp
 CPPSRC += $(MATTER_DRIVER)/dishwasher_alarm/ameba_dishwasher_alarm_stubs.cpp
 CPPSRC += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode.cpp
-CPPSRC += $(MATTER_DRIVER)/electrical_energy_measurement/ameba_electrical_energy_measurement_stubs.cpp
-CPPSRC += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement.cpp
-CPPSRC += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement_stubs.cpp
+CPPSRC += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement_delegate.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_charging_targets_mem_manager.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_fake_readings.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_delegate_impl.cpp
+CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_main.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manager.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manufacturer_impl.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_mode.cpp
@@ -179,7 +187,6 @@ CPPSRC += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate_im
 CPPSRC += $(MATTER_DRIVER)/oven_mode/ameba_oven_modes.cpp
 CPPSRC += $(MATTER_DRIVER)/oven_operational_state/ameba_oven_operational_state_delegate.cpp
 CPPSRC += $(MATTER_DRIVER)/power_topology/ameba_power_topology_delegate.cpp
-CPPSRC += $(MATTER_DRIVER)/power_topology/ameba_power_topology_stub.cpp
 CPPSRC += $(MATTER_DRIVER)/resource_monitoring/ameba_resource_monitoring_delegate.cpp
 CPPSRC += $(MATTER_DRIVER)/refrigerator_mode/ameba_tcc_mode.cpp
 CPPSRC += $(MATTER_DRIVER)/rvc_modes/ameba_rvc_modes.cpp

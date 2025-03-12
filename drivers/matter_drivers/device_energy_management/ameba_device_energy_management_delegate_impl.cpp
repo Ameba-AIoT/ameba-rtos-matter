@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include "device_energy_management/ameba_device_energy_management_delegate_impl.h"
-#include "device_energy_management/ameba_device_energy_management_manufacturer_delegate.h"
-#include "device_energy_management/ameba_energy_time_utils.h"
+#include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
+#include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
+#include <device_energy_management/ameba_energy_time_utils.h>
 #include <app/EventLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -60,6 +60,11 @@ void DeviceEnergyManagementDelegate::SetDEMManufacturerDelegate(
     DEMManufacturerDelegate & deviceEnergyManagementManufacturerDelegate)
 {
     mpDEMManufacturerDelegate = &deviceEnergyManagementManufacturerDelegate;
+}
+
+chip::app::Clusters::DeviceEnergyManagement::DEMManufacturerDelegate * DeviceEnergyManagementDelegate::GetDEMManufacturerDelegate()
+{
+    return mpDEMManufacturerDelegate;
 }
 
 /**
@@ -264,7 +269,6 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerAdjustRequestAndGenerateEv
     SetESAState(ESAStateEnum::kOnline);
 
     mPowerAdjustmentInProgress = false;
-
     SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
 
     CHIP_ERROR err = GeneratePowerAdjustEndEvent(cause);

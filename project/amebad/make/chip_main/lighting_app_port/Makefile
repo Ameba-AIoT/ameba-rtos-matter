@@ -30,6 +30,7 @@ OUTPUT_DIR = $(CHIPDIR)/examples/lighting-app/ameba/build/chip
 CODEGEN_DIR = $(OUTPUT_DIR)/codegen
 
 DIR = $(SRCDIR)
+DIR += $(CHIPDIR)/src
 DIR += $(CHIPDIR)/src/app
 DIR += $(CHIPDIR)/src/app/server
 DIR += $(CHIPDIR)/src/lib/dnssd/minimal_mdns/responders
@@ -105,38 +106,47 @@ CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
 
 CPPSRC += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
 
+CPPSRC += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
+CPPSRC += $(CHIPDIR)/src/app/icd/server/ICDMonitoringTable.cpp
 CPPSRC += $(CHIPDIR)/src/app/server/AclStorage.cpp
 CPPSRC += $(CHIPDIR)/src/app/server/DefaultAclStorage.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/Server.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/Dnssd.cpp
 CPPSRC += $(CHIPDIR)/src/app/server/EchoHandler.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/OnboardingCodesUtil.cpp
+CPPSRC += $(CHIPDIR)/src/app/server/Dnssd.cpp
+CPPSRC += $(CHIPDIR)/src/app/server/Server.cpp
 CPPSRC += $(CHIPDIR)/src/app/server/CommissioningWindowManager.cpp
 
-CPPSRC += $(CHIPDIR)/src/app/icd/server/ICDMonitoringTable.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/attribute-storage.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/attribute-table.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/binding-table.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/DataModelHandler.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/ember-compatibility-functions.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/ember-global-attribute-access-interface.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/ember-io-storage.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/generic-callback-stubs.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/util.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/privilege-storage.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/persistence/AttributePersistenceProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/persistence/DefaultAttributePersistenceProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/persistence/DeferredAttributePersistenceProvider.cpp
 
 CPPSRC += $(CHIPDIR)/src/app/reporting/Engine.cpp
 CPPSRC += $(CHIPDIR)/src/app/reporting/reporting.cpp
 
-CPPSRC += $(CHIPDIR)/src/lib/dnssd/minimal_mdns/responders/IP.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberMetadata.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/Instance.cpp
+
+CPPSRC += $(CHIPDIR)/src/setup_payload/OnboardingCodesUtil.cpp
+
+CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
+CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
 
 CPPSRC += $(shell cat $(CODEGEN_DIR)/cluster-file.txt)
-
 CPPSRC += $(CODEGEN_DIR)/app/callback-stub.cpp
 CPPSRC += $(CODEGEN_DIR)/app/cluster-init-callback.cpp
 CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
-
-CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
 
 # porting layer src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_core.cpp

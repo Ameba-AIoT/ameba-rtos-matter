@@ -21,7 +21,7 @@ RUN set -x \
 
 # Define build arguments for repositories
 ARG CHIP_REPO=https://github.com/project-chip/connectedhomeip.git
-ARG CHIP_REF=v1.4-branch
+ARG CHIP_REF=master
 ARG AMEBA_DIR=/opt/ameba
 
 # Create the necessary directory, clone the connectedhomeip repo

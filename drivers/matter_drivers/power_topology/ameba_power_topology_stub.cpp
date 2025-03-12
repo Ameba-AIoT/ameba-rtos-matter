@@ -15,12 +15,41 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <power_topology/ameba_power_topology_delegate.h>
+
 #include <app/clusters/power-topology-server/power-topology-server.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::PowerTopology;
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace PowerTopology {
+
+class PowerTopologyDelegate : public Delegate
+{
+public:
+    ~PowerTopologyDelegate() = default;
+
+    CHIP_ERROR GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId) override;
+    CHIP_ERROR GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId) override;
+};
+
+CHIP_ERROR PowerTopologyDelegate::GetAvailableEndpointAtIndex(size_t index, EndpointId & endpointId)
+{
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+CHIP_ERROR PowerTopologyDelegate::GetActiveEndpointAtIndex(size_t index, EndpointId & endpointId)
+{
+    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+}
+
+} // namespace PowerTopology
+} // namespace Clusters
+} // namespace app
+} // namespace chip
 
 static std::unique_ptr<PowerTopology::Delegate> gDelegate;
 static std::unique_ptr<PowerTopology::Instance> gInstance;

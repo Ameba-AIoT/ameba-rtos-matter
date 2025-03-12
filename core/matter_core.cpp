@@ -26,20 +26,22 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Commands.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/DeferredAttributePersistenceProvider.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
+#include <app/util/persistence/DeferredAttributePersistenceProvider.h>
+#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
-#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
+#include <data-model-providers/codegen/Instance.h>
+#include <lib/core/CHIPError.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/dnssd/Advertiser.h>
 #include <platform/Ameba/AmebaUtils.h>
 
@@ -48,7 +50,7 @@
 #include <platform/Ameba/NetworkCommissioningDriver.h>
 
 #include <route_hook/ameba_route_hook.h>
-
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <core/ErrorStr.h>
@@ -80,7 +82,10 @@ DeferredAttribute gDeferredAttributeArray[] =
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentX::Id)),
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentY::Id)),
 };
-DeferredAttributePersistenceProvider gDeferredAttributePersister(Server::GetInstance().GetDefaultAttributePersister(), Span<DeferredAttribute>(gDeferredAttributeArray, 6), System::Clock::Milliseconds32(5000));
+
+// Deferred persistence will be auto-initialized as soon as the default persistence is initialized
+DefaultAttributePersistenceProvider gSimpleAttributePersistence;
+DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence, Span<DeferredAttribute>(gDeferredAttributeArray, 6), System::Clock::Milliseconds32(5000));
 
 app::Clusters::NetworkCommissioning::Instance
     sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
@@ -190,6 +195,7 @@ void matter_core_init_server(intptr_t context)
     // Init ZCL Data Model and CHIP App Server
     static chip::CommonCaseDeviceServerInitParams initParams;
     initParams.InitializeStaticResourcesBeforeServerInit();
+    initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
 #if CONFIG_ENABLE_AMEBA_CRYPTO
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");
@@ -209,6 +215,7 @@ void matter_core_init_server(intptr_t context)
     chip::Inet::UDPEndPointImplLwIP::SetQueueFilter(&sMdnsPacketFilter);
 #endif
 
+    VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     // TODO: Use our own DeviceInfoProvider
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
