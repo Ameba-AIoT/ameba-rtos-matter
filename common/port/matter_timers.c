@@ -1,5 +1,9 @@
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <platform_opts.h>
 #include <platform/platform_stdlib.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <platform_stdlib.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +33,9 @@ extern int FreeRTOS_errno;
 int FreeRTOS_errno = 0;
 #endif
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #define errno FreeRTOS_errno
+#endif
 
 extern void vTaskDelay(const TickType_t xTicksToDelay);
 
@@ -37,6 +43,7 @@ static uint64_t current_us = 0;
 static uint32_t tick_count = 0;
 static bool matter_sntp_rtc_sync = FALSE;
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 {
     BOOL xReturn = FALSE;
@@ -53,6 +60,7 @@ BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 
     return xReturn;
 }
+#endif
 
 #if defined(CONFIG_PLATFORM_8721D)
 int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *const pxResult)

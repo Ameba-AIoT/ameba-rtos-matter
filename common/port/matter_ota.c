@@ -1,5 +1,9 @@
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <platform_opts.h>
 #include <platform/platform_stdlib.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <platform_stdlib.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,6 +16,10 @@ extern "C" {
 #include <chip_porting.h>
 #if defined(CONFIG_PLATFORM_8710C)
 #include <ota_8710c.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <FreeRTOS.h>
+#include <task.h>
+#include <ameba_ota.h>
 #endif
 
 #define MATTER_OTA_SECTOR_SIZE 4096
@@ -24,6 +32,15 @@ static flash_t matter_ota_flash;
 #define MATTER_OTA_SIGNATURE_SIZE 8
 #define MATTER_OTA_HEADER_SIZE (32 + MATTER_OTA_SIGNATURE_SIZE)
 update_ota_target_hdr targetHeader;
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#define OTA_SUCCESS 1
+#define OTA_ERROR -1
+#define MATTER_OTA_HEADER_SIZE 32
+#define MATTER_OTA_FIRMWARE_LENGTH   0x1EC000
+flash_t matter_ota_flash;
+ota_context matterCtx = {0};
+update_ota_ctrl_info matterOtaCtrl = {0};
+update_ota_target_hdr matterOtaTargetHdr = {0};
 #endif
 
 bool matter_ota_first_sector_written = false;
@@ -64,6 +81,38 @@ void matter_ota_prepare_partition(void)
     {
         matter_ota_new_firmware_addr = LS_IMG2_OTA1_ADDR - SPI_FLASH_BASE;
     }
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    memset(&matterCtx, 0, sizeof(matterCtx));
+    memset(&matterOtaCtrl, 0, sizeof(matterOtaCtrl));
+    memset(&matterOtaTargetHdr, 0, sizeof(matterOtaTargetHdr));
+
+	matterCtx.otactrl = &matterOtaCtrl;
+	matterCtx.otaTargetHdr = &matterOtaTargetHdr;
+
+    matterCtx.otactrl->ImgId = OTA_IMGID_APP;
+    matterCtx.otactrl->ImageLen = MATTER_OTA_FIRMWARE_LENGTH;
+
+    matterCtx.otaTargetHdr->FileImgHdr[OTA_INDEX_1].ImgID = OTA_IMGID_APP;
+    matterCtx.otaTargetHdr->FileImgHdr[OTA_INDEX_2].ImgID = OTA_IMGID_APP;
+    matterCtx.otaTargetHdr->FileImgHdr[OTA_INDEX_1].ImgLen = MATTER_OTA_FIRMWARE_LENGTH;
+    matterCtx.otaTargetHdr->FileImgHdr[OTA_INDEX_2].ImgLen = MATTER_OTA_FIRMWARE_LENGTH;
+    matterCtx.otaTargetHdr->FileImgHdr[OTA_INDEX_1].Offset = 0x1000; //Offset of Manifest in firmware
+    matterCtx.otaTargetHdr->FileImgHdr[OTA_INDEX_2].Offset = 0x1000; //Offset of Manifest in firmware
+
+	if (ota_get_cur_index(matterCtx.otactrl->ImgId) == OTA_INDEX_1)
+    {
+        matterCtx.otactrl->index = OTA_INDEX_1;
+		matterCtx.otactrl->targetIdx = OTA_INDEX_2;
+        flash_get_layout_info(IMG_APP_OTA2, &matter_ota_new_firmware_addr, NULL);
+	}
+    else
+    {
+        matterCtx.otactrl->index = OTA_INDEX_2;
+		matterCtx.otactrl->targetIdx = OTA_INDEX_1;
+        flash_get_layout_info(IMG_APP_OTA1, &matter_ota_new_firmware_addr, NULL);
+	}
+    matter_ota_new_firmware_addr = matter_ota_new_firmware_addr - SPI_FLASH_BASE;
+    matterCtx.otactrl->FlashAddr = matter_ota_new_firmware_addr;
 #endif
     matter_ota_flash_sector_base = matter_ota_new_firmware_addr; // Note that the new fw address must be multiples of 4KB
 }
@@ -95,7 +144,7 @@ int8_t matter_ota_flash_burst_write(uint8_t *data, uint32_t size)
 
     if (!matter_ota_first_sector_written)
     {
-#if defined(CONFIG_PLATFORM_8710C)
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
         sectorBase += matter_ota_header_size; // leave first 32-bytes for header
         writeLength -= matter_ota_header_size;
         bufferRemainSize -= matter_ota_header_size;
@@ -130,6 +179,9 @@ int8_t matter_ota_flash_burst_write(uint8_t *data, uint32_t size)
 #elif defined(CONFIG_PLATFORM_8721D)
         erase_ota_target_flash(matter_ota_flash_sector_base + SPI_FLASH_BASE, MATTER_OTA_SECTOR_SIZE);
         ota_writestream_user(sectorBase, writeLength, matter_ota_buffer);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+        flash_erase_sector(&matter_ota_flash, matter_ota_flash_sector_base);
+        flash_burst_write(&matter_ota_flash, sectorBase, writeLength, matter_ota_buffer);
 #endif
         if (!matter_ota_first_sector_written)
         {
@@ -194,6 +246,16 @@ int8_t matter_ota_flush_last(void)
         return OTA_ERROR;
     }
 
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    if (matter_ota_buffer_size > 0)
+    {
+        flash_erase_sector(&matter_ota_flash, matter_ota_flash_sector_base);
+        flash_burst_write(&matter_ota_flash, matter_ota_flash_sector_base, matter_ota_buffer_size, matter_ota_buffer);
+
+        matter_ota_flash_sector_base += MATTER_OTA_SECTOR_SIZE; // point to next sector
+        memset(matter_ota_buffer, 0, sizeof(matter_ota_buffer)); // clear buffer after writing
+        matter_ota_buffer_size = 0;
+    }
 #endif
 
     return OTA_SUCCESS;
@@ -220,12 +282,23 @@ int8_t matter_ota_update_signature(void)
     }
 
     return OTA_SUCCESS;
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    memcpy(&(matterCtx.otaTargetHdr->Manifest[matterCtx.otactrl->index]), matter_ota_header, sizeof(Manifest_TypeDef));
+    if (!ota_update_manifest(matterCtx.otaTargetHdr, matterCtx.otactrl->targetIdx, matterCtx.otactrl->index)) {
+        return OTA_ERROR;
+    }
+    return OTA_SUCCESS;
 #endif
 }
 
 void matter_ota_platform_reset(void)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     ota_platform_reset();
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    rtos_time_delay_ms(100);
+    sys_reset();
+#endif
 }
 
 static void matter_ota_abort_task(void *pvParameters)
@@ -254,6 +327,19 @@ static void matter_ota_abort_task(void *pvParameters)
         for (size_t i=0; i<newFWBlkSize; i++)
         {
             erase_ota_target_flash(matter_ota_new_firmware_addr + SPI_FLASH_BASE + (i * MATTER_OTA_SECTOR_SIZE), MATTER_OTA_SECTOR_SIZE);
+        }
+    }
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    uint32_t newFWBlkSize = (MATTER_OTA_FIRMWARE_LENGTH - 1) / MATTER_OTA_SECTOR_SIZE + 1;
+    DiagPrintf("Cleaning up aborted OTA\r\n");
+    DiagPrintf("Erasing %d sectors\r\n", newFWBlkSize);
+
+    if (matter_ota_new_firmware_addr != 0)
+    {
+        for (size_t i=0; i<newFWBlkSize; i++)
+        {
+            rtos_time_delay_ms(2); // to avoid undefined behaviour when it suddenly resets the ameba during flash erase
+            flash_erase_sector(&matter_ota_flash, matter_ota_new_firmware_addr + (i * MATTER_OTA_SECTOR_SIZE));
         }
     }
 #endif

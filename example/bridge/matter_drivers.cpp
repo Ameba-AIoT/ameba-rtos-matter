@@ -29,6 +29,15 @@ using chip::Protocols::InteractionModel::Status;
 #elif defined(CONFIG_PLATFORM_8721D)
 #define PWM_PIN         PB_5
 #define GPIO_IRQ_PIN    PA_12
+#elif defined (CONFIG_AMEBASMART)
+#define PWM_PIN      PA_5
+#define GPIO_IRQ_PIN PA_10
+#elif defined (CONFIG_AMEBALITE)
+#define PWM_PIN      PA_31
+#define GPIO_IRQ_PIN PA_29
+#elif defined (CONFIG_AMEBADPLUS)
+#define PWM_PIN      PB_18
+#define GPIO_IRQ_PIN PA_12
 #endif
 
 MatterBridge ALight1;
@@ -457,7 +466,11 @@ void matter_driver_bridge_server_thread(void *param)
     struct sockaddr_in server_addr, client_addr, local_name, remote_name;
     socklen_t addrlen = sizeof(struct sockaddr_in);
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     while (wifi_is_ready_to_transceive(RTW_STA_INTERFACE) != RTW_SUCCESS)
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    while(matter_wifi_is_ready_to_transceive(RTW_STA_INTERFACE) != RTW_SUCCESS)
+#endif
     {
         vTaskDelay(2000);
     }

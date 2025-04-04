@@ -8,6 +8,9 @@
 ********************************************************************************/
 #pragma once
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <FreeRTOS.h>
+#endif
 #include <platform_stdlib.h>
 #include <gpio_api.h>
 #include <gpio_irq_api.h>

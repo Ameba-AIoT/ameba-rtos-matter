@@ -9,7 +9,11 @@
 #include "mbedtls/ssl.h"
 #include "mbedtls/pk.h"
 #include "mbedtls/version.h"
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include "crypto_api.h"
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS)
+#include "ameba_crypto_api.h"
+#endif
 
 #if defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
 #include "matter_utils.h"
@@ -17,8 +21,8 @@
 #include "mbedtls/aes.h"
 
 __weak const uint8_t kSecureDacPrivateKey[] = {
-0xe6, 0xfe, 0xfc, 0xf7, 0x38, 0x1e, 0x01, 0x6e, 0x66, 0xa3, 0x09, 0xe6, 0x55, 0x20, 0x20, 0x1f,
-0x85, 0x9d, 0xaa, 0x4a, 0xf3, 0x07, 0x92, 0x13, 0x86, 0x68, 0x63, 0x1c, 0xe5, 0xdc, 0xac, 0xd9,
+0x76, 0x49, 0x9f, 0xda, 0xf4, 0x30, 0x10, 0x66, 0x36, 0x97, 0x0a, 0x42, 0x88, 0x83, 0x97, 0x1f,
+0x5f, 0xff, 0xc7, 0x0d, 0x08, 0xd3, 0xd2, 0x51, 0x5a, 0x17, 0x14, 0x5a, 0xba, 0x3f, 0x95, 0xa4,
 };
 
 unsigned char test_key[] = {0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
@@ -80,6 +84,9 @@ static int _random(void *p_rng, unsigned char *output, size_t output_len)
  * Upon successful execution, the key pair associated with the specified Matter Key Type is freed, and 
  * the 'keyInitialized' flag is set to 0 to indicate that the key pair is no longer initialized.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_clear_keypair(matter_key_type key_type)
 {
     if (keyInitialized)
@@ -106,6 +113,9 @@ int NS_ENTRY matter_secure_clear_keypair(matter_key_type key_type)
  * @param  out_buf: Pointer to the buffer where the SHA-256 hash will be stored.
  * @return  0 on success, negative value otherwise
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_hash_sha256(const uint8_t * msg, size_t msg_size, uint8_t * out_buf)
 {
     // Check if 'msg' or 'out_buf' pointers are nullptr
@@ -133,6 +143,9 @@ int NS_ENTRY matter_hash_sha256(const uint8_t * msg, size_t msg_size, uint8_t * 
  *  - The ECDSA signature is computed and stored in the 'signature' buffer.
  *  - Error handling includes printing error messages and returning appropriate error codes.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char * msg, size_t msg_size, unsigned char *signature)
 {
     int result;
@@ -217,6 +230,9 @@ int NS_ENTRY matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsign
  * @param  csr_length: Length of the CSR buffer.
  * @return  The length of the generated CSR on success, MATTER_ERROR_INTERNAL otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_new_csr(uint8_t *out_csr, size_t csr_length)
 {
     int result = 0;
@@ -302,6 +318,9 @@ exit:
  *  - It generates a new keypair using the elliptic curve specified by 'group' (SECP256R1).
  *  - If an error occurs during the key generation process, the function prints an error message and returns the error code.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_opkey_init_keypair()
 {
     int result = 0;
@@ -337,6 +356,9 @@ exit:
  * Notes:
  *  - Upon successful encryption, the encrypted Operational Private Key is copied back to the input buffer 'buf'.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_encrypt_key(uint8_t *buf, size_t size)
 {
     int result = 0;
@@ -390,6 +412,9 @@ exit:
  * @param  pubkey_size: Size of the buffer to accommodate the public key.
  * @return  0 on success, negative value otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_get_opkey_pub(uint8_t * pubkey, size_t pubkey_size)
 {
     int result = 0;
@@ -419,6 +444,9 @@ int NS_ENTRY matter_secure_get_opkey_pub(uint8_t * pubkey, size_t pubkey_size)
  * @param  privkey_size: Size of the buffer to accommodate the encrypted private key.
  * @return  0 on success, negative value otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_get_opkey_priv(uint8_t * privkey, size_t privkey_size)
 {
     int result = 0;
@@ -459,6 +487,9 @@ exit:
  * It's important to note that the decrypted private key remains within the secure context and is not exposed to 
  * non-secure environments. The Operational Keypair (Opkey) is exclusively used within a secure context.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_get_opkey(uint8_t *buf, size_t size)
 {
     int result = 0;
@@ -557,6 +588,9 @@ exit:
  *  - If an error occurs during the retrieval or serialization process, the function prints an error message,
  *    clears the Operational Keypair, and returns the error code.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_serialize(uint8_t *output_buf, size_t output_size)
 {
     int result = 0;
@@ -595,6 +629,9 @@ exit:
  * @param  pub_size: Size of the public key buffer.
  * @return  0 on success, negative value otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_deserialize(uint8_t *pub_buf, size_t pub_size)
 {
     int result = 0;
@@ -641,6 +678,9 @@ exit:
  * @param  pub_size: Size of the public key buffer.
  * @return  0 on success, negative value otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size)
 {
     unsigned char *output_buffer;

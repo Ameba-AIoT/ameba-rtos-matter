@@ -19,6 +19,15 @@ using chip::Protocols::InteractionModel::Status;
 #elif defined(CONFIG_PLATFORM_8721D)
 #define PWM_LED         PB_5
 #define GPIO_IRQ_PIN    PA_12
+#elif defined (CONFIG_AMEBASMART)
+#define PWM_LED      PA_5
+#define GPIO_IRQ_PIN PA_10
+#elif defined (CONFIG_AMEBALITE)
+#define PWM_LED      PA_31
+#define GPIO_IRQ_PIN PA_29
+#elif defined (CONFIG_AMEBADPLUS)
+#define PWM_LED      PB_18
+#define GPIO_IRQ_PIN PA_12
 #endif
 
 MatterLED led;

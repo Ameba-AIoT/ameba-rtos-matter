@@ -1,5 +1,14 @@
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <platform_opts.h>
 #include <platform/platform_stdlib.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <platform_stdlib.h>
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
+#define MATTER_FACTORY_DATA (0x08400000 - SPI_FLASH_BASE)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+#define MATTER_FACTORY_DATA (0x08600000 - SPI_FLASH_BASE)
+#endif
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -303,9 +312,13 @@ int32_t ReadFactory(uint8_t *buffer, uint16_t *pfactorydata_len)
     uint8_t length_bytes = 2;
 
     // The first 2 bytes of the binary file is the length of the FactoryData
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     device_mutex_lock(RT_DEV_LOCK_FLASH);
     ret = flash_stream_read(&flash, address, length_bytes, (uint8_t *)pfactorydata_len);
     device_mutex_unlock(RT_DEV_LOCK_FLASH);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    ret = flash_stream_read(&flash, address, length_bytes, (uint8_t *)pfactorydata_len);
+#endif
 
     // Check if factory data length is more than 4096
     // Which indicates that factory data is not flashed
@@ -316,9 +329,13 @@ int32_t ReadFactory(uint8_t *buffer, uint16_t *pfactorydata_len)
     }
 
     // +2 offset to read the FactoryData
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     device_mutex_lock(RT_DEV_LOCK_FLASH);
     ret = flash_stream_read(&flash, address+2, *pfactorydata_len, buffer);
     device_mutex_unlock(RT_DEV_LOCK_FLASH);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    ret = flash_stream_read(&flash, address+2, *pfactorydata_len, buffer);
+#endif
 
     return ret;
 }
@@ -418,7 +435,9 @@ exit:
 #if defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
 #define MATTER_SECURE_CONTEXT_STACK_SIZE 4096
 extern int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void);
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 extern void NS_ENTRY secure_set_ns_device_lock(void (*device_mutex_lock_func)(uint32_t), void (*device_mutex_unlock_func)(uint32_t));
+#endif
 extern int NS_ENTRY matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size);
 extern int NS_ENTRY matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *msg, size_t msg_size, unsigned char *signature);
 extern int NS_ENTRY matter_secure_get_opkey(uint8_t *buf, size_t size);
@@ -435,9 +454,15 @@ void matter_create_secure_context(void)
         return;
     }
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     rtw_create_secure_context(MATTER_SECURE_CONTEXT_STACK_SIZE);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    rtos_create_secure_context(MATTER_SECURE_CONTEXT_STACK_SIZE);
+#endif
     secure_mbedtls_platform_set_calloc_free();
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     secure_set_ns_device_lock(device_mutex_lock, device_mutex_unlock);
+#endif
 
     matter_secure_context_created = true;
 }

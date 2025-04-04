@@ -8,7 +8,9 @@
 void MatterLED::Init(PinName pin)
 {
     mPwm_obj                        = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    mPwm_obj->pwm_idx               = 1;
+#endif
     pwmout_init(mPwm_obj, pin);
 #if defined(CONFIG_PLATFORM_8710C)
     pwmout_period_us(mPwm_obj, 20000); //pwm period = 20ms
@@ -41,6 +43,13 @@ void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin)
     pwmout_period_us(mPwm_blue, 20000); //pwm period = 20ms
     pwmout_start(mPwm_blue);
 #elif defined(CONFIG_PLATFORM_8721D)
+    pwmout_init(mPwm_red, redpin);
+    pwmout_init(mPwm_green, bluepin);
+    pwmout_init(mPwm_blue, greenpin);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    mPwm_red->pwm_idx               = 1;
+    mPwm_green->pwm_idx             = 2;
+    mPwm_blue->pwm_idx              = 3;
     pwmout_init(mPwm_red, redpin);
     pwmout_init(mPwm_green, bluepin);
     pwmout_init(mPwm_blue, greenpin);
@@ -84,6 +93,17 @@ void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin, PinName 
     pwmout_period_us(mPwm_wwhite, 20000); //pwm period = 20ms
     pwmout_start(mPwm_wwhite);
 #elif defined(CONFIG_PLATFORM_8721D)
+    pwmout_init(mPwm_red, redpin);
+    pwmout_init(mPwm_green, bluepin);
+    pwmout_init(mPwm_blue, greenpin);
+    pwmout_init(mPwm_cwhite, cwhitepin);
+    pwmout_init(mPwm_wwhite, wwhitepin);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    mPwm_red->pwm_idx               = 1;
+    mPwm_green->pwm_idx             = 2;
+    mPwm_blue->pwm_idx              = 3;
+    mPwm_cwhite->pwm_idx            = 4;
+    mPwm_wwhite->pwm_idx            = 5;
     pwmout_init(mPwm_red, redpin);
     pwmout_init(mPwm_green, bluepin);
     pwmout_init(mPwm_blue, greenpin);

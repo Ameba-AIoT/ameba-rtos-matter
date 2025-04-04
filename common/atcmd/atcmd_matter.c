@@ -1,8 +1,19 @@
 #include <platform_stdlib.h>
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <platform_opts.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <platform_autoconf.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
+#endif
 
 #if defined(CONFIG_MATTER) && CONFIG_MATTER
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <log_service.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <atcmd_service.h>
+#endif
 #include <main.h>
 #include <sys_api.h>
 #include <wifi_conf.h>
@@ -13,6 +24,11 @@ extern u32 deinitPref(void);
 extern void amebaQueryImageCmdHandler();
 extern void amebaApplyUpdateCmdHandler();
 #endif
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+#if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
+extern void NS_ENTRY vMatterPrintSecureHeapStatus(void);
+#endif // CONFIG_PLATFORM_AMEBADPLUS
+#endif // CONFIG_PLATFORM
 
 // Queue for matter shell
 QueueHandle_t shell_queue;
@@ -53,6 +69,7 @@ void fATchipapp2(void *arg)
 void fATmattershell(void *arg)
 {
     if (arg != NULL)
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     {
         xQueueSend(shell_queue, arg, pdMS_TO_TICKS(10));
     }
@@ -60,6 +77,35 @@ void fATmattershell(void *arg)
     {
         printf("No arguments provided for matter shell\n");
     }
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    {
+        if(strcmp(arg, "factoryreset") == 0) {
+            fATchipapp(NULL);
+        } else if(strcmp(arg, "queryimage") == 0) {
+            fATchipapp1(NULL);
+        } else if(strcmp(arg, "applyupdate") == 0) {
+            fATchipapp2(NULL);
+#if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
+        } else if(strcmp(arg, "secureheapstatus") == 0) {
+            vMatterPrintSecureHeapStatus();
+#endif
+        } else {
+            xQueueSend(shell_queue, arg, pdMS_TO_TICKS(10));
+        }
+    }
+    else
+    {
+        DiagPrintf("No arguments provided for matter shell, available commands:\n%s\n%s\n%s\n%s\n",
+                   "ATmatter factoryreset     : to factory reset the matter application",
+                   "ATmatter queryimage       : query image for matter ota requestor app",
+                   "ATmatter applyupdate      : apply update for matter ota requestor app",
+                   "ATmatter help             : to show other matter commands");
+        //Diagnostics logs is not yet implemented
+#if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
+        DiagPrintf("ATmatter secureheapstatus : to check secure heap status\n");
+#endif
+    }
+#endif // CONFIG_PLATFORM
 }
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
@@ -149,6 +195,7 @@ void fATnetworklog(void *arg)
 
 log_item_t at_matter_items[] = {
 #ifndef CONFIG_INIC_NO_FLASH
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #if ATCMD_VER == ATVER_1
     {"ATM$", fATchipapp, {NULL,NULL}},
     {"ATM%", fATchipapp1, {NULL,NULL}},
@@ -161,13 +208,20 @@ log_item_t at_matter_items[] = {
     {"^^^^", fATnetworklog},
 #endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
 #endif // end of #if ATCMD_VER == ATVER_1
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    {"matter", fATmattershell, {NULL, NULL}},
+#endif // CONFIG_PLATFORM
 #endif
 };
 
 void at_matter_init(void)
 {
     shell_queue = xQueueCreate(3, 256); // backlog 3 commands max
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     log_service_add_table(at_matter_items, sizeof(at_matter_items)/sizeof(at_matter_items[0]));
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    atcmd_service_add_table(at_matter_items, sizeof(at_matter_items)/sizeof(at_matter_items[0]));
+#endif // CONFIG_PLATFORM
 }
 
 #if SUPPORT_LOG_SERVICE

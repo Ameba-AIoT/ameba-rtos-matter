@@ -5,7 +5,9 @@
 
 #include <gpio_api.h>
 #include <gpio_irq_api.h>
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <gpio_irq_ex_api.h>
+#endif
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -28,6 +30,15 @@ using chip::Protocols::InteractionModel::Status;
 #elif defined(CONFIG_PLATFORM_8721D)
 #define GPIO_IRQ_LEVEL_PIN    PA_28
 #define GPIO_LED_PIN          PB_4
+#elif defined (CONFIG_AMEBASMART)
+#define GPIO_LED_PIN       PA_5
+#define GPIO_IRQ_LEVEL_PIN PA_10
+#elif defined (CONFIG_AMEBALITE)
+#define GPIO_LED_PIN       PA_31
+#define GPIO_IRQ_LEVEL_PIN PA_29
+#elif defined (CONFIG_AMEBADPLUS)
+#define GPIO_LED_PIN       PB_18
+#define GPIO_IRQ_LEVEL_PIN PA_12
 #endif
 
 MatterRefrigerator refrigerator;

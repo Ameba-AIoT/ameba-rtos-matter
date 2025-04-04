@@ -1,0 +1,167 @@
+
+#*****************************************************************************#
+#                                Variable Definition                          #
+#*****************************************************************************#
+
+CHIPDIR           = $(BASEDIR)/third_party/connectedhomeip
+MATTER_DIR        = $(BASEDIR)/component/application/matter
+MATTER_BUILDDIR   = $(MATTER_DIR)/project/amebadplus
+MATTER_TOOLDIR    = $(MATTER_DIR)/tools
+MATTER_MBEDTLSDIR = $(MATTER_DIR)/common/mbedtls
+MATTER_EXAMPLEDIR = $(MATTER_DIR)/example
+MATTER_INCLUDE    = $(MATTER_BUILDDIR)/Makefile.include.matter
+ifeq ($(MBEDTLS_MATTER_ENABLE),y)
+MBEDTLSDIR	      = $(MATTER_MBEDTLSDIR)/mbedtls-2.28.1
+endif
+
+#*****************************************************************************#
+#                              Include Directories                            #
+#*****************************************************************************#
+
+ifeq ($(MBEDTLS_MATTER_ENABLE),y)
+IFLAGS               += -I$(MBEDTLSDIR)/include
+IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
+IFLAGS               += -I$(BASEDIR)/component/ssl/mbedtls_ram_map/rom
+endif
+
+IFLAGS               += -I$(MATTER_DIR)/api
+IFLAGS               += -I$(MATTER_DIR)/common/file_system/kv
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/api
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/include
+IFLAGS               += -I$(MATTER_DIR)/common/port
+IFLAGS               += -I$(MATTER_DIR)/common/os
+IFLAGS               += -I$(MATTER_DIR)/common/include
+IFLAGS               += -I$(MATTER_DIR)/common/protobuf
+IFLAGS               += -I$(MATTER_DIR)/common/protobuf/nanopb
+
+IFLAGS               += -I$(BASEDIR)/component/at_cmd
+
+IFLAGS               += -I$(FREERTOSDIR)/include/
+IFLAGS               += -I$(FREERTOSDIR)/portable/GCC/AmebaDplus_KM4/non_secure
+IFLAGS               += -I$(FREERTOSDIR)/portable/GCC/AmebaDplus_KM4/secure
+
+ifeq ($(CONFIG_BT_MATTER_ADAPTER), y)
+IFLAGS               += -I$(MATTER_DIR)/common/bluetooth/bt_matter_adapter
+endif
+ifeq ($(CONFIG_BLE_MATTER_ADAPTER), y)
+IFLAGS               += -I$(MATTER_DIR)/common/bluetooth
+IFLAGS               += -I$(MATTER_DIR)/common/bluetooth/ble_matter_adapter_peripheral
+endif
+
+#lwip_default_hooks
+IFLAGS               += -I$(MATTER_DIR)/common/lwip/lwip_v2.1.2/port/realtek/include/
+
+#*****************************************************************************#
+#                           ARM COMPILATION FLAGS                             #
+#*****************************************************************************#
+
+GLOBAL_CFLAGS += -DCONFIG_MATTER=1
+
+# CPP standards and language
+CPPFLAGS += -std=c++11
+CPPFLAGS += -std=gnu++17
+CPPFLAGS += -fno-rtti
+
+# Compile Warnings
+GLOBAL_CFLAGS += -Wno-sign-compare
+GLOBAL_CFLAGS += -Wno-unused-function
+GLOBAL_CFLAGS += -Wno-unused-but-set-variable
+GLOBAL_CFLAGS += -Wno-unused-variable
+GLOBAL_CFLAGS += -Wno-unused-label
+GLOBAL_CFLAGS += -Wno-deprecated-declarations
+GLOBAL_CFLAGS += -Wno-unused-parameter
+GLOBAL_CFLAGS += -Wno-format
+GLOBAL_CFLAGS += -Wno-format-nonliteral
+GLOBAL_CFLAGS += -Wno-format-security
+GLOBAL_CFLAGS += -Wno-address
+GLOBAL_CFLAGS += -Wno-stringop-truncation 
+
+# chip device options
+GLOBAL_CFLAGS += -DCHIP_DEVICE_LAYER_TARGET=Ameba
+GLOBAL_CFLAGS += -DCHIP_DEVICE_LAYER_NONE=0
+
+# chip System options
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_LWIP=1
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_SOCKETS=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=0
+GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_POSIX_LOCKING=0
+GLOBAL_CFLAGS += -DCHIP_SHELL_MAX_TOKENS=11
+
+# chip IPv4 options
+GLOBAL_CFLAGS += -DINET_CONFIG_ENABLE_IPV4=0
+
+# BLE options
+GLOBAL_CFLAGS += -DCHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1
+
+# LwIP options
+GLOBAL_CFLAGS += -DFD_SETSIZE=10
+GLOBAL_CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
+
+# Mbedtls options
+GLOBAL_CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
+
+# matter ota options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1
+
+ifeq ($(CONFIG_MATTER_SECURE_EN), y)
+# matter factory data options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_CRYPTO=1
+# matter additional secure options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=1
+else
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
+endif
+
+# matter factory data encryption options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_FACTORY_DATA_ENCRYPTION=0
+
+# matter kv options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_KV_ENCRYPTION=0
+
+# ameba TestEvent Trigger EnableKey
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
+
+# ameba mdns filter options
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_MDNS_FILTER=1
+
+# other options
+GLOBAL_CFLAGS += -DCHIP_HAVE_CONFIG_H
+
+# example options
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER=1
+ifneq ($(EXAMPLE),)
+GLOBAL_CFLAGS += -DCONFIG_PLATFORM_AMEBADPLUS=1
+ifeq ($(EXAMPLE), chiptest)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_CHIPTEST=1
+endif
+ifeq ($(EXAMPLE), aircon)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_AIRCON=1
+endif
+ifeq ($(EXAMPLE), bridge)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_BRIDGE=1
+endif
+ifeq ($(EXAMPLE), dishwasher)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_DISHWASHER=1
+endif
+ifeq ($(EXAMPLE), fan)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_FAN=1
+endif
+ifeq ($(EXAMPLE), light)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_LIGHT=1
+endif
+ifeq ($(EXAMPLE), laundrywasher)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER=1
+endif
+ifeq ($(EXAMPLE), microwaveoven)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN=1
+endif
+ifeq ($(EXAMPLE), refrigerator)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_REFRIGERATOR=1
+endif
+ifeq ($(EXAMPLE), thermostat)
+GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_THERMOSTAT=1
+endif
+endif

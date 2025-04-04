@@ -1,7 +1,12 @@
 #include <platform_stdlib.h>
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <platform_opts_bt.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <platform_autoconf.h>
+#endif
 
 #if defined(CONFIG_BLE_MATTER_ADAPTER) && CONFIG_BLE_MATTER_ADAPTER
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <string.h>
 #include <gap.h>
 #include <gap_adv.h>
@@ -16,32 +21,55 @@
 #include <ble_matter_adapter_app_task.h>
 #include <ble_matter_adapter_app.h>
 #include <matter_blemgr_common.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <string.h>
+#include <matter_blemgr_common.h>
+#endif
 
 /*============================================================================*
  *                              Constants
  *============================================================================*/
 #define MAX_ADV_NUMBER 2
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#define BLE_MATTER_DEVICE_NAME_LEN	39
+#endif
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 uint8_t matter_adv_id = MAX_ADV_NUMBER;
+#endif
 uint16_t matter_adv_interval = 0;
 uint16_t matter_adv_int_min = 0x20;
 uint16_t matter_adv_int_max = 0x20;
 uint8_t matter_adv_data_length = 0;
 uint8_t matter_adv_data[31] = {0};
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 uint8_t customer_adv_data[] = {0x02, 0x01, 0x05, 0x03, 0x03, 0x0A, 0xA0, 0x0D, 0x09, 'B', 'L', 'E', '_', 'C', 'U', 'S', 'T', 'O', 'M', 'E', 'R'};
 uint8_t customer_rsp_data[] = {0x03, 0x19, 0x00, 0x00};
 uint8_t customer_adv_data_length = sizeof(customer_adv_data);
 uint8_t customer_rsp_data_length = sizeof(customer_rsp_data);
+#endif
 matter_blemgr_callback matter_blemgr_callback_func = NULL;
 void *matter_blemgr_callback_data = NULL;
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 extern T_SERVER_ID ble_matter_adapter_service_id;
 extern T_MULTI_ADV_CONCURRENT matter_multi_adapter;
 extern int ble_matter_adapter_peripheral_app_max_links;
+#endif
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 extern void ble_matter_adapter_multi_adv_init(void);
 extern bool matter_multi_adv_stop_by_id(uint8_t *adv_id);
 extern bool matter_multi_adv_start_by_id(uint8_t *adv_id, uint8_t *adv_data, uint16_t adv_len, uint8_t *rsp_data, uint16_t rsp_len, uint8_t type);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+extern int ble_matter_adapter_peripheral_main(uint8_t enable);
+extern int ble_matter_adapter_start_adv(void);
+extern int ble_matter_adapter_stop_adv(void);
+extern int ble_matter_adapter_config_adv(uint8_t *adv_data, uint8_t adv_data_length);
+extern uint16_t ble_matter_adapter_get_mtu(uint8_t conn_id);
+extern int ble_matter_adapter_disconnect(uint8_t connect_id);
+extern int ble_matter_adapter_send_indication(uint8_t connect_id, uint8_t *data, uint16_t data_length);
+#endif
 
 #if CONFIG_BLE_MATTER_MULTI_ADV_ON
 extern uint8_t customer_adv_id;
@@ -53,8 +81,12 @@ extern uint8_t customer_adv_id;
 
 int matter_blemgr_init(void)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     ble_matter_adapter_app_init();
     ble_matter_adapter_multi_adv_init();
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+	ble_matter_adapter_peripheral_main(1);
+#endif
 
     return 0;
 }
@@ -67,6 +99,7 @@ void matter_blemgr_set_callback_func(matter_blemgr_callback p, void *data)
 
 int matter_blemgr_start_adv(void)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     bool result = 0;
 
     uint8_t adv_stop_flag = ble_matter_adapter_judge_adv_stop(matter_adv_id);
@@ -88,12 +121,16 @@ int matter_blemgr_start_adv(void)
         return 1;
     }
 #endif
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+	ble_matter_adapter_start_adv();
+#endif
 
     return 0;
 }
 
 int matter_blemgr_stop_adv(void)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     bool result = 0;
 
     if (matter_multi_adapter.matter_sta_sto_flag != false)
@@ -109,17 +146,27 @@ int matter_blemgr_stop_adv(void)
     }
 
     matter_multi_adapter.matter_sta_sto_flag = true;
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    ble_matter_adapter_stop_adv();
+#endif
 
     return 0;
 }
 
 int matter_blemgr_config_adv(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t *adv_data, uint8_t adv_data_length)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
+    matter_adv_interval = adv_int_max;
     matter_adv_int_min = adv_int_min;
     matter_adv_int_max = adv_int_max;
     matter_adv_interval = adv_int_min + 10;
     matter_adv_data_length = adv_data_length;
     memcpy(matter_adv_data, adv_data, adv_data_length);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    matter_adv_data_length = adv_data_length;
+    memcpy(matter_adv_data, adv_data, adv_data_length);
+    ble_matter_adapter_config_adv(matter_adv_data, matter_adv_data_length);
+#endif
 
     return 0;
 }
@@ -129,6 +176,7 @@ uint16_t matter_blemgr_get_mtu(uint8_t connect_id)
     int ret;
     uint16_t mtu_size;
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     if (ble_matter_adapter_peripheral_app_max_links == 0)
     {
         printf("[%s]matter as slave, no connection\n", __func__);
@@ -137,6 +185,10 @@ uint16_t matter_blemgr_get_mtu(uint8_t connect_id)
 
     ret = le_get_conn_param(GAP_PARAM_CONN_MTU_SIZE, &mtu_size, connect_id);
     if (ret == 0)
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+	mtu_size = ble_matter_adapter_get_mtu(connect_id);
+	if (mtu_size != 0xFFFF)
+#endif
     {
         printf("printing MTU size\n");
         return mtu_size;
@@ -149,19 +201,34 @@ uint16_t matter_blemgr_get_mtu(uint8_t connect_id)
 
 int matter_blemgr_set_device_name(char *device_name, uint8_t device_name_length)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     if (device_name == NULL || device_name_length > GAP_DEVICE_NAME_LEN)
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    if (device_name == NULL || device_name_length > BLE_MATTER_DEVICE_NAME_LEN)
+#endif
     {
         printf("[%s]:invalid name or len:name 0x%x,len %d\n", __func__, device_name, device_name_length);
         return 1;
     }
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     le_set_gap_param(GAP_PARAM_DEVICE_NAME, device_name_length, device_name);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+	int ret = rtk_bt_le_gap_set_device_name((const uint8_t *)device_name);
+	if (ret) {
+		printf("[%s]:set device name failed! err: 0x%x",__func__, ret);
+		return -1;
+	}
+
+	printf("[%s] set device name success",__func__);
+#endif
 
     return 0;
 }
 
 int matter_blemgr_disconnect(uint8_t connect_id)
 {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     if (connect_id >= BLE_MATTER_ADAPTER_APP_MAX_LINKS)
     {
         printf("[%s]:invalid conn_hdl[%d]\n", __func__, connect_id);
@@ -178,6 +245,9 @@ int matter_blemgr_disconnect(uint8_t connect_id)
         os_mem_free(conn_id);
         return 1;
     }
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+	ble_matter_adapter_disconnect(connect_id);
+#endif
 
     return 0;
 }
@@ -185,6 +255,7 @@ int matter_blemgr_disconnect(uint8_t connect_id)
 int matter_blemgr_send_indication(uint8_t connect_id, uint8_t *data, uint16_t data_length)
 {
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     if (connect_id >= BLE_MATTER_ADAPTER_APP_MAX_LINKS || data == NULL || data_length == 0)
     {
         printf("[%s]:invalid param:conn_hdl %d,data 0x%x data_length 0x%x\n", __func__, connect_id, data, data_length);
@@ -214,6 +285,9 @@ int matter_blemgr_send_indication(uint8_t connect_id, uint8_t *data, uint16_t da
             return 1;
         }
     }
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+	ble_matter_adapter_send_indication(connect_id, data, data_length);
+#endif
 
     return 0;
 }

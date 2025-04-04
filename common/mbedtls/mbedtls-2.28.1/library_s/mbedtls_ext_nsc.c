@@ -63,6 +63,9 @@ void* __attribute__((cmse_nonsecure_call)) (*ns_calloc)(size_t, size_t) = NULL;
 void __attribute__((cmse_nonsecure_call)) (*ns_free)(void *) = NULL;
 #endif
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY secure_mbedtls_platform_set_ns_calloc_free(
 	void* (*calloc_func)(size_t, size_t),
 	void (*free_func)(void *))
@@ -77,22 +80,34 @@ int NS_ENTRY secure_mbedtls_platform_set_ns_calloc_free(
     return( 0 );
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 void NS_ENTRY secure_mbedtls_ssl_init(mbedtls_ssl_context *ssl)
 {
 	mbedtls_ssl_init(ssl);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 void NS_ENTRY secure_mbedtls_ssl_conf_dbg(mbedtls_ssl_config *conf, void  *p_dbg)
 {
 	mbedtls_debug_set_threshold(0);
 	mbedtls_ssl_conf_dbg(conf, _debug, p_dbg);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 void NS_ENTRY secure_mbedtls_ssl_conf_verify(mbedtls_ssl_config *conf, void *p_vrfy)
 {
 	mbedtls_ssl_conf_verify(conf, _verify, p_vrfy);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY secure_mbedtls_ssl_conf_own_cert(
 	mbedtls_ssl_config *conf,
 	mbedtls_x509_crt *own_cert,
@@ -101,6 +116,9 @@ int NS_ENTRY secure_mbedtls_ssl_conf_own_cert(
 	return mbedtls_ssl_conf_own_cert(conf, own_cert, pk_key);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 mbedtls_x509_crt* NS_ENTRY secure_mbedtls_x509_crt_parse(void)
 {
 	mbedtls_x509_crt *client_crt = (mbedtls_x509_crt *) mbedtls_calloc(1, sizeof(mbedtls_x509_crt));
@@ -129,6 +147,9 @@ error:
 	return NULL;
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 mbedtls_x509_crt* NS_ENTRY secure_mbedtls_x509_crt_parse_ca(void)
 {
 	mbedtls_x509_crt *ca_crt = (mbedtls_x509_crt *) mbedtls_calloc(1, sizeof(mbedtls_x509_crt));
@@ -157,48 +178,75 @@ error:
 	return NULL;
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 void NS_ENTRY secure_mbedtls_x509_crt_free(mbedtls_x509_crt *crt)
 {
 	mbedtls_x509_crt_free(crt);
 	mbedtls_free(crt);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY secure_mbedtls_ssl_setup(mbedtls_ssl_context *ssl, const mbedtls_ssl_config *conf)
 {
 	return mbedtls_ssl_setup(ssl, conf);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 void NS_ENTRY secure_mbedtls_ssl_free(mbedtls_ssl_context *ssl)
 {
 	mbedtls_ssl_free(ssl);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 void NS_ENTRY secure_mbedtls_ssl_config_free(mbedtls_ssl_config *conf)
 {
 	mbedtls_ssl_config_free(conf);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY secure_mbedtls_ssl_handshake(mbedtls_ssl_context *ssl)
 {
 	return mbedtls_ssl_handshake(ssl);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 char* NS_ENTRY secure_mbedtls_ssl_get_ciphersuite(const mbedtls_ssl_context *ssl, char *buf)
 {
 	strcpy(buf, mbedtls_ssl_get_ciphersuite(ssl));
 	return buf;
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY secure_mbedtls_ssl_close_notify(mbedtls_ssl_context *ssl)
 {
 	return mbedtls_ssl_close_notify(ssl);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY secure_mbedtls_ssl_read(mbedtls_ssl_context *ssl, unsigned char *buf, size_t len)
 {
 	return mbedtls_ssl_read(ssl, buf, len);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+IMAGE3_ENTRY_SECTION
+#endif
 int NS_ENTRY secure_mbedtls_ssl_write(mbedtls_ssl_context *ssl, const unsigned char *buf, size_t len)
 {
 	return mbedtls_ssl_write(ssl, buf, len);
