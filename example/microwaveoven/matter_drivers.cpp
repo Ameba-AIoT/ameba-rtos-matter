@@ -53,8 +53,7 @@ CHIP_ERROR matter_driver_microwave_oven_set_startup_value(void)
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL)
-    {
+    if (err == CHIP_ERROR_INTERNAL) {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
 
@@ -78,24 +77,23 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId)
-    {
-    case Clusters::OperationalState::Id:
-        {
-            ChipLogProgress(DeviceLayer, "OvenOperationalState(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-            MicrowaveOven.setOpState(aEvent->value._u8);
-        }
-        break;
-    case Clusters::MicrowaveOvenMode::Id:
-        {
-            ChipLogProgress(DeviceLayer, "MicrowaveOvenMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-        }
-        break;
-    case Clusters::MicrowaveOvenControl::Id:
-        {
-            ChipLogProgress(DeviceLayer, "MicrowaveOvenControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-        }
-        break;
+    switch (path.mClusterId) {
+    case Clusters::OperationalState::Id: {
+        ChipLogProgress(DeviceLayer, "OvenOperationalState(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
+                        path.mAttributeId);
+        MicrowaveOven.setOpState(aEvent->value._u8);
+    }
+    break;
+    case Clusters::MicrowaveOvenMode::Id: {
+        ChipLogProgress(DeviceLayer, "MicrowaveOvenMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
+                        path.mAttributeId);
+    }
+    break;
+    case Clusters::MicrowaveOvenControl::Id: {
+        ChipLogProgress(DeviceLayer, "MicrowaveOvenControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
+                        path.mAttributeId);
+    }
+    break;
     default:
         break;
     }
@@ -108,19 +106,16 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type)
-    {
-    case AppEvent::kEventType_Downlink_Opstate_State:
-        {
-            ChipLogProgress(DeviceLayer, "Set Oven Operational State 0x%x", event->value._u8);
-            CHIP_ERROR err;
-            err = GetMatterMicrowaveOvenServer()->GetOperationalStateInstance()->SetOperationalState(event->value._u8);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(DeviceLayer, "ManualMicrowaveOvenOperationalStateSetStateCommandHandler Failed!\r\n");
-            }
+    switch (event->Type) {
+    case AppEvent::kEventType_Downlink_Opstate_State: {
+        ChipLogProgress(DeviceLayer, "Set Oven Operational State 0x%x", event->value._u8);
+        CHIP_ERROR err;
+        err = GetMatterMicrowaveOvenServer()->GetOperationalStateInstance()->SetOperationalState(event->value._u8);
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(DeviceLayer, "ManualMicrowaveOvenOperationalStateSetStateCommandHandler Failed!\r\n");
         }
-        break;
+    }
+    break;
     default:
         break;
     }

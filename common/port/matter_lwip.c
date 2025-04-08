@@ -57,6 +57,19 @@ uint8_t *matter_LwIP_GetMASK(uint8_t idx)
 }
 
 #if LWIP_IPV6
+
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+uint8_t *LwIP_GetIPv6_linklocal(uint8_t idx)
+{
+    return (uint8_t *) netif_ip6_addr(&xnetif[idx], 0)->addr;
+}
+
+uint8_t *LwIP_GetIPv6_global(uint8_t idx)
+{
+    return (uint8_t *) netif_ip6_addr(&xnetif[idx], 1)->addr;
+}
+#endif
+
 void matter_lwip_dhcp6(void)
 {
 #if LWIP_IPV6_DHCP6 && (LWIP_VERSION_MAJOR >= 2) && (LWIP_VERSION_MINOR >= 1)
@@ -66,18 +79,20 @@ void matter_lwip_dhcp6(void)
 
     pnetif = &xnetif[0]; //Station will always be netif[0]
 
-    if(!netif_is_up(pnetif))
-    {
+    if (!netif_is_up(pnetif)) {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
         netif_set_up(pnetif);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+        netifapi_netif_set_up(pnetif);
+#endif
     }
 
-    for (;;)
-    {
-        if (ip6_addr_isvalid(netif_ip6_addr_state(pnetif, 0)))
-        {
+    for (;;) {
+        if (ip6_addr_isvalid(netif_ip6_addr_state(pnetif, 0))) {
             wifi_indication(WIFI_EVENT_DHCP6_DONE, NULL, 0, 0);
             return;
         }
+        vTaskDelay(10); //giving delay solves hang issue for ameba-rtos
     }
 #endif
 }

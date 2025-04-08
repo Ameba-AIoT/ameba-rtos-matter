@@ -7,8 +7,8 @@
   *
 ******************************************************************************/
 
-#ifndef _KV_MATTER_H_
-#define _KV_MATTER_H_
+#ifndef _MATTER_KV_H_
+#define _MATTER_KV_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,4 +24,4 @@ int32_t rt_kv_get_length(const char *key);
 }
 #endif
 
-#endif // _KV_MATTER_H_
+#endif // _MATTER_KV_H_

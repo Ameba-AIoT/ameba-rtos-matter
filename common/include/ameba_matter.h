@@ -36,11 +36,11 @@
   * @brief SHA2 Type Definitions
   */
 typedef enum _SHA2_TYPE_ {
-	SHA2_NONE 	= 0,
-	SHA2_224 	= 224 / 8,
-	SHA2_256 	= 256 / 8,
-	SHA2_384 	= 384 / 8,
-	SHA2_512 	= 512 / 8
+    SHA2_NONE 	= 0,
+    SHA2_224 	= 224 / 8,
+    SHA2_256 	= 256 / 8,
+    SHA2_384 	= 384 / 8,
+    SHA2_512 	= 512 / 8
 } SHA2_TYPE;
 #endif
 

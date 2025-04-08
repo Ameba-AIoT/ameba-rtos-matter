@@ -4,7 +4,7 @@
 
 void MatterMicrowaveOven::Init(PinName pin)
 {
-    mPwm_obj                        = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_obj                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
 #if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
     mPwm_obj->pwm_idx               = 1;
 #endif
@@ -22,8 +22,7 @@ void MatterMicrowaveOven::deInit(void)
 
 void MatterMicrowaveOven::setOpState(uint8_t state)
 {
-    if (mOpState == state)
-    {
+    if (mOpState == state) {
         return;
     }
 

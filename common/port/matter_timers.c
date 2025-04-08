@@ -48,12 +48,10 @@ BOOL UTILS_ValidateTimespec(const struct timespec *const pxTimespec)
 {
     BOOL xReturn = FALSE;
 
-    if (pxTimespec != NULL)
-    {
+    if (pxTimespec != NULL) {
         /* Verify 0 <= tv_nsec < 1000000000. */
         if ((pxTimespec->tv_nsec >= 0) &&
-                (pxTimespec->tv_nsec < NANOSECONDS_PER_SECOND))
-        {
+            (pxTimespec->tv_nsec < NANOSECONDS_PER_SECOND)) {
             xReturn = TRUE;
         }
     }
@@ -70,17 +68,13 @@ int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *c
     long lNanoseconds = 0;
 
     /* Check parameters. */
-    if ((pxTimespec == NULL) || (pxResult == NULL))
-    {
+    if ((pxTimespec == NULL) || (pxResult == NULL)) {
         iStatus = EINVAL;
-    }
-    else if ((iStatus == 0) && (UTILS_ValidateTimespec(pxTimespec) == FALSE))
-    {
+    } else if ((iStatus == 0) && (UTILS_ValidateTimespec(pxTimespec) == FALSE)) {
         iStatus = EINVAL;
     }
 
-    if (iStatus == 0)
-    {
+    if (iStatus == 0) {
         /* Convert timespec.tv_sec to ticks. */
         llTotalTicks = (int64_t) configTICK_RATE_HZ * (pxTimespec->tv_sec);
 
@@ -94,20 +88,15 @@ int UTILS_TimespecToTicks(const struct timespec *const pxTimespec, TickType_t *c
         llTotalTicks += (int64_t) lNanoseconds;
 
         /* Check for overflow */
-        if (llTotalTicks < 0)
-        {
+        if (llTotalTicks < 0) {
             iStatus = EINVAL;
-        }
-        else
-        {
+        } else {
             /* check if TickType_t is 32 bit or 64 bit */
             uint32_t ulTickTypeSize = sizeof(TickType_t);
 
             /* check for downcast overflow */
-            if (ulTickTypeSize == sizeof(uint32_t))
-            {
-                if (llTotalTicks > UINT_MAX)
-                {
+            if (ulTickTypeSize == sizeof(uint32_t)) {
+                if (llTotalTicks > UINT_MAX) {
                     iStatus = EINVAL;
                 }
             }
@@ -130,17 +119,14 @@ int _nanosleep(const struct timespec *rqtp, struct timespec *rmtp)
     (void) rmtp;
 
     /* Check rqtp. */
-    if (UTILS_ValidateTimespec(rqtp) == FALSE)
-    {
+    if (UTILS_ValidateTimespec(rqtp) == FALSE) {
         errno = EINVAL;
         iStatus = -1;
     }
 
-    if (iStatus == 0)
-    {
+    if (iStatus == 0) {
         /* Convert rqtp to ticks and delay. */
-        if (UTILS_TimespecToTicks(rqtp, &xSleepTime) == 0)
-        {
+        if (UTILS_TimespecToTicks(rqtp, &xSleepTime) == 0) {
             vTaskDelay(xSleepTime);
         }
     }
@@ -178,8 +164,7 @@ time_t _time(time_t *tloc)
     xCurrentTime = tp.tv_sec;
 
     /* Set the output parameter if provided. */
-    if (tloc != NULL)
-    {
+    if (tloc != NULL) {
         *tloc = xCurrentTime;
     }
 
@@ -200,8 +185,7 @@ void matter_rtc_init(void)
 
 time_t matter_rtc_read(void)
 {
-    if (rtc_isenabled() == 0)
-    {
+    if (rtc_isenabled() == 0) {
         rtc_init();
     }
 
@@ -210,8 +194,7 @@ time_t matter_rtc_read(void)
 
 void matter_rtc_write(time_t time)
 {
-    if (rtc_isenabled() == 0)
-    {
+    if (rtc_isenabled() == 0) {
         rtc_init();
     }
 
@@ -247,8 +230,7 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
     sntp_get_lasttime(&update_sec, &update_usec, &update_tick);
 
-    if (update_tick)  //if sntp server is reachable, write to the dct and rtc
-    {
+    if (update_tick) { //if sntp server is reachable, write to the dct and rtc
         time_t tick_diff_sec, tick_diff_ms;
         unsigned int current_tick = xTaskGetTickCount();
 
@@ -261,9 +243,7 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
         matter_rtc_write(*current_sec);
         matter_sntp_rtc_sync = TRUE;
-    }
-    else //if the sntp is not reachable yet, use the last known epoch time if available
-    {
+    } else { //if the sntp is not reachable yet, use the last known epoch time if available
         *current_sec = matter_rtc_read();
     }
 }

@@ -20,12 +20,12 @@ endif
 
 ifeq ($(MBEDTLS_MATTER_ENABLE),y)
 IFLAGS               += -I$(MBEDTLSDIR)/include
+IFLAGS               += -I$(MBEDTLSDIR)/include/mbedtls
 IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
 IFLAGS               += -I$(BASEDIR)/component/ssl/mbedtls_ram_map/rom
 endif
 
 IFLAGS               += -I$(MATTER_DIR)/api
-IFLAGS               += -I$(MATTER_DIR)/common/file_system/kv
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/api
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/include
 IFLAGS               += -I$(MATTER_DIR)/common/port

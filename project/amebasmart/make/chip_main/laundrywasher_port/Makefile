@@ -189,6 +189,6 @@ $(STATIC_LIB):$(OBJS)
 #*****************************************************************************#
 clean: CLEAN_OBJS
 	$(call CLEAN_FUNC)
-	rm -f $(MATTER_EXAMPLEDIR)/laundrywasher/laundrywasher-app-ameba-rtos.matter
+	rm -f $(MATTER_EXAMPLEDIR)/laundrywasher/laundrywasher-app.matter
 
 -include $(DEPS)

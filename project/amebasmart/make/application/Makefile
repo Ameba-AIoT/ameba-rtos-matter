@@ -11,7 +11,6 @@ include $(MAKE_INCLUDE_GEN)
 DIR         = $(BASEDIR)/component/application/matter
 ATCMDDIR    = $(BASEDIR)/component/application/matter/common/atcmd
 BTDIR       = $(BASEDIR)/component/application/matter/common/bluetooth
-FSKVDIR     = $(BASEDIR)/component/application/matter/file_system/kv
 LWIPDIR     = $(BASEDIR)/component/application/matter/lwip
 MBEDDIR     = $(BASEDIR)/component/application/matter/mbedtls
 PORTDIR     = $(BASEDIR)/component/application/matter/port
@@ -35,16 +34,13 @@ ifeq ($(CONFIG_MATTER_EN),y)
 CSRC += $(ATCMDDIR)/atcmd_matter.c
 
 # Matter BLE
-CSRC += $(BTDIR)/matter_blemgr_common.c \
-        $(BTDIR)/ble_matter_adapter_peripheral/ble_matter_adapter_service.c \
-        $(BTDIR)/ble_matter_adapter_peripheral/ble_matter_adapter_peripheral_main.c
+CSRC += $(BTDIR)/matter_blemgr_common.c
 
 # Matter KV
-CSRC += $(FSKVDIR)/kv_matter.c
+CSRC += $(PORTDIR)/matter_kv.c
 
 # Matter LwIP
-CSRC += $(LWIPDIR)/api/lwip_netconf_matter.c \
-        $(LWIPDIR)/lwip_v2.1.2/port/realtek/hooks/lwip_default_hooks.c
+CSRC += $(LWIPDIR)/lwip_v2.1.2/port/realtek/hooks/lwip_default_hooks.c
 
 # Matter MBEDTLS
 CSRC += $(MBEDDIR)/net_sockets.c

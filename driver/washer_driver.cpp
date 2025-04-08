@@ -4,7 +4,7 @@
 
 void MatterWasher::Init(PinName pin)
 {
-    mPwm_obj                        = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_obj                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
 #if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
     mPwm_obj->pwm_idx               = 1;
 #endif

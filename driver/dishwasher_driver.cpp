@@ -4,7 +4,7 @@
 
 void MatterDishwasher::Init(PinName pin)
 {
-    mPwm_obj                        = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_obj                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
 #if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
     mPwm_obj->pwm_idx               = 1;
 #endif
@@ -47,12 +47,9 @@ int16_t MatterDishwasher::GetTemperature(void)
 
 void MatterDishwasher::SetTemperature(int16_t temp)
 {
-    if ((temp >= minTemperature) && (temp <= maxTemperature))
-    {
+    if ((temp >= minTemperature) && (temp <= maxTemperature)) {
         localTemperature = temp;
-    }
-    else
-    {
+    } else {
         ChipLogProgress(DeviceLayer, "Temperature must be set between %i and %i", minTemperature, maxTemperature);
     }
 }

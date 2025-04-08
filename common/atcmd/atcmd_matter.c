@@ -36,10 +36,10 @@ QueueHandle_t shell_queue;
 void fATchipapp(void *arg)
 {
     /* To avoid gcc warnings */
-    ( void ) arg;
-    printf("xPortGetTotalHeapSize = %d\n",xPortGetTotalHeapSize());
-    printf("xPortGetFreeHeapSize = %d\n",xPortGetFreeHeapSize());
-    printf("xPortGetMinimumEverFreeHeapSize = %d\n",xPortGetMinimumEverFreeHeapSize());
+    (void) arg;
+    printf("xPortGetTotalHeapSize = %d\n", xPortGetTotalHeapSize());
+    printf("xPortGetFreeHeapSize = %d\n", xPortGetFreeHeapSize());
+    printf("xPortGetMinimumEverFreeHeapSize = %d\n", xPortGetMinimumEverFreeHeapSize());
 
     deinitPref();
     wifi_disconnect();
@@ -68,44 +68,11 @@ void fATchipapp2(void *arg)
 
 void fATmattershell(void *arg)
 {
-    if (arg != NULL)
-#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
-    {
+    if (arg != NULL) {
         xQueueSend(shell_queue, arg, pdMS_TO_TICKS(10));
-    }
-    else
-    {
+    } else {
         printf("No arguments provided for matter shell\n");
     }
-#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
-    {
-        if(strcmp(arg, "factoryreset") == 0) {
-            fATchipapp(NULL);
-        } else if(strcmp(arg, "queryimage") == 0) {
-            fATchipapp1(NULL);
-        } else if(strcmp(arg, "applyupdate") == 0) {
-            fATchipapp2(NULL);
-#if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
-        } else if(strcmp(arg, "secureheapstatus") == 0) {
-            vMatterPrintSecureHeapStatus();
-#endif
-        } else {
-            xQueueSend(shell_queue, arg, pdMS_TO_TICKS(10));
-        }
-    }
-    else
-    {
-        DiagPrintf("No arguments provided for matter shell, available commands:\n%s\n%s\n%s\n%s\n",
-                   "ATmatter factoryreset     : to factory reset the matter application",
-                   "ATmatter queryimage       : query image for matter ota requestor app",
-                   "ATmatter applyupdate      : apply update for matter ota requestor app",
-                   "ATmatter help             : to show other matter commands");
-        //Diagnostics logs is not yet implemented
-#if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
-        DiagPrintf("ATmatter secureheapstatus : to check secure heap status\n");
-#endif
-    }
-#endif // CONFIG_PLATFORM
 }
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
@@ -168,8 +135,7 @@ void fATnetworklog(void *arg)
 
     size_t dataSize = (size_t)atoi((const char *)arg);
     u8 *data = (u8 *)malloc(dataSize * sizeof(u8));
-    if (data == NULL)
-    {
+    if (data == NULL) {
         return;
     }
 
@@ -185,8 +151,7 @@ void fATnetworklog(void *arg)
 
     matter_insert_network_log(data, dataSize);
 
-    if (data)
-    {
+    if (data) {
         free(data);
     }
     return;
@@ -197,10 +162,10 @@ log_item_t at_matter_items[] = {
 #ifndef CONFIG_INIC_NO_FLASH
 #if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #if ATCMD_VER == ATVER_1
-    {"ATM$", fATchipapp, {NULL,NULL}},
-    {"ATM%", fATchipapp1, {NULL,NULL}},
-    {"ATM^", fATchipapp2, {NULL,NULL}},
-    {"ATMS", fATmattershell, {NULL,NULL}},
+    {"ATM$", fATchipapp, {NULL, NULL}},
+    {"ATM%", fATchipapp1, {NULL, NULL}},
+    {"ATM^", fATchipapp2, {NULL, NULL}},
+    {"ATMS", fATmattershell, {NULL, NULL}},
 #if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
     {"@@@@", fATcrash},
     {"####", fATcrashbdx},
@@ -209,7 +174,11 @@ log_item_t at_matter_items[] = {
 #endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
 #endif // end of #if ATCMD_VER == ATVER_1
 #elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
-    {"matter", fATmattershell, {NULL, NULL}},
+    {"M$", fATchipapp, {NULL, NULL}},
+    {"M%", fATchipapp1, {NULL, NULL}},
+    {"M^", fATchipapp2, {NULL, NULL}},
+    {"MS", fATmattershell, {NULL, NULL}},
+    // CONFIG_ENABLE_AMEBA_DLOG_TEST no implementation yet
 #endif // CONFIG_PLATFORM
 #endif
 };
@@ -218,9 +187,9 @@ void at_matter_init(void)
 {
     shell_queue = xQueueCreate(3, 256); // backlog 3 commands max
 #if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
-    log_service_add_table(at_matter_items, sizeof(at_matter_items)/sizeof(at_matter_items[0]));
+    log_service_add_table(at_matter_items, sizeof(at_matter_items) / sizeof(at_matter_items[0]));
 #elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
-    atcmd_service_add_table(at_matter_items, sizeof(at_matter_items)/sizeof(at_matter_items[0]));
+    atcmd_service_add_table(at_matter_items, sizeof(at_matter_items) / sizeof(at_matter_items[0]));
 #endif // CONFIG_PLATFORM
 }
 

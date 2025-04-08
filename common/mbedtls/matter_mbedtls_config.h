@@ -3539,11 +3539,7 @@
 #endif
 
 #if (MBEDTLS_VERSION_NUMBER < 0x03000000)
-#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <check_config.h>
-#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
-#include <mbedtls/check_config.h>
-#endif
 #endif
 
 #endif /* CONFIG_MATTER */
