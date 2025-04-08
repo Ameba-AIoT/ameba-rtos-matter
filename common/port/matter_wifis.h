@@ -36,17 +36,6 @@ extern rtw_mode_t wifi_mode;
  *               WiFi Security
  ******************************************************/
 #define RTW_SECURITY_WPA_WPA2_MIXED    RTW_SECURITY_WPA_WPA2_MIXED_PSK
-#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
-#define RTW_SECURITY_WPA_TKIP_ENTERPRISE       (ENTERPRISE_ENABLED | RTW_SECURITY_WPA_TKIP_PSK)
-#define RTW_SECURITY_WPA_AES_ENTERPRISE        (ENTERPRISE_ENABLED | RTW_SECURITY_WPA_AES_PSK)
-#define RTW_SECURITY_WPA_MIXED_ENTERPRISE      (ENTERPRISE_ENABLED | RTW_SECURITY_WPA_MIXED_PSK)
-#define RTW_SECURITY_WPA2_TKIP_ENTERPRISE      (ENTERPRISE_ENABLED | RTW_SECURITY_WPA2_TKIP_PSK)
-#define RTW_SECURITY_WPA2_AES_ENTERPRISE       (ENTERPRISE_ENABLED | RTW_SECURITY_WPA2_AES_PSK)
-#define RTW_SECURITY_WPA2_MIXED_ENTERPRISE     (ENTERPRISE_ENABLED | RTW_SECURITY_WPA2_MIXED_PSK)
-#define RTW_SECURITY_WPA_WPA2_TKIP_ENTERPRISE  (ENTERPRISE_ENABLED | RTW_SECURITY_WPA_WPA2_TKIP_PSK)
-#define RTW_SECURITY_WPA_WPA2_AES_ENTERPRISE   (ENTERPRISE_ENABLED | RTW_SECURITY_WPA_WPA2_AES_PSK)
-#define RTW_SECURITY_WPA_WPA2_MIXED_ENTERPRISE (ENTERPRISE_ENABLED | RTW_SECURITY_WPA_WPA2_MIXED_PSK)
-#endif
 
 /******************************************************
  *               WiFi Connection Status
@@ -77,7 +66,7 @@ typedef struct rtw_wifi_config {
     unsigned char    ssid[32];
     unsigned char    ssid_len;
     unsigned char    security_type;
-    unsigned char    password[RTW_MAX_PSK_LEN+1];
+    unsigned char    password[RTW_MAX_PSK_LEN + 1];
     unsigned char    password_len;
     unsigned char    channel;
 } rtw_wifi_config_t;
@@ -108,7 +97,7 @@ enum rtw_connect_error_flag_t {
 /******************************************************
  *               Matter WiFi Event
  ******************************************************/
-typedef enum{
+typedef enum {
 #if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     MATTER_WIFI_EVENT_CONNECT                = WIFI_EVENT_CONNECT,
     MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE = WIFI_EVENT_FOURWAY_HANDSHAKE_DONE,

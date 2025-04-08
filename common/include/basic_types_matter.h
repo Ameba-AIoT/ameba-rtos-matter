@@ -12,11 +12,11 @@
 
 #if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
 #ifndef in_addr_t
-    typedef __uint32_t in_addr_t;
+typedef __uint32_t in_addr_t;
 #endif
 
 #ifdef IN
-    #undef IN
+#undef IN
 #endif
 #endif //defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
 

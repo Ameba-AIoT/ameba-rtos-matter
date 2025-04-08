@@ -30,18 +30,16 @@ mbedtls_aes_context aes_ctx;
 
 static bool store_string_spake2_salt(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -53,18 +51,16 @@ static bool store_string_spake2_salt(pb_istream_t *stream, const pb_field_t *fie
 
 static bool store_string_spake2_verifier(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -76,18 +72,16 @@ static bool store_string_spake2_verifier(pb_istream_t *stream, const pb_field_t 
 
 static bool store_string_dac_cert(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -99,18 +93,16 @@ static bool store_string_dac_cert(pb_istream_t *stream, const pb_field_t *field,
 
 static bool store_string_dac_key(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -122,18 +114,16 @@ static bool store_string_dac_key(pb_istream_t *stream, const pb_field_t *field, 
 
 static bool store_string_pai_cert(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -145,18 +135,16 @@ static bool store_string_pai_cert(pb_istream_t *stream, const pb_field_t *field,
 
 static bool store_string_cd(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -168,18 +156,16 @@ static bool store_string_cd(pb_istream_t *stream, const pb_field_t *field, void 
 
 static bool store_string_vendor_name(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -191,18 +177,16 @@ static bool store_string_vendor_name(pb_istream_t *stream, const pb_field_t *fie
 
 static bool store_string_product_name(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -214,18 +198,16 @@ static bool store_string_product_name(pb_istream_t *stream, const pb_field_t *fi
 
 static bool store_string_hw_ver_string(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -237,18 +219,16 @@ static bool store_string_hw_ver_string(pb_istream_t *stream, const pb_field_t *f
 
 static bool store_string_mfg_date(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -260,18 +240,16 @@ static bool store_string_mfg_date(pb_istream_t *stream, const pb_field_t *field,
 
 static bool store_string_serial_num(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -283,18 +261,16 @@ static bool store_string_serial_num(pb_istream_t *stream, const pb_field_t *fiel
 
 static bool store_string_rd_id_uid(pb_istream_t *stream, const pb_field_t *field, void **arg)
 {
-    FactoryData *fdp = *(FactoryData**) arg;
+    FactoryData *fdp = *(FactoryData **) arg;
     uint8_t buffer[1024] = {0};
 
     /* We could read block-by-block to avoid the large buffer... */
     size_t data_length = stream->bytes_left;
-    if (stream->bytes_left > sizeof(buffer) - 1)
-    {
+    if (stream->bytes_left > sizeof(buffer) - 1) {
         return false;
     }
 
-    if (!pb_read(stream, buffer, stream->bytes_left))
-    {
+    if (!pb_read(stream, buffer, stream->bytes_left)) {
         return false;
     }
 
@@ -323,18 +299,17 @@ int32_t ReadFactory(uint8_t *buffer, uint16_t *pfactorydata_len)
     // Check if factory data length is more than 4096
     // Which indicates that factory data is not flashed
     // Return to prevent reading from non-existent address
-    if (*pfactorydata_len > 4096)
-    {
+    if (*pfactorydata_len > 4096) {
         return -1;
     }
 
     // +2 offset to read the FactoryData
 #if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     device_mutex_lock(RT_DEV_LOCK_FLASH);
-    ret = flash_stream_read(&flash, address+2, *pfactorydata_len, buffer);
+    ret = flash_stream_read(&flash, address + 2, *pfactorydata_len, buffer);
     device_mutex_unlock(RT_DEV_LOCK_FLASH);
 #elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
-    ret = flash_stream_read(&flash, address+2, *pfactorydata_len, buffer);
+    ret = flash_stream_read(&flash, address + 2, *pfactorydata_len, buffer);
 #endif
 
     return ret;
@@ -355,22 +330,18 @@ int32_t DecodeFactory(uint8_t *buffer, FactoryData *fdp, uint16_t data_len)
     unsigned char stream_block[16] = {0};
     size_t iv_offset = 0;
 
-    unsigned char *decrypted_output = (unsigned char*) pvPortMalloc(data_len);
-    if (decrypted_output == NULL)
-    {
+    unsigned char *decrypted_output = (unsigned char *) pvPortMalloc(data_len);
+    if (decrypted_output == NULL) {
         ret = -1;
         goto encrypt_exit;
     }
 
     memcpy(nonce_counter, test_iv, sizeof(nonce_counter));
     ret = mbedtls_aes_crypt_ctr(&aes_ctx, data_len, &nc_off, nonce_counter, stream_block, buffer, decrypted_output);
-    if (ret != 0)
-    {
+    if (ret != 0) {
         ret = -1;
         goto encrypt_exit;
-    }
-    else
-    {
+    } else {
         ret = 1;
         memcpy(buffer, decrypted_output, data_len);
     }
@@ -414,8 +385,7 @@ encrypt_exit:
     FDP.dii.serial_num.value.arg = fdp;
     FDP.dii.rd_id_uid.value.arg = fdp;
 
-    if (!pb_decode(&stream, FactoryDataProvider_fields, &FDP))
-    {
+    if (!pb_decode(&stream, FactoryDataProvider_fields, &FDP)) {
         ret = -1;
         goto exit;
     }
@@ -449,8 +419,7 @@ static bool matter_secure_context_created = false;
 
 void matter_create_secure_context(void)
 {
-    if (matter_secure_context_created)
-    {
+    if (matter_secure_context_created) {
         return;
     }
 
@@ -467,22 +436,20 @@ void matter_create_secure_context(void)
     matter_secure_context_created = true;
 }
 
-int matter_get_signature(uint8_t *pub_buf, size_t pub_size, const unsigned char *msg, size_t msg_size , unsigned char *signature)
+int matter_get_signature(uint8_t *pub_buf, size_t pub_size, const unsigned char *msg, size_t msg_size, unsigned char *signature)
 {
     int result = 0;
 
     matter_create_secure_context();
 
     result = matter_secure_dac_init_keypair(pub_buf, pub_size);
-    if (result != 0)
-    {
+    if (result != 0) {
         printf("Error: %s DAC init failed, result=%d\n", __FUNCTION__, result);
         goto exit;
     }
 
     result = matter_secure_ecdsa_sign_msg(MATTER_DACKEY_KEY_TYPE, msg, msg_size, signature);
-    if (result != 0)
-    {
+    if (result != 0) {
         printf("Error: %s ecdsa sign failed, result=%d\n", __FUNCTION__, result);
         goto exit;
     }
@@ -491,13 +458,12 @@ exit:
     return result;
 }
 
-int matter_ecdsa_sign_msg(const unsigned char *msg, size_t msg_size , unsigned char *signature)
+int matter_ecdsa_sign_msg(const unsigned char *msg, size_t msg_size, unsigned char *signature)
 {
     int result = 0;
 
-    result = matter_secure_ecdsa_sign_msg(MATTER_OPKEY_KEY_TYPE ,msg, msg_size, signature);
-    if (result != 0)
-    {
+    result = matter_secure_ecdsa_sign_msg(MATTER_OPKEY_KEY_TYPE, msg, msg_size, signature);
+    if (result != 0) {
         printf("ERROR: %s get signature failed, result=%d\n", __FUNCTION__, result);
     }
 
@@ -507,10 +473,9 @@ int matter_ecdsa_sign_msg(const unsigned char *msg, size_t msg_size , unsigned c
 int matter_get_publickey(uint8_t *pubkey, size_t pubkey_size)
 {
     int result = 0;
-    
+
     result = matter_secure_get_opkey_pub(pubkey, pubkey_size);
-    if (result != 0)
-    {
+    if (result != 0) {
         printf("ERROR: %s get public key failed, result=%d\n", __FUNCTION__, result);
     }
 
@@ -522,8 +487,7 @@ size_t matter_gen_new_csr(uint8_t *out_csr, size_t csr_length)
     int result = 0;
 
     result = matter_secure_new_csr(out_csr, csr_length);
-    if (result <= 0)
-    {
+    if (result <= 0) {
         printf("ERROR: %s create csr failed, return=%d\n", __FUNCTION__, result);
     }
 
@@ -535,9 +499,8 @@ int matter_serialize(uint8_t *output_buf, size_t output_size)
     int result = 0;
 
     result = matter_secure_serialize(output_buf, output_size);
-    if (result != 0)
-    {
-        printf("ERROR: %s serialize failed, result=%d\n", __FUNCTION__,result);
+    if (result != 0) {
+        printf("ERROR: %s serialize failed, result=%d\n", __FUNCTION__, result);
     }
 
     return result;
@@ -550,9 +513,8 @@ int matter_deserialize(uint8_t *buf, size_t size)
     matter_create_secure_context();
 
     result = matter_secure_get_opkey(buf, size);
-    if (result != 0)
-    {
-        printf("ERROR: %s decrypt failed, result=%d\n", __FUNCTION__,result);
+    if (result != 0) {
+        printf("ERROR: %s decrypt failed, result=%d\n", __FUNCTION__, result);
         return result;
     }
 

@@ -25,7 +25,7 @@ public:
     uint8_t GetDoorStatus(void);
     void SetDoorStatus(uint8_t temp);
     void SetAlarm(void);
-    
+
 private:
     gpio_t alarmGpio;
     uint16_t mode;

@@ -49,8 +49,10 @@ extern "C" {
 #undef LWIP_ICMP6
 #define LWIP_ICMP6                  1
 
+#if defined(CONFIG_PLATFORM_8710C)
 #undef LWIP_IPV6_DHCP6
 #define LWIP_IPV6_DHCP6             1
+#endif /* defined(CONFIG_PLATFORM_8710C) */
 
 #undef MEMP_NUM_MLD6_GROUP
 #define MEMP_NUM_MLD6_GROUP         6
