@@ -15,7 +15,9 @@
 #ifndef _RTK_CHIP_PORTING_H_
 #define _RTK_CHIP_PORTING_H_
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <platform_opts_bt.h>
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,17 +26,21 @@ extern "C" {
 #include <stddef.h>
 #include <stdarg.h>
 #include <cmsis_compiler.h>
-#include <dct.h>
 
-#include <wifi_structures.h>
-
-#include <matter_dcts.h>
-#include <matter_fs.h>
+#include <matter_kvs.h>
 #include <matter_lwip.h>
 #include <matter_ota.h>
 #include <matter_timers.h>
 #include <matter_utils.h>
 #include <matter_wifis.h>
+
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
+#include <dct.h>
+#include <wifi_structures.h>
+#include <matter_fs.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <wifi_intf_drv_to_app_basic.h>
+#endif
 
 #if defined(CONFIG_BT_MESH_DEVICE_MATTER) && CONFIG_BT_MESH_DEVICE_MATTER
 /** @brief  Config local address type: 0-pulic address, 1-static random address */

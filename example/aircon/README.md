@@ -107,3 +107,104 @@ Refer to this [guide](https://github.com/ambiot/ambd_matter/blob/main/tools/Ameb
     cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make clean
 </details>
+
+<details>
+  <summary>Building with AmebaDplus</summary>
+
+### AmebaDplus (RTL8721Dx)
+
+#### GPIO Pin Configuration
+
+| Peripheral | Pin   |
+| ---------- | ----- |
+| Fan        | PB_18  |
+| Sensor     | Depends on type of sensor |
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebadplus_gcc_project/project_km4
+    make -C asdk aircon_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project/project_km4
+    make EXAMPLE=aircon
+    cd ameba-rtos/amebadplus_gcc_project/project_km0
+    make all
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project/project_km4
+    make clean
+</details>
+
+<details>
+  <summary>Building with AmebaLite</summary>
+
+### AmebaLite (RTL8720EA / RTL8726EA)
+
+#### GPIO Pin Configuration
+
+| Peripheral | Pin   |
+| ---------- | ----- |
+| Fan        | PA_31  |
+| Sensor     | Depends on type of sensor |
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebalite_gcc_project/project_km4
+    make -C asdk aircon_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebalite_gcc_project/project_km4
+    make EXAMPLE=aircon
+    cd ameba-rtos/amebalite_gcc_project/project_kr4
+    make all
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebalite_gcc_project/project_km4
+    make clean
+</details>
+
+<details>
+  <summary>Building with AmebaSmart</summary>
+
+### AmebaSmart (RTL8730E)
+
+#### GPIO Pin Configuration
+
+| Peripheral | Pin   |
+| ---------- | ----- |
+| Fan        | PA_5  |
+| Sensor     | Depends on type of sensor |
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebasmart_gcc_project/project_ap
+    make -C asdk aircon_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project/project_ap
+    make EXAMPLE=aircon
+    cd ameba-rtos/amebasmart_gcc_project/project_hp
+    make all
+    cd ameba-rtos/amebasmart_gcc_project/project_lp
+    make all
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project/project_ap
+    make clean
+</details>

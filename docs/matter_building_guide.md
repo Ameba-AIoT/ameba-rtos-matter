@@ -13,6 +13,12 @@ This general guide provides an overview of the Matter integration process and se
 
 - [AmebaD Building Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/amebad_general_build.md) - Step-by-step instructions for building Matter on AmebaD.
 
+- [AmebaDplus Building Guide](amebadplus_general_build.md) - Step-by-step instructions for building Matter on AmebaDplus.
+
+- [AmebaLite Building Guide](amebalite_general_build.md) - Step-by-step instructions for building Matter on AmebaLite.
+
+- [AmebaSmart Building Guide](amebasmart_general_build.md) - Step-by-step instructions for building Matter on AmebaSmart.
+
 ## Building Different Applications
 
 Each device type has its standalone example, and here is how you can build the application.
@@ -37,6 +43,28 @@ make all_clusters / air_purifier / aircon_port / bridge_dm  / dishwasher_port / 
 make -C asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / laundrywasher_port
              light / light_dm / light_port / light_switch /microwaveoven_port / refrigerator_port / thermostat_port
 ```
+
+#### AmebaDplus (RTL8721Dx) Commands:
+
+```
+make -C asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / fan_port
+             laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
+```
+
+#### AmebaLite (RTL8720EA / RTL8726EA) Commands:
+
+```
+make -C asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / fan_port
+             laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
+```
+
+#### AmebaSmart (RTL8730E) Commands:
+
+```
+make -C asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / fan_port
+             laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
+```
+
 ### Matter Application Types
 
 There are two different types of Matter applications:
