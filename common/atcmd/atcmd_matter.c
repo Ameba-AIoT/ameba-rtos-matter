@@ -1,8 +1,19 @@
 #include <platform_stdlib.h>
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <platform_opts.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <platform_autoconf.h>
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
+#endif
 
 #if defined(CONFIG_MATTER) && CONFIG_MATTER
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <log_service.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <atcmd_service.h>
+#endif
 #include <main.h>
 #include <sys_api.h>
 #include <wifi_conf.h>
@@ -13,6 +24,11 @@ extern u32 deinitPref(void);
 extern void amebaQueryImageCmdHandler();
 extern void amebaApplyUpdateCmdHandler();
 #endif
+#if defined(CONFIG_PLATFORM_AMEBADPLUS)
+#if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
+extern void NS_ENTRY vMatterPrintSecureHeapStatus(void);
+#endif // CONFIG_PLATFORM_AMEBADPLUS
+#endif // CONFIG_PLATFORM
 
 // Queue for matter shell
 QueueHandle_t shell_queue;
@@ -20,10 +36,10 @@ QueueHandle_t shell_queue;
 void fATchipapp(void *arg)
 {
     /* To avoid gcc warnings */
-    ( void ) arg;
-    printf("xPortGetTotalHeapSize = %d\n",xPortGetTotalHeapSize());
-    printf("xPortGetFreeHeapSize = %d\n",xPortGetFreeHeapSize());
-    printf("xPortGetMinimumEverFreeHeapSize = %d\n",xPortGetMinimumEverFreeHeapSize());
+    (void) arg;
+    printf("xPortGetTotalHeapSize = %d\n", xPortGetTotalHeapSize());
+    printf("xPortGetFreeHeapSize = %d\n", xPortGetFreeHeapSize());
+    printf("xPortGetMinimumEverFreeHeapSize = %d\n", xPortGetMinimumEverFreeHeapSize());
 
     deinitPref();
     wifi_disconnect();
@@ -52,12 +68,9 @@ void fATchipapp2(void *arg)
 
 void fATmattershell(void *arg)
 {
-    if (arg != NULL)
-    {
+    if (arg != NULL) {
         xQueueSend(shell_queue, arg, pdMS_TO_TICKS(10));
-    }
-    else
-    {
+    } else {
         printf("No arguments provided for matter shell\n");
     }
 }
@@ -122,8 +135,7 @@ void fATnetworklog(void *arg)
 
     size_t dataSize = (size_t)atoi((const char *)arg);
     u8 *data = (u8 *)malloc(dataSize * sizeof(u8));
-    if (data == NULL)
-    {
+    if (data == NULL) {
         return;
     }
 
@@ -139,8 +151,7 @@ void fATnetworklog(void *arg)
 
     matter_insert_network_log(data, dataSize);
 
-    if (data)
-    {
+    if (data) {
         free(data);
     }
     return;
@@ -149,11 +160,12 @@ void fATnetworklog(void *arg)
 
 log_item_t at_matter_items[] = {
 #ifndef CONFIG_INIC_NO_FLASH
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #if ATCMD_VER == ATVER_1
-    {"ATM$", fATchipapp, {NULL,NULL}},
-    {"ATM%", fATchipapp1, {NULL,NULL}},
-    {"ATM^", fATchipapp2, {NULL,NULL}},
-    {"ATMS", fATmattershell, {NULL,NULL}},
+    {"ATM$", fATchipapp, {NULL, NULL}},
+    {"ATM%", fATchipapp1, {NULL, NULL}},
+    {"ATM^", fATchipapp2, {NULL, NULL}},
+    {"ATMS", fATmattershell, {NULL, NULL}},
 #if defined(CONFIG_ENABLE_AMEBA_DLOG_TEST) && (CONFIG_ENABLE_AMEBA_DLOG_TEST == 1)
     {"@@@@", fATcrash},
     {"####", fATcrashbdx},
@@ -161,13 +173,24 @@ log_item_t at_matter_items[] = {
     {"^^^^", fATnetworklog},
 #endif /* CONFIG_ENABLE_AMEBA_DLOG_TEST */
 #endif // end of #if ATCMD_VER == ATVER_1
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    {"M$", fATchipapp, {NULL, NULL}},
+    {"M%", fATchipapp1, {NULL, NULL}},
+    {"M^", fATchipapp2, {NULL, NULL}},
+    {"MS", fATmattershell, {NULL, NULL}},
+    // CONFIG_ENABLE_AMEBA_DLOG_TEST no implementation yet
+#endif // CONFIG_PLATFORM
 #endif
 };
 
 void at_matter_init(void)
 {
     shell_queue = xQueueCreate(3, 256); // backlog 3 commands max
-    log_service_add_table(at_matter_items, sizeof(at_matter_items)/sizeof(at_matter_items[0]));
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
+    log_service_add_table(at_matter_items, sizeof(at_matter_items) / sizeof(at_matter_items[0]));
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    atcmd_service_add_table(at_matter_items, sizeof(at_matter_items) / sizeof(at_matter_items[0]));
+#endif // CONFIG_PLATFORM
 }
 
 #if SUPPORT_LOG_SERVICE

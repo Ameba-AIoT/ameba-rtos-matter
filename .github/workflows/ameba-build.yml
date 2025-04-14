@@ -1,0 +1,72 @@
+name: Build Ameba RTOS Matter Docker Image
+
+on:
+  pull_request:
+    branches:
+      - release/v1.3
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: true
+          swap-storage: true
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker common base image
+      run: |
+        docker buildx build --file tools/docker/Dockerfile --tag ameba-rtos-matter:common --load .
+
+    # - name: Build AmebaZ2 Docker image
+    #   run: |
+    #     docker buildx build --file tools/docker/amebaz2/Dockerfile --tag ameba-rtos-matter:amebaz2 --load .
+
+    # - name: Build AmebaD Docker image
+    #   run: |
+    #     docker buildx build --file tools/docker/amebad/Dockerfile --tag ameba-rtos-matter:amebad --load .
+
+    - name: Build AmebaRTOS Docker image
+      run: |
+        docker buildx build --file tools/docker/ameba-rtos/Dockerfile --tag ameba-rtos-matter:ameba-rtos --load .
+
+    - name: Check Docker images
+      run: docker images
+
+    # - name: Run Docker container for AmebaZ2 and execute scripts
+    #   run: |
+    #     chmod +x ./tools/docker/amebaz2/run_docker_build_scripts.sh
+    #     ./tools/docker/amebaz2/run_docker_build_scripts.sh
+
+    # - name: Run Docker container for AmebaD and execute scripts
+    #   run: |
+    #     chmod +x ./tools/docker/amebad/run_docker_build_scripts.sh
+    #     ./tools/docker/amebad/run_docker_build_scripts.sh
+
+    - name: Run Docker container for amebadplus and execute scripts
+      run: |
+        chmod +x ./tools/docker/ameba-rtos/amebadplus/run_docker_build_scripts.sh
+        ./tools/docker/ameba-rtos/amebadplus/run_docker_build_scripts.sh
+
+    - name: Run Docker container for amebalite and execute scripts
+      run: |
+        chmod +x ./tools/docker/ameba-rtos/amebalite/run_docker_build_scripts.sh
+        ./tools/docker/ameba-rtos/amebalite/run_docker_build_scripts.sh
+
+    - name: Run Docker container for amebasmart and execute scripts
+      run: |
+        chmod +x ./tools/docker/ameba-rtos/amebasmart/run_docker_build_scripts.sh
+        ./tools/docker/ameba-rtos/amebasmart/run_docker_build_scripts.sh
+
+    - name: Clean up Docker
+      run: docker system prune -af
