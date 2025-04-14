@@ -1,4 +1,8 @@
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include <platform_opts.h>
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <platform_autoconf.h>
+#endif
 #if defined(CONFIG_PLATFORM_8721D)
 #include <atcmd_matter.h>
 #endif
@@ -34,7 +38,11 @@
  * All of the examples (except CONFIG_EXAMPLE_MATTER_CHIPTEST) are disabled by default for code size consideration
  * The configuration is enabled in platform_opts_matter.h
  */
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 void matter_example_entry(void)
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+void app_example(void)
+#endif
 {
 #if defined(CONFIG_PLATFORM_8721D)
     matter_shell_init();

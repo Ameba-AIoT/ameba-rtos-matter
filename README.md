@@ -24,8 +24,11 @@ Please read the [Important Notice](https://github.com/Ameba-AIoT/ameba-matter/bl
 
 Feel free to explore our curated list of supported ICs below to find the best match for your project.
 
-1. AmebaZ2 (RTL8710C)
-2. AmebaD  (RTL8721D)
+1. AmebaZ2    (RTL8710C)
+2. AmebaD     (RTL8721D)
+3. AmebaDplus (RTL8721Dx)
+4. AmebaLite  (RTL8720EA / RTL8726EA)
+5. AmebaSmart (RTL8730E)
 
 Checkout the [Application Notes](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/AN0204%20Realtek%20Matter%20application%20note.en.pdf) to learn more about Realtek's Matter solution.
 

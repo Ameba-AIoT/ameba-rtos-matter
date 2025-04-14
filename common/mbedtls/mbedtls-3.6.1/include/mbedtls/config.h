@@ -1,7 +1,9 @@
 #define CONFIG_SSL_RSA          0
 
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 #include "rom_ssl_ram_map.h"
 #include "platform_opts.h"
+#endif
 //#define RTL_HW_CRYPTO
 //#define SUPPORT_HW_SW_CRYPTO
 

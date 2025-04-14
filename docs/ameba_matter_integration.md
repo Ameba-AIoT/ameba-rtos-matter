@@ -6,15 +6,21 @@ Integrate the `ameba-rtos-matter` repository using the following steps:
 
 ### Method 1: Clone the Repository
 
-Navigate to `sdk/component/common/application/matter`:
+Navigate to `application/matter`:
 
-1. Navigate to the directory `sdk/component/common/application/matter`.
+1. Navigate to the directory `application/matter`.
 2. Clone the repository `ameba-rtos-matter` from GitHub:
 
 ```bash
     cd sdk
+
+    # for AmebaZ2, AmebaZ2plus, and AmebaD
     git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/common/application/matter
     cd component/common/application/matter
+    # for AmebaDplus, AmebaLite, and AmebaSmart
+    git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/application/matter
+    cd component/application/matter
+
     git checkout release/v1.4
 ```
 
@@ -25,8 +31,14 @@ Navigate to `sdk/component/common/application/matter`:
 
 ```bash
     cd sdk
+
+    # for AmebaZ2, AmebaZ2plus, and AmebaD
     git submodule add https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/common/application/matter
     cd component/common/application/matter
+    # for AmebaDplus, AmebaLite, and AmebaSmart
+    git submodule add https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/application/matter
+    cd component/application/matter
+
     git checkout release/v1.4
 ```
 

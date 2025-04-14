@@ -21,6 +21,9 @@ extern "C" {
 
 #include <wifi_conf.h>
 #include <lwip_netconf.h>
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include "rtw_wifi_constants.h"
+#endif
 
 /******************************************************
  *               Other Variables
@@ -39,7 +42,7 @@ extern rtw_mode_t wifi_mode;
  ******************************************************/
 #define JOIN_HANDSHAKE_DONE            (uint32_t)(1 << 7)
 
-#if defined(CONFIG_PLATFORM_8721D)
+#if defined(CONFIG_PLATFORM_8721D) || defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
 #define IW_ENCODE_ALG_NONE             0
 #define IW_ENCODE_ALG_WEP              1
 #define IW_ENCODE_ALG_TKIP             2
@@ -48,13 +51,62 @@ extern rtw_mode_t wifi_mode;
 #define IW_ENCODE_ALG_AES_CMAC         5
 #endif
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+
+/******************************************************
+ *         Wifi Network Mode (BGN)
+ ******************************************************/
+typedef int rtw_network_mode_t;
+
+/******************************************************
+ *               WiFi Config
+ ******************************************************/
+typedef struct rtw_wifi_config {
+    unsigned int		boot_mode;
+    unsigned char 		ssid[32];
+    unsigned char		ssid_len;
+    unsigned char		security_type;
+    unsigned char		password[RTW_MAX_PSK_LEN + 1];
+    unsigned char		password_len;
+    unsigned char		channel;
+} rtw_wifi_config_t;
+
+/******************************************************
+ *               WiFi Interface
+ ******************************************************/
+
+typedef u8 rtw_interface_t;
+#define RTW_STA_INTERFACE WLAN0_IDX
+#define RTW_AP_INTERFACE WLAN1_IDX
+
+/******************************************************
+ *               Wifi Connect Error
+ ******************************************************/
+
+enum rtw_connect_error_flag_t {
+    RTW_NO_ERROR,        /**< no error */
+    RTW_NONE_NETWORK,   /**< none network */
+    RTW_WRONG_PASSWORD, /**< wrong password */
+    RTW_4WAY_HANDSHAKE_TIMEOUT, /**< 4 way handshake timeout*/
+    RTW_CONNECT_FAIL,  /**< connect fail*/
+    RTW_DHCP_FAIL,        /**< dhcp fail*/
+    RTW_UNKNOWN,         /**< unknown*/
+};
+#endif
+
 /******************************************************
  *               Matter WiFi Event
  ******************************************************/
-typedef enum{
+typedef enum {
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
     MATTER_WIFI_EVENT_CONNECT                = WIFI_EVENT_CONNECT,
     MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE = WIFI_EVENT_FOURWAY_HANDSHAKE_DONE,
     MATTER_WIFI_EVENT_DISCONNECT             = WIFI_EVENT_DISCONNECT,
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    MATTER_WIFI_EVENT_CONNECT                = WIFI_EVENT_STA_ASSOC,
+    MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE = WIFI_EVENT_WPA_STA_4WAY_RECV,
+    MATTER_WIFI_EVENT_DISCONNECT             = WIFI_EVENT_STA_DISASSOC,
+#endif
     MATTER_WIFI_EVENT_DHCP6_DONE             = WIFI_EVENT_DHCP6_DONE,
 } matter_wifi_event;
 
@@ -97,11 +149,15 @@ rtw_scan_result_t *matter_get_scan_results(void);
  * @param[in]  password_len   The length of the password.
  * @param[in]  key_id         The key ID used for the WiFi network.
  */
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
 void matter_wifi_autoreconnect_hdl(
     rtw_security_t security_type,
     char *ssid, int ssid_len,
     char *password, int password_len,
     int key_id);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+void matter_reconn_task_hdl(void *param);
+#endif
 
 /**
  * @brief  Set the auto-reconnect mode for WiFi.

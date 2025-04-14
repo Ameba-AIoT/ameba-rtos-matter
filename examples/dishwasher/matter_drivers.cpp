@@ -26,6 +26,12 @@ using chip::Protocols::InteractionModel::Status;
 #define PWM_PIN         PA_23
 #elif defined(CONFIG_PLATFORM_8721D)
 #define PWM_PIN         PB_5
+#elif defined (CONFIG_AMEBASMART)
+#define PWM_PIN         PA_5
+#elif defined (CONFIG_AMEBALITE)
+#define PWM_PIN         PA_31
+#elif defined (CONFIG_AMEBADPLUS)
+#define PWM_PIN         PB_18
 #endif
 
 MatterDishwasher dishwasher;
@@ -41,43 +47,38 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status;
     ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
-    ModeBase::Instance & dishwasherInstance = DishwasherMode::Instance();
-    DishwasherAlarmServer & dishwasherAlarmInstance = DishwasherAlarmServer::Instance();
+    ModeBase::Instance &dishwasherInstance = DishwasherMode::Instance();
+    DishwasherAlarmServer &dishwasherAlarmInstance = DishwasherAlarmServer::Instance();
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     status = Clusters::OnOff::Attributes::OnOff::Set(1, false);
-    if (status != Status::Success)
-    {
+    if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set OnOff!\n");
         err = CHIP_ERROR_INTERNAL;
     }
 
     status = Clusters::TemperatureControl::Attributes::MaxTemperature::Set(1, dishwasher.GetMaxTemperature());
-    if (status != Status::Success)
-    {
+    if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set MaxTemperature!\n");
         err = CHIP_ERROR_INTERNAL;
     }
 
     status = Clusters::TemperatureControl::Attributes::MinTemperature::Set(1, dishwasher.GetMinTemperature());
-    if (status != Status::Success)
-    {
+    if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set MinTemperature!\n");
         err = CHIP_ERROR_INTERNAL;
     }
 
     dishwasher.SetTemperature(55); // Set dishwasher temperature
     status = Clusters::TemperatureControl::Attributes::TemperatureSetpoint::Set(1, dishwasher.GetTemperature());
-    if (status != Status::Success)
-    {
+    if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set TemperatureSetpoint!\n");
         err = CHIP_ERROR_INTERNAL;
     }
 
     modeChangedResponse.status = to_underlying(dishwasherInstance.UpdateCurrentMode(to_underlying(ModeTag::kNormal))); // Set dishwasher mode
-    if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
-    {
+    if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess)) {
         ChipLogProgress(DeviceLayer, "Failed to set Dishwasher Mode!\n");
         err = CHIP_ERROR_INTERNAL;
     }
@@ -88,10 +89,9 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
     supported.SetField(AlarmMap::kDoorError, 1);             // 0x04, 4
     supported.SetField(AlarmMap::kTempTooLow, 1);            // 0x08, 8
     supported.SetField(AlarmMap::kTempTooHigh, 1);           // 0x10, 16
-    supported.SetField(AlarmMap::kWaterLevelError, 1);       // 0x20, 32 
+    supported.SetField(AlarmMap::kWaterLevelError, 1);       // 0x20, 32
     dishwasherAlarmInstance.SetSupportedValue(1, supported); // 0x3F, 63
-    if (status != Status::Success)
-    {
+    if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set Dishwasher Alarm Supported Value!\n");
         err = CHIP_ERROR_INTERNAL;
     }
@@ -102,10 +102,9 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
     mask.SetField(AlarmMap::kDoorError, 1);        // 0x04, 4
     mask.SetField(AlarmMap::kTempTooLow, 1);       // 0x08, 8
     mask.SetField(AlarmMap::kTempTooHigh, 1);      // 0x10, 16
-    mask.SetField(AlarmMap::kWaterLevelError, 1);  // 0x20, 32 
+    mask.SetField(AlarmMap::kWaterLevelError, 1);  // 0x20, 32
     dishwasherAlarmInstance.SetMaskValue(1, mask); // 0x3F, 63
-    if (status != Status::Success)
-    {
+    if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set Dishwasher Alarm Mask Value!\n");
         err = CHIP_ERROR_INTERNAL;
     }
@@ -118,8 +117,7 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
     latch.SetField(AlarmMap::kDoorError, 1);         // 0x04, 4
     latch.SetField(AlarmMap::kTempTooLow, 1);        // 0x08, 8
     dishwasherAlarmInstance.SetLatchValue(1, latch); // 0x0D, 13
-    if (status != Status::Success)
-    {
+    if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set Dishwasher Alarm Latch Value!\n");
         err = CHIP_ERROR_INTERNAL;
     }
@@ -191,45 +189,37 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId)
-    {
-    case Clusters::OnOff::Id:
-        {
-            ChipLogProgress(DeviceLayer, "OnOff(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+    switch (path.mClusterId) {
+    case Clusters::OnOff::Id: {
+        ChipLogProgress(DeviceLayer, "OnOff(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+    }
+    break;
+    case Clusters::OperationalState::Id: {
+        ChipLogProgress(DeviceLayer, "OperationalState(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+    }
+    break;
+    case Clusters::DishwasherMode::Id: {
+        ChipLogProgress(DeviceLayer, "DishwasherMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        if (path.mAttributeId == Clusters::DishwasherMode::Attributes::CurrentMode::Id) {
+            dishwasher.SetMode(aEvent->value._u16); // Set mode when current mode is changed
         }
-        break;
-    case Clusters::OperationalState::Id:
-        {
-            ChipLogProgress(DeviceLayer, "OperationalState(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+    }
+    break;
+    case Clusters::DishwasherAlarm::Id: {
+        ChipLogProgress(DeviceLayer, "DishwasherAlarm(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        if (path.mAttributeId == Clusters::DishwasherAlarm::Attributes::State::Id) {
+            dishwasher.SetAlarm(); // Set alarm when alarm state is changed
         }
-        break;
-    case Clusters::DishwasherMode::Id:
-        {
-            ChipLogProgress(DeviceLayer, "DishwasherMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-            if (path.mAttributeId == Clusters::DishwasherMode::Attributes::CurrentMode::Id)
-            {
-                dishwasher.SetMode(aEvent->value._u16); // Set mode when current mode is changed
-            }
+    }
+    break;
+    case Clusters::TemperatureControl::Id: {
+        ChipLogProgress(DeviceLayer, "TemperatureControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
+                        path.mAttributeId);
+        if (path.mAttributeId == Clusters::TemperatureControl::Attributes::TemperatureSetpoint::Id) {
+            dishwasher.SetTemperature(aEvent->value._i16); // Change physical temperature
         }
-        break;
-    case Clusters::DishwasherAlarm::Id:
-        {
-            ChipLogProgress(DeviceLayer, "DishwasherAlarm(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-            if (path.mAttributeId == Clusters::DishwasherAlarm::Attributes::State::Id)
-            {
-                dishwasher.SetAlarm(); // Set alarm when alarm state is changed
-            }
-        }
-        break;
-    case Clusters::TemperatureControl::Id:
-        {
-            ChipLogProgress(DeviceLayer, "TemperatureControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-            if (path.mAttributeId == Clusters::TemperatureControl::Attributes::TemperatureSetpoint::Id)
-            {
-                dishwasher.SetTemperature(aEvent->value._i16); // Change physical temperature
-            }
-        }
-        break;
+    }
+    break;
     default:
         break;
     }
@@ -243,77 +233,63 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     Status status;
     CHIP_ERROR error;
     ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
-    ModeBase::Instance & dishwasherInstance = DishwasherMode::Instance();
-    DishwasherAlarmServer & dishwasherAlarmInstance = DishwasherAlarmServer::Instance();
-    
+    ModeBase::Instance &dishwasherInstance = DishwasherMode::Instance();
+    DishwasherAlarmServer &dishwasherAlarmInstance = DishwasherAlarmServer::Instance();
+
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type)
-    {
-    case AppEvent::kEventType_Downlink_OnOff:
-        {
-            ChipLogProgress(DeviceLayer, "Set OnOff 0x%x", event->value._u8);
-            status = Clusters::OnOff::Attributes::OnOff::Set(1, (bool) event->value._u8);
-            if (status != Status::Success)
-            {
-                ChipLogProgress(DeviceLayer, "Failed to set OnOff!\n");
-            }
+    switch (event->Type) {
+    case AppEvent::kEventType_Downlink_OnOff: {
+        ChipLogProgress(DeviceLayer, "Set OnOff 0x%x", event->value._u8);
+        status = Clusters::OnOff::Attributes::OnOff::Set(1, (bool) event->value._u8);
+        if (status != Status::Success) {
+            ChipLogProgress(DeviceLayer, "Failed to set OnOff!\n");
         }
-        break;
-    case AppEvent::kEventType_Downlink_Opstate_State:
-        {
-            ChipLogProgress(DeviceLayer, "Set Operational State 0x%x", event->value._u8);
-            error = Clusters::OperationalState::GetOperationalStateInstance()->SetOperationalState(event->value._u8);
-            if (error != CHIP_NO_ERROR)
-            {
-                ChipLogProgress(DeviceLayer, "Failed to set Operational State!\n");
-            }
+    }
+    break;
+    case AppEvent::kEventType_Downlink_Opstate_State: {
+        ChipLogProgress(DeviceLayer, "Set Operational State 0x%x", event->value._u8);
+        error = Clusters::OperationalState::GetOperationalStateInstance()->SetOperationalState(event->value._u8);
+        if (error != CHIP_NO_ERROR) {
+            ChipLogProgress(DeviceLayer, "Failed to set Operational State!\n");
         }
-        break;
-    case AppEvent::kEventType_Downlink_Opstate_Error_State:
-        {
-            ChipLogProgress(DeviceLayer, "Set Operational State Error 0x%x", event->value._u8);
-            Clusters::detail::Structs::ErrorStateStruct::Type errStateObj = {.errorStateID = event->value._u8};
-            Clusters::OperationalState::GetOperationalStateInstance()->OnOperationalErrorDetected(errStateObj);
+    }
+    break;
+    case AppEvent::kEventType_Downlink_Opstate_Error_State: {
+        ChipLogProgress(DeviceLayer, "Set Operational State Error 0x%x", event->value._u8);
+        Clusters::detail::Structs::ErrorStateStruct::Type errStateObj = {.errorStateID = event->value._u8};
+        Clusters::OperationalState::GetOperationalStateInstance()->OnOperationalErrorDetected(errStateObj);
+    }
+    break;
+    case AppEvent::kEventType_Downlink_DW_Alarm_Set: {
+        ChipLogProgress(DeviceLayer, "Set Dishwasher Alarm State 0x%u", event->value._u8);
+        status = dishwasherAlarmInstance.SetStateValue(1, event->value._u8,
+                 false); // We can input the value directly, no need to use BitMask<AlarmMap> and setfield one by one.
+        if (status != Status::Success) {
+            ChipLogProgress(DeviceLayer, "Failed to set DishwasherAlarm state!\n");
         }
-        break;
-    case AppEvent::kEventType_Downlink_DW_Alarm_Set:
-        {
-            ChipLogProgress(DeviceLayer, "Set Dishwasher Alarm State 0x%u", event->value._u8);
-            status = dishwasherAlarmInstance.SetStateValue(1, event->value._u8, false); // We can input the value directly, no need to use BitMask<AlarmMap> and setfield one by one.
-            if (status != Status::Success)
-            {
-                ChipLogProgress(DeviceLayer, "Failed to set DishwasherAlarm state!\n");
-            }
+    }
+    break;
+    case AppEvent::kEventType_Downlink_DW_Mode: {
+        ChipLogProgress(DeviceLayer, "Set Dishwasher Mode 0x%x", event->value._u8);
+        modeChangedResponse.status = to_underlying(dishwasherInstance.UpdateCurrentMode(event->value._u8));
+        if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess)) {
+            ChipLogProgress(DeviceLayer, "Failed to set Dishwasher mode!\n");
         }
-        break;
-    case AppEvent::kEventType_Downlink_DW_Mode:
-        {
-            ChipLogProgress(DeviceLayer, "Set Dishwasher Mode 0x%x", event->value._u8);
-            modeChangedResponse.status = to_underlying(dishwasherInstance.UpdateCurrentMode(event->value._u8));
-            if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
-            {
-                ChipLogProgress(DeviceLayer, "Failed to set Dishwasher mode!\n");
+    }
+    break;
+    case AppEvent::kEventType_Downlink_TempControl_SetPoint: {
+        if ((event->value._i16 >= dishwasher.GetMinTemperature()) && (event->value._i16 <= dishwasher.GetMaxTemperature())) {
+            ChipLogProgress(DeviceLayer, "Set TemperatureSetpoint %i", event->value._i16);
+            status = Clusters::TemperatureControl::Attributes::TemperatureSetpoint::Set(1, event->value._i16);
+            if (status != Status::Success) {
+                ChipLogProgress(DeviceLayer, "Failed to set TemperatureSetpoint!\n");
             }
+        } else {
+            ChipLogProgress(DeviceLayer, "Temperature must be set between %i and %i", dishwasher.GetMinTemperature(), dishwasher.GetMaxTemperature());
         }
-        break;
-    case AppEvent::kEventType_Downlink_TempControl_SetPoint:
-        {
-            if ((event->value._i16 >= dishwasher.GetMinTemperature()) && (event->value._i16 <= dishwasher.GetMaxTemperature()))
-            {
-                ChipLogProgress(DeviceLayer, "Set TemperatureSetpoint %i", event->value._i16);
-                status = Clusters::TemperatureControl::Attributes::TemperatureSetpoint::Set(1, event->value._i16);
-                if (status != Status::Success)
-                {
-                    ChipLogProgress(DeviceLayer, "Failed to set TemperatureSetpoint!\n");
-                }
-            }
-            else
-            {
-                ChipLogProgress(DeviceLayer, "Temperature must be set between %i and %i", dishwasher.GetMinTemperature(), dishwasher.GetMaxTemperature());
-            }
-        }
-        break;
+    }
+    break;
     default:
         break;
     }

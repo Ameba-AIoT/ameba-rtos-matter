@@ -7,8 +7,10 @@
 // normal LED
 void MatterLED::Init(PinName pin)
 {
-    mPwm_obj                        = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-
+    mPwm_obj                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    mPwm_obj->pwm_idx               = 1;
+#endif
     pwmout_init(mPwm_obj, pin);
 #if defined(CONFIG_PLATFORM_8710C)
     pwmout_period_us(mPwm_obj, 20000); //pwm period = 20ms
@@ -24,9 +26,9 @@ void MatterLED::Init(PinName pin)
 // RGB LED
 void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin)
 {
-    mPwm_red                        = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_green                      = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_blue                       = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_red                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_green                      = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_blue                       = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
 
 #if defined(CONFIG_PLATFORM_8710C)
     pwmout_init(mPwm_red, redpin);
@@ -44,6 +46,13 @@ void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin)
     pwmout_init(mPwm_red, redpin);
     pwmout_init(mPwm_green, bluepin);
     pwmout_init(mPwm_blue, greenpin);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    mPwm_red->pwm_idx               = 1;
+    mPwm_green->pwm_idx             = 2;
+    mPwm_blue->pwm_idx              = 3;
+    pwmout_init(mPwm_red, redpin);
+    pwmout_init(mPwm_green, bluepin);
+    pwmout_init(mPwm_blue, greenpin);
 #endif
 
     mRgb                            = true;
@@ -57,11 +66,11 @@ void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin)
 // RGBCW LED
 void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin, PinName cwhitepin, PinName wwhitepin)
 {
-    mPwm_red                        = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_green                      = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_blue                       = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_cwhite                     = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_wwhite                     = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_red                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_green                      = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_blue                       = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_cwhite                     = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_wwhite                     = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
 
 #if defined(CONFIG_PLATFORM_8710C)
     pwmout_init(mPwm_red, redpin);
@@ -89,6 +98,17 @@ void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin, PinName 
     pwmout_init(mPwm_blue, greenpin);
     pwmout_init(mPwm_cwhite, cwhitepin);
     pwmout_init(mPwm_wwhite, wwhitepin);
+#elif defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    mPwm_red->pwm_idx               = 1;
+    mPwm_green->pwm_idx             = 2;
+    mPwm_blue->pwm_idx              = 3;
+    mPwm_cwhite->pwm_idx            = 4;
+    mPwm_wwhite->pwm_idx            = 5;
+    pwmout_init(mPwm_red, redpin);
+    pwmout_init(mPwm_green, bluepin);
+    pwmout_init(mPwm_blue, greenpin);
+    pwmout_init(mPwm_cwhite, cwhitepin);
+    pwmout_init(mPwm_wwhite, wwhitepin);
 #endif
 
     mRgb                            = true;
@@ -101,19 +121,15 @@ void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin, PinName 
 
 void MatterLED::deInit(void)
 {
-    if (mRgb)
-    {
+    if (mRgb) {
         vPortFree(mPwm_red);
         vPortFree(mPwm_green);
         vPortFree(mPwm_blue);
     }
-    if (mRgbw)
-    {
+    if (mRgbw) {
         vPortFree(mPwm_cwhite);
         vPortFree(mPwm_wwhite);
-    }
-    else
-    {
+    } else {
         vPortFree(mPwm_obj);
     }
 }
@@ -130,8 +146,7 @@ bool MatterLED::IsTurnedOn(void)
 
 void MatterLED::Set(bool state)
 {
-    if (mState == state)
-    {
+    if (mState == state) {
         return;
     }
 
@@ -156,24 +171,20 @@ void MatterLED::DoSet(void)
 {
     uint8_t brightness = mState ? mBrightness : 0;
 
-    if (!mRgb)
-    {
-        float duty_cycle = (float) (brightness) / 254;
+    if (!mRgb) {
+        float duty_cycle = (float)(brightness) / 254;
         pwmout_write(mPwm_obj, duty_cycle);
-    }
-    else
-    {
+    } else {
         uint8_t red, green, blue, coolwhite, warmwhite;
         float duty_red, duty_green, duty_blue, duty_cwhite, duty_wwhite;
         // uint8_t brightness = mState ? mBrightness : 0;
 
         HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
 
-        if (mRgbw)
-        {
+        if (mRgbw) {
             simpleRGB2RGBW(red, green, blue, coolwhite, warmwhite);
-            duty_cwhite = static_cast<float> (coolwhite) / 254.0;
-            duty_wwhite = static_cast<float> (warmwhite) / 254.0;
+            duty_cwhite = static_cast<float>(coolwhite) / 254.0;
+            duty_wwhite = static_cast<float>(warmwhite) / 254.0;
         }
 
         duty_red = static_cast<float>(red) / 254.0;
@@ -185,8 +196,7 @@ void MatterLED::DoSet(void)
         // ChipLogProgress(DeviceLayer, "green: %d, green_duty: %f", green, duty_green);
         // ChipLogProgress(DeviceLayer, "blue: %d, blue_duty: %f", blue, duty_blue);
 
-        if (mRgbw)
-        {
+        if (mRgbw) {
             // ChipLogProgress(DeviceLayer, "cwhite: %d, cwhite_duty: %f", coolwhite, duty_cwhite);
             // ChipLogProgress(DeviceLayer, "wwhite: %d, wwhite_duty: %f", warmwhite, duty_wwhite);
             pwmout_write(mPwm_cwhite, duty_cwhite);
@@ -202,8 +212,7 @@ void MatterLED::DoSet(void)
 // Below functions are WIP
 void MatterLED::SetColor(uint8_t Hue, uint8_t Saturation)
 {
-    if (mRgb)
-    {
+    if (mRgb) {
         uint8_t red, green, blue, coolwhite, warmwhite;
         float duty_red, duty_green, duty_blue, duty_cwhite, duty_wwhite;
         uint8_t brightness = mState ? mBrightness : 0;
@@ -212,11 +221,10 @@ void MatterLED::SetColor(uint8_t Hue, uint8_t Saturation)
 
         HSB2rgb(mHue, mSaturation, brightness, red, green, blue);
 
-        if (mRgbw)
-        {
+        if (mRgbw) {
             simpleRGB2RGBW(red, green, blue, coolwhite, warmwhite);
-            duty_cwhite = static_cast<float> (coolwhite) / 254.0;
-            duty_wwhite = static_cast<float> (warmwhite) / 254.0;
+            duty_cwhite = static_cast<float>(coolwhite) / 254.0;
+            duty_wwhite = static_cast<float>(warmwhite) / 254.0;
         }
 
         duty_red = static_cast<float>(red) / 254.0;
@@ -228,8 +236,7 @@ void MatterLED::SetColor(uint8_t Hue, uint8_t Saturation)
         ChipLogProgress(DeviceLayer, "green: %d, green_duty: %f", green, duty_green);
         ChipLogProgress(DeviceLayer, "blue: %d, blue_duty: %f", blue, duty_blue);
 
-        if (mRgbw)
-        {
+        if (mRgbw) {
             ChipLogProgress(DeviceLayer, "cwhite: %d, cwhite_duty: %f", coolwhite, duty_cwhite);
             ChipLogProgress(DeviceLayer, "wwhite: %d, wwhite_duty: %f\r\n", warmwhite, duty_wwhite);
             pwmout_write(mPwm_cwhite, duty_cwhite);
@@ -257,8 +264,7 @@ void MatterLED::HSB2rgb(uint16_t Hue, uint8_t Saturation, uint8_t brightness, ui
     uint16_t diff    = Hue % 60;
     uint16_t rgb_adj = (rgb_max - rgb_min) * diff / 60;
 
-    switch (i)
-    {
+    switch (i) {
     case 0:
         red   = rgb_max;
         green = rgb_min + rgb_adj;
@@ -304,18 +310,15 @@ void MatterLED:: simpleRGB2RGBW(uint8_t &red, uint8_t &green, uint8_t &blue, uin
     uint16_t colortemp;
     uint8_t i = 0;
 
-    while (i < 11)
-    {
+    while (i < 11) {
         colortemp = WhitePercentage[i][0];
-        if (mColorTemp < colortemp)
-        {
+        if (mColorTemp < colortemp) {
             break;
         }
         i++;
     }
 
-    if (i != 0)
-    {
+    if (i != 0) {
         i -= 1;
     }
 

@@ -8,6 +8,9 @@
 ********************************************************************************/
 #pragma once
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <FreeRTOS.h>
+#endif
 #include <platform_stdlib.h>
 #include <pwmout_api.h>
 
@@ -26,7 +29,7 @@ public:
     void SetColor(uint8_t Hue, uint8_t Saturation);
     void SetColorTemp(uint16_t colortemp);
     void HSB2rgb(uint16_t Hue, uint8_t Saturation, uint8_t brightness, uint8_t &red, uint8_t &green, uint8_t &blue);
-    void simpleRGB2RGBW(uint8_t & red, uint8_t & green, uint8_t &blue, uint8_t &cwhite, uint8_t &wwhite);
+    void simpleRGB2RGBW(uint8_t &red, uint8_t &green, uint8_t &blue, uint8_t &cwhite, uint8_t &wwhite);
     uint8_t mBrightness;
     uint16_t mHue;       // mHue [0, 360]
     uint8_t mSaturation; // mSaturation [0, 100]
@@ -43,8 +46,7 @@ private:
     bool mRgbw = false;
     bool mState;
     void DoSet();
-    uint16_t WhitePercentage[11][3] = 
-    {
+    uint16_t WhitePercentage[11][3] = {
         /*CT--coolwhite%--warmwhite%*/
         {2708, 0, 100},
         {2891, 10, 90},

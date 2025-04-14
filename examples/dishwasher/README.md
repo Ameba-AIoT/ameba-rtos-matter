@@ -89,3 +89,83 @@ Refer to this [guide](https://github.com/ambiot/ambd_matter/blob/main/tools/Ameb
     make clean
 
 </details>
+
+<details>
+  <summary>Building with AmebaDplus</summary>
+
+### AmebaDplus (RTL8721Dx)
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebadplus_gcc_project/project_km4
+    make -C asdk dishwasher_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project/project_km4
+    make EXAMPLE=dishwasher
+    cd ameba-rtos/amebadplus_gcc_project/project_km0
+    make all
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project/project_km4
+    make clean
+</details>
+
+<details>
+  <summary>Building with AmebaLite</summary>
+
+### AmebaLite (RTL8720EA / RTL8726EA)
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebalite_gcc_project/project_km4
+    make -C asdk dishwasher_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebalite_gcc_project/project_km4
+    make EXAMPLE=dishwasher
+    cd ameba-rtos/amebalite_gcc_project/project_kr4
+    make all
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebalite_gcc_project/project_km4
+    make clean
+</details>
+
+<details>
+  <summary>Building with AmebaSmart</summary>
+
+### AmebaSmart (RTL8730E)
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebasmart_gcc_project/project_ap
+    make -C asdk dishwasher_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project/project_ap
+    make EXAMPLE=dishwasher
+    cd ameba-rtos/amebasmart_gcc_project/project_hp
+    make all
+    cd ameba-rtos/amebasmart_gcc_project/project_lp
+    make all
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project/project_ap
+    make clean
+</details>

@@ -41,7 +41,7 @@ static void platform_free_uninit(void *ptr)
 #define MBEDTLS_PLATFORM_STD_FREE     platform_free_uninit
 #endif /* !MBEDTLS_PLATFORM_STD_FREE */
 
-static void * (*mbedtls_calloc_func)(size_t, size_t) = MBEDTLS_PLATFORM_STD_CALLOC;
+static void *(*mbedtls_calloc_func)(size_t, size_t) = MBEDTLS_PLATFORM_STD_CALLOC;
 static void (*mbedtls_free_func)(void *) = MBEDTLS_PLATFORM_STD_FREE;
 
 void *mbedtls_calloc(size_t nmemb, size_t size)
@@ -54,13 +54,17 @@ void mbedtls_free(void *ptr)
     (*mbedtls_free_func)(ptr);
 }
 
-extern int platform_set_malloc_free( void * (*malloc_func)( size_t ), void (*free_func)( void * ) );
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
+extern int platform_set_malloc_free(void *(*malloc_func)(size_t), void (*free_func)(void *));
+#endif
 int mbedtls_platform_set_calloc_free(void *(*calloc_func)(size_t, size_t),
                                      void (*free_func)(void *))
 {
     mbedtls_calloc_func = calloc_func;
     mbedtls_free_func = free_func;
-    platform_set_malloc_free( (void*(*)( size_t ))calloc_func, free_func);
+#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
+    platform_set_malloc_free((void *(*)(size_t))calloc_func, free_func);
+#endif
     return 0;
 }
 #endif /* MBEDTLS_PLATFORM_MEMORY &&
@@ -104,8 +108,8 @@ int (*mbedtls_snprintf)(char *s, size_t n,
                         ...) = MBEDTLS_PLATFORM_STD_SNPRINTF;
 
 int mbedtls_platform_set_snprintf(int (*snprintf_func)(char *s, size_t n,
-                                                       const char *format,
-                                                       ...))
+                                  const char *format,
+                                  ...))
 {
     mbedtls_snprintf = snprintf_func;
     return 0;
@@ -128,7 +132,7 @@ int mbedtls_platform_win32_vsnprintf(char *s, size_t n, const char *fmt, va_list
 #else
     ret = vsnprintf(s, n, fmt, arg);
     if (ret < 0 || (size_t) ret == n) {
-        s[n-1] = '\0';
+        s[n - 1] = '\0';
         ret = -1;
     }
 #endif
@@ -160,8 +164,8 @@ int (*mbedtls_vsnprintf)(char *s, size_t n,
                          va_list arg) = MBEDTLS_PLATFORM_STD_VSNPRINTF;
 
 int mbedtls_platform_set_vsnprintf(int (*vsnprintf_func)(char *s, size_t n,
-                                                         const char *format,
-                                                         va_list arg))
+                                   const char *format,
+                                   va_list arg))
 {
     mbedtls_vsnprintf = vsnprintf_func;
     return 0;

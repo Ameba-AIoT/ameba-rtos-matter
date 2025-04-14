@@ -18,6 +18,15 @@ using chip::Protocols::InteractionModel::Status;
 #elif defined(CONFIG_PLATFORM_8721D)
 #define PWM_LED         PB_5
 #define GPIO_IRQ_PIN    PA_12
+#elif defined (CONFIG_AMEBASMART)
+#define PWM_LED         PA_5
+#define GPIO_IRQ_PIN    PA_10
+#elif defined (CONFIG_AMEBALITE)
+#define PWM_LED         PA_31
+#define GPIO_IRQ_PIN    PA_29
+#elif defined (CONFIG_AMEBADPLUS)
+#define PWM_LED         PB_18
+#define GPIO_IRQ_PIN    PA_12
 #endif
 
 MatterLED led;
@@ -77,8 +86,7 @@ CHIP_ERROR matter_driver_led_set_startup_value(void)
     led.SetBrightness(LEDCurrentLevelValue.Value());
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL)
-    {
+    if (err == CHIP_ERROR_INTERNAL) {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     return err;
@@ -96,8 +104,7 @@ void matter_driver_on_identify_stop(Identify *identify)
 
 void matter_driver_on_trigger_effect(Identify *identify)
 {
-    switch (identify->mCurrentEffectIdentifier)
-    {
+    switch (identify->mCurrentEffectIdentifier) {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
@@ -124,17 +131,14 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId)
-    {
+    switch (path.mClusterId) {
     case Clusters::OnOff::Id:
-        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id)
-        {
+        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id) {
             led.Set(aEvent->value._u8);
         }
         break;
     case Clusters::LevelControl::Id:
-        if (path.mAttributeId == Clusters::LevelControl::Attributes::CurrentLevel::Id)
-        {
+        if (path.mAttributeId == Clusters::LevelControl::Attributes::CurrentLevel::Id) {
             led.SetBrightness(aEvent->value._u8);
         }
         break;
@@ -150,28 +154,24 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type)
-    {
-    case AppEvent::kEventType_Downlink_OnOff:
-        {
-            led.Toggle();
-            ChipLogProgress(DeviceLayer, "Writing to OnOff cluster");
-            Status status = Clusters::OnOff::Attributes::OnOff::Set(1, led.IsTurnedOn());
+    switch (event->Type) {
+    case AppEvent::kEventType_Downlink_OnOff: {
+        led.Toggle();
+        ChipLogProgress(DeviceLayer, "Writing to OnOff cluster");
+        Status status = Clusters::OnOff::Attributes::OnOff::Set(1, led.IsTurnedOn());
 
-            if (status != Status::Success)
-            {
-                ChipLogError(DeviceLayer, "Updating on/off cluster failed: %x", status);
-            }
-
-            ChipLogProgress(DeviceLayer, "Writing to LevelControl cluster");
-            status = Clusters::LevelControl::Attributes::CurrentLevel::Set(1, led.GetLevel());
-
-            if (status != Status::Success)
-            {
-                ChipLogError(DeviceLayer, "Updating level cluster failed: %x", status);
-            }
+        if (status != Status::Success) {
+            ChipLogError(DeviceLayer, "Updating on/off cluster failed: %x", status);
         }
-        break;
+
+        ChipLogProgress(DeviceLayer, "Writing to LevelControl cluster");
+        status = Clusters::LevelControl::Attributes::CurrentLevel::Set(1, led.GetLevel());
+
+        if (status != Status::Success) {
+            ChipLogError(DeviceLayer, "Updating level cluster failed: %x", status);
+        }
+    }
+    break;
     }
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();

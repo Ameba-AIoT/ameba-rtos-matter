@@ -4,7 +4,10 @@
 
 void MatterWasher::Init(PinName pin)
 {
-    mPwm_obj                        = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_obj                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+    mPwm_obj->pwm_idx               = 1;
+#endif
     pwmout_init(mPwm_obj, pin);
 #if defined(CONFIG_PLATFORM_8710C)
     pwmout_period_us(mPwm_obj, 20000); //pwm period = 20ms

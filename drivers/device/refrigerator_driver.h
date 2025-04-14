@@ -8,6 +8,9 @@
 ********************************************************************************/
 #pragma once
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
+#include <FreeRTOS.h>
+#endif
 #include <platform_stdlib.h>
 #include <gpio_api.h>
 #include <gpio_irq_api.h>
@@ -22,7 +25,7 @@ public:
     uint8_t GetDoorStatus(void);
     void SetDoorStatus(uint8_t temp);
     void SetAlarm(void);
-    
+
 private:
     gpio_t alarmGpio;
     uint16_t mode;

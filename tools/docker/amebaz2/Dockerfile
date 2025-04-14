@@ -2,8 +2,8 @@
 FROM ameba-rtos-matter:common
 
 # Redefine following build arguments to respective repo and tag/branch
-ARG AMEBA_MATTER_REPO=https://github.com/xshuqun/ameba-rtos-matter.git
-ARG TAG_NAME=ameba/v1.4_rename_wrapper
+ARG AMEBA_MATTER_REPO=https://github.com/mikaelajiwidodo/ameba-rtos-matter.git
+ARG TAG_NAME=release/ameba-rtos-v1.0/v1.4
 
 # Define fixed build arguments
 ARG AMBZ2_REPO=https://github.com/Ameba-AIoT/ameba-rtos-z2.git
