@@ -24,6 +24,7 @@
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
 
 #include <atomic>
+#include <app/server/Dnssd.h>
 #include <inet/EndpointQueueFilter.h>
 #include <inet/IPPacketInfo.h>
 #include <inet/UDPEndPointImpl.h>
@@ -31,8 +32,10 @@
 #include <lib/support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 
-namespace chip {
-namespace Inet {
+namespace chip
+{
+namespace Inet
+{
 
 /**
  * @brief Basic filter that counts how many pending (not yet dequeued) packets
@@ -42,8 +45,8 @@ namespace Inet {
 class DropIfTooManyQueuedPacketsFilter : public chip::Inet::EndpointQueueFilter
 {
 public:
-    typedef bool (*PacketMatchPredicateFunc)(void * context, const void * endpoint, const chip::Inet::IPPacketInfo & pktInfo,
-                                             const chip::System::PacketBufferHandle & pktPayload);
+    typedef bool (*PacketMatchPredicateFunc)(void *context, const void *endpoint, const chip::Inet::IPPacketInfo &pktInfo,
+            const chip::System::PacketBufferHandle &pktPayload);
 
     /**
      * @brief Initialize the packet filter with a starting limit
@@ -61,7 +64,7 @@ public:
      * @param predicateFunc - Predicate function to apply. If nullptr, no filtering will take place
      * @param context - Pointer to predicate-specific context that will be provided to predicate at every call. May be nullptr.
      */
-    void SetPredicate(PacketMatchPredicateFunc predicateFunc, void * context)
+    void SetPredicate(PacketMatchPredicateFunc predicateFunc, void *context)
     {
         mPredicate = predicateFunc;
         mContext   = context;
@@ -76,17 +79,26 @@ public:
      *
      * @param maxAllowedQueuedPackets - number of packets currently pending allowed.
      */
-    void SetMaxQueuedPacketsLimit(size_t maxAllowedQueuedPackets) { mMaxAllowedQueuedPackets.store(maxAllowedQueuedPackets); }
+    void SetMaxQueuedPacketsLimit(size_t maxAllowedQueuedPackets)
+    {
+        mMaxAllowedQueuedPackets.store(maxAllowedQueuedPackets);
+    }
 
     /**
      * @return the total number of packets dropped so far by the filter
      */
-    size_t GetNumDroppedPackets() const { return mNumDroppedPackets.load(); }
+    size_t GetNumDroppedPackets() const
+    {
+        return mNumDroppedPackets.load();
+    }
 
     /**
      * @brief Reset the counter of dropped packets.
      */
-    void ClearNumDroppedPackets() { mNumDroppedPackets.store(0); }
+    void ClearNumDroppedPackets()
+    {
+        mNumDroppedPackets.store(0);
+    }
 
     /**
      * @brief Method called when a packet is dropped due to high watermark getting reached, based on predicate.
@@ -99,8 +111,8 @@ public:
      * @param pktInfo - info about source/dest of packet
      * @param pktPayload - payload content of packet
      */
-    virtual void OnDropped(const void * endpoint, const chip::Inet::IPPacketInfo & pktInfo,
-                           const chip::System::PacketBufferHandle & pktPayload)
+    virtual void OnDropped(const void *endpoint, const chip::Inet::IPPacketInfo &pktInfo,
+                           const chip::System::PacketBufferHandle &pktPayload)
     {}
 
     /**
@@ -117,8 +129,8 @@ public:
      * @param pktInfo - info about source/dest of packet
      * @param pktPayload - payload content of packet
      */
-    virtual void OnLastMatchDequeued(const void * endpoint, const chip::Inet::IPPacketInfo & pktInfo,
-                                     const chip::System::PacketBufferHandle & pktPayload)
+    virtual void OnLastMatchDequeued(const void *endpoint, const chip::Inet::IPPacketInfo &pktInfo,
+                                     const chip::System::PacketBufferHandle &pktPayload)
     {}
 
     /**
@@ -126,20 +138,18 @@ public:
      *
      * See base class for arguments
      */
-    FilterOutcome FilterBeforeEnqueue(const void * endpoint, const chip::Inet::IPPacketInfo & pktInfo,
-                                      const chip::System::PacketBufferHandle & pktPayload) override
+    FilterOutcome FilterBeforeEnqueue(const void *endpoint, const chip::Inet::IPPacketInfo &pktInfo,
+                                      const chip::System::PacketBufferHandle &pktPayload) override
     {
         // WARNING: This is likely called in a different context than `FilterAfterDequeue`. We use an atomic for the counter.
 
         // Drop all IPv4 Mdns packets
-        if (pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == chip::Dnssd::kMdnsPort)
-        {
+        if (pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == chip::Dnssd::kMdnsPort) {
             ChipLogProgress(DeviceLayer, "IPv4 MDNS packet dropped...");
             return FilterOutcome::kDropPacket;
         }
 
-        if (mNumQueuedPackets.load() >= mMaxAllowedQueuedPackets)
-        {
+        if (mNumQueuedPackets.load() >= mMaxAllowedQueuedPackets) {
             ++mNumDroppedPackets;
             OnDropped(endpoint, pktInfo, pktPayload);
             return FilterOutcome::kDropPacket;
@@ -155,14 +165,13 @@ public:
      *
      * See base class for arguments
      */
-    FilterOutcome FilterAfterDequeue(const void * endpoint, const chip::Inet::IPPacketInfo & pktInfo,
-                                     const chip::System::PacketBufferHandle & pktPayload) override
+    FilterOutcome FilterAfterDequeue(const void *endpoint, const chip::Inet::IPPacketInfo &pktInfo,
+                                     const chip::System::PacketBufferHandle &pktPayload) override
     {
         // WARNING: This is likely called in a different context than `FilterBeforeEnqueue`. We use an atomic for the counter.
         // NOTE: This is always called from Matter platform event loop
 
-        if (pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == chip::Dnssd::kMdnsPort)
-        {
+        if (pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == chip::Dnssd::kMdnsPort) {
             ChipLogProgress(DeviceLayer, "IPv4 MDNS packet dropped...");
             return FilterOutcome::kDropPacket;
         }
@@ -170,8 +179,7 @@ public:
         --mNumQueuedPackets;
 
         size_t numQueuedPackets = mNumQueuedPackets.load();
-        if (numQueuedPackets == 0)
-        {
+        if (numQueuedPackets == 0) {
             OnLastMatchDequeued(endpoint, pktInfo, pktPayload);
         }
 
@@ -181,7 +189,7 @@ public:
 
 protected:
     PacketMatchPredicateFunc mPredicate = nullptr;
-    void * mContext                     = nullptr;
+    void *mContext                     = nullptr;
     std::atomic_size_t mNumQueuedPackets{ 0 };
     std::atomic_size_t mMaxAllowedQueuedPackets{ 0 };
     std::atomic_size_t mNumDroppedPackets{ 0u };

@@ -16,8 +16,12 @@ RUN set -x \
     libgirepository1.0-dev \
     libcairo2-dev \
     libreadline-dev \
+    libssl-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Link `sh` to `bash`
+RUN ln -sf /bin/bash /bin/sh
 
 # Define build arguments for repositories
 ARG CHIP_REPO=https://github.com/project-chip/connectedhomeip.git

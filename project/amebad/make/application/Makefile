@@ -30,7 +30,7 @@ CSRC += $(BTDIR)/matter_blemgr_common.c
 
 # Matter Common code porting
 CSRC += $(PORTDIR)/DsoHandle.c \
-        $(PORTDIR)/matter_dcts.c \
+        $(PORTDIR)/matter_kvs.c \
         $(PORTDIR)/matter_lwip.c \
         $(PORTDIR)/matter_timers.c \
         $(PORTDIR)/matter_ota.c \

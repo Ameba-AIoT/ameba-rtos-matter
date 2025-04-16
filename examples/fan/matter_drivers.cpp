@@ -15,6 +15,12 @@ using chip::Protocols::InteractionModel::Status;
 #define PWM_PIN         PA_23
 #elif defined(CONFIG_PLATFORM_8721D)
 #define PWM_PIN         PB_5
+#elif defined (CONFIG_AMEBASMART)
+#define PWM_PIN         PA_5
+#elif defined (CONFIG_AMEBALITE)
+#define PWM_PIN         PA_31
+#elif defined (CONFIG_AMEBADPLUS)
+#define PWM_PIN         PB_18
 #endif
 
 MatterFan fan;
@@ -49,8 +55,7 @@ CHIP_ERROR matter_driver_fan_set_startup_value(void)
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL)
-    {
+    if (err == CHIP_ERROR_INTERNAL) {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     return err;
@@ -68,8 +73,7 @@ void matter_driver_on_identify_stop(Identify *identify)
 
 void matter_driver_on_trigger_effect(Identify *identify)
 {
-    switch (identify->mCurrentEffectIdentifier)
-    {
+    switch (identify->mCurrentEffectIdentifier) {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
@@ -97,23 +101,18 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId)
-    {
+    switch (path.mClusterId) {
     case Clusters::OnOff::Id:
-        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id)
-        {
+        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id) {
             fan.setFanMode((aEvent->value._u8 == 1) ? 4 /* kOn */ : 0 /* kOff */);
             chip::DeviceLayer::PlatformMgr().LockChipStack();
             Clusters::FanControl::Attributes::FanMode::Set(1, (aEvent->value._u8 == 1) ? Clusters::FanControl::FanModeEnum::kOn : Clusters::FanControl::FanModeEnum::kOff);
             chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     case Clusters::FanControl::Id:
-        if (path.mAttributeId == Clusters::FanControl::Attributes::PercentSetting::Id)
-        {
+        if (path.mAttributeId == Clusters::FanControl::Attributes::PercentSetting::Id) {
             fan.setFanSpeedPercent(aEvent->value._u8);
-        }
-        else if (path.mAttributeId == Clusters::FanControl::Attributes::FanMode::Id)
-        {
+        } else if (path.mAttributeId == Clusters::FanControl::Attributes::FanMode::Id) {
             fan.setFanMode(aEvent->value._u8);
         }
         break;

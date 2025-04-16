@@ -22,7 +22,7 @@ To perform a factory reset on the device:
 
 To interact with the Matter shell (client) via AT commands, use the following syntax:
 
-### For AmebaZ2 and AmebaZ2Plus
+### For AmebaZ2, AmebaZ2Plus, AmebaDplus, AmebaLite, and AmebaSmart
 
     ATMS=switch
 

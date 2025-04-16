@@ -37,6 +37,10 @@ jobs:
       run: |
         docker buildx build --file tools/docker/amebad/Dockerfile --tag ameba-rtos-matter:amebad --load .
 
+    - name: Build AmebaRTOS Docker image
+      run: |
+        docker buildx build --file tools/docker/ameba-rtos/Dockerfile --tag ameba-rtos-matter:ameba-rtos --load .
+
     - name: Check Docker images
       run: docker images
 
@@ -49,6 +53,21 @@ jobs:
       run: |
         chmod +x ./tools/docker/amebad/run_docker_build_scripts.sh
         ./tools/docker/amebad/run_docker_build_scripts.sh
+
+    - name: Run Docker container for amebadplus and execute scripts
+      run: |
+        chmod +x ./tools/docker/ameba-rtos/amebadplus/run_docker_build_scripts.sh
+        ./tools/docker/ameba-rtos/amebadplus/run_docker_build_scripts.sh
+
+    - name: Run Docker container for amebalite and execute scripts
+      run: |
+        chmod +x ./tools/docker/ameba-rtos/amebalite/run_docker_build_scripts.sh
+        ./tools/docker/ameba-rtos/amebalite/run_docker_build_scripts.sh
+
+    - name: Run Docker container for amebasmart and execute scripts
+      run: |
+        chmod +x ./tools/docker/ameba-rtos/amebasmart/run_docker_build_scripts.sh
+        ./tools/docker/ameba-rtos/amebasmart/run_docker_build_scripts.sh
 
     - name: Clean up Docker
       run: docker system prune -af
