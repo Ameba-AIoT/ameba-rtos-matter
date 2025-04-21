@@ -17,7 +17,7 @@ Create and enter new directory
 
 If you have already obtained the ameba-rtos SDK from the FAE, you can skip this step, else check out this repository:
 
-    git clone https://github.com/mikaelajiwidodo/ameba-rtos.git -b ameba-rtos-v1.0/matter/release/v1.3
+    git clone https://github.com/mikaelajiwidodo/ameba-rtos.git -b ameba-rtos-v1.0/matter/release/v1.4
 
 To check out Matter repository:
 
@@ -36,7 +36,7 @@ Make sure ameba-rtos and connectedhomeip are on the same directory level
 
     cd connectedhomeip
 
-	git checkout 70d9a61475d31686f0fde8e7b56f352a0f59b299 #release/v1.3
+	git switch v1.4-branch
 
     git submodule sync
 

@@ -115,12 +115,19 @@ CPPSRC += $(CHIPDIR)/src/app/util/attribute-table.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/binding-table.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/DataModelHandler.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/ember-compatibility-functions.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/ember-global-attribute-access-interface.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/ember-io-storage.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/generic-callback-stubs.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/util.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/privilege-storage.cpp
 
 CPPSRC += $(CHIPDIR)/src/app/reporting/Engine.cpp
 CPPSRC += $(CHIPDIR)/src/app/reporting/reporting.cpp
+
+ifeq ($(CONFIG_MATTER_TC_EN),y)
+CPPSRC += $(CHIPDIR)/src/app/server/DefaultTermsAndConditionsProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
+endif
 
 CPPSRC += $(CHIPDIR)/src/lib/dnssd/minimal_mdns/responders/IP.cpp
 

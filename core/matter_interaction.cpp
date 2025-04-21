@@ -15,6 +15,21 @@ QueueHandle_t DownlinkEventQueue;
 TaskHandle_t UplinkTaskHandle;
 TaskHandle_t DownlinkTaskHandle;
 
+uint8_t uplink_init = 0;
+uint8_t downlink_init = 0;
+
+void PostEvent(uint16_t eventType)
+{
+    chip::DeviceLayer::ChipDeviceEvent event;
+    event.Type = eventType;
+    CHIP_ERROR error = chip::DeviceLayer::PlatformMgr().PostEvent(&event);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to post event for event type:%x, err:%" CHIP_ERROR_FORMAT, eventType, error.Format());
+    }
+}
+
 void PostDownlinkEvent(const AppEvent *aEvent)
 {
     if (DownlinkEventQueue != NULL)
@@ -30,7 +45,7 @@ void PostDownlinkEvent(const AppEvent *aEvent)
             ChipLogError(DeviceLayer, "Failed to post downlink event to downlink event queue with");
         }
     }
-    else
+    else if (downlink_init)
     {
         ChipLogError(DeviceLayer, "Downlink Event Queue is NULL should never happen");
     }
@@ -79,6 +94,11 @@ CHIP_ERROR matter_interaction_start_downlink()
     BaseType_t xReturned;
     xReturned = xTaskCreate(DownlinkTask, "Downlink", 1024, NULL, 1, &DownlinkTaskHandle);
 
+    if (xReturned == pdPASS)
+    {
+        downlink_init = 1;
+    }
+
     return (xReturned == pdPASS) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
@@ -94,7 +114,7 @@ void PostUplinkEvent(const AppEvent *aEvent)
             ChipLogError(DeviceLayer, "Failed to post uplink event to uplink event queue");
         }
     }
-    else
+    else if (uplink_init)
     {
         ChipLogError(DeviceLayer, "Uplink Event Queue is NULL should never happen");
     }
@@ -142,6 +162,11 @@ CHIP_ERROR matter_interaction_start_uplink()
     // Start Uplink task.
     BaseType_t xReturned;
     xReturned = xTaskCreate(UplinkTask, "Uplink", 1024, NULL, 1, &UplinkTaskHandle);
+
+    if (xReturned == pdPASS)
+    {
+        uplink_init = 1;
+    }
 
     return (xReturned == pdPASS) ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }

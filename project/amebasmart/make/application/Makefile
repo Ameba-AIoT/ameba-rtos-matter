@@ -15,13 +15,13 @@ LWIPDIR     = $(BASEDIR)/component/application/matter/lwip
 MBEDDIR     = $(BASEDIR)/component/application/matter/mbedtls
 PORTDIR     = $(BASEDIR)/component/application/matter/port
 PROTOBUFDIR = $(BASEDIR)/component/application/matter/protobuf
-EXAMPLEDIR  = $(BASEDIR)/component/application/matter/example
-CHIPTESTDIR = $(BASEDIR)/component/application/matter/example/chiptest
+EXAMPLEDIR  = $(BASEDIR)/component/application/matter/examples
+CHIPTESTDIR = $(BASEDIR)/component/application/matter/examples/chiptest
 
 vpath %.c $(DIR)/ $(shell find $(DIR)/ -type d)
 
 MODULE_IFLAGS += -I$(MBEDTLSDIR)/library
-MODULE_IFLAGS += -I$(BASEDIR)/component/application/matter/example
+MODULE_IFLAGS += -I$(BASEDIR)/component/application/matter/examples
 
 #*****************************************************************************#
 #                               Source FILE LIST                              #

@@ -125,12 +125,15 @@
 #define CONFIG_MBED_TLS_ENABLED 1
 #undef  CONFIG_SSL_ROM_TEST
 #define MBEDTLS_MATTER_ENABLE 1
+#undef  MBEDTLS_MATTER_V_2_28_1_ENABLE
+#define MBEDTLS_MATTER_V_3_6_1_ENABLE 1
 
 /*
  * < Matter Config 
  */
 #define CONFIG_MATTER_EN 1
 #define CONFIG_MATTER 1
+#undef  CONFIG_MATTER_TC_EN
 
 /*
  * < GUI Config

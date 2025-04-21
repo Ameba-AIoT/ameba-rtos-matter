@@ -130,6 +130,8 @@
 #undef  MBEDTLS_V_3_4_1_ENABLE
 #define MBEDTLS_MATTER_ENABLE 1
 #undef  MBEDTLS_V_2_16_9_ENABLE
+#undef  MBEDTLS_MATTER_V_2_28_1_ENABLE
+#define MBEDTLS_MATTER_V_3_6_1_ENABLE 1
 
 /*
  * < 802154 Config
@@ -158,6 +160,7 @@
  */
 #define CONFIG_MATTER_EN 1
 #define CONFIG_MATTER 1
+#undef  CONFIG_MATTER_TC_EN
 
 /*
  * < GUI Config
