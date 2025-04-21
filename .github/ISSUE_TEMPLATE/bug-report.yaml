@@ -46,8 +46,9 @@ body:
           description: Which IC is affected by the bug?
           multiple: true
           options:
-            - AmebaZ2 (RTL8710C)
-            - AmebaD (RTL8721D)
+            - AmebaDplus (RTL8721Dx)
+            - AmebaLite (RTL8720E/RTL8726E)
+            - AmebaSmart (RTL8730E)
             - other
     - type: textarea
       attributes:
