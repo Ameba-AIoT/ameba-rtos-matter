@@ -1,0 +1,125 @@
+# Matter (previously CHIP) on AmebaSmart
+
+- [Get Ameba SDK & Matter SDK](#get-ameba-sdk--matter-sdk)
+- [Set Matter Build Environment](#set-matter-build-environment)
+- [Set Ameba Build Environment](#set-ameba-build-environment)
+- [Build CHIP library by GN and Final Firmware](#build-chip-library-by-gn-and-final-firmware)
+- [Flash Image](#flash-image)
+
+## Get Ameba SDK & Matter SDK
+
+    Tested on Ubuntu 22.04 or above
+
+Create and enter new directory
+
+    mkdir dev
+    cd dev
+
+If you have already obtained the ameba-rtos SDK from the FAE, you can skip this step, else check out this repository:
+
+    git clone https://github.com/mikaelajiwidodo/ameba-rtos.git -b ameba-rtos-v1.0/matter/release/v1.3
+
+To check out Matter repository:
+
+    git clone https://github.com/project-chip/connectedhomeip.git
+    
+Make sure ameba-rtos and connectedhomeip are on the same directory level
+
+    dev/
+    ├── ameba-rtos
+    └── connectedhomeip
+
+## Set Matter Build Environment
+
+    > Find more details to setup linux build environment
+    > https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md
+
+    cd connectedhomeip
+
+	git checkout 70d9a61475d31686f0fde8e7b56f352a0f59b299 #release/v1.3
+
+    git submodule sync
+
+    git submodule update --init --recursive
+
+    source scripts/bootstrap.sh
+
+    source scripts/activate.sh
+
+## Set Ameba Build Environment
+
+Navigate to the `ameba-rtos` directory:
+
+    cd ameba-rtos
+
+    chmod u+x matter_setup.sh
+
+    ./matter_setup.sh ameba-rtos
+
+## Build CHIP library by GN and Final Firmware
+
+In this context, we will demostrate building of all-clusters-app.
+
+### Make Matter Libraries
+
+Navigate to the `amebasmart_gcc_project` directory:
+
+    cd ameba-rtos/amebasmart_gcc_project/
+
+Menuconfig for matter:
+- To enable Matter, select `MENUCONFIG FOR CA32 CONFIG`, then select `Matter Config`, and enable `Enable Matter`.
+- Change mbedtls version to matter. Under `MENUCONFIG FOR CA32 CONFIG`, select `SSL Config`, then set the `MBEDTLS Version` to `MBEDTLS_MATTER`
+- If you want to support Matter BLE, under `CONFIG BT`, select `BLE_Matter_Adapter` and save the configuration.
+
+```
+make menuconfig
+```
+
+Navigate to the `project_ap` directory:
+
+    cd ameba-rtos/amebasmart_gcc_project/project_ap/
+
+Start building the Matter libraries with:
+
+    make -C asdk all_clusters
+
+### Make project_ap
+
+Ensure the same menuconfig settings as described in `Make Matter Libraries` and continue building the `project_ap` images.
+
+    cd ameba-rtos/amebasmart_gcc_project/project_ap/
+
+Build `project_ap`:
+
+    make EXAMPLE=chiptest
+
+### Make project_hp
+
+Navigate to the `project_hp` directory:
+
+    cd ameba-rtos/amebasmart_gcc_project/project_hp/
+
+Build the `project_hp`:
+
+    make all
+
+### Make project_lp
+
+Navigate to the `project_lp` directory:
+
+    cd ameba-rtos/amebasmart_gcc_project/project_lp/
+
+Build the `project_lp`:
+
+    make all
+
+### Clean Ameba Matter libraries and application
+
+    make clean
+
+## Flash Image
+
+The generated image is found in the ameba-rtos sdk `ameba-rtos/amebasmart_gcc_project/project_hp/asdk/image`, both `km4_boot_all.bin` and `km0_km4_ca32_app.bin` will be flashed.
+
+- Find more detail in [ameba-rtos/README.md](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing)
+
