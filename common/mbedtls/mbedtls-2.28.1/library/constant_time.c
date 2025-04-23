@@ -45,6 +45,7 @@
 #endif
 
 #include <string.h>
+#include <limits.h>
 
 #if defined(MBEDTLS_BIGNUM_USE_S_ROM_API)
 #include "mbedtls/bignum_rom.h"

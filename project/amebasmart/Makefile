@@ -55,27 +55,27 @@ air_purifier: prebuild copy_ld_img2 $(AIR_PURIFIER_FILE)
 
 aircon_port: prebuild copy_ld_img2 $(AIRCON_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/aircon_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/aircon_port all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/aircon_app_port all
 
 bridge_dm: prebuild copy_ld_img2 $(BRIDGE_DM_FILE) copy_gen_files_bridge_dm
-	@make -C $(MATTER_BUILDDIR)/make/chip/bridge_dm_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/bridge_dm_app all
+	@make -C $(MATTER_BUILDDIR)/make/chip/bridge_app_dm all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/bridge_app_port_dm all
 
 bridge_port: prebuild copy_ld_img2 $(BRIDGE_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/bridge_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/bridge_port all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/bridge_app_port all
 
 dishwasher_port: prebuild copy_ld_img2 $(DISHWASHER_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/dishwasher_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/dishwasher_port all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/dishwasher_app_port all
 
 fan_port: prebuild copy_ld_img2 $(FAN_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/fan_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/fan_port all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/fan_app_port all
 
 laundrywasher_port: prebuild copy_ld_img2 $(LAUNDRYWASHER_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/laundrywasher_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/laundrywasher_port all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/laundrywasher_app_port all
 
 light: prebuild copy_ld_img2 $(LIGHTING_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/lighting_app all
@@ -83,23 +83,23 @@ light: prebuild copy_ld_img2 $(LIGHTING_FILE)
 
 light_port: prebuild copy_ld_img2 $(LIGHTING_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/lighting_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/lighting_port all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/lighting_app_port all
 
 light_dm: prebuild copy_ld_img2 $(LIGHTING_FILE) copy_gen_files_light_dm
 	@make -C $(MATTER_BUILDDIR)/make/chip/lighting_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/lighting_dm_app all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/lighting_app_port_dm all
 
 microwaveoven_port: prebuild copy_ld_img2 $(MICROWAVEOVEN_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/microwaveoven_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/microwaveoven_port all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/microwaveoven_app_port all
 
 refrigerator_port: prebuild copy_ld_img2 $(REFRIGERATOR_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/refrigerator_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/refrigerator_port all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/refrigerator_app_port all
 
 thermostat_port: prebuild copy_ld_img2 $(THERMOSTAT_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/thermostat_app all
-	@make -C $(MATTER_BUILDDIR)/make/chip_main/thermostat_port all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/thermostat_app_port all
 
 #*****************************************************************************#
 #                      RULES TO MAKE SUB DIRS                                 #

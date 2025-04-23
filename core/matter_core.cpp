@@ -2,16 +2,23 @@
 #include <stdint.h>
 
 #include <matter_core.h>
+#include <matter_events.h>
+#include <matter_interaction.h>
 #include <matter_ota_initializer.h>
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
 #include <matter_fs.h>
 #include <diagnostic_logs/ameba_logging_faultlog.h>
 #include <diagnostic_logs/ameba_logging_redirect_handler.h>
 #endif
-
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
+#include <matter_fabric_observer.h>
+#endif
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+#include <matter_device_utils.h>
+#endif
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
 #include <matter_mdns_filter.h>
-#endif /* CONFIG_ENABLE_AMEBA_MDNS_FILTER */
+#endif
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -81,6 +88,11 @@ sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::A
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 
+#if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
+constexpr size_t kMaxPendingMdnsPackets = 10u;
+chip::Inet::DropIfTooManyQueuedPacketsFilter sMdnsPacketFilter(kMaxPendingMdnsPackets);
+#endif
+
 void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t arg)
 {
     switch (event->Type) {
@@ -127,6 +139,38 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
         ChipLogProgress(DeviceLayer, "Commissioning Complete");
         chip::DeviceLayer::Internal::AmebaUtils::SetCurrentProvisionedNetwork();
         break;
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
+    case DeviceEventType::kEvent_CommissioningSessionEstablishmentStarted:
+        ChipLogProgress(DeviceLayer, "Commissioning Session has been established");
+        break;
+    case DeviceEventType::kEvent_CommissioningSessionStarted:
+        ChipLogProgress(DeviceLayer, "Commissioning Session started");
+        break;
+    case DeviceEventType::kEvent_CommissioningSessionEstablishmentError:
+        ChipLogProgress(DeviceLayer, "Commissioning Session established error");
+        break;
+    case DeviceEventType::kEvent_CommissioningSessionStopped:
+        ChipLogProgress(DeviceLayer, "Commissioning Session stopped");
+        break;
+    case DeviceEventType::kEvent_CommissioningWindowOpened:
+        ChipLogProgress(DeviceLayer, "Commissioning Window is opened");
+        break;
+    case DeviceEventType::kEvent_CommissioningWindowClosed:
+        ChipLogProgress(DeviceLayer, "Commissioning Window is closed");
+        break;
+    case DeviceEventType::kEvent_FabricWillBeRemoved:
+        ChipLogProgress(DeviceLayer, "Fabric removing");
+        break;
+    case DeviceEventType::kEvent_FabricRemoved:
+        ChipLogProgress(DeviceLayer, "Fabric removed successfully");
+        break;
+    case DeviceEventType::kEvent_FabricCommitted:
+        ChipLogProgress(DeviceLayer, "Fabric info committed");
+        break;
+    case DeviceEventType::kEvent_FabricUpdated:
+        ChipLogProgress(DeviceLayer, "Fabric info updated");
+        break;
+#endif /* CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER */
     }
 }
 
@@ -144,12 +188,16 @@ void matter_core_init_server(intptr_t context)
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
 #endif
 
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
+    static AmebaObserver sAmebaObserver;
+    initParams.appDelegate = &sAmebaObserver;
+#endif
+
     chip::Server::GetInstance().Init(initParams);
 
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
-    static chip::Inet::AmebaEndpointQueueFilter sEndpointQueueFilter;
-    chip::Inet::UDPEndPointImpl::SetQueueFilter(&sEndpointQueueFilter);
-#endif /* CONFIG_ENABLE_AMEBA_MDNS_FILTER */
+    chip::Inet::UDPEndPointImplLwIP::SetQueueFilter(&sMdnsPacketFilter);
+#endif
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
     // TODO: Use our own DeviceInfoProvider
@@ -207,6 +255,10 @@ CHIP_ERROR matter_core_init(void)
     if (CONFIG_NETWORK_LAYER_BLE) {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
+
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+    matter_op_hours();
+#endif
 
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();

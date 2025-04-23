@@ -36,7 +36,7 @@ clean: CLEAN_OBJS
 	@make -C air_purifier_app clean
 	@make -C aircon_app clean
 	@make -C bridge_app clean
-	@make -C bridge_dm_app clean
+	@make -C bridge_app_dm clean
 	@make -C dishwasher_app clean
 	@make -C fan_app clean
 	@make -C laundrywasher_app clean
