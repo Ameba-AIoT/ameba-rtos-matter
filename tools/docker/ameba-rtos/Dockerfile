@@ -3,11 +3,11 @@ FROM ameba-rtos-matter:common
 
 # Redefine following build arguments to respective repo and tag/branch
 ARG AMEBA_MATTER_REPO=https://github.com/mikaelajiwidodo/ameba-rtos-matter.git
-ARG TAG_NAME=ameba-rtos/release/v1.3
+ARG TAG_NAME=ameba-rtos/v1.3/add_sta_ap_wifi_mode
 
 # Define fixed build arguments
 ARG AMBRTOS_REPO=https://github.com/mikaelajiwidodo/ameba-rtos.git
-ARG AMBRTOS_TAG_NAME=ameba-rtos-v1.0/matter/release/v1.3
+ARG AMBRTOS_TAG_NAME=release/v1.0+matter_init
 ARG AMEBA_MATTER_DIR=component/application/matter
 ARG AMEBA_DIR=/opt/ameba
 
