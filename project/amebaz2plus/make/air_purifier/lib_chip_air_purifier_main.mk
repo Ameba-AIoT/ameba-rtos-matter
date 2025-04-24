@@ -118,6 +118,7 @@ ifeq ($(CHIP_ENABLE_AMEBA_TC), 1)
 SRC_CPP += $(CHIPDIR)/src/app/server/DefaultTermsAndConditionsProvider.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
 endif
+SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
 
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp
@@ -125,6 +126,7 @@ SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/EmberMetadata.cpp
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/Instance.cpp
+SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/ServerClusterInterfaceRegistry.cpp
 
 SRC_CPP += $(CHIPDIR)/src/setup_payload/OnboardingCodesUtil.cpp
 
@@ -133,7 +135,7 @@ SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-
 
 SRC_CPP += $(shell cat $(CODEGENDIR)/cluster-file.txt)
 SRC_CPP += $(CODEGENDIR)/app/callback-stub.cpp
-SRC_CPP += $(CODEGENDIR)/app/cluster-init-callback.cpp
+SRC_CPP += $(CODEGENDIR)/app/cluster-callbacks.cpp
 SRC_CPP += $(CODEGENDIR)/zap-generated/IMClusterCommandHandler.cpp
 
 # air-purifier-app clusters source files

@@ -132,6 +132,7 @@ ifeq ($(CHIP_ENABLE_AMEBA_TC), 1)
 CPPSRC += $(CHIPDIR)/src/app/server/DefaultTermsAndConditionsProvider.cpp
 CPPSRC += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
 endif
+CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
 
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp
@@ -139,6 +140,7 @@ CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_W
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberMetadata.cpp
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/Instance.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/ServerClusterInterfaceRegistry.cpp
 
 CPPSRC += $(CHIPDIR)/src/setup_payload/OnboardingCodesUtil.cpp
 
@@ -147,7 +149,7 @@ CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-o
 
 CPPSRC += $(shell cat $(CODEGEN_DIR)/cluster-file.txt)
 CPPSRC += $(CODEGEN_DIR)/app/callback-stub.cpp
-CPPSRC += $(CODEGEN_DIR)/app/cluster-init-callback.cpp
+CPPSRC += $(CODEGEN_DIR)/app/cluster-callbacks.cpp
 CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
 
 CPPSRC += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
