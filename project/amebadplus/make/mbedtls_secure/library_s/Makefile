@@ -6,17 +6,17 @@ include $(MAKE_INCLUDE_GEN)
 #*****************************************************************************#
 #                               VARIABLES	                              #
 #*****************************************************************************#
-DIR = $(MATTER_MBEDTLSDIR)
+DIR = $(MBEDTLSDIR)
 
 MODULE_IFLAGS += -DCONFIG_BUILD_SECURE=1
 
-vpath %.c $(DIR) $(shell find $(DIR) -type d) 
+vpath %.c $(DIR) $(shell find $(DIR) -type d) $(MATTER_MBEDTLSDIR) $(shell find $(MATTER_MBEDTLSDIR) -type d)
 
 #*****************************************************************************#
 #                               Source FILE LIST                              #
 #*****************************************************************************#
-CSRC = $(DIR)/matter_mbedtls_nsc.c \
-       $(DIR)/mbedtls-2.28.1/library_s/mbedtls_nsc.c
+CSRC = $(DIR)/library_s/mbedtls_nsc.c \
+       $(MATTER_MBEDTLSDIR)/matter_mbedtls_nsc.c
 
 #*****************************************************************************#
 #                               Object FILE LIST                              #
