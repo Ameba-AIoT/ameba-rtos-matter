@@ -19,25 +19,29 @@
 extern "C" {
 #endif
 
+#define MATTER_FACTORY_DATA_STRING_MAX_LEN      68
+#define MATTER_CERT_DATA_STRING_MAX_LEN         602
+#define MATTER_VERIFIER_DATA_STRING_MAX_LEN     256
+
 /******************************************************
  *               Factory Data Structure
  ******************************************************/
 
 typedef struct
 {
-    uint8_t value[68];
+    uint8_t value[MATTER_FACTORY_DATA_STRING_MAX_LEN];
     size_t len;
 } FactoryDataString;
 
 typedef struct
 {
-    uint8_t value[602];
+    uint8_t value[MATTER_CERT_DATA_STRING_MAX_LEN];
     size_t len;
 } CertDataString;
 
 typedef struct
 {
-    uint8_t value[256];
+    uint8_t value[MATTER_VERIFIER_DATA_STRING_MAX_LEN];
     size_t len;
 } VerifierDataString;
 
