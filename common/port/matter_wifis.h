@@ -31,6 +31,11 @@ extern uint32_t rtw_join_status;
 extern rtw_mode_t wifi_mode;
 
 /******************************************************
+ *               WiFi Mode
+ ******************************************************/
+#define RTW_MODE_STA_AP RTW_MODE_STA
+
+/******************************************************
  *               WiFi Security
  ******************************************************/
 #define RTW_SECURITY_WPA_WPA2_MIXED    RTW_SECURITY_WPA_WPA2_MIXED_PSK

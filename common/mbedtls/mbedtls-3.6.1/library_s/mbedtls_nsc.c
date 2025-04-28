@@ -1,10 +1,10 @@
 #include "cmsis.h"
 #include "platform_stdlib.h"
-#include "osdep_service.h"
+#include "FreeRTOS.h"
 #include "mbedtls/config.h"
 #include "mbedtls/platform.h"
 #include "mbedtls/ssl.h"
-#include "crypto_api.h"
+#include "ameba_crypto_api.h"
 
 #if defined(CONFIG_SSL_CLIENT_PRIVATE_IN_TZ) && (CONFIG_SSL_CLIENT_PRIVATE_IN_TZ == 1)
 extern const char *client_key_s;
@@ -57,6 +57,7 @@ void __attribute__((cmse_nonsecure_call)) (*ns_device_mutex_lock)(uint32_t) = NU
 void __attribute__((cmse_nonsecure_call)) (*ns_device_mutex_unlock)(uint32_t) = NULL;
 #endif
 
+IMAGE3_ENTRY_SECTION
 void NS_ENTRY secure_set_ns_device_lock(
 	void (*device_mutex_lock_func)(uint32_t),
 	void (*device_mutex_unlock_func)(uint32_t))
@@ -70,16 +71,19 @@ void NS_ENTRY secure_set_ns_device_lock(
 #endif
 }
 
+IMAGE3_ENTRY_SECTION
 void NS_ENTRY secure_mbedtls_ssl_conf_rng(mbedtls_ssl_config *conf, void *p_rng)
 {
 	mbedtls_ssl_conf_rng(conf, _random, p_rng);
 }
 
+IMAGE3_ENTRY_SECTION
 int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void)
 {
 	return 	mbedtls_platform_set_calloc_free(_calloc, _free);
 }
 
+IMAGE3_ENTRY_SECTION
 mbedtls_pk_context* NS_ENTRY secure_mbedtls_pk_parse_key(void)
 {
 #if defined(CONFIG_SSL_CLIENT_PRIVATE_IN_TZ) && (CONFIG_SSL_CLIENT_PRIVATE_IN_TZ == 1)
@@ -112,17 +116,20 @@ error:
 	return NULL;
 }
 
+IMAGE3_ENTRY_SECTION
 void NS_ENTRY secure_mbedtls_pk_free(mbedtls_pk_context *pk)
 {
 	mbedtls_pk_free(pk);
 	mbedtls_free(pk);
 }
 
+IMAGE3_ENTRY_SECTION
 int NS_ENTRY secure_mbedtls_pk_can_do(const mbedtls_pk_context *ctx, mbedtls_pk_type_t type)
 {
 	return mbedtls_pk_can_do(ctx, type);
 }
 
+IMAGE3_ENTRY_SECTION
 unsigned char NS_ENTRY secure_mbedtls_ssl_sig_from_pk(mbedtls_pk_context *pk)
 {
 #if defined(MBEDTLS_RSA_C)
@@ -149,6 +156,7 @@ struct secure_mbedtls_pk_sign_restartable_param {
 	mbedtls_pk_restart_ctx *rs_ctx;
 };
 
+IMAGE3_ENTRY_SECTION
 int NS_ENTRY secure_mbedtls_pk_sign_restartable(struct secure_mbedtls_pk_sign_restartable_param *param)
 {
 
