@@ -69,9 +69,6 @@ int matter_initiate_wifi_and_connect(rtw_network_info_t *connect_param)
         case RTW_CONNECT_SUCCESS:
             error_flag = RTW_NO_ERROR;
             break;
-        case RTW_CONNECT_UNKNOWN_FAIL:
-            error_flag = RTW_UNKNOWN;
-            break;
         case RTW_CONNECT_SCAN_FAIL:
             error_flag = RTW_NONE_NETWORK;
             break;
@@ -98,7 +95,6 @@ static void print_matter_scan_result(rtw_scan_result_t *record)
     RTW_API_INFO(MAC_FMT, MAC_ARG(record->BSSID.octet));
     RTW_API_INFO(" %d\t ", record->signal_strength);
     RTW_API_INFO(" %d\t  ", record->channel);
-    RTW_API_INFO(" %d\t  ", record->wps_type);
     RTW_API_INFO("%s\t\t ", (record->security == RTW_SECURITY_OPEN) ? "Open" :
                  (record->security == RTW_SECURITY_WEP_PSK) ? "WEP" :
                  (record->security == RTW_SECURITY_WPA_TKIP_PSK) ? "WPA TKIP" :

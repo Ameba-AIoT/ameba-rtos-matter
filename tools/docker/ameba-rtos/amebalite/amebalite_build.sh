@@ -32,7 +32,7 @@ source ${chipdir}/scripts/activate.sh
 cd ${amebadir}
 
 chmod u+x matter_setup.sh
-.//matter_setup.sh ameba-rtos || handle_error "Failed to run matter_setup.sh for ameba-rtos"
+.//matter_setup.sh ameba-rtos v1.3 || handle_error "Failed to run matter_setup.sh for ameba-rtos"
 
 cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebalite/inc/kr4/platform_autoconf.h ${amebadir}/amebalite_gcc_project/project_kr4/inc/
 cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebalite/inc/km4/platform_autoconf.h ${amebadir}/amebalite_gcc_project/project_km4/inc/
