@@ -23,9 +23,9 @@ endif
 #                              Include Directories
 #*****************************************************************************#
 
+IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
 ifeq ($(MBEDTLS_MATTER_ENABLE),y)
 IFLAGS               += -I$(MBEDTLSDIR)/include
-IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
 IFLAGS               += -I$(BASEDIR)/component/ssl/mbedtls_ram_map/rom
 ifeq ($(MBEDTLS_MATTER_V_3_6_1_ENABLE), y)
 IFLAGS               += -I$(MBEDTLSDIR)/library
@@ -65,7 +65,6 @@ IFLAGS               += -I$(MATTER_DIR)/common/lwip/lwip_v2.1.2/port/realtek/inc
 GLOBAL_CFLAGS += -DCONFIG_MATTER=1
 
 # CPP standards and language
-CPPFLAGS += -std=c++11
 CPPFLAGS += -std=gnu++17
 CPPFLAGS += -fno-rtti
 
