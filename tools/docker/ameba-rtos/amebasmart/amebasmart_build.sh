@@ -32,7 +32,7 @@ source ${chipdir}/scripts/activate.sh
 cd ${amebadir}
 
 chmod u+x matter_setup.sh
-.//matter_setup.sh ameba-rtos || handle_error "Failed to run matter_setup.sh for ameba-rtos"
+.//matter_setup.sh ameba-rtos v1.3 || handle_error "Failed to run matter_setup.sh for ameba-rtos"
 
 cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/inc/lp/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/project_lp/inc/
 cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/inc/hp/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/project_hp/inc/
