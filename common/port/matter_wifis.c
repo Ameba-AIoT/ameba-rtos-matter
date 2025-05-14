@@ -60,9 +60,6 @@ int matter_initiate_wifi_and_connect(rtw_network_info_t *connect_param)
     if (error_flag == RTW_SUCCESS) {
         sta_security_type = connect_param->security_type;
         memcpy(&ap_bssid, connect_param->bssid.octet, ETH_ALEN);
-        wifi_indication(WIFI_EVENT_STA_ASSOC, NULL, 0, 0);
-        // wifi_join_status_indicate(RTW_JOINSTATUS_SUCCESS);
-        wifi_indication(WIFI_EVENT_JOIN_STATUS, NULL, 0, RTW_JOINSTATUS_SUCCESS);
     } else if (rtw_join_status == RTW_JOINSTATUS_FAIL) {
         wifi_indication(WIFI_EVENT_STA_DISASSOC, NULL, 0, 0);
         switch (error_flag) {
