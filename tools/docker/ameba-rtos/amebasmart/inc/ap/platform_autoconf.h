@@ -158,6 +158,10 @@
  */
 #define CONFIG_MATTER_EN 1
 #define CONFIG_MATTER 1
+#define MATTER_V_1_3_EN 1
+#undef  MATTER_V_1_4_EN
+#define CONFIG_MATTER_SECURE_EN 1
+#define CONFIG_MATTER_SECURE 1
 
 /*
  * < GUI Config

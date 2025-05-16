@@ -50,6 +50,10 @@ endif
 #lwip_default_hooks
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/lwip_v2.1.2/port/realtek/include/
 
+ifeq ($(CONFIG_MATTER_SECURE_EN), y)
+IFLAGS               += -I$(MATTER_DIR)/common/atf/include
+endif
+
 #*****************************************************************************#
 #                           ARM COMPILATION FLAGS
 #*****************************************************************************#

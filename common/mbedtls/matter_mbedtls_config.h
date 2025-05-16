@@ -33,6 +33,18 @@
 
 #include <platform_autoconf.h>
 #include <stdio.h>
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_PLATFORM_AMEBASMART)
+#include <stdlib.h>
+#include <string.h>
+#include <rand.h>
+
+int strstr(const char *s1, const char *s2);
+#define __weak __attribute__((weak))
+#define u32 uint32_t
+
+#define MATTER_MBEDTLS_SECURE_HEAP_SIZE		U(13 * 1024)
+#endif
+
 #define MBEDTLS_VERSION_CONVERT(a,b,c) (((a) << 16) + ((b) << 8) + (c))
 #ifndef MBEDTLS_VERSION
 #define MBEDTLS_VERSION MBEDTLS_VERSION_NUMBER
@@ -43,7 +55,9 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
+#if !(defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_PLATFORM_AMEBASMART))
 #include <rom_ssl_ram_map.h>
+#endif
 
 /**
  * \name SECTION: System support
@@ -2609,6 +2623,10 @@
  * Enable this module to enable the buffer memory allocator.
  */
 //#define MBEDTLS_MEMORY_BUFFER_ALLOC_C
+//Ameba Smart Matter Secure needs to use MbedTLS memory management
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_PLATFORM_AMEBASMART)
+#define MBEDTLS_MEMORY_BUFFER_ALLOC_C
+#endif
 
 /**
  * \def MBEDTLS_NET_C

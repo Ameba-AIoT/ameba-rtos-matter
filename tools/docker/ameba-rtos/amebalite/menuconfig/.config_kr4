@@ -8,6 +8,7 @@
 #
 # < CONFIG TrustZone
 #
+CONFIG_TRUSTZONE_EN=y
 
 #
 # < CONFIG Link Option
@@ -18,6 +19,8 @@ CONFIG_IMG1_FLASH=y
 # CONFIG_CODE_PSRAM_DATA_SRAM is not set
 # CONFIG_CODE_PSRAM_DATA_PSRAM is not set
 CONFIG_CODE_XIP_DATA_SRAM=y
+CONFIG_IMG3_PSRAM=y
+# CONFIG_IMG3_SRAM is not set
 
 #
 # < CONFIG Mass Production
