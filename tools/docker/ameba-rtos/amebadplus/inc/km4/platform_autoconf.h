@@ -2,7 +2,11 @@
 /*
  * < CONFIG TrustZone
  */
-#undef  CONFIG_TRUSTZONE
+#define CONFIG_TRUSTZONE 1
+#define CONFIG_RDP_BASIC 1
+#undef  CONFIG_RDP_TFM
+#define CONFIG_TRUSTZONE_EN 1
+#undef  CONFIG_TFM_TEST_ENABLE
 
 /*
  * < CONFIG Link Option
@@ -12,6 +16,8 @@
 #define CONFIG_IMG2_FLASH 1
 #undef  CONFIG_IMG2_PSRAM
 #undef  CONFIG_PSRAM_AS_HEAP
+#define CONFIG_IMG3_PSRAM 1
+#undef  CONFIG_IMG3_SRAM
 
 /*
  * < CONFIG Mass Production
@@ -137,7 +143,11 @@
  */
 #define CONFIG_MATTER_EN 1
 #define CONFIG_MATTER 1
+#undef  MATTER_V_1_3_EN
+#define MATTER_V_1_4_EN 1
 #undef  CONFIG_MATTER_TC_EN
+#define CONFIG_MATTER_SECURE_EN 1
+#define CONFIG_MATTER_SECURE 1
 
 /*
  * < GUI Config

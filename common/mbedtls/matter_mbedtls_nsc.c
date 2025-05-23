@@ -1,5 +1,8 @@
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 #include "cmsis.h"
 #include "platform_stdlib.h"
+#include "ameba_crypto_api.h"
+#endif
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE
 #else
@@ -9,7 +12,7 @@
 #include "mbedtls/ssl.h"
 #include "mbedtls/pk.h"
 #include "mbedtls/version.h"
-#include "ameba_crypto_api.h"
+#include "mbedtls/sha256.h"
 
 #if defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
 #include "matter_utils.h"
@@ -30,6 +33,8 @@ mbedtls_ecp_keypair OpKey;
 
 int keyInitialized = 0;
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
+
 static void *_calloc(size_t count, size_t size)
 {
     void *ptr = pvPortMalloc(count * size);
@@ -38,6 +43,15 @@ static void *_calloc(size_t count, size_t size)
     }
     return ptr;
 }
+
+#define _free		vPortFree
+
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+
+#define _calloc mbedtls_calloc
+#define _free   mbedtls_free
+
+#endif //defined(CONFIG_PLATFORM_XXX)
 
 static int _random(void *p_rng, unsigned char *output, size_t output_len)
 {
@@ -77,8 +91,12 @@ static int _random(void *p_rng, unsigned char *output, size_t output_len)
  * Upon successful execution, the key pair associated with the specified Matter Key Type is freed, and
  * the 'keyInitialized' flag is set to 0 to indicate that the key pair is no longer initialized.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
-int NS_ENTRY matter_secure_clear_keypair(matter_key_type key_type)
+void NS_ENTRY matter_secure_clear_keypair(matter_key_type key_type)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+void matter_secure_clear_keypair(matter_key_type key_type)
+#endif
 {
     if (keyInitialized) {
         switch (key_type) {
@@ -102,8 +120,12 @@ int NS_ENTRY matter_secure_clear_keypair(matter_key_type key_type)
  * @param  out_buf: Pointer to the buffer where the SHA-256 hash will be stored.
  * @return  0 on success, negative value otherwise
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_hash_sha256(const uint8_t *msg, size_t msg_size, uint8_t *out_buf)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_hash_sha256(const uint8_t *msg, size_t msg_size, uint8_t *out_buf)
+#endif
 {
     // Check if 'msg' or 'out_buf' pointers are nullptr
     if ((msg == NULL) || (out_buf == NULL)) {
@@ -129,8 +151,12 @@ int NS_ENTRY matter_hash_sha256(const uint8_t *msg, size_t msg_size, uint8_t *ou
  *  - The ECDSA signature is computed and stored in the 'signature' buffer.
  *  - Error handling includes printing error messages and returning appropriate error codes.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *msg, size_t msg_size, unsigned char *signature)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *msg, size_t msg_size, unsigned char *signature)
+#endif
 {
     int result;
     uint8_t digest[MATTER_SHA256_HASH_LENGTH];
@@ -202,13 +228,56 @@ int NS_ENTRY matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsign
 }
 
 /**
+ * @brief Generate a new Operational Keypair for a CASE Session.
+ * @return  0 on success, negative value otherwise.
+ *
+ * Notes:
+ *  - The function initializes a new Operational Keypair structure ('OpKey') and clears any existing keypair of the same type.
+ *  - It generates a new keypair using the elliptic curve specified by 'group' (SECP256R1).
+ *  - If an error occurs during the key generation process, the function prints an error message and returns the error code.
+ */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
+IMAGE3_ENTRY_SECTION
+int NS_ENTRY matter_secure_opkey_init_keypair()
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_opkey_init_keypair()
+#endif
+{
+    int result = 0;
+    mbedtls_ecp_group_id group = MBEDTLS_ECP_DP_SECP256R1;
+
+    matter_secure_clear_keypair(MATTER_OPKEY_KEY_TYPE);
+
+    // Initialize the Operational Keypair
+    mbedtls_ecp_keypair_init(&OpKey);
+
+    // Generate a new keypair using the specified elliptic curve group
+    result = mbedtls_ecp_gen_key(group, &OpKey, _random, NULL);
+    if (result != 0) {
+        printf("Error: %s gen key failed, result=%d \n\r", __FUNCTION__, result);
+        goto exit;
+    }
+
+    keyInitialized = 1;
+    return result;
+
+exit:
+    matter_secure_clear_keypair(MATTER_OPKEY_KEY_TYPE);
+    return result;
+}
+
+/**
  * @brief Generate a Certificate Signing Request (CSR) for a CASE Session using the Operational Keypair.
  * @param  out_csr: Pointer to the buffer where the CSR will be stored.
  * @param  csr_length: Length of the CSR buffer.
  * @return  The length of the generated CSR on success, MATTER_ERROR_INTERNAL otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_new_csr(uint8_t *out_csr, size_t csr_length)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_new_csr(uint8_t *out_csr, size_t csr_length)
+#endif
 {
     int result = 0;
     mbedtls_ecp_group_id group = MBEDTLS_ECP_DP_SECP256R1;
@@ -280,41 +349,6 @@ exit:
 }
 
 /**
- * @brief Generate a new Operational Keypair for a CASE Session.
- * @return  0 on success, negative value otherwise.
- *
- * Notes:
- *  - The function initializes a new Operational Keypair structure ('OpKey') and clears any existing keypair of the same type.
- *  - It generates a new keypair using the elliptic curve specified by 'group' (SECP256R1).
- *  - If an error occurs during the key generation process, the function prints an error message and returns the error code.
- */
-IMAGE3_ENTRY_SECTION
-int NS_ENTRY matter_secure_opkey_init_keypair()
-{
-    int result = 0;
-    mbedtls_ecp_group_id group = MBEDTLS_ECP_DP_SECP256R1;
-
-    matter_secure_clear_keypair(MATTER_OPKEY_KEY_TYPE);
-
-    // Initialize the Operational Keypair
-    mbedtls_ecp_keypair_init(&OpKey);
-
-    // Generate a new keypair using the specified elliptic curve group
-    result = mbedtls_ecp_gen_key(group, &OpKey, _random, NULL);
-    if (result != 0) {
-        printf("Error: %s gen key failed, result=%d \n\r", __FUNCTION__, result);
-        goto exit;
-    }
-
-    keyInitialized = 1;
-    return result;
-
-exit:
-    matter_secure_clear_keypair(MATTER_OPKEY_KEY_TYPE);
-    return result;
-}
-
-/**
  * @brief Encrypts the Operational Private Key using AES-CTR for storing into DCT.
  * @param  buf: Pointer to the buffer containing the original Operational Private Key.
  * @param  size: Size of the buffer containing the original Operational Private Key.
@@ -323,8 +357,12 @@ exit:
  * Notes:
  *  - Upon successful encryption, the encrypted Operational Private Key is copied back to the input buffer 'buf'.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_encrypt_key(uint8_t *buf, size_t size)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_encrypt_key(uint8_t *buf, size_t size)
+#endif
 {
     int result = 0;
     size_t nc_off = 0;
@@ -338,7 +376,7 @@ int NS_ENTRY matter_secure_encrypt_key(uint8_t *buf, size_t size)
     mbedtls_aes_setkey_enc(&aes_ctx, test_key, 256);
 
     // Allocate memory for decrypted_privkey
-    unsigned char *encrypted_privkey = (unsigned char *) pvPortMalloc(size);
+    unsigned char *encrypted_privkey = (unsigned char *) _calloc(1, size);
     if (encrypted_privkey == NULL) {
         result = -1;
         goto exit;
@@ -361,7 +399,7 @@ int NS_ENTRY matter_secure_encrypt_key(uint8_t *buf, size_t size)
 
 exit:
     if (encrypted_privkey) {
-        vPortFree(encrypted_privkey);
+        _free(encrypted_privkey);
     }
 
     mbedtls_aes_free(&aes_ctx);
@@ -374,8 +412,12 @@ exit:
  * @param  pubkey_size: Size of the buffer to accommodate the public key.
  * @return  0 on success, negative value otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_get_opkey_pub(uint8_t *pubkey, size_t pubkey_size)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_get_opkey_pub(uint8_t *pubkey, size_t pubkey_size)
+#endif
 {
     int result = 0;
     size_t temp_size = 0;
@@ -402,8 +444,12 @@ int NS_ENTRY matter_secure_get_opkey_pub(uint8_t *pubkey, size_t pubkey_size)
  * @param  privkey_size: Size of the buffer to accommodate the encrypted private key.
  * @return  0 on success, negative value otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_get_opkey_priv(uint8_t *privkey, size_t privkey_size)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_get_opkey_priv(uint8_t *privkey, size_t privkey_size)
+#endif
 {
     int result = 0;
 
@@ -441,8 +487,12 @@ exit:
  * It's important to note that the decrypted private key remains within the secure context and is not exposed to
  * non-secure environments. The Operational Keypair (Opkey) is exclusively used within a secure context.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_get_opkey(uint8_t *buf, size_t size)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_get_opkey(uint8_t *buf, size_t size)
+#endif
 {
     int result = 0;
     size_t nc_off = 0;
@@ -453,13 +503,13 @@ int NS_ENTRY matter_secure_get_opkey(uint8_t *buf, size_t size)
     mbedtls_aes_setkey_enc(&aes_ctx, test_key, 256);
 
     //initialize decrypted_privkey for store decrypted private key
-    unsigned char *decrypted_privkey = (unsigned char *) pvPortMalloc(MATTER_P256_FE_LENGTH);
+    unsigned char *decrypted_privkey = (unsigned char *) _calloc(1, MATTER_P256_FE_LENGTH);
     if (decrypted_privkey == NULL) {
         result = -1;
         goto exit;
     }
 
-    unsigned char *pubkey = (unsigned char *) pvPortMalloc(MATTER_PUBLIC_KEY_SIZE);
+    unsigned char *pubkey = (unsigned char *) _calloc(1, MATTER_PUBLIC_KEY_SIZE);
     if (pubkey == NULL) {
         result = -1;
         goto exit;
@@ -509,10 +559,10 @@ int NS_ENTRY matter_secure_get_opkey(uint8_t *buf, size_t size)
 
 exit:
     if (decrypted_privkey) {
-        vPortFree(decrypted_privkey);
+        _free(decrypted_privkey);
     }
     if (pubkey) {
-        vPortFree(pubkey);
+        _free(pubkey);
     }
 
     mbedtls_aes_free(&aes_ctx);
@@ -532,8 +582,12 @@ exit:
  *  - If an error occurs during the retrieval or serialization process, the function prints an error message,
  *    clears the Operational Keypair, and returns the error code.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_serialize(uint8_t *output_buf, size_t output_size)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_serialize(uint8_t *output_buf, size_t output_size)
+#endif
 {
     int result = 0;
     uint8_t privkey[MATTER_P256_FE_LENGTH];
@@ -569,8 +623,12 @@ exit:
  * @param  pub_size: Size of the public key buffer.
  * @return  0 on success, negative value otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_deserialize(uint8_t *pub_buf, size_t pub_size)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_deserialize(uint8_t *pub_buf, size_t pub_size)
+#endif
 {
     int result = 0;
 
@@ -613,8 +671,12 @@ exit:
  * @param  pub_size: Size of the public key buffer.
  * @return  0 on success, negative value otherwise.
  */
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size)
+#endif
 {
     unsigned char *output_buffer;
     int result = 0;

@@ -12,6 +12,8 @@ CONFIG_IMG1_FLASH=y
 CONFIG_IMG2_FLASH=y
 # CONFIG_IMG2_PSRAM is not set
 # CONFIG_PSRAM_AS_HEAP is not set
+CONFIG_IMG3_PSRAM=y
+# CONFIG_IMG3_SRAM is not set
 
 #
 # < CONFIG Mass Production
