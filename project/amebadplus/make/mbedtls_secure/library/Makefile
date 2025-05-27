@@ -11,6 +11,7 @@ DIR_FWLIB = $(BASEDIR)/component/soc/amebadplus/fwlib/ram_km4
 DIR_RAMMAP = $(BASEDIR)/component/ssl/mbedtls_ram_map
 
 MODULE_IFLAGS += -DCONFIG_BUILD_SECURE=1
+MODULE_IFLAGS += -ffunction-sections
 MODULE_IFLAGS += -I$(BASEDIR)/component/ssl/mbedtls_ram_map/rom
 MODULE_IFLAGS += -I$(BASEDIR)/component/soc/common/crashdump/include
 
@@ -65,7 +66,6 @@ OBJS = $(notdir $(CSRC:.c=.o))
 #*****************************************************************************#
 -include $(OBJS:.o=.d)
 
-	
 #*****************************************************************************#
 #                        RULES TO GENERATE TARGETS                            #
 #*****************************************************************************#
@@ -77,9 +77,6 @@ all: COPY_RAM_OBJS
 #              GENERATE OBJECT FILE 
 #*****************************************************************************#
 CORE_TARGETS: $(OBJS)
-
-%.o:%.c
-	$(CC) -ffunction-sections $(GLOBAL_CFLAGS) $(MODULE_IFLAGS) $<  -o $@
 
 #*****************************************************************************#
 #              CLEAN GENERATED FILES                                          #

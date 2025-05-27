@@ -16,6 +16,10 @@ extern "C" {
 #include <pb_decode.h>
 #include <device_lock.h>
 
+#if defined(CONFIG_PLATFORM_AMEBASMART) && defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
+#include <matter_rtk_svc_setup.h>
+#endif
+
 #if CONFIG_ENABLE_FACTORY_DATA_ENCRYPTION
 #include <mbedtls/aes.h>
 unsigned char test_key[] = {0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
@@ -386,6 +390,7 @@ exit:
 }
 
 #if defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 #define MATTER_SECURE_CONTEXT_STACK_SIZE 4096
 extern int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void);
 extern int NS_ENTRY matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size);
@@ -393,7 +398,6 @@ extern int NS_ENTRY matter_secure_ecdsa_sign_msg(matter_key_type key_type, const
 extern int NS_ENTRY matter_secure_get_opkey(uint8_t *buf, size_t size);
 extern int NS_ENTRY matter_secure_get_opkey_pub(uint8_t *pubkey, size_t pubkey_size);
 extern int NS_ENTRY matter_secure_new_csr(uint8_t *out_csr, size_t csr_length);
-extern int NS_ENTRY matter_secure_opkey(uint8_t *buf, size_t size);
 extern int NS_ENTRY matter_secure_serialize(uint8_t *output_buf, size_t output_size);
 static bool matter_secure_context_created = false;
 
@@ -409,11 +413,75 @@ void matter_create_secure_context(void)
     matter_secure_context_created = true;
 }
 
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+
+static bool matter_secure_mbedtls_initialized = false;
+struct arm_smccc_res {
+    unsigned long a0;
+    unsigned long a1;
+    unsigned long a2;
+    unsigned long a3;
+};
+/**
+ * struct arm_smccc_quirk - Contains quirk information
+ * @id: quirk identification
+ * @state: quirk specific information
+ * @a6: Qualcomm quirk entry for returning post-smc call contents of a6
+ */
+struct arm_smccc_quirk {
+    int	id;
+    union {
+        unsigned long a6;
+    } state;
+};
+extern void __arm_smccc_smc(unsigned long a0, unsigned long a1,
+                            unsigned long a2, unsigned long a3, unsigned long a4,
+                            unsigned long a5, unsigned long a6, unsigned long a7,
+                            struct arm_smccc_res *res, struct arm_smccc_quirk *quirk);
+
+#define arm_smccc_smc(...) __arm_smccc_smc(__VA_ARGS__, NULL)
+static unsigned long invoke_matter_secure_smc(unsigned long function_id,
+        unsigned long arg0, unsigned long arg1,
+        unsigned long arg2, unsigned long arg3)
+{
+    struct arm_smccc_res res;
+    printf("invoke_matter_secure_smc: function_id(0x%x)\n", function_id);
+    arm_smccc_smc(function_id, arg0, arg1, arg2, arg3, 0, 0, 0, &res);
+    printf("invoke_matter_secure_smc: res.a0(0x%x) \n", res.a0);
+    return res.a0;
+}
+
+#define matter_secure_mbedtls_init(random_seed)                          invoke_matter_secure_smc(MATTER_SECURE_MBEDTLS_INIT, random_seed, 0, 0, 0)
+#define matter_secure_dac_init_keypair(pub_buf, pub_size)                invoke_matter_secure_smc(MATTER_SECURE_DAC_INIT_KEYPAIR, pub_buf, pub_size, 0, 0)
+#define matter_secure_ecdsa_sign_msg(key_type, msg, msg_size, signature) invoke_matter_secure_smc(MATTER_SECURE_ECDSA_SIGN_MSG, key_type, msg, msg_size, signature)
+#define matter_secure_get_opkey(buf, size)                               invoke_matter_secure_smc(MATTER_SECURE_GET_OPKEY, buf, size, 0, 0)
+#define matter_secure_get_opkey_pub(pubkey, pubkey_size)                 invoke_matter_secure_smc(MATTER_SECURE_GET_OPKEY_PUB, pubkey, pubkey_size, 0, 0)
+#define matter_secure_new_csr(out_csr, csr_length)                       invoke_matter_secure_smc(MATTER_SECURE_NEW_CSR, out_csr, csr_length, 0, 0)
+#define matter_secure_serialize(output_buf, output_size)                 invoke_matter_secure_smc(MATTER_SECURE_SERIALIZE, output_buf, output_size, 0, 0)
+
+void matter_init_secure_mbedtls(void)
+{
+    uint32_t random_seed;
+    if (matter_secure_mbedtls_initialized) {
+        return;
+    }
+    // Generate random seed for the secure world
+    TRNG_get_random_bytes(&random_seed, sizeof(random_seed));
+    matter_secure_mbedtls_init(random_seed);
+    matter_secure_mbedtls_initialized = true;
+}
+
+#endif
+
 int matter_get_signature(uint8_t *pub_buf, size_t pub_size, const unsigned char *msg, size_t msg_size, unsigned char *signature)
 {
     int result = 0;
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
     matter_create_secure_context();
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+    matter_init_secure_mbedtls();
+#endif
 
     result = matter_secure_dac_init_keypair(pub_buf, pub_size);
     if (result != 0) {
@@ -483,7 +551,11 @@ int matter_deserialize(uint8_t *buf, size_t size)
 {
     int result = 0;
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
     matter_create_secure_context();
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+    matter_init_secure_mbedtls();
+#endif
 
     result = matter_secure_get_opkey(buf, size);
     if (result != 0) {

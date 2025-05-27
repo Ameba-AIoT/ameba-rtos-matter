@@ -7,7 +7,8 @@
 /*
  * < CONFIG TrustZone
  */
-#undef  CONFIG_TRUSTZONE
+#define CONFIG_TRUSTZONE 1
+#define CONFIG_TRUSTZONE_EN 1
 
 /*
  * < CONFIG Link Option
@@ -18,6 +19,8 @@
 #undef  CONFIG_CODE_PSRAM_DATA_SRAM
 #undef  CONFIG_CODE_PSRAM_DATA_PSRAM
 #define CONFIG_CODE_XIP_DATA_SRAM 1
+#define CONFIG_IMG3_PSRAM 1
+#undef  CONFIG_IMG3_SRAM
 
 /*
  * < CONFIG Mass Production
@@ -131,6 +134,10 @@
  */
 #define CONFIG_MATTER_EN 1
 #define CONFIG_MATTER 1
+#define MATTER_V_1_3_EN 1
+#undef  MATTER_V_1_4_EN
+#define CONFIG_MATTER_SECURE_EN 1
+#define CONFIG_MATTER_SECURE 1
 
 /*
  * < GUI Config

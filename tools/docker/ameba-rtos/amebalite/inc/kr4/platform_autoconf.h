@@ -7,6 +7,7 @@
 /*
  * < CONFIG TrustZone
  */
+#define CONFIG_TRUSTZONE_EN 1
 
 /*
  * < CONFIG Link Option
@@ -17,6 +18,8 @@
 #undef  CONFIG_CODE_PSRAM_DATA_SRAM
 #undef  CONFIG_CODE_PSRAM_DATA_PSRAM
 #define CONFIG_CODE_XIP_DATA_SRAM 1
+#define CONFIG_IMG3_PSRAM 1
+#undef  CONFIG_IMG3_SRAM
 
 /*
  * < CONFIG Mass Production
