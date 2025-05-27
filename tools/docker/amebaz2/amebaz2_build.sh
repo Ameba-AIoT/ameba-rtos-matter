@@ -33,6 +33,8 @@ echo "Changing directory to build location ${amebadir}"
 
 cd ${amebadir}
 
+cp ${amebadir}/component/common/application/matter/tools/docker/matter_version_selection.sh ${amebadir}/component/common/application/matter/tools/scripts/matter_version_selection.sh
+
 chmod u+x matter_setup.sh
 ./matter_setup.sh amebaz2 || handle_error "Failed to run matter_setup.sh for amebaz2"
 
