@@ -11,6 +11,8 @@
 #define CONFIG_IMG2_FLASH 1
 #undef  CONFIG_IMG2_PSRAM
 #undef  CONFIG_PSRAM_AS_HEAP
+#define CONFIG_IMG3_PSRAM 1
+#undef  CONFIG_IMG3_SRAM
 
 /*
  * < CONFIG Mass Production

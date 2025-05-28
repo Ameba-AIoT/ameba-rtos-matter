@@ -19,12 +19,14 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#if !(defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_PLATFORM_AMEBASMART))
 #if defined(__ARM_NEON)
 #include <arm_neon.h>
 #define MBEDTLS_HAVE_NEON_INTRINSICS
 #elif defined(MBEDTLS_PLATFORM_IS_WINDOWS_ON_ARM64)
 #include <arm64_neon.h>
 #define MBEDTLS_HAVE_NEON_INTRINSICS
+#endif
 #endif
 
 /** Helper to define a function as static except when building invasive tests.

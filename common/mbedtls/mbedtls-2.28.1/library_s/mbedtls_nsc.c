@@ -1,5 +1,9 @@
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 #include "cmsis.h"
 #include "platform_stdlib.h"
+#include "ameba_crypto_api.h"
+#include "FreeRTOS.h"
+#endif
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE
 #else
@@ -9,12 +13,12 @@
 #include "mbedtls/ssl.h"
 #include "mbedtls/pk.h"
 #include "mbedtls/version.h"
-#include "ameba_crypto_api.h"
-#include "FreeRTOS.h"
 
 #if defined(CONFIG_SSL_CLIENT_PRIVATE_IN_TZ) && (CONFIG_SSL_CLIENT_PRIVATE_IN_TZ == 1)
 extern const char *client_key_s;
 #endif
+
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 
 static void *_calloc(size_t count, size_t size)
 {
@@ -26,6 +30,13 @@ static void *_calloc(size_t count, size_t size)
 }
 
 #define _free		vPortFree
+
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+
+#define _calloc mbedtls_calloc
+#define _free   mbedtls_free
+
+#endif //defined(CONFIG_BUILD_SECURE)
 
 static int _random(void *p_rng, unsigned char *output, size_t output_len)
 {
@@ -56,6 +67,7 @@ static int _random(void *p_rng, unsigned char *output, size_t output_len)
     return 0;
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 #if defined(__ICCARM__)
 void (__cmse_nonsecure_call *ns_device_mutex_lock)(uint32_t) = NULL;
 void (__cmse_nonsecure_call *ns_device_mutex_unlock)(uint32_t) = NULL;
@@ -79,12 +91,6 @@ void NS_ENTRY secure_set_ns_device_lock(
 }
 
 IMAGE3_ENTRY_SECTION
-void NS_ENTRY secure_mbedtls_ssl_conf_rng(mbedtls_ssl_config *conf, void *p_rng)
-{
-    mbedtls_ssl_conf_rng(conf, _random, p_rng);
-}
-
-IMAGE3_ENTRY_SECTION
 int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void)
 {
 #if defined(MBEDTLS_VERSION_NUMBER) && ( MBEDTLS_VERSION_NUMBER==0x02100300 || MBEDTLS_VERSION_NUMBER==0x021C0000)
@@ -92,10 +98,25 @@ int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void)
 #endif
     return 	mbedtls_platform_set_calloc_free(_calloc, _free);
 }
+#endif
+
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
+IMAGE3_ENTRY_SECTION
+void NS_ENTRY secure_mbedtls_ssl_conf_rng(mbedtls_ssl_config *conf, void *p_rng)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+void secure_mbedtls_ssl_conf_rng(mbedtls_ssl_config *conf, void *p_rng)
+#endif
+{
+    mbedtls_ssl_conf_rng(conf, _random, p_rng);
+}
 
 #if defined(CONFIG_SSL_CLIENT_PRIVATE_IN_TZ) && (CONFIG_SSL_CLIENT_PRIVATE_IN_TZ == 1)
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 uint8_t *NS_ENTRY secure_mbedtls_pk_parse_key(void)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+uint8_t *secure_mbedtls_pk_parse_key(void)
+#endif
 {
 
     mbedtls_pk_context *client_pk = (mbedtls_pk_context *) mbedtls_calloc(1, sizeof(mbedtls_pk_context));
@@ -123,21 +144,33 @@ error:
 }
 #endif
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 void NS_ENTRY secure_mbedtls_pk_free(mbedtls_pk_context *pk)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+void secure_mbedtls_pk_free(mbedtls_pk_context *pk)
+#endif
 {
     mbedtls_pk_free(pk);
     mbedtls_free(pk);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY secure_mbedtls_pk_can_do(const mbedtls_pk_context *ctx, mbedtls_pk_type_t type)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int secure_mbedtls_pk_can_do(const mbedtls_pk_context *ctx, mbedtls_pk_type_t type)
+#endif
 {
     return mbedtls_pk_can_do(ctx, type);
 }
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 unsigned char NS_ENTRY secure_mbedtls_ssl_sig_from_pk(mbedtls_pk_context *pk)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+unsigned char secure_mbedtls_ssl_sig_from_pk(mbedtls_pk_context *pk)
+#endif
 {
 #if defined(MBEDTLS_RSA_C)
     if (mbedtls_pk_can_do(pk, MBEDTLS_PK_RSA)) {
@@ -163,8 +196,12 @@ struct secure_mbedtls_pk_sign_param {
     void *p_rng;
 };
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY secure_mbedtls_pk_sign(struct secure_mbedtls_pk_sign_param *param)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+int secure_mbedtls_pk_sign(struct secure_mbedtls_pk_sign_param *param)
+#endif
 {
 
     return mbedtls_pk_sign(param->ctx, param->md_alg, param->hash, param->hash_len,
@@ -175,8 +212,12 @@ int NS_ENTRY secure_mbedtls_pk_sign(struct secure_mbedtls_pk_sign_param *param)
 #include "mbedtls/threading_alt.h"
 #include "mbedtls/threading.h"
 
+#if defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 mbedtls_pk_type_t NS_ENTRY secure_mbedtls_pk_get_type(const mbedtls_pk_context *ctx)
+#elif defined(CONFIG_PLATFORM_AMEBASMART)
+mbedtls_pk_type_t secure_mbedtls_pk_get_type(const mbedtls_pk_context *ctx)
+#endif
 {
     return mbedtls_pk_get_type(ctx);
 }
