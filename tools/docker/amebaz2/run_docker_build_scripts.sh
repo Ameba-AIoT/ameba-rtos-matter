@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 run_docker_build_scripts() {
   # Define the common path for the tools directory
   local tools_dir="component/common/application/matter/tools/docker"

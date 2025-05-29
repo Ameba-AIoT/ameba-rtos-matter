@@ -1,9 +1,18 @@
 name: Build Ameba RTOS Matter Docker Image
 
 on:
+  push:
+    branches:
+      - main
+      - release/*
   pull_request:
     branches:
       - main
+      - release/*
+
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}-${{ (github.event_name == 'pull_request' && github.event.number) || (github.event_name == 'workflow_dispatch' && github.run_number) || github.sha }}
+    cancel-in-progress: true
 
 jobs:
   build:
@@ -13,13 +22,13 @@ jobs:
     - name: Free Disk Space (Ubuntu)
       uses: jlumbroso/free-disk-space@main
       with:
-          tool-cache: false
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: false
-          docker-images: true
-          swap-storage: true
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: false
+        docker-images: true
+        swap-storage: true
 
     - name: Checkout code
       uses: actions/checkout@v3
@@ -51,4 +60,3 @@ jobs:
 
     - name: Clean up Docker
       run: docker system prune -af
-
