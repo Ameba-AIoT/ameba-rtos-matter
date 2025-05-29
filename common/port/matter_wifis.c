@@ -478,6 +478,16 @@ int matter_wifi_is_up(rtw_interface_t interface)
     return wifi_is_up(interface);
 }
 
+int matter_wifi_is_station_mode(void)
+{
+    if (wifi_mode == RTW_MODE_STA || wifi_mode == RTW_MODE_STA_AP) {
+        return RTW_SUCCESS;
+    } else {
+        return RTW_ERROR;
+    }
+
+}
+
 int matter_wifi_get_ap_bssid(unsigned char *bssid)
 {
     return wifi_get_ap_bssid(bssid);
@@ -503,30 +513,24 @@ int matter_wifi_get_rssi(int *prssi)
     return wifi_get_rssi(prssi);
 }
 
-int matter_wifi_get_security_type(uint8_t wlan_idx, uint16_t *alg, uint8_t *key_idx, uint8_t *passphrase)
+int matter_wifi_get_security_type(uint8_t wlan_idx, uint32_t *wifi_security)
 {
-    int ret = RTW_SUCCESS;
+    int ret = RTW_ERROR;
+    const char *iface_name = NULL;
+    rtw_wifi_setting_t setting;
 
-    switch (wlan_idx)
-    {
-    case WLAN0_IDX:
-        if (wext_get_enc_ext(WLAN0_NAME, alg, key_idx, passphrase) < 0)
-        {
-            ret = RTW_ERROR;
-        }
-        break;
-    case WLAN1_IDX:
-        if (wext_get_enc_ext(WLAN1_NAME, alg, key_idx, passphrase) < 0)
-        {
-            ret = RTW_ERROR;
-        }
-        break;
-    default:
-        RTW_API_INFO("ERROR: Invalid index\n");
-        ret = RTW_ERROR;
-        break;
+    if (wlan_idx == WLAN0_IDX) {
+        iface_name = WLAN0_NAME;
+    } else if (wlan_idx == WLAN1_IDX) {
+        iface_name = WLAN1_NAME;
+    } else {
+        return ret;
     }
 
+    ret = wifi_get_setting(iface_name, &setting);
+    if (ret == RTW_SUCCESS) {
+        *wifi_security = setting.security_type;
+    }
     return ret;
 }
 
