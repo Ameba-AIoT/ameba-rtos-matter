@@ -13,13 +13,14 @@ extern "C" {
 #include <wifi_auto_reconnect.h>
 #include <wifi_conf.h>
 
+static const char *TAG = "matter_wifis";
 u32 apNum = 0; // no of total AP scanned
 static u8 matter_wifi_trigger = 0;
 static rtw_scan_result_t matter_userdata[65] = {0};
 static char *matter_ssid;
 rtw_mac_t ap_bssid;
 rtw_security_t sta_security_type;
-int error_flag = RTW_UNKNOWN;
+int volatile error_flag = RTW_UNKNOWN;
 rtw_mode_t wifi_mode = RTW_MODE_NONE;
 
 #if defined(CONFIG_AUTO_RECONNECT) && CONFIG_AUTO_RECONNECT
@@ -61,26 +62,7 @@ int matter_initiate_wifi_and_connect(rtw_network_info_t *connect_param)
         sta_security_type = connect_param->security_type;
         memcpy(&ap_bssid, connect_param->bssid.octet, ETH_ALEN);
     } else if (rtw_join_status == RTW_JOINSTATUS_FAIL) {
-        wifi_indication(WIFI_EVENT_STA_DISASSOC, NULL, 0, 0);
-        switch (error_flag) {
-        case RTW_CONNECT_SUCCESS:
-            error_flag = RTW_NO_ERROR;
-            break;
-        case RTW_CONNECT_SCAN_FAIL:
-            error_flag = RTW_NONE_NETWORK;
-            break;
-        case RTW_CONNECT_AUTH_FAIL:
-        case RTW_CONNECT_ASSOC_FAIL:
-        case RTW_CONNECT_4WAY_HANDSHAKE_FAIL:
-            error_flag = RTW_CONNECT_FAIL;
-            break;
-        case RTW_CONNECT_AUTH_PASSWORD_WRONG:
-        case RTW_CONNECT_4WAY_PASSWORD_WRONG:
-            error_flag = RTW_WRONG_PASSWORD;
-            break;
-        default:
-            break;
-        }
+        RTK_LOGI(TAG, "Failed to connect!");
     }
 
     return error_flag;
@@ -448,6 +430,15 @@ int matter_wifi_is_up(rtw_interface_t interface)
     }
 }
 
+int matter_wifi_is_station_mode(void)
+{
+    if (wifi_mode == RTW_MODE_STA || wifi_mode == RTW_MODE_STA_AP) {
+        return RTW_SUCCESS;
+    } else {
+        return RTW_ERROR;
+    }
+}
+
 int matter_wifi_get_ap_bssid(unsigned char *bssid)
 {
     if ((int) RTW_SUCCESS == matter_wifi_is_ready_to_transceive(RTW_STA_INTERFACE)) {
@@ -488,7 +479,7 @@ int matter_wifi_get_rssi(int *prssi)
     return ret;
 }
 
-int matter_wifi_get_security_type(uint8_t wlan_idx, uint16_t *alg, uint8_t *key_idx, uint8_t *passphrase)
+int matter_wifi_get_security_type(uint8_t wlan_idx, uint32_t *wifi_security)
 {
     int ret = RTW_SUCCESS;
 
@@ -496,9 +487,7 @@ int matter_wifi_get_security_type(uint8_t wlan_idx, uint16_t *alg, uint8_t *key_
     if (wifi_get_setting(wlan_idx, &setting) < 0) {
         ret = RTW_ERROR;
     } else {
-        memcpy(alg, &setting.alg, sizeof(setting.alg));
-        memcpy(key_idx, &setting.key_idx, sizeof(setting.key_idx));
-        memcpy(passphrase, &setting.password, sizeof(setting.password));
+        *wifi_security = setting.security_type;
     }
 
     return ret;
@@ -532,6 +521,67 @@ int matter_get_sta_wifi_info(rtw_wifi_setting_t *pSetting)
 void matter_wifi_reg_event_handler(matter_wifi_event event_cmds, rtw_event_handler_t handler_func, void *handler_user_data)
 {
     wifi_reg_event_handler(event_cmds, handler_func, handler_user_data);
+}
+
+static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags, void *userdata)
+{
+    UNUSED(buf_len);
+    UNUSED(userdata);
+
+    enum rtw_join_status_type join_status = (enum rtw_join_status_type)flags;
+    struct rtw_event_join_fail_info_t *fail_info = (struct rtw_event_join_fail_info_t *)buf;
+
+    switch (join_status) {
+        case RTW_JOINSTATUS_SUCCESS:
+            error_flag = RTW_NO_ERROR;
+            RTK_LOGI(TAG, "Join success!\n");
+            wifi_indication(WIFI_EVENT_MATTER_STA_CONN, NULL, 0, 0);
+            break;
+        case RTW_JOINSTATUS_FAIL:
+            RTK_LOGI(TAG, "Join fail, reason = %d ", fail_info->fail_reason);
+            switch (fail_info->fail_reason) {
+                case RTW_CONNECT_SCAN_FAIL:
+                    error_flag = RTW_NONE_NETWORK;
+                    RTK_LOGI(NOTAG, "(Can not found target AP)\n");
+                    break;
+                case RTW_CONNECT_AUTH_FAIL:
+                case RTW_CONNECT_ASSOC_FAIL:
+                case RTW_CONNECT_4WAY_HANDSHAKE_FAIL:
+                    error_flag = RTW_CONNECT_FAIL;
+                    RTK_LOGI(NOTAG, "(Auth/Assoc/Handshake failed)\n");
+                    break;
+                case RTW_CONNECT_AUTH_PASSWORD_WRONG:
+                case RTW_CONNECT_4WAY_PASSWORD_WRONG:
+                    error_flag = RTW_WRONG_PASSWORD;
+                    RTK_LOGI(NOTAG, "(Wrong Password)\n");
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case RTW_JOINSTATUS_DISCONNECT:
+            error_flag = RTW_CONNECT_FAIL;
+            RTK_LOGI(TAG, "Disconnected, try to reconnect...\n");
+            wifi_indication(WIFI_EVENT_MATTER_STA_DISCONN, NULL, 0, 0);
+            break;
+        default:
+            break;
+    }
+}
+
+void matter_wifi_reg_join_status_handler(void)
+{
+    wifi_reg_event_handler(WIFI_EVENT_JOIN_STATUS, matter_wifi_join_status_event_hdl, NULL);
+}
+
+void matter_wifi_init(void)
+{
+    matter_wifi_on(RTW_MODE_STA);
+    matter_wifi_reg_join_status_handler();
+#if CONFIG_AUTO_RECONNECT
+    //setup reconnection flag
+    matter_set_autoreconnect(1);
+#endif
 }
 
 #ifdef __cplusplus
