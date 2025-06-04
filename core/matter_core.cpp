@@ -19,6 +19,9 @@
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
 #include <matter_mdns_filter.h>
 #endif
+#if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
+#include <app/server/TermsAndConditionsManager.h>
+#endif
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -213,6 +216,13 @@ void matter_core_init_server(intptr_t context)
     // TODO: Use our own DeviceInfoProvider
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     SetAttributePersistenceProvider(&gDeferredAttributePersister);
+
+#if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
+    const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
+        app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
+    PersistentStorageDelegate & persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
+    chip::app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, termsAndConditions);
+#endif
 
     sWiFiNetworkCommissioningInstance.Init();
 
