@@ -20,6 +20,7 @@
 #
 
 include $(MAKE_INCLUDE_GEN)
+include $(MATTER_BUILDDIR)/make/chip_main/matter_main_sources.mk
 
 .PHONY: all clean
 
@@ -29,25 +30,11 @@ include $(MAKE_INCLUDE_GEN)
 OUTPUT_DIR = $(CHIPDIR)/examples/lighting-app/ameba/build/chip
 CODEGEN_DIR = $(OUTPUT_DIR)/codegen
 
-DIR = $(SRCDIR)
-DIR += $(CHIPDIR)/src
-DIR += $(CHIPDIR)/src/app
-DIR += $(CHIPDIR)/src/app/server
-DIR += $(CHIPDIR)/src/lib/dnssd/minimal_mdns/responders
-DIR += $(CHIPDIR)/examples/platform/ameba/ota
-DIR += $(CHIPDIR)/examples/platform/ameba/route_hook
-DIR += $(CHIPDIR)/examples/providers
-DIR += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated
-DIR += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes
+DIR += $(SRCDIR)
 DIR += $(CODEGEN_DIR)/app
 DIR += $(CODEGEN_DIR)/zap-generated
 DIR += $(CHIPDIR)/examples/lighting-app/lighting-common
 DIR += $(CHIPDIR)/examples/lighting-app/ameba/main
-DIR += $(BASEDIR)/component/common/application/matter/api
-DIR += $(BASEDIR)/component/common/application/matter/core
-DIR += $(BASEDIR)/component/common/application/matter/drivers/device
-DIR += $(BASEDIR)/component/common/application/matter/drivers/matter_consoles
-DIR += $(BASEDIR)/component/common/application/matter/drivers/matter_drivers
 DIR += $(MATTER_EXAMPLEDIR)/light
 
 vpath %.cpp $(DIR) $(shell find $(DIR) -type d)
@@ -56,14 +43,12 @@ vpath %.c $(DIR) $(shell find $(DIR) -type d)
 #*****************************************************************************#
 #                              BUILD DEFINITIONS                              #
 #*****************************************************************************#
-
 CHIP_ENABLE_AMEBA_TC = $(shell grep '\#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION ' $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
 CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 
 #*****************************************************************************#
 #                              CFLAGS                                         #
 #*****************************************************************************#
-
 GLOBAL_CFLAGS += -DCHIP_PROJECT=1
 GLOBAL_CFLAGS += -DSTD_PRINTF=1
 GLOBAL_CFLAGS += -DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\"lib/address_resolve/AddressResolve_DefaultImpl.h\"
@@ -76,21 +61,6 @@ endif
 #*****************************************************************************#
 #                              INCLUDE FILE LIST                              #
 #*****************************************************************************#
-
-IFLAGS += -I$(CHIPDIR)/examples/platform/ameba
-IFLAGS += -I$(CHIPDIR)/examples/providers
-IFLAGS += -I$(CHIPDIR)/src/
-IFLAGS += -I$(CHIPDIR)/src/app/
-IFLAGS += -I$(CHIPDIR)/src/app/util/
-IFLAGS += -I$(CHIPDIR)/src/app/server/
-IFLAGS += -I$(CHIPDIR)/src/controller/data_model
-IFLAGS += -I$(CHIPDIR)/src/include/
-IFLAGS += -I$(CHIPDIR)/src/lib/
-IFLAGS += -I$(CHIPDIR)/third_party/nlassert/repo/include/
-IFLAGS += -I$(CHIPDIR)/third_party/nlio/repo/include/
-IFLAGS += -I$(CHIPDIR)/third_party/nlunit-test/repo/src
-IFLAGS += -I$(CHIPDIR)/zzz_generated
-IFLAGS += -I$(CHIPDIR)/zzz_generated/app-common
 IFLAGS += -I$(CODEGEN_DIR)
 IFLAGS += -I$(CODEGEN_DIR)/zap-generated
 IFLAGS += -I$(CHIPDIR)/examples/lighting-app/lighting-common
@@ -101,61 +71,6 @@ IFLAGS += -I$(MATTER_EXAMPLEDIR)/light
 #*****************************************************************************#
 #                              SOURCE FILE LIST                               #
 #*****************************************************************************#
-
-CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
-CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
-
-CPPSRC += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
-
-CPPSRC += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
-CPPSRC += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
-CPPSRC += $(CHIPDIR)/src/app/icd/server/ICDMonitoringTable.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/AclStorage.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/DefaultAclStorage.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/EchoHandler.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/Dnssd.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/Server.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/CommissioningWindowManager.cpp
-
-CPPSRC += $(CHIPDIR)/src/app/util/attribute-storage.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/attribute-table.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/binding-table.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/DataModelHandler.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/ember-io-storage.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/generic-callback-stubs.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/util.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/privilege-storage.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/persistence/AttributePersistenceProvider.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/persistence/DefaultAttributePersistenceProvider.cpp
-CPPSRC += $(CHIPDIR)/src/app/util/persistence/DeferredAttributePersistenceProvider.cpp
-
-CPPSRC += $(CHIPDIR)/src/app/reporting/Engine.cpp
-CPPSRC += $(CHIPDIR)/src/app/reporting/reporting.cpp
-
-ifeq ($(CHIP_ENABLE_AMEBA_TC), 1)
-CPPSRC += $(CHIPDIR)/src/app/server/DefaultTermsAndConditionsProvider.cpp
-CPPSRC += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
-endif
-CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
-
-CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
-CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp
-CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp
-CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp
-CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberMetadata.cpp
-CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/Instance.cpp
-CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/ServerClusterInterfaceRegistry.cpp
-
-CPPSRC += $(CHIPDIR)/src/setup_payload/OnboardingCodesUtil.cpp
-
-CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp
-CPPSRC += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
-
-CPPSRC += $(shell cat $(CODEGEN_DIR)/cluster-file.txt)
-CPPSRC += $(CODEGEN_DIR)/app/callback-stub.cpp
-CPPSRC += $(CODEGEN_DIR)/app/cluster-callbacks.cpp
-CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
-
 # porting layer src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_core.cpp
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_interaction.cpp
@@ -167,9 +82,6 @@ endif
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/led_driver.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/light/example_matter_light.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/light/matter_drivers.cpp
-
-CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
-CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

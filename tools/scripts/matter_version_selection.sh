@@ -22,8 +22,20 @@ for i in "${!available_version[@]}"; do
     echo "$((i+1))) ${available_version[$i]}"
 done
 
-read -p "Enter Matter Version (default: $DEFAULT_MATTER_VERSION): " MATTER_VERSION
-MATTER_VERSION=${MATTER_VERSION:-$DEFAULT_MATTER_VERSION}
+read -p "Enter Matter Version (number or name, default: $DEFAULT_MATTER_VERSION): " USER_INPUT
+USER_INPUT=${USER_INPUT:-$DEFAULT_MATTER_VERSION}
+
+if [[ "$USER_INPUT" =~ ^[0-9]+$ ]]; then
+    INDEX=$((USER_INPUT - 1))
+    if [[ $INDEX -ge 0 && $INDEX -lt ${#available_version[@]} ]]; then
+        MATTER_VERSION="${available_version[$INDEX]}"
+    else
+        echo "Invalid selection number."
+        exit 1
+    fi
+else
+    MATTER_VERSION="$USER_INPUT"
+fi
 
 valid=false
 for version in "${available_version[@]}"; do
@@ -56,4 +68,3 @@ if [ "$current_branch" != "$MATTER_BRANCH" ]; then
 else
     echo "Already on branch '$MATTER_BRANCH'"
 fi
-
