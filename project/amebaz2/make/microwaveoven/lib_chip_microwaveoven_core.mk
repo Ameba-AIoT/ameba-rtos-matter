@@ -123,6 +123,7 @@ GENERATE_NINJA:
 	if [ $(CHIP_ENABLE_AMEBA_TC) -eq 0 ]; then echo chip_terms_and_conditions_required = "false" >> $(OUTPUT_DIR)/args.gn; else echo chip_terms_and_conditions_required = "true" >> $(OUTPUT_DIR)/args.gn; fi && \
 	echo chip_support_enable_storage_api_audit = "false" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_use_transitional_commissionable_data_provider = "true" >> $(OUTPUT_DIR)/args.gn && \
+	echo chip_persist_subscriptions = "true" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_logging = "true" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_error_logging  = "true" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_progress_logging  = "true" >> $(OUTPUT_DIR)/args.gn && \
