@@ -7,6 +7,10 @@ import glob
 import sys
 import os
 
+excluded_files = [
+    "TemporaryTestCoupling.cpp",
+]
+
 def parse_zapfile_clusters(cluster_file, chip_path):
     """Prints all of the source directories to build for a given ZAP file.
     Arguments:
@@ -26,8 +30,11 @@ def parse_zapfile_clusters(cluster_file, chip_path):
     chip_cluster_path = os.getcwd()
     for cluster in cluster_list:
         for clusters_cpp in glob.glob(chip_cluster_path + '/' + cluster + "/*.cpp"):
-                f.write(chip_cluster_path + '/' + cluster + '/' + os.path.basename(clusters_cpp) + '\n')
-        # f.write(chip_cluster_path + '/' + cluster + '/' + cluster + '.cpp' + '\n')
+            cpp_filename = os.path.basename(clusters_cpp)
+            if cpp_filename in excluded_files:
+                continue  # Skip excluded files
+            cpp_path = chip_cluster_path + '/' + cluster + '/' + cpp_filename
+            f.write(cpp_path + '\n')
 
     # Restore current working directory and close file
     os.chdir(cwd)
