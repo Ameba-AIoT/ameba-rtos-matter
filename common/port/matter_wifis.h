@@ -83,22 +83,25 @@ typedef u8 rtw_interface_t;
  ******************************************************/
 
 enum rtw_connect_error_flag_t {
-    RTW_NO_ERROR,        /**< no error */
-    RTW_NONE_NETWORK,   /**< none network */
-    RTW_WRONG_PASSWORD, /**< wrong password */
+    RTW_NO_ERROR = 0,           /**< no error */
+    RTW_NONE_NETWORK,           /**< none network */
+    RTW_WRONG_PASSWORD,         /**< wrong password */
     RTW_4WAY_HANDSHAKE_TIMEOUT, /**< 4 way handshake timeout*/
-    RTW_CONNECT_FAIL,  /**< connect fail*/
-    RTW_DHCP_FAIL,        /**< dhcp fail*/
-    RTW_UNKNOWN,         /**< unknown*/
+    RTW_CONNECT_FAIL,           /**< connect fail*/
+    RTW_DHCP_FAIL,              /**< dhcp fail*/
+    RTW_UNKNOWN,                /**< unknown*/
 };
 
 /******************************************************
  *               Matter WiFi Event
  ******************************************************/
 typedef enum {
-    MATTER_WIFI_EVENT_CONNECT                = WIFI_EVENT_STA_ASSOC,
-    MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE = WIFI_EVENT_WPA_STA_4WAY_RECV,
-    MATTER_WIFI_EVENT_DISCONNECT             = WIFI_EVENT_STA_DISASSOC,
+    MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE = WIFI_EVENT_MATTER_STA_CONN,
+    MATTER_WIFI_EVENT_CONNECT                = WIFI_EVENT_MATTER_STA_CONN,
+    // both MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE and MATTER_WIFI_EVENT_CONNECT
+    // are registered to the same handler, so it does not need to report the event twice
+    // both matter_wifi_event are declared because both are used in the connectedhomeip SDK
+    MATTER_WIFI_EVENT_DISCONNECT             = WIFI_EVENT_MATTER_STA_DISCONN,
     MATTER_WIFI_EVENT_DHCP6_DONE             = WIFI_EVENT_DHCP6_DONE,
 } matter_wifi_event;
 
@@ -213,6 +216,12 @@ int matter_wifi_is_ready_to_transceive(rtw_interface_t interface);
 int matter_wifi_is_up(rtw_interface_t interface);
 
 /**
+ * @brief  Check if the wifi mode is station mode.
+ * @return  RTW_SUCCESS if wifi_mode is station, RTW_ERROR otherwise.
+ */
+int matter_wifi_is_station_mode(void);
+
+/**
  * @brief  Get the BSSID of the connected access point.
  * @param[out]  bssid: Pointer to store the BSSID.
  * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
@@ -296,6 +305,11 @@ int matter_get_sta_wifi_info(rtw_wifi_setting_t *pSetting);
  * @param[in]  handler_user_data: User data to be passed to the handler function (optional).
  */
 void matter_wifi_reg_event_handler(matter_wifi_event event_cmds, rtw_event_handler_t handler_func, void *handler_user_data);
+
+/**
+ * @brief  Initialize matter wifis module
+ */
+void matter_wifi_init(void);
 
 #ifdef __cplusplus
 }

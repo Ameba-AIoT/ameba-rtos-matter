@@ -46,7 +46,13 @@ typedef enum _SHA2_TYPE_ {
 
 // taken from ameba_rom_patch.h
 _LONG_CALL_ int TRNG_get_random_bytes(void *dst, u32 size);
+#ifndef rtw_get_random_bytes
 #define rtw_get_random_bytes TRNG_get_random_bytes
+#endif
+
+#ifndef __NO_RETURN
+#define __NO_RETURN __attribute__((__noreturn__))
+#endif
 
 #endif //defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBASMART) || defined(CONFIG_PLATFORM_AMEBALITE)
 
