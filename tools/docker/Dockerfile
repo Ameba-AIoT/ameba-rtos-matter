@@ -3,7 +3,9 @@ FROM ubuntu:24.04
 
 # Install common dependencies and clean up to reduce image size
 RUN set -x \
-    && apt-get update \
+    && find /etc/apt/ -name '*.list' -exec sed -i 's|http://archive.ubuntu.com/ubuntu|http://mirrors.aliyun.com/ubuntu|g' {} + \
+    && find /etc/apt/ -name '*.list' -exec sed -i 's|http://security.ubuntu.com/ubuntu|http://mirrors.aliyun.com/ubuntu|g' {} + \
+    && for i in 1 2 3; do apt-get update && break || sleep 5; done \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
     git \
     gcc \
