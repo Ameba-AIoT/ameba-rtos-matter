@@ -106,7 +106,7 @@ CHIP_CXXFLAGS += $(INCLUDES)
 all: GENERATE_NINJA
 
 GENERATE_NINJA:
-	echo "INSTALL CHIP...CHIP_ENABLE_OTA_REQUESTOR=$(CHIP_ENABLE_OTA_REQUESTOR)" && \
+	echo "INSTALL CHIP..." && \
 	echo $(BASEDIR) && \
 	mkdir -p $(OUTPUT_DIR) && \
 	echo > $(OUTPUT_DIR)/args.gn && \
