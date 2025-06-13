@@ -152,23 +152,8 @@ CHIP_ERROR ElectricalPowerMeasurementInit(chip::EndpointId endpointId)
     gEPMInstance = std::make_unique<ElectricalPowerMeasurementInstance>(
         EndpointId(endpointId), *gEPMDelegate,
         BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
-            ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
-            ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
-            ElectricalPowerMeasurement::Feature::kPowerQuality),
-        BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactivePower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
+            ElectricalPowerMeasurement::Feature::kDirectCurrent),
+        BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(0));
 
     if (!gEPMInstance)
     {
