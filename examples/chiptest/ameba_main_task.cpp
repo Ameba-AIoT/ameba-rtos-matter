@@ -31,6 +31,7 @@
 #include <app/server/Server.h>
 #endif
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
+#include <ameba_matter_attribute_callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -45,8 +46,14 @@ app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesMana
 app::Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 } // namespace
 
+static void InitAmebaDeviceManager(void)
+{
+    AmebaDeviceManager::InitInstance(1);  // for Endpoint 1
+}
+
 void AppTaskInit(void)
 {
+    InitAmebaDeviceManager();
 #if CONFIG_ENABLE_CHIP_SHELL
     InitManualOperation();
 #endif
