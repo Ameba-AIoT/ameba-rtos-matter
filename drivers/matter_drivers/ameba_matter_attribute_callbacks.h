@@ -49,6 +49,8 @@ private:
     EndpointId mEndpointId;
 
     /* Fan Control */
+    bool kOnOffSupported = true;
+
     /* Fan Mode Limits */
     static constexpr int FAN_MODE_LOW_LOWER_BOUND    = 1;
     static constexpr int FAN_MODE_LOW_UPPER_BOUND    = 3;
@@ -58,10 +60,16 @@ private:
     static constexpr int FAN_MODE_HIGH_UPPER_BOUND   = 10;
 
     void HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
+    void UpdatePercentCurrent(uint8_t aNewPercentSetting);
     void UpdateFanModeFromSpeedSetting(uint8_t aNewSpeedSetting);
     void UpdateSpeedSettingFromFanMode(FanControl::FanModeEnum aNewFanMode);
     void SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting);
     DataModel::Nullable<uint8_t> GetSpeedSetting(void);
+    DataModel::Nullable<Percent> GetPercentSetting(void);
+    uint8_t GetSpeedMax(void);
+
+    /* OnOff */
+    void HandleOnOffAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
 };
 
 

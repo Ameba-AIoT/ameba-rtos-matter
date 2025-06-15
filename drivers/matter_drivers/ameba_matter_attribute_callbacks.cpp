@@ -26,8 +26,29 @@ using namespace chip::app::Clusters;
 using Protocols::InteractionModel::Status;
 
 /* Fan Control */
+void AmebaDeviceManager::UpdatePercentCurrent(uint8_t aNewPercentSetting)
+{
+    if (kOnOffSupported)
+    {
+        Status status = FanControl::Attributes::PercentCurrent::Set(mEndpointId, aNewPercentSetting);
+        if (status != Status::Success)
+        {
+            ChipLogError(NotSpecified, "UpdatePercetCurrent: Failed to set PercentCurrent attribute: %d", to_underlying(status));
+        }
+    }
+}
+
 void AmebaDeviceManager::UpdateFanModeFromSpeedSetting(uint8_t aNewSpeedSetting)
 {
+    if (kOnOffSupported)
+    {
+        Status status = FanControl::Attributes::SpeedCurrent::Set(mEndpointId, aNewSpeedSetting);
+        if (status != Status::Success)
+        {
+            ChipLogError(NotSpecified, "UpdateFanModeFromSpeedSetting: Failed to set SpeedCurrent attribute: %d", to_underlying(status));
+        }
+    }
+
     if (aNewSpeedSetting == 0) {
         FanControl::Attributes::FanMode::Set(mEndpointId, FanControl::FanModeEnum::kOff);
     }
@@ -114,10 +135,51 @@ DataModel::Nullable<uint8_t> AmebaDeviceManager::GetSpeedSetting(void)
     return speedSetting;
 }
 
+DataModel::Nullable<Percent> AmebaDeviceManager::GetPercentSetting(void)
+{
+    DataModel::Nullable<Percent> percentSetting;
+    Status status = FanControl::Attributes::PercentSetting::Get(mEndpointId, percentSetting);
+
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "GetPercentSetting: Failed to get PercentSetting attribute: %d",
+                     to_underlying(status));
+    }
+
+    return percentSetting;
+}
+
+uint8_t AmebaDeviceManager::GetSpeedMax(void)
+{
+    uint8_t speedMax = 1;
+    Status status    = FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
+    if (status != Status::Success)
+    {
+        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get SpeedMax attribute: %d",
+                     to_underlying(status));
+    }
+    return speedMax;
+}
+
 void AmebaDeviceManager::HandleFanControlAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
 {
     switch (attributeId)
     {
+    case FanControl::Attributes::FanMode::Id: {
+        FanControl::FanModeEnum fanMode = static_cast<FanControl::FanModeEnum>(*value);
+        UpdateSpeedSettingFromFanMode(fanMode);
+        break;
+    }
+    case FanControl::Attributes::PercentSetting::Id: {
+        DataModel::Nullable<Percent> percentSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
+        if (percentSetting.IsNull()) {
+            UpdatePercentCurrent(0);
+        }
+        else {
+            UpdatePercentCurrent(percentSetting.Value());
+        }
+        break;
+    }
     case FanControl::Attributes::SpeedSetting::Id: {
         DataModel::Nullable<uint8_t> speedSetting = static_cast<DataModel::Nullable<uint8_t>>(*value);
         if (speedSetting.IsNull()) {
@@ -128,15 +190,52 @@ void AmebaDeviceManager::HandleFanControlAttributeChange(AttributeId attributeId
         }
         break;
     }
-    case FanControl::Attributes::FanMode::Id: {
-        FanControl::FanModeEnum fanMode = static_cast<FanControl::FanModeEnum>(*value);
-        UpdateSpeedSettingFromFanMode(fanMode);
-        break;
-    }
     default: {
         break;
     }
     }
+}
+
+void AmebaDeviceManager::HandleOnOffAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value)
+{
+    if (attributeId != OnOff::Attributes::OnOff::Id) {
+        return;
+    }
+
+    bool on = static_cast<bool>(*value);
+    uint8_t new_speed;
+    uint8_t new_percent;
+
+    if (on) {
+        DataModel::Nullable<Percent> percent = GetPercentSetting();
+        DataModel::Nullable<uint8_t> speed   = GetSpeedSetting();
+        uint8_t speedMax                     = GetSpeedMax();
+        if (speedMax == 0) {
+            ChipLogError(NotSpecified, "Out of bounds value for SpeedMax, setting to default (1)");
+            speedMax = 1;
+        }
+        if (percent.IsNull() && speed.IsNull()) {
+            new_percent = 100;
+            new_speed   = speedMax;
+        } else if (percent.IsNull()) {
+            ChipLogError(NotSpecified, "PercentSetting is null");
+            new_speed   = speed.Value();
+            new_percent = static_cast<uint8_t>(new_speed * 100u / speedMax);
+        } else if (speed.IsNull()) {
+            ChipLogError(NotSpecified, "SpeedSetting is null");
+            new_percent = percent.Value();
+            new_speed   = static_cast<uint8_t>(new_percent * speedMax / 100u);
+        } else {
+            new_percent = percent.Value();
+            new_speed   = speed.Value();
+        }
+    } else {
+        new_percent = 0;
+        new_speed   = 0;
+    }
+    FanControl::Attributes::SpeedCurrent::Set(mEndpointId, new_speed);
+    FanControl::Attributes::PercentCurrent::Set(mEndpointId, new_percent);
+    kOnOffSupported = on;
 }
 
 void AmebaDeviceManager::AmebaPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
@@ -146,6 +245,10 @@ void AmebaDeviceManager::AmebaPostAttributeChangeCallback(EndpointId endpoint, C
     {
     case FanControl::Id: {
         HandleFanControlAttributeChange(attributeId, type, size, value);
+        break;
+    }
+    case OnOff::Id: {
+        HandleOnOffAttributeChange(attributeId, type, size, value);
         break;
     }
     default:
