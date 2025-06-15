@@ -51,6 +51,19 @@ Engine sShellManualOvenCavityOperationalStateSubCommands;
 CHIP_ERROR ManualOperationalStateCommandHelpHandler(int argc, char ** argv)
 {
     sShellManualOperationalStateSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+
+    printf("OperationalState Values: \n");
+    printf("    0: kStopped\n");
+    printf("    1: kRunning\n");
+    printf("    2: kPaused\n");
+    printf("    3: kError\n\n");
+
+    printf("OperationalStateError Values: \n");
+    printf("    0: kNoError\n");
+    printf("    1: kUnableToStartOrResume\n");
+    printf("    2: kUnableToCompleteOperation\n");
+    printf("    3: kCommandInvalidInState\n\n");
+
     return CHIP_NO_ERROR;
 }
 
@@ -118,6 +131,41 @@ CHIP_ERROR ManualOperationalStateSetErrorCommandHandler(int argc, char ** argv)
 CHIP_ERROR ManualRVCOperationalStateCommandHelpHandler(int argc, char ** argv)
 {
     sShellManualRVCOperationalStateSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+
+    printf("OperationalState Values: \n");
+    printf("    0: kStopped\n");
+    printf("    1: kRunning\n");
+    printf("    2: kPaused\n");
+    printf("    3: kError\n");
+    printf("    64: kSeekingCharger\n");
+    printf("    65: kCharging\n");
+    printf("    66: kDocked\n");
+    printf("    67: kEmptyingDustBin\n");
+    printf("    68: kCleaningMop\n");
+    printf("    69: kFillingWaterTank\n");
+    printf("    70: kUpdatingMaps\n\n");
+
+    printf("OperationalStateError Values: \n");
+    printf("    0: kNoError\n");
+    printf("    1: kUnableToStartOrResume\n");
+    printf("    2: kUnableToCompleteOperation\n");
+    printf("    3: kCommandInvalidInState\n");
+    printf("    64: kFailedToFindChargingDock\n");
+    printf("    65: kStuck\n");
+    printf("    66: kDustBinMissing\n");
+    printf("    67: kDustBinFull\n");
+    printf("    68: kWaterTankEmpty\n");
+    printf("    69: kWaterTankMissing\n");
+    printf("    70: kWaterTankLidOpen\n");
+    printf("    71: kMopCleaningPadMissing\n");
+    printf("    72: kLowBattery\n");
+    printf("    73: kCannotReachTargetArea\n");
+    printf("    74: kDirtyWaterTankFull\n");
+    printf("    75: kDirtyWaterTankMissing\n");
+    printf("    76: kWheelsJammed\n");
+    printf("    77: kBrushJammed\n");
+    printf("    78: kNavigationSensorObscured\n\n");
+
     return CHIP_NO_ERROR;
 }
 
@@ -174,6 +222,13 @@ CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char ** arg
     case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankMissing):         // 0x45, 69
     case to_underlying(RvcOperationalState::ErrorStateEnum::kWaterTankLidOpen):         // 0x46, 70
     case to_underlying(RvcOperationalState::ErrorStateEnum::kMopCleaningPadMissing):    // 0x47, 71
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kLowBattery):               // 0x48, 72
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kCannotReachTargetArea):    // 0x49, 73
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankFull):       // 0x4A, 74
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kDirtyWaterTankMissing):    // 0x4B, 75
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kWheelsJammed):             // 0x4C, 76
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kBrushJammed):              // 0x4D, 77
+    case to_underlying(RvcOperationalState::ErrorStateEnum::kNavigationSensorObscured): // 0x4E, 78
         err.errorStateID = error;
         break;
     default:
@@ -193,6 +248,19 @@ CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char ** arg
 CHIP_ERROR ManualOvenCavityOperationalStateCommandHelpHandler(int argc, char ** argv)
 {
     sShellManualOvenCavityOperationalStateSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+
+    printf("OperationalState Values: \n");
+    printf("    0: kStopped\n");
+    printf("    1: kRunning\n");
+    printf("    2: kPaused\n");
+    printf("    3: kError\n\n");
+
+    printf("OperationalStateError Values: \n");
+    printf("    0: kNoError\n");
+    printf("    1: kUnableToStartOrResume\n");
+    printf("    2: kUnableToCompleteOperation\n");
+    printf("    3: kCommandInvalidInState\n\n");
+
     return CHIP_NO_ERROR;
 }
 

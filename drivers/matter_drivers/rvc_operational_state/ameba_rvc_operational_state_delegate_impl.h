@@ -33,15 +33,18 @@ namespace RvcOperationalState {
 class RvcOperationalStateDelegate : public Delegate
 {
 private:
-    const Clusters::OperationalState::GenericOperationalState rvcOpStateList[7] = {
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)),
-        OperationalState::GenericOperationalState(
-            to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)),
-        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)),
+    const Clusters::OperationalState::GenericOperationalState rvcOpStateList[11] = {
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)), // 0
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)), // 1
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)), // 2
+        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError)), // 3
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kSeekingCharger)), // 64
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCharging)), // 65
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kDocked)), // 66
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kEmptyingDustBin)), //67
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kCleaningMop)), // 68
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kFillingWaterTank)), //69
+        OperationalState::GenericOperationalState(to_underlying(Clusters::RvcOperationalState::OperationalStateEnum::kUpdatingMaps)), //70
     };
 
     Span<const OperationalState::GenericOperationalState> mOperationalStateList =
