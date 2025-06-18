@@ -70,6 +70,7 @@ Menuconfig for matter:
 - To enable Matter, select `MENUCONFIG FOR CA32 CONFIG`, then select `Matter Config`, and enable `Enable Matter`.
 - Change mbedtls version to matter. Under `MENUCONFIG FOR CA32 CONFIG`, select `SSL Config`, then set the `MBEDTLS Version` to `MBEDTLS_MATTER`
 - If you want to support Matter BLE, under `CONFIG BT`, select `BLE_Matter_Adapter` and save the configuration.
+- If you want to support [Matter ESF](matter_commissioning_and_control_guide.md#enable-matter-esf), under `Matter Config`, enable `Enable Matter Terms and Condition`
 
 ```
 make menuconfig

@@ -102,7 +102,6 @@
 #define CONFIG_AMEBALITE 1
 #define ARM_CORE_CM4 1
 #undef  CONFIG_FPGA
-#define CONFIG_AMEBALITE_A_CUT 1
 
 /*
  * < CONFIG OS
@@ -138,14 +137,10 @@
 #define CONFIG_MATTER 1
 #undef  MATTER_V_1_3_EN
 #define MATTER_V_1_4_EN 1
-#undef  CONFIG_MATTER_TC_EN
+#define CONFIG_MATTER_TC_EN 1
+#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION 1
 #define CONFIG_MATTER_SECURE_EN 1
 #define CONFIG_MATTER_SECURE 1
-
-/*
- * < GUI Config
- */
-#undef  CONFIG_GUI_EN
 
 /*
  * < Audio Config
@@ -158,6 +153,11 @@
  */
 #undef  CONFIG_SPEEX_LIB
 #undef  CONFIG_OPUS_LIB
+
+/*
+ * < GUI Config
+ */
+#undef  CONFIG_GUI_EN
 
 /*
  * < CONFIG IPC Message Queue

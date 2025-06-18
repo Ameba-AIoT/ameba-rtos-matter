@@ -6,11 +6,6 @@
 # CONFIG_XIP_FLASH is not set
 
 #
-# < CLINTWOOD Config
-#
-# CONFIG_CLINTWOOD is not set
-
-#
 # < CONFIG Mass Production
 #
 # CONFIG_MP_INCLUDED is not set
@@ -165,7 +160,8 @@ CONFIG_MATTER_EN=y
 CONFIG_MATTER=y
 # MATTER_V_1_3_EN is not set
 MATTER_V_1_4_EN=y
-# CONFIG_MATTER_TC_EN is not set
+CONFIG_MATTER_TC_EN=y
+CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION=y
 CONFIG_MATTER_SECURE_EN=y
 CONFIG_MATTER_SECURE=y
 
@@ -173,6 +169,12 @@ CONFIG_MATTER_SECURE=y
 # < GUI Config
 #
 # CONFIG_GUI_EN is not set
+
+#
+# Third Party Lib
+#
+# CONFIG_GUI_LIB_PNG is not set
+# CONFIG_GUI_LIB_JPG is not set
 
 #
 # < Range Config
