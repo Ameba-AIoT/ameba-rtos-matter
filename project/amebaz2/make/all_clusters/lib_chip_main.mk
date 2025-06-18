@@ -140,7 +140,7 @@ ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
 SRC_CPP += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
 endif
 SRC_CPP += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
-SRC_CPP += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
+#SRC_CPP += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
 
 # Matter Main Common Source file list
 # -------------------------------------------------------------------

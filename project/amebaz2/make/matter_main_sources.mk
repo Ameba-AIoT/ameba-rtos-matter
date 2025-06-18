@@ -22,7 +22,7 @@ INCLUDES += -I$(CHIPDIR)/zzz_generated/app-common
 SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
 SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
 
-SRC_CPP += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
+#SRC_CPP += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
 
 SRC_CPP += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
 SRC_CPP += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
@@ -77,6 +77,8 @@ SRC_CPP += $(CODEGENDIR)/zap-generated/IMClusterCommandHandler.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_api.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/api/matter_log_api.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_device_utils.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_device_info_provider_impl.cpp
+SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_test_event_trigger.cpp
 
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_diagnosticlogs_provider_delegate_impl.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/diagnostic_logs/ameba_logging_faultlog.cpp

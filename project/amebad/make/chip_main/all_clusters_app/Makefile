@@ -139,7 +139,7 @@ ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
 CPPSRC += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
 endif
 CPPSRC += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
-CPPSRC += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
+#CPPSRC += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
 
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #

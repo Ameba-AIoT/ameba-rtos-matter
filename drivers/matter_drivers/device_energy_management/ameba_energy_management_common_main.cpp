@@ -216,10 +216,9 @@ CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId)
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    chip::BitMask<DeviceEnergyManagement::Feature> featureMap = 0x0;
-
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(endpointId, *gDEMDelegate, featureMap);
+    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(endpointId, *gDEMDelegate, 
+        BitMask<DeviceEnergyManagement::Feature, uint32_t>(DeviceEnergyManagement::Feature::kPowerForecastReporting));
 
     if (!gDEMInstance)
     {

@@ -9502,6 +9502,7 @@
           "side": "server",
           "enabled": 1,
           "apiMaturity": "provisional",
+          "commands": [],
           "attributes": [
             {
               "name": "ESAType",
@@ -9578,6 +9579,22 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": null,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "Forecast",
+              "code": 6,
+              "mfgCode": null,
+              "side": "server",
+              "type": "ForecastStruct",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -9663,7 +9680,8 @@
               "maxInterval": 65534,
               "reportableChange": 0
             }
-          ]
+          ],
+          "events": []
         },
         {
           "name": "Energy EVSE",

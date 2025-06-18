@@ -37,7 +37,7 @@ IFLAGS += -I$(CHIPDIR)/zzz_generated/app-common
 CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
 CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
 
-CPPSRC += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
+#CPPSRC += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
 
 CPPSRC += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
 CPPSRC += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
@@ -91,3 +91,5 @@ CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
 
 CPPSRC += $(BASEDIR)/component/common/application/matter/api/matter_api.cpp
 CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_utils.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_device_info_provider_impl.cpp
+CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_test_event_trigger.cpp
