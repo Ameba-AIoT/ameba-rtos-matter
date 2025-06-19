@@ -79,6 +79,7 @@ IFLAGS += -I$(BASEDIR)/component/common/application/matter/examples/chiptest
 #*****************************************************************************#
 # all-clusters-app clusters source files
 CPPSRC += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_consoles/matter_command.cpp
+CPPSRC += $(MATTER_DRIVER)/ameba_matter_attribute_callbacks.cpp
 CPPSRC += $(MATTER_DRIVER)/action/ameba_bridged_actions_stubs.cpp
 CPPSRC += $(MATTER_DRIVER)/air_quality/ameba_air_quality_instance.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_concentration_measurement_instances.cpp
