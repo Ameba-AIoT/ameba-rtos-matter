@@ -56,8 +56,8 @@ CHIP_ERROR ValveControlDelegate::HandleCloseValve()
 
 void ValveControlDelegate::HandleRemainingDurationTick(uint32_t duration)
 {
-    ChipLogProgress(NotSpecified, "Valve remaining duration ticking: %dsec level: %d duration %d", duration, sLevel,
-                    sLastOpenDuration);
+    ChipLogProgress(NotSpecified, "Valve remaining duration ticking: %d, sec level: %d, duration %d",
+                                    duration, sLevel, sLastOpenDuration);
     if (sLastOpenDuration == 0)
     {
         VerifyOrReturn(CHIP_NO_ERROR == ValveConfigurationAndControl::UpdateCurrentLevel(kValveEndpoint, sLevel),
