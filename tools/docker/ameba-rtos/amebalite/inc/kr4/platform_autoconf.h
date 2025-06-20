@@ -97,7 +97,6 @@
 #define CONFIG_AMEBALITE 1
 #define RSICV_CORE_KR4 1
 #undef  CONFIG_FPGA
-#define CONFIG_AMEBALITE_A_CUT 1
 
 /*
  * < CONFIG OS
@@ -129,6 +128,11 @@
  */
 #undef  CONFIG_SPEEX_LIB
 #undef  CONFIG_OPUS_LIB
+
+/*
+ * < GUI Config
+ */
+#undef  CONFIG_GUI_EN
 
 /*
  * < CONFIG IPC Message Queue

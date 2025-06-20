@@ -100,7 +100,6 @@ CONFIG_FW_DRIVER_COEXIST=y
 CONFIG_AMEBALITE=y
 RSICV_CORE_KR4=y
 # CONFIG_FPGA is not set
-CONFIG_AMEBALITE_A_CUT=y
 
 #
 # < CONFIG OS
@@ -132,6 +131,11 @@ CONFIG_MBED_TLS_ENABLED=y
 #
 # CONFIG_SPEEX_LIB is not set
 # CONFIG_OPUS_LIB is not set
+
+#
+# < GUI Config
+#
+# CONFIG_GUI_EN is not set
 
 #
 # < CONFIG IPC Message Queue

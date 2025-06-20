@@ -5,11 +5,6 @@
 #undef  CONFIG_XIP_FLASH
 
 /*
- * < CLINTWOOD Config
- */
-#undef  CONFIG_CLINTWOOD
-
-/*
  * < CONFIG Mass Production
  */
 #undef  CONFIG_MP_INCLUDED
@@ -162,7 +157,8 @@
 #define CONFIG_MATTER 1
 #undef  MATTER_V_1_3_EN
 #define MATTER_V_1_4_EN 1
-#undef  CONFIG_MATTER_TC_EN
+#define CONFIG_MATTER_TC_EN 1
+#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION 1
 #define CONFIG_MATTER_SECURE_EN 1
 #define CONFIG_MATTER_SECURE 1
 
@@ -170,6 +166,12 @@
  * < GUI Config
  */
 #undef  CONFIG_GUI_EN
+
+/*
+ * Third Party Lib
+ */
+#undef  CONFIG_GUI_LIB_PNG
+#undef  CONFIG_GUI_LIB_JPG
 
 /*
  * < Range Config
