@@ -78,7 +78,7 @@ IFLAGS += -I$(BASEDIR)/component/common/application/matter/examples/chiptest
 #                              SOURCE FILE LIST                               #
 #*****************************************************************************#
 # all-clusters-app clusters source files
-CPPSRC += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_consoles/matter_command.cpp
+CPPSRC += $(MATTER_DIR)/drivers/matter_consoles/matter_command.cpp
 CPPSRC += $(MATTER_DRIVER)/action/ameba_bridged_actions_stubs.cpp
 CPPSRC += $(MATTER_DRIVER)/air_quality/ameba_air_quality_instance.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_concentration_measurement_instances.cpp
@@ -144,10 +144,9 @@ CPPSRC += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTr
 #*****************************************************************************#
 #                              OBJECT FILE LIST                               #
 #*****************************************************************************#
-CPPOBJS = $(notdir $(CPPSRC:.cpp=.o))
+CPPOBJS = $(CPPSRC:.cpp=.o)
 COBJS = $(notdir $(CSRC:.c=.o))
-OBJS = $(CPPOBJS)
-OBJS += $(COBJS)
+OBJS = $(CPPOBJS) $(COBJS)
 STATIC_LIB = lib_main.a
 
 #*****************************************************************************#
@@ -163,20 +162,26 @@ all: CORE_TARGETS
 #*****************************************************************************#
 #                              GENERATE OBJECT FILE                           #
 #*****************************************************************************#
-CORE_TARGETS: $(OBJS) $(STATIC_LIB)
+CORE_TARGETS: $(CPPOBJS) $(COBJS) $(STATIC_LIB)
+
+$(CPPOBJS): %.o: %.cpp
+	$(CC) -ffunction-sections $(CPPFLAGS) $(MODULE_IFLAGS) -c $< -o $@
+	foldername=$$(basename $$(dirname $<)); \
+	mkdir -p $${foldername}; \
+	cp $@ $${foldername}/$(notdir $@)
+
 $(STATIC_LIB):$(OBJS)
-	$(AR) rvs $@ $^
+	$(AR) rvs $@ *.o */*.o
 	$(MOVE) -f $@ $(ROOTDIR)/lib/application
 
 #*****************************************************************************#
 #                              CLEAN GENERATED FILES                          #
 #*****************************************************************************#
 clean:
-	rm -f $(MATTER_BUILDDIR)/make/chip_main/all_clusters_app/*.o
-	rm -f $(MATTER_BUILDDIR)/make/chip_main/all_clusters_app/*.i
-	rm -f $(MATTER_BUILDDIR)/make/chip_main/all_clusters_app/*.s
-	rm -f $(MATTER_BUILDDIR)/make/chip_main/all_clusters_app/*.d
-	rm -f $(MATTER_BUILDDIR)/make/chip_main/all_clusters_app/*.ii
-	rm -f $(MATTER_BUILDDIR)/make/chip_main/all_clusters_app/*.su
+	find $(MATTER_BUILDDIR)/make/chip_main/all_clusters_app/ -mindepth 1 -type d -exec rm -r {} +
+	rm -f $(patsubst %.cpp,%.d,$(CPPSRC:.cpp=.d))
+	rm -f $(patsubst %.cpp,%.su,$(CPPSRC:.cpp=.su))
+	rm -f $(patsubst %.cpp,%.o,$(CPPSRC:.cpp=.o))
+	rm -f *.d *.su *.o
 
 -include $(DEPS)

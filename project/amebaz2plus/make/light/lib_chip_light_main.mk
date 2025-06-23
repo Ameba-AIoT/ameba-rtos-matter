@@ -135,7 +135,7 @@ CPPFLAGS += $(CFLAGS)
 
 .PHONY: lib_main
 lib_main: prerequirement $(SRC_O) $(DRAM_O) $(SRC_OO)
-	$(AR) crv $(BIN_DIR)/$(TARGET).a $(OBJ_CPP_LIST) $(OBJ_LIST) $(VER_O)
+	$(AR) crv $(BIN_DIR)/$(TARGET).a $(OBJ_DIR)/*/*.oo $(OBJ_LIST) $(VER_O)
 	cp $(BIN_DIR)/$(TARGET).a $(SDKROOTDIR)/component/soc/realtek/8710c/misc/bsp/lib/common/GCC/$(TARGET).a
 
 # Manipulate Image
@@ -155,7 +155,6 @@ prerequirement:
 	@rm -f $(TARGET)_version*.o
 	@echo const char $(TARGET)_rev[] = \"$(TARGET)_ver_`git rev-parse HEAD`_`date +%Y/%m/%d-%T`\"\; > $(TARGET)_version.c
 	@$(CC) $(CFLAGS) $(INCLUDES) -c $(VER_C) -o $(VER_O)
-	@echo "===== $(ARM_GCC_TOOLCHAIN)"
 	@if [ ! -d $(ARM_GCC_TOOLCHAIN) ]; then \
 		echo ===========================================================; \
 		echo Toolchain not found, \"make toolchain\" first!; \
@@ -171,11 +170,14 @@ prerequirement:
 
 $(SRC_OO): %_$(TARGET).oo : %.cpp | prerequirement
 	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
-	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -MM -MT $@ -MF $(OBJ_DIR)/$(notdir $(patsubst %.oo,%.d,$@))
-	cp $@ $(OBJ_DIR)/$(notdir $@)
-	cp $*_$(TARGET).ii $(INFO_DIR)
-	cp $*_$(TARGET).s $(INFO_DIR)
-	chmod 777 $(OBJ_DIR)/$(notdir $@)
+	foldername=$$(basename $$(dirname $<)); \
+	mkdir -p $(OBJ_DIR)/$${foldername}; \
+	mkdir -p $(INFO_DIR)/$${foldername}; \
+	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -MM -MT $@ -MF $(OBJ_DIR)/$${foldername}/$(notdir $(patsubst %.oo,%.d,$@)); \
+	cp $@ $(OBJ_DIR)/$${foldername}/$(notdir $@); \
+	cp $*_$(TARGET).ii $(INFO_DIR)/$${foldername}/$(notdir $@).ii; \
+	cp $*_$(TARGET).s $(INFO_DIR)/$${foldername}/$(notdir $@).s; \
+	chmod 777 $(OBJ_DIR)/$${foldername}/$(notdir $@);
 
 $(SRC_O): %_$(TARGET).o : %.c | prerequirement
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
