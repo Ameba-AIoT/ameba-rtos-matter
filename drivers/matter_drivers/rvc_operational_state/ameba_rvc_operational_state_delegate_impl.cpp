@@ -59,6 +59,15 @@ void RvcOperationalStateDelegate::HandlePauseStateCallback(OperationalState::Gen
 void RvcOperationalStateDelegate::HandleResumeStateCallback(OperationalState::GenericOperationalError & err)
 {
     // placeholder implementation
+    OperationalState::OperationalStateEnum state =
+    static_cast<OperationalState::OperationalStateEnum>(GetInstance()->GetCurrentOperationalState());
+
+    if (state == OperationalState::OperationalStateEnum::kStopped || state == OperationalState::OperationalStateEnum::kError || state == static_cast<OperationalState::OperationalStateEnum>(Clusters::RvcOperationalState::OperationalStateEnum::kCharging) || state == static_cast<OperationalState::OperationalStateEnum>(Clusters::RvcOperationalState::OperationalStateEnum::kCharging) || state == static_cast<OperationalState::OperationalStateEnum>(Clusters::RvcOperationalState::OperationalStateEnum::kDocked) || state == static_cast<OperationalState::OperationalStateEnum>(Clusters::RvcOperationalState::OperationalStateEnum::kEmptyingDustBin) || state == static_cast<OperationalState::OperationalStateEnum>(Clusters::RvcOperationalState::OperationalStateEnum::kCleaningMop) || state == static_cast<OperationalState::OperationalStateEnum>(Clusters::RvcOperationalState::OperationalStateEnum::kFillingWaterTank) || state == static_cast<OperationalState::OperationalStateEnum>(Clusters::RvcOperationalState::OperationalStateEnum::kUpdatingMaps))
+    {
+        err.Set(to_underlying(OperationalState::ErrorStateEnum::kCommandInvalidInState));
+        return;
+    }
+    
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {
