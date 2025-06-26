@@ -9,6 +9,7 @@ import os
 
 excluded_files = [
     "TemporaryTestCoupling.cpp",
+    "access-control-server/ArlEncoder.cpp",
 ]
 
 def parse_zapfile_clusters(cluster_file, chip_path):
@@ -32,6 +33,10 @@ def parse_zapfile_clusters(cluster_file, chip_path):
         for clusters_cpp in glob.glob(chip_cluster_path + '/' + cluster + "/*.cpp"):
             cpp_filename = os.path.basename(clusters_cpp)
             if cpp_filename in excluded_files:
+                continue  # Skip excluded files
+            relative_path = os.path.relpath(clusters_cpp, chip_cluster_path)
+            print(relative_path)
+            if relative_path in excluded_files:
                 continue  # Skip excluded files
             cpp_path = chip_cluster_path + '/' + cluster + '/' + cpp_filename
             f.write(cpp_path + '\n')
