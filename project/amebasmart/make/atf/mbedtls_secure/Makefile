@@ -75,10 +75,24 @@ LIBMBEDTLS_SRCS+= $(addprefix ${MBEDTLS_DIR}/library/, \
                     rsa_alt_helpers.c \
                     sha3.c \
                     )
+else ifeq ($(CONFIG_MBEDTLS_V_3_6_2_ENABLE), y)
+LIBMBEDTLS_SRCS+= $(addprefix ${MBEDTLS_DIR}/library/, \
+                    des.c \
+                    pk_ecc.c \
+                    bignum_core.c \
+                    bignum_mod.c \
+                    bignum_mod_raw.c \
+                    rsa_alt_helpers.c \
+                    sha3.c \
+                    )
 endif
 
-LIBMBEDTLS_SRCS += ${MATTER_MBEDTLSDIR}/matter_mbedtls_nsc.c \
-                   ${MBEDTLS_DIR}/library_s/mbedtls_nsc.c
+LIBMBEDTLS_SRCS += ${MATTER_MBEDTLSDIR}/matter_mbedtls_nsc.c
+ifeq ($(CONFIG_MBEDTLS_V_3_6_2_ENABLE), y)
+LIBMBEDTLS_SRCS += ${MATTER_MBEDTLSDIR}/mbedtls-3.6.2/library_s/mbedtls_nsc.c
+else
+LIBMBEDTLS_SRCS += ${MBEDTLS_DIR}/library_s/mbedtls_nsc.c
+endif
 
 $(eval $(call MAKE_LIB,mbedtls))
 

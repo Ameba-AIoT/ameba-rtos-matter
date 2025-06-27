@@ -66,7 +66,13 @@ void matter_lwip_dhcp6(void)
 
     for (;;) {
         if (ip6_addr_isvalid(netif_ip6_addr_state(pnetif, 0))) {
+#if defined(CONFIG_MATTER_AMEBARTOS_VER)
+#if (CONFIG_MATTER_AMEBARTOS_VER == 100)
             wifi_indication(WIFI_EVENT_DHCP6_DONE, NULL, 0, 0);
+#elif (CONFIG_MATTER_AMEBARTOS_VER > 101)
+            wifi_indication(RTW_EVENT_DHCP6_DONE, NULL, 0, 0);
+#endif // (CONFIG_MATTER_AMEBARTOS_VER == XXX)
+#endif // defined(CONFIG_MATTER_AMEBARTOS_VER)
             return;
         }
         vTaskDelay(10); //giving delay solves hang issue for ameba-rtos

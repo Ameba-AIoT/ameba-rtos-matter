@@ -33,6 +33,7 @@ endif
 endif
 
 IFLAGS               += -I$(MATTER_DIR)/api
+IFLAGS               += -I$(MATTER_DIR)/common/atcmd
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/api
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/include
 IFLAGS               += -I$(MATTER_DIR)/common/port
@@ -65,6 +66,7 @@ endif
 #                           ARM COMPILATION FLAGS
 #*****************************************************************************#
 
+GLOBAL_CFLAGS += -DCONFIG_MATTER_AMEBARTOS_VER=100
 GLOBAL_CFLAGS += -DCONFIG_MATTER=1
 
 # CPP standards and language

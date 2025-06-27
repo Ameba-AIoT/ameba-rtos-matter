@@ -2,6 +2,9 @@
 #include "cmsis.h"
 #include "platform_stdlib.h"
 #include "ameba_crypto_api.h"
+#ifndef printf
+#define printf DiagPrintf
+#endif
 #endif
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE

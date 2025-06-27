@@ -1,0 +1,34 @@
+menu "Matter Config"
+    config MATTER_EN
+        bool "Enable Matter"
+        default n
+    if MATTER_EN
+        choice
+            prompt "Ameba RTOS SDK Version"
+            default MATTER_AMEBARTOS_DEVELOPMENT_EN
+            config MATTER_AMEBARTOS_RELEASE_101_EN
+                bool "ameba-rtos release/v1.1"
+            config MATTER_AMEBARTOS_DEVELOPMENT_EN
+                bool "ameba-rtos development"
+        endchoice
+        config MATTER_AMEBARTOS_VER
+            int
+            default 101 if MATTER_AMEBARTOS_RELEASE_101_EN
+            default 999 if MATTER_AMEBARTOS_DEVELOPMENT_EN
+        config MATTER_TC_EN
+            bool "Enable Matter Terms and Condition"
+            default n
+        config MATTER_SECURE_EN
+            bool "Enable Matter Secure"
+            default n
+            depends on ((AMEBADPLUS || AMEBALITE) && TRUSTZONE_FOR_KM4) || (AMEBASMART)
+        config MATTER_SECURE
+            bool
+            default y
+            depends on MATTER_SECURE_EN
+        config MBEDTLS_V_3_6_2_ENABLE
+            bool
+            default y
+            depends on MATTER_AMEBARTOS_DEVELOPMENT_EN
+    endif
+endmenu

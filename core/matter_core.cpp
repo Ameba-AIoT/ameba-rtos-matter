@@ -220,7 +220,7 @@ void matter_core_init_server(intptr_t context)
     // TODO: configure the endpoint
     emberAfEndpointEnableDisable(0xFFFE, false);
 
-    if (RTW_SUCCESS != wifi_is_connected_to_ap()) {
+    if (RTW_SUCCESS != matter_wifi_is_connected_to_ap()) {
         // QR code will be used with CHIP Tool
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
@@ -302,7 +302,7 @@ CHIP_ERROR matter_core_start(void)
     instance.InitAmebaLogSubsystem();
 #endif
 
-    wifi_config_autoreconnect(0);
+    matter_set_autoreconnect(0);
 
     return matter_core_init();
 }

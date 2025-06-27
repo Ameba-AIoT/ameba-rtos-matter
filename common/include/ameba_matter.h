@@ -14,7 +14,10 @@
 
 #include "hal_platform.h"
 
-#if defined(CONFIG_PLATFORM_AMEBALITE)
+#if defined(CONFIG_PLATFORM_AMEBALITE) || defined(CONFIG_PLATFORM_AMEBASMART)
+#if defined(CONFIG_MATTER_AMEBARTOS_VER) && (CONFIG_MATTER_AMEBARTOS_VER > 101)
+#include "ameba_vector_table.h"
+#endif
 #include "ameba_vector.h"
 #endif
 

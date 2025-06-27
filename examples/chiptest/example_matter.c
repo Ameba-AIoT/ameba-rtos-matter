@@ -3,7 +3,7 @@
 #include <basic_types.h>
 #include <platform_stdlib.h>
 #include <rtw_wifi_constants.h>
-#include <wifi_intf_drv_to_app_basic.h>
+#include <chip_porting.h>
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG)
 #include <matter_fs.h>
@@ -16,12 +16,13 @@ extern void ChipTest(void);
 
 static void example_matter_task_thread(void *pvParameters)
 {
-    while (!(wifi_is_running(WLAN0_IDX) || wifi_is_running(WLAN1_IDX)))
+    do // Wait first to avoid hang issue for ameba-smart cmake
     {
         vTaskDelay(500);
     }
+    while (!(wifi_is_running(WLAN0_IDX) || wifi_is_running(WLAN1_IDX)));
 
-    wifi_config_autoreconnect(0);
+    matter_set_autoreconnect(0);
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
     fault_handler_override(matter_fault_log, matter_bt_log);

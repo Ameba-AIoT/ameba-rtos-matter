@@ -3,7 +3,6 @@
 #include <basic_types.h>
 #include <platform_stdlib.h>
 #include <rtw_wifi_constants.h>
-#include <wifi_intf_drv_to_app_basic.h>
 
 #include <chip_porting.h>
 #include <matter_core.h>

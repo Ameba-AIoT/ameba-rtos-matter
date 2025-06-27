@@ -71,11 +71,11 @@ int matter_initiate_wifi_and_connect(rtw_network_info_t *connect_param)
 
 static void print_matter_scan_result(rtw_scan_result_t *record)
 {
-    RTW_API_INFO("%s\t ", (record->bss_type == RTW_BSS_TYPE_ADHOC) ? "Adhoc" : "Infra");
-    RTW_API_INFO(MAC_FMT, MAC_ARG(record->BSSID.octet));
-    RTW_API_INFO(" %d\t ", record->signal_strength);
-    RTW_API_INFO(" %d\t  ", record->channel);
-    RTW_API_INFO("%s\t\t ", (record->security == RTW_SECURITY_OPEN) ? "Open" :
+    DiagPrintf("%s\t ", (record->bss_type == RTW_BSS_TYPE_INFRASTRUCTURE) ? "Infra" : "Adhoc");
+    DiagPrintf(MAC_FMT, MAC_ARG(record->BSSID.octet));
+    DiagPrintf(" %d\t ", record->signal_strength);
+    DiagPrintf(" %d\t  ", record->channel);
+    DiagPrintf("%s\t\t ", (record->security == RTW_SECURITY_OPEN) ? "Open" :
                  (record->security == RTW_SECURITY_WEP_PSK) ? "WEP" :
                  (record->security == RTW_SECURITY_WPA_TKIP_PSK) ? "WPA TKIP" :
                  (record->security == RTW_SECURITY_WPA_AES_PSK) ? "WPA AES" :
@@ -88,8 +88,8 @@ static void print_matter_scan_result(rtw_scan_result_t *record)
                  (record->security == RTW_SECURITY_WPA_WPA2_MIXED_PSK) ? "WPA/WPA2 Mixed" :
                  "Unknown");
 
-    RTW_API_INFO(" %s ", record->SSID.val);
-    RTW_API_INFO("\n");
+    DiagPrintf(" %s ", record->SSID.val);
+    DiagPrintf("\n");
 }
 
 static rtw_result_t matter_scan_result_handler(unsigned int scanned_AP_num, void *user_data)
@@ -115,7 +115,7 @@ static rtw_result_t matter_scan_result_handler(unsigned int scanned_AP_num, void
         for (int i = 0; i < scanned_AP_num; i++) {
             scanned_AP_info = (rtw_scan_result_t *)(scan_buf + i * sizeof(rtw_scan_result_t));
 
-            RTW_API_INFO("%d\t ", ++apNum);
+            DiagPrintf("%d\t ", ++apNum);
             memcpy(&matter_userdata[i], scanned_AP_info, sizeof(rtw_scan_result_t));
             print_matter_scan_result(&matter_userdata[i]);
         }
@@ -151,7 +151,7 @@ void matter_scan_networks(void)
     ret = wifi_scan_networks(&scan_param, 0);
     if (ret != RTW_SUCCESS)
     {
-        RTW_API_INFO("ERROR: wifi scan failed\n");
+        RTK_LOGE(TAG, "ERROR: wifi scan failed\n");
     }
 }
 
@@ -175,7 +175,7 @@ void matter_scan_networks_with_ssid(const unsigned char *ssid, size_t length)
     ret = wifi_scan_networks(&scan_param, 0);
     if (ret != RTW_SUCCESS)
     {
-        RTW_API_INFO("ERROR: wifi scan failed\n");
+        RTK_LOGE(TAG, "ERROR: wifi scan failed\n");
     }
 }
 
@@ -344,7 +344,7 @@ int matter_wifi_connect(
 
     err = matter_initiate_wifi_and_connect(&connect_param);
     if (err != RTW_SUCCESS) {
-        RTW_API_INFO("ERROR: wifi Connect failed\n");
+        RTK_LOGE(TAG, "ERROR: wifi Connect failed\n");
     }
 
     return err;
@@ -391,7 +391,17 @@ int matter_wifi_set_mode(rtw_mode_t mode)
 
 int matter_wifi_is_connected_to_ap(void)
 {
+#if defined(CONFIG_MATTER_AMEBARTOS_VER)
+#if (CONFIG_MATTER_AMEBARTOS_VER == 100)
     return wifi_is_connected_to_ap();
+#elif (CONFIG_MATTER_AMEBARTOS_VER > 101)
+    u8 join_status = RTW_JOINSTATUS_UNKNOWN;
+    if ((wifi_get_join_status(&join_status) == RTK_SUCCESS) && (join_status == RTW_JOINSTATUS_SUCCESS))
+        return RTW_SUCCESS;
+    else
+        return RTW_ERROR;
+#endif // (CONFIG_MATTER_AMEBARTOS_VER == XXX)
+#endif // defined(CONFIG_MATTER_AMEBARTOS_VER)
 }
 
 int matter_wifi_is_open_security(void)
@@ -472,11 +482,21 @@ int matter_wifi_get_network_mode(rtw_network_mode_t *pmode)
 int matter_wifi_get_rssi(int *prssi)
 {
     int ret;
+#if defined(CONFIG_MATTER_AMEBARTOS_VER)
+#if (CONFIG_MATTER_AMEBARTOS_VER == 100)
     rtw_phy_statistics_t phy_statistics;
     ret = wifi_fetch_phy_statistic(&phy_statistics);
     if (ret >= 0) {
         *prssi = phy_statistics.rssi;
     }
+#elif (CONFIG_MATTER_AMEBARTOS_VER > 101)
+    union rtw_phy_stats phy_stats;
+    ret = wifi_get_phy_stats(STA_WLAN_INDEX, NULL, &phy_stats);
+    if (ret >= 0) {
+        *prssi = phy_stats.sta.rssi;
+    }
+#endif // (CONFIG_MATTER_AMEBARTOS_VER == XXX)
+#endif // defined(CONFIG_MATTER_AMEBARTOS_VER)
     return ret;
 }
 
@@ -506,11 +526,20 @@ int matter_wifi_get_setting(unsigned char wlan_idx, rtw_wifi_setting_t *psetting
 int matter_wifi_get_wifi_channel_number(uint8_t wlan_idx, uint8_t *ch)
 {
     int ret = RTW_SUCCESS;
-
+#if defined(CONFIG_MATTER_AMEBARTOS_VER)
+#if (CONFIG_MATTER_AMEBARTOS_VER == 100)
     if (wifi_get_channel(wlan_idx, ch) < 0) {
         ret = RTW_ERROR;
     }
-
+#elif (CONFIG_MATTER_AMEBARTOS_VER > 101)
+    rtw_wifi_setting_t setting = {0};
+    if (wifi_get_setting(wlan_idx, &setting) < 0) {
+        ret = RTW_ERROR;
+    } else {
+        *ch = setting.channel;
+    }
+#endif // (CONFIG_MATTER_AMEBARTOS_VER == XXX)
+#endif // defined(CONFIG_MATTER_AMEBARTOS_VER)
     return ret;
 }
 
@@ -529,6 +558,8 @@ static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags,
     UNUSED(buf_len);
     UNUSED(userdata);
 
+#if defined(CONFIG_MATTER_AMEBARTOS_VER)
+#if (CONFIG_MATTER_AMEBARTOS_VER == 100)
     enum rtw_join_status_type join_status = (enum rtw_join_status_type)flags;
     struct rtw_event_join_fail_info_t *fail_info = (struct rtw_event_join_fail_info_t *)buf;
 
@@ -571,11 +602,64 @@ static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags,
         default:
             break;
     }
+#elif (CONFIG_MATTER_AMEBARTOS_VER > 101)
+	u8 join_status = (u8)flags;
+	struct rtw_event_info_joinstatus_joinfail *fail_info = (struct rtw_event_info_joinstatus_joinfail *)buf;
+
+    switch (join_status) {
+        case RTW_JOINSTATUS_SUCCESS: // Connecting --> Connected Succesfully
+            error_flag = RTW_NO_ERROR;
+            RTK_LOGI(TAG, "Join success!\n");
+            wifi_indication(RTW_EVENT_MATTER_STA_CONN, NULL, 0, 0);
+            break;
+        case RTW_JOINSTATUS_FAIL: // Connecting --> Failed to Connect
+            RTK_LOGI(TAG, "Join fail, error_flag = ");
+            switch (fail_info->fail_reason) {
+                case -RTK_ERR_WIFI_CONN_SCAN_FAIL:
+                    error_flag = RTW_NONE_NETWORK;
+                    RTK_LOGI(NOTAG, "%d (Can not found target AP)\n", error_flag);
+                    break;
+                case -RTK_ERR_WIFI_CONN_AUTH_FAIL:
+                case -RTK_ERR_WIFI_CONN_ASSOC_FAIL:
+                case -RTK_ERR_WIFI_CONN_4WAY_HANDSHAKE_FAIL:
+                    error_flag = RTW_CONNECT_FAIL;
+                    RTK_LOGI(NOTAG, "%d (Auth/Assoc/Handshake failed)\n", error_flag);
+                    break;
+                case -RTK_ERR_WIFI_CONN_AUTH_PASSWORD_WRONG:
+                case -RTK_ERR_WIFI_CONN_4WAY_PASSWORD_WRONG:
+                    error_flag = RTW_WRONG_PASSWORD;
+                    RTK_LOGI(NOTAG, "%d (Wrong Password)\n", error_flag);
+                    break;
+                default:
+                    error_flag = RTW_UNKNOWN;
+                    RTK_LOGI(NOTAG, "%d (Unknown Error)\n", error_flag);
+                    break;
+            }
+            wifi_indication(RTW_EVENT_MATTER_STA_DISCONN, NULL, 0, 0);
+            break;
+        case RTW_JOINSTATUS_DISCONNECT: // Connected --> Disconnected
+            error_flag = RTW_CONNECT_FAIL;
+            RTK_LOGI(TAG, "Disconnected, try to reconnect...\n");
+            wifi_indication(RTW_EVENT_MATTER_STA_DISCONN, NULL, 0, 0);
+            break;
+        default:
+            break;
+    }
+#endif // (CONFIG_MATTER_AMEBARTOS_VER == XXX)
+#endif // defined(CONFIG_MATTER_AMEBARTOS_VER)
+
+
 }
 
 void matter_wifi_reg_join_status_handler(void)
 {
+#if defined(CONFIG_MATTER_AMEBARTOS_VER)
+#if (CONFIG_MATTER_AMEBARTOS_VER == 100)
     wifi_reg_event_handler(WIFI_EVENT_JOIN_STATUS, matter_wifi_join_status_event_hdl, NULL);
+#elif (CONFIG_MATTER_AMEBARTOS_VER > 101)
+    wifi_reg_event_handler(RTW_EVENT_JOIN_STATUS, matter_wifi_join_status_event_hdl, NULL);
+#endif // (CONFIG_MATTER_AMEBARTOS_VER == XXX)
+#endif // defined(CONFIG_MATTER_AMEBARTOS_VER)
 }
 
 void matter_wifi_init(void)

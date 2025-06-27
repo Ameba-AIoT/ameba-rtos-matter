@@ -25,7 +25,7 @@ extern "C" {
 #include <cmsis_compiler.h>
 
 #include <kv.h>
-#include <wifi_intf_drv_to_app_basic.h>
+#include <wifi_conf.h>
 
 #include <matter_kvs.h>
 #include <matter_lwip.h>
@@ -38,6 +38,12 @@ extern "C" {
 /** @brief  Config local address type: 0-pulic address, 1-static random address */
 #undef F_BT_LE_USE_STATIC_RANDOM_ADDR
 #define F_BT_LE_USE_STATIC_RANDOM_ADDR      1
+#endif
+
+#if defined(CONFIG_MATTER_AMEBARTOS_VER) && (CONFIG_MATTER_AMEBARTOS_VER > 101)
+/** @brief  Redefine Return Codes */
+#define RTW_SUCCESS RTK_SUCCESS
+#define RTW_ERROR   RTK_FAIL
 #endif
 
 #ifdef __cplusplus

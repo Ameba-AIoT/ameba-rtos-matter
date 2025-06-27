@@ -1,4 +1,5 @@
 #include <platform_autoconf.h>
+#include <atcmd_matter.h>
 
 #if defined(CONFIG_EXAMPLE_MATTER) && (CONFIG_EXAMPLE_MATTER == 1)
 
@@ -30,6 +31,7 @@
  */
 void app_example(void)
 {
+    matter_shell_init();
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && (CONFIG_EXAMPLE_MATTER_CHIPTEST == 1)
     example_matter_task();
 #elif defined(CONFIG_EXAMPLE_MATTER_AIRCON) && (CONFIG_EXAMPLE_MATTER_AIRCON == 1)

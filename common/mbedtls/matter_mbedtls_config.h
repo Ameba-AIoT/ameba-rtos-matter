@@ -2670,6 +2670,9 @@ int strstr(const char *s1, const char *s2);
  *
  */
 //#define MBEDTLS_CMAC_C
+#if defined(CONFIG_MATTER_AMEBARTOS_VER) && (CONFIG_MATTER_AMEBARTOS_VER > 101)
+#define MBEDTLS_CMAC_C
+#endif
 
 /**
  * \def MBEDTLS_CTR_DRBG_C
@@ -2732,6 +2735,9 @@ int strstr(const char *s1, const char *s2);
  *            security risk. We recommend considering stronger ciphers instead.
  */
 //#define MBEDTLS_DES_C
+#if defined(CONFIG_MATTER_AMEBARTOS_VER) && (CONFIG_MATTER_AMEBARTOS_VER > 101)
+#define MBEDTLS_DES_C
+#endif
 
 /**
  * \def MBEDTLS_DHM_C

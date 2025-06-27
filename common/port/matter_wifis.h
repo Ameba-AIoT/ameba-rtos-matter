@@ -24,14 +24,7 @@ extern "C" {
 #include "rtw_wifi_constants.h"
 
 /******************************************************
- *               Other Variables
- ******************************************************/
-extern u32 apNum;
-extern uint32_t rtw_join_status;
-extern rtw_mode_t wifi_mode;
-
-/******************************************************
- *               WiFi Mode
+ *               WiFi Modes
  ******************************************************/
 #define RTW_MODE_STA_AP RTW_MODE_STA
 
@@ -53,7 +46,7 @@ extern rtw_mode_t wifi_mode;
 #define IW_ENCODE_ALG_AES_CMAC         5
 
 /******************************************************
- *         Wifi Network Mode (BGN)
+ *         WiFi Network Mode (BGN)
  ******************************************************/
 typedef int rtw_network_mode_t;
 
@@ -71,15 +64,7 @@ typedef struct rtw_wifi_config {
 } rtw_wifi_config_t;
 
 /******************************************************
- *               WiFi Interface
- ******************************************************/
-
-typedef u8 rtw_interface_t;
-#define RTW_STA_INTERFACE WLAN0_IDX
-#define RTW_AP_INTERFACE WLAN1_IDX
-
-/******************************************************
- *               Wifi Connect Error
+ *               WiFi Connect Error
  ******************************************************/
 
 enum rtw_connect_error_flag_t {
@@ -91,6 +76,10 @@ enum rtw_connect_error_flag_t {
     RTW_DHCP_FAIL,              /**< dhcp fail*/
     RTW_UNKNOWN,                /**< unknown*/
 };
+
+// Added for ameba-rtos development branch support
+#if defined(CONFIG_MATTER_AMEBARTOS_VER)
+#if (CONFIG_MATTER_AMEBARTOS_VER == 100)
 
 /******************************************************
  *               Matter WiFi Event
@@ -104,6 +93,109 @@ typedef enum {
     MATTER_WIFI_EVENT_DISCONNECT             = WIFI_EVENT_MATTER_STA_DISCONN,
     MATTER_WIFI_EVENT_DHCP6_DONE             = WIFI_EVENT_DHCP6_DONE,
 } matter_wifi_event;
+
+#elif (CONFIG_MATTER_AMEBARTOS_VER > 101)
+
+/******************************************************
+ *               Matter WiFi Event
+ ******************************************************/
+typedef enum {
+    MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE = RTW_EVENT_MATTER_STA_CONN,
+    MATTER_WIFI_EVENT_CONNECT                = RTW_EVENT_MATTER_STA_CONN,
+    // both MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE and MATTER_WIFI_EVENT_CONNECT
+    // are registered to the same handler, so it does not need to report the event twice
+    // both matter_wifi_event are declared because both are used in the connectedhomeip SDK
+    MATTER_WIFI_EVENT_DISCONNECT             = RTW_EVENT_MATTER_STA_DISCONN,
+    MATTER_WIFI_EVENT_DHCP6_DONE             = RTW_EVENT_DHCP6_DONE,
+} matter_wifi_event;
+
+/******************************************************
+ *         WiFi Modes
+ ******************************************************/
+typedef uint8_t rtw_mode_t;
+
+/******************************************************
+ *         WiFi Interface
+ ******************************************************/
+#define WLAN0_IDX   STA_WLAN_INDEX
+#define WLAN1_IDX   SOFTAP_WLAN_INDEX
+
+/******************************************************
+ *         WiFi Result
+ ******************************************************/
+typedef int rtw_result_t;
+
+/******************************************************
+ *         WiFi Scan Result
+ ******************************************************/
+typedef struct rtw_scan_result rtw_scan_result_t;
+
+/******************************************************
+ *         WiFi Security
+ ******************************************************/
+typedef uint32_t rtw_security_t;
+
+/******************************************************
+ *         WiFi Settings
+ ******************************************************/
+typedef struct rtw_wifi_setting rtw_wifi_setting_t;
+
+/******************************************************
+ *         WiFi Event Handler
+ ******************************************************/
+typedef void (*rtw_event_handler_t)(char *buf, int buf_len, int flags, void *handler_user_data);
+
+/******************************************************
+ *         WiFi Mac Address
+ ******************************************************/
+typedef struct rtw_mac rtw_mac_t;
+
+/******************************************************
+ *         WiFi Network Info
+ ******************************************************/
+typedef struct rtw_network_info rtw_network_info_t;
+
+/******************************************************
+ *         WiFi Scan Parameter
+ ******************************************************/
+typedef struct rtw_scan_param rtw_scan_param_t;
+
+/******************************************************
+ *         WiFi Auto Reconnect
+ ******************************************************/
+#define wifi_config_autoreconnect wifi_set_autoreconnect
+
+/******************************************************
+ *         WiFi is connected to AP
+ ******************************************************/
+#define wifi_is_connected_to_ap matter_wifi_is_connected_to_ap
+
+#endif // defined(CONFIG_MATTER_AMEBARTOS_VER > 101)
+#endif // defined(CONFIG_MATTER_AMEBARTOS_VER)
+
+/******************************************************
+ *               WiFi Interface
+ ******************************************************/
+
+typedef u8 rtw_interface_t;
+#define RTW_STA_INTERFACE WLAN0_IDX
+#define RTW_AP_INTERFACE WLAN1_IDX
+
+/******************************************************
+ *               Other Variables
+ ******************************************************/
+extern u32 apNum;
+extern uint32_t rtw_join_status;
+extern rtw_mode_t wifi_mode;
+
+/******************************************************
+ * Undefine WiFi Macro to avoid conflict when compiling Matter Project
+ ******************************************************/
+#if defined(CHIP_PROJECT) && CHIP_PROJECT
+#ifdef GetPriority
+#undef GetPriority
+#endif
+#endif
 
 /******************************************************
  *               Matter WiFi Functions

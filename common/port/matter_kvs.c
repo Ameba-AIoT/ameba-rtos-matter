@@ -8,6 +8,7 @@ extern "C" {
 #include <string.h>
 #include <stdbool.h>
 #include "kv.h"
+#include "matter_kv.h"
 
 #include <chip_porting.h>
 
@@ -185,7 +186,7 @@ bool checkExist(const char *domain, const char *key)
 
     tempKey = malloc(keyLen + 1);
     modifyKey(tempKey, key, keyLen);
-    ret = rt_kv_get_length(tempKey);
+    ret = rt_kv_size(tempKey);
 
     if (ret > 0) {
         DiagPrintf("checkExist key=%s found.\n", tempKey);
@@ -311,7 +312,7 @@ s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSi
     tempKey = malloc(keyLen + 1);
     modifyKey(tempKey, key, keyLen);
     memset(buf, 0, bufSize);
-    *outLen = (size_t)rt_kv_get_length(tempKey);
+    *outLen = (size_t)rt_kv_size(tempKey);
 #if CONFIG_ENABLE_KV_ENCRYPTION
     ret = kv_get_encrypted_variable(tempKey, (uint8_t *)buf, (int32_t) * outLen);
 #else
@@ -341,7 +342,7 @@ s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize
     tempKey = malloc(keyLen + 1);
     modifyKey(tempKey, key, keyLen);
     memset(buf, 0, bufSize);
-    *outLen = (size_t)rt_kv_get_length(tempKey);
+    *outLen = (size_t)rt_kv_size(tempKey);
 #if CONFIG_ENABLE_KV_ENCRYPTION
     ret = kv_get_encrypted_variable(tempKey, buf, (int32_t) * outLen);
 #else

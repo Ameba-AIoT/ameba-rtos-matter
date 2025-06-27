@@ -24,6 +24,8 @@ static char *kv_matter_prefix;
 
 int rt_kv_deinit(void)
 {
+#if defined(CONFIG_MATTER_AMEBARTOS_VER)
+#if (CONFIG_MATTER_AMEBARTOS_VER == 100)
     int res = -1;
     char *path = NULL;
     DIR *directory;
@@ -71,9 +73,62 @@ exit:
         rtos_mem_free(path);
     }
     return res;
+#elif (CONFIG_MATTER_AMEBARTOS_VER > 101)
+    dirent *info;
+    DIR *dir;
+    char *path = NULL;
+    int ret = -1;
+
+    kv_matter_prefix = find_vfs_tag(VFS_REGION_1);
+    if (kv_matter_prefix == NULL) {
+        goto exit;
+    }
+
+    if ((path = rtos_mem_zmalloc(MAX_KEY_LENGTH + 2)) == NULL) {
+        VFS_DBG(VFS_ERROR, "KV malloc fail");
+        goto exit;
+    }
+
+    DiagSnPrintf(path, MAX_KEY_LENGTH + 2, "%s:KV", kv_matter_prefix);
+
+    dir = (DIR *)opendir(path);
+    if (dir == NULL) {
+        VFS_DBG(VFS_ERROR, "opendir failed");
+        goto exit;
+    }
+
+    while (1) {
+        info = readdir((void **)dir);
+        if (info == NULL) {
+            break;
+        } else if (strcmp(info->d_name, ".") != 0 && strcmp(info->d_name, "..") != 0) {
+            ret = rt_kv_delete(info->d_name);
+            if (ret < 0)
+            {
+                DiagPrintf("rt_kv_deinit: failed to delete %s\n", info->d_name);
+                goto exit;
+            }
+            else
+            {
+                DiagPrintf("rt_kv_deinit: succesfully deleted %s\n", info->d_name);
+            }
+        }
+    }
+
+    ret = closedir((void **)dir);
+
+    exit:
+    if (path) {
+        rtos_mem_free(path);
+    }
+
+    return ret;
+#endif // (CONFIG_MATTER_AMEBARTOS_VER == XXX)
+#endif // defined(CONFIG_MATTER_AMEBARTOS_VER)
 }
 
-int32_t rt_kv_get_length(const char *key)
+#if defined(CONFIG_MATTER_AMEBARTOS_VER) && (CONFIG_MATTER_AMEBARTOS_VER == 100)
+int32_t rt_kv_size(const char *key)
 {
     vfs_file *finfo;
     int res = -1;
@@ -121,3 +176,4 @@ exit:
     }
     return res;
 }
+#endif
