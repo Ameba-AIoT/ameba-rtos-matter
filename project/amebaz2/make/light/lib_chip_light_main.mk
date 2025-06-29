@@ -170,7 +170,7 @@ prerequirement:
 
 $(SRC_OO): %_$(TARGET).oo : %.cpp | prerequirement
 	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -o $@
-	foldername=$$(basename $$(dirname $<)); \
+	@foldername=$$(basename $$(dirname $<)); \
 	mkdir -p $(OBJ_DIR)/$${foldername}; \
 	mkdir -p $(INFO_DIR)/$${foldername}; \
 	$(CC) $(CPPFLAGS) $(INCLUDES) -c $< -MM -MT $@ -MF $(OBJ_DIR)/$${foldername}/$(notdir $(patsubst %.oo,%.d,$@)); \
