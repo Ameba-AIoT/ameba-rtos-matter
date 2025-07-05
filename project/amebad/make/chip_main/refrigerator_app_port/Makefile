@@ -105,7 +105,7 @@ CORE_TARGETS: $(CPPOBJS) $(COBJS) $(STATIC_LIB)
 
 $(CPPOBJS): %.o: %.cpp
 	$(CC) -ffunction-sections $(CPPFLAGS) $(MODULE_IFLAGS) -c $< -o $@
-	foldername=$$(basename $$(dirname $<)); \
+	@foldername=$$(basename $$(dirname $<)); \
 	mkdir -p $${foldername}; \
 	cp $@ $${foldername}/$(notdir $@)
 
