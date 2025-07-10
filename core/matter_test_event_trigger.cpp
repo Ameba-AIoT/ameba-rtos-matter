@@ -21,11 +21,27 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <energy_evse/ameba_energy_evse_delegate_impl.h>
+#include <energy_evse/ameba_energy_evse_manufacturer_impl.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagement;
+using namespace chip::app::Clusters::EnergyEvse;
+
+struct EVSETestEventSaveData
+{
+    int64_t mOldMaxHardwareCurrentLimit;
+    int64_t mOldCircuitCapacity;
+    int64_t mOldUserMaximumChargeCurrent;
+    int64_t mOldCableAssemblyLimit;
+    StateEnum mOldHwStateBasic;           /* For storing hwState before Basic Func event */
+    StateEnum mOldHwStatePluggedIn;       /* For storing hwState before PluggedIn event */
+    StateEnum mOldHwStatePluggedInDemand; /* For storing hwState before PluggedInDemand event */
+};
+
+static EVSETestEventSaveData sEVSETestEventSaveData;
 
 extern bool AmebaHandleGlobalTestEventTrigger(uint64_t eventTrigger);
 
@@ -151,6 +167,70 @@ void SetTestEventTrigger_ForecastClear()
     GetDEMDelegate()->SetForecast(DataModel::MakeNullable(sForecastStruct));
 }
 
+EnergyEvseDelegate * GetEvseDelegate()
+{
+    printf("EnergyEvseDelegate * GetEvseDelegate() to call GetEvseManufacturer\n");
+    EVSEManufacturer * mn = GetEvseManufacturer();
+    VerifyOrDieWithMsg(mn != nullptr, AppServer, "EVSEManufacturer is null");
+    EnergyEvseDelegate * dg = mn->GetEvseDelegate();
+    VerifyOrDieWithMsg(dg != nullptr, AppServer, "EVSE Delegate is null");
+
+    return dg;
+}
+
+void SetTestEventTrigger_BasicFunctionality()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    sEVSETestEventSaveData.mOldMaxHardwareCurrentLimit  = dg->HwGetMaxHardwareCurrentLimit();
+    sEVSETestEventSaveData.mOldCircuitCapacity          = dg->GetCircuitCapacity();
+    sEVSETestEventSaveData.mOldUserMaximumChargeCurrent = dg->GetUserMaximumChargeCurrent();
+    sEVSETestEventSaveData.mOldHwStateBasic             = dg->HwGetState();
+
+    dg->HwSetMaxHardwareCurrentLimit(32000);
+    dg->HwSetCircuitCapacity(32000);
+    dg->SetUserMaximumChargeCurrent(32000);
+    dg->HwSetState(StateEnum::kNotPluggedIn);
+}
+
+void SetTestEventTrigger_BasicFunctionalityClear()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    dg->HwSetMaxHardwareCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareCurrentLimit);
+    dg->HwSetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
+    dg->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
+    dg->HwSetState(sEVSETestEventSaveData.mOldHwStateBasic);
+}
+
+void SetTestEventTrigger_EVTimeOfUseMode()
+{
+    // TODO - See #34249
+}
+
+void SetTestEventTrigger_EVTimeOfUseModeClear()
+{
+    // TODO - See #34249
+}
+
+void SetTestEventTrigger_EVPluggedIn()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    sEVSETestEventSaveData.mOldCableAssemblyLimit = dg->HwGetCableAssemblyLimit();
+    sEVSETestEventSaveData.mOldHwStatePluggedIn   = dg->HwGetState();
+
+    dg->HwSetCableAssemblyLimit(63000);
+    dg->HwSetState(StateEnum::kPluggedInNoDemand);
+}
+
+void SetTestEventTrigger_EVPluggedInClear()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+    dg->HwSetCableAssemblyLimit(sEVSETestEventSaveData.mOldCableAssemblyLimit);
+    dg->HwSetState(sEVSETestEventSaveData.mOldHwStatePluggedIn);
+}
+
 bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
 {
     DeviceEnergyManagementTrigger trigger = static_cast<DeviceEnergyManagementTrigger>(eventTrigger);
@@ -166,6 +246,44 @@ bool HandleDeviceEnergyManagementTestEventTrigger(uint64_t eventTrigger)
         SetTestEventTrigger_ForecastClear();
         break;
 
+    default:
+        return false;
+    }
+
+    return true;
+}
+
+bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
+{
+    EnergyEvseTrigger trigger = static_cast<EnergyEvseTrigger>(eventTrigger);
+
+    switch (trigger)
+    {
+    case EnergyEvseTrigger::kBasicFunctionality:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => Basic Functionality install");
+        SetTestEventTrigger_BasicFunctionality();
+        break;
+    case EnergyEvseTrigger::kBasicFunctionalityClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => Basic Functionality clear");
+        SetTestEventTrigger_BasicFunctionalityClear();
+        break;
+    case EnergyEvseTrigger::kEVTimeOfUseMode:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV TimeOfUse Mode");
+        SetTestEventTrigger_EVTimeOfUseMode();
+        break;
+    case EnergyEvseTrigger::kEVTimeOfUseModeClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV TimeOfUse Mode clear");
+        SetTestEventTrigger_EVTimeOfUseModeClear();
+        break;
+    case EnergyEvseTrigger::kEVPluggedIn:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV plugged in");
+        SetTestEventTrigger_EVPluggedIn();
+        break;
+    case EnergyEvseTrigger::kEVPluggedInClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV unplugged");
+        SetTestEventTrigger_EVPluggedInClear();
+        break;
+        
     default:
         return false;
     }
@@ -190,9 +308,11 @@ bool AmebaTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKe
 CHIP_ERROR AmebaTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
 {
     // Custom implementation
-    printf("*****%s %d 0x%x, 0x%x\n", __FUNCTION__, __LINE__, eventTrigger, DeviceEnergyManagementTrigger::kForecast);
+    printf("*****%s %d  0x%x, Forecast=0x%x, BasicFunc=0x%x\n",
+       __FUNCTION__, __LINE__, eventTrigger,DeviceEnergyManagementTrigger::kForecast, EnergyEvseTrigger::kBasicFunctionality);
+
     eventTrigger = clearEndpointInEventTrigger(eventTrigger);
-    if (HandleDeviceEnergyManagementTestEventTrigger(eventTrigger))
+    if ((HandleDeviceEnergyManagementTestEventTrigger(eventTrigger)) || (HandleEnergyEvseTestEventTrigger(eventTrigger))) 
     {
         return CHIP_NO_ERROR;
     }

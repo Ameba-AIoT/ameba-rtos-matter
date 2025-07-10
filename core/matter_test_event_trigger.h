@@ -76,4 +76,44 @@ enum class DeviceEnergyManagementTrigger : uint64_t
     // Clear the forecast
     kForecastClear = 0x0098'0000'0000'0010,
 };
+
+enum class EnergyEvseTrigger : uint64_t
+{
+    // Scenarios
+    // Basic Functionality Test Event       | Simulate installation with _{A_CIRCUIT_CAPACITY}_=32A and
+    // _{A_USER_MAXIMUM_CHARGE_CURRENT}_=32A
+    kBasicFunctionality = 0x0099000000000000,
+    // Basic Functionality Test Event Clear | End simulation of installation
+    kBasicFunctionalityClear = 0x0099000000000001,
+    // EV Plugged-in Test Event | Simulate plugging the EV into the EVSE using a cable of 63A capacity
+    kEVPluggedIn = 0x0099000000000002,
+    // EV Plugged-in Test Event Clear | Simulate unplugging the EV
+    kEVPluggedInClear = 0x0099000000000003,
+    // EV Charge Demand Test Event | Simulate the EV presenting charge demand to the EVSE
+    kEVChargeDemand = 0x0099000000000004,
+    // EV Charge Demand Test Event Clear | Simulate the EV becoming fully charged
+    kEVChargeDemandClear = 0x0099000000000005,
+    // EV Charge TimeOfUse Mode | Simulate putting the EVSE into a Mode with the TimeOfUse tag included
+    kEVTimeOfUseMode = 0x0099000000000006,
+    // EVSE has a GroundFault fault
+    kEVSEGroundFault = 0x0099000000000010,
+    // EVSE has a OverTemperature fault
+    kEVSEOverTemperatureFault = 0x0099000000000011,
+    // EVSE faults have cleared
+    kEVSEFaultClear = 0x0099000000000012,
+    // EVSE Diagnostics Complete | Simulate diagnostics have been completed and return to normal
+    kEVSEDiagnosticsComplete = 0x0099000000000020,
+    // EV Charge TimeOfUse Mode clear | Simulate clearing the EVSE Mode TimeOfUse tag
+    kEVTimeOfUseModeClear = 0x0099000000000021,
+    // EVSE Set SoC Low | Simulate a vehicle reporting 20% State of Charge, 70kWh battery capacity
+    kEVSESetSoCLow = 0x0099000000000030,
+    // EVSE Set SoC High | Simulate a vehicle reporting 95% State of Charge, 70kWh battery capacity
+    kEVSESetSoCHigh = 0x0099000000000031,
+    // EVSE Set SoC Clear | Simulate no vehicle State of Charge information
+    kEVSESetSoCClear = 0x0099000000000032,
+    // EVSE Set VehicleID | Simulate a vehicle ID being sent
+    kEVSESetVehicleID = 0x0099000000000040,
+    // EVSE Trigger RFID | Simulate an RFID tag being activated
+    kEVSETriggerRFID = 0x0099000000000050,
+};
 } // namespace chip

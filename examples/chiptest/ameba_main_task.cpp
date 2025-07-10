@@ -63,6 +63,7 @@ void AppTaskInit(void)
     app::Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
     WaterHeaterApplicationInit();
     MatterMicrowaveOvenServerInit();
+    EvseApplicationInit();
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
     static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;
