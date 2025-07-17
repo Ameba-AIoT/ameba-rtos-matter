@@ -54,13 +54,15 @@ static FanControlManager * mFanControlManager = nullptr;
 
 CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
 {
+    printf("[FanControlManager][ReadPercentCurrent]\n");
     // Return PercentSetting attribute value for now
-    DataModel::Nullable<Percent> percentSetting;
-    PercentSetting::Get(mEndpoint, percentSetting);
+    chip::Percent percentCurrent;
+
+    auto status = PercentCurrent::Get(mEndpoint, &percentCurrent);
     Percent ret = 0;
-    if (!percentSetting.IsNull())
+    if (status == Protocols::InteractionModel::Status::Success)
     {
-        ret = percentSetting.Value();
+        ret = percentCurrent;
     }
 
     return aEncoder.Encode(ret);
@@ -68,13 +70,15 @@ CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncode
 
 CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 {
+    printf("[FanControlManager][ReadSpeedCurrent]\n");
     // Return SpeedCurrent attribute value for now
-    DataModel::Nullable<uint8_t> speedSetting;
-    SpeedSetting::Get(mEndpoint, speedSetting);
+
+    uint8_t speedCurrent;
+    auto status = SpeedCurrent::Get(mEndpoint, &speedCurrent);
     uint8_t ret = 0;
-    if (!speedSetting.IsNull())
+    if (status == Protocols::InteractionModel::Status::Success)
     {
-        ret = speedSetting.Value();
+        ret = speedCurrent;
     }
 
     return aEncoder.Encode(ret);
