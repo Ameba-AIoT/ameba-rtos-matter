@@ -54,7 +54,6 @@ static FanControlManager * mFanControlManager = nullptr;
 
 CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncoder)
 {
-    printf("[FanControlManager][ReadPercentCurrent]\n");
     // Return PercentSetting attribute value for now
     chip::Percent percentCurrent;
 
@@ -70,7 +69,6 @@ CHIP_ERROR FanControlManager::ReadPercentCurrent(AttributeValueEncoder & aEncode
 
 CHIP_ERROR FanControlManager::ReadSpeedCurrent(AttributeValueEncoder & aEncoder)
 {
-    printf("[FanControlManager][ReadSpeedCurrent]\n");
     // Return SpeedCurrent attribute value for now
 
     uint8_t speedCurrent;
