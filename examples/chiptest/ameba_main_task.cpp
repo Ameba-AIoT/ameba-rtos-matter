@@ -17,20 +17,22 @@
 
 #include <CHIPDeviceManager.h>
 
+#include <matter_attribute_callbacks.h>
 #include <matter_command.h>
+
 #include <device_energy_management/ameba_energy_management_common_main.h>
 #include <microwave_oven/ameba_microwave_oven_device.h>
 #include <valve_control/ameba_valve_control_delegate.h>
 #include <water_heater_management/ameba_water_heater_management_main.h>
 #include <mode_select/ameba_modes_manager.h>
 #include <temperature_levels/ameba_temperature_levels.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #include <test_event_trigger/AmebaTestEventTriggerDelegate.h>
 #include <app/server/Server.h>
 #endif
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -45,8 +47,14 @@ app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesMana
 app::Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
 } // namespace
 
+static void InitAmebaDeviceManager(void)
+{
+    AmebaDeviceManager::InitInstance(1);  // for Endpoint 1
+}
+
 void AppTaskInit(void)
 {
+    InitAmebaDeviceManager();
 #if CONFIG_ENABLE_CHIP_SHELL
     InitManualOperation();
 #endif

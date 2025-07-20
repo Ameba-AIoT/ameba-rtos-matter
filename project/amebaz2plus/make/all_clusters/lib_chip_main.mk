@@ -77,7 +77,6 @@ SRC_C =
 SRC_CPP =
 
 # all-clusters-app clusters source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_consoles/matter_command.cpp
 SRC_CPP += $(MATTER_DRIVER)/action/ameba_bridged_actions_stubs.cpp
 SRC_CPP += $(MATTER_DRIVER)/air_quality/ameba_air_quality_instance.cpp
 SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_concentration_measurement_instances.cpp
@@ -124,7 +123,9 @@ SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_managemen
 SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_main.cpp
 SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_manufacturer.cpp
 SRC_CPP += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode.cpp
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/examples/chiptest/ameba_main_task.cpp
+SRC_CPP += $(MATTER_DIR)/drivers/matter_consoles/matter_command.cpp
+SRC_CPP += $(MATTER_DIR)/core/matter_attribute_callbacks.cpp
+SRC_CPP += $(MATTER_DIR)/examples/chiptest/ameba_main_task.cpp
 
 # all-clusters-app ameba source files
 SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/ameba/main/chipinterface.cpp
@@ -139,7 +140,6 @@ ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
 SRC_CPP += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
 endif
 SRC_CPP += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
-SRC_CPP += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
 
 # Matter Main Common Source file list
 # -------------------------------------------------------------------
@@ -181,7 +181,8 @@ CFLAGS += -DV8M_STKOVF
 include $(MATTER_INCLUDE)
 
 CFLAGS += -DCHIP_PROJECT=1
-CFLAGS += -DCHIP_AMEBA_APP_TASK=1
+CFLAGS += -DCONFIG_ENABLE_AMEBA_APP_TASK=1
+CFLAGS += -DCONFIG_ENABLE_AMEBA_ATTRIBUTE_CALLBACK=1
 
 # Matter Shell Flags
 ifeq ($(CHIP_ENABLE_SHELL), true)
