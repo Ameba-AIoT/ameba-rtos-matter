@@ -1,4 +1,4 @@
-# Matter OTA Guide for AmebaD
+# Matter OTA Guide
 
 Follow this guide to carry out Matter standard Over the Air Software Update
 
@@ -18,19 +18,74 @@ You can check the current image's software version using `chip-tool` commands be
     ./chip-tool basicinformation read software-version 1 0
     ./chip-tool basicinformation read software-version-string 1 0
 
-Add AmebaD OTA header.
+<details>
+  <summary>For AmebaZ2/AmebaZ2Plus OTA Image</summary>
 
-    python3 python_custom_ecdsa_D_gcc.py <path to km0_km4_image2.bin> <output image with AmebaD header>
+In `GCC-RELEASE/amebaz2_firmware_xx.json`, update the **serial** value to a higher number than that of current image.
 
-After adding Ameba OTA header to the image, use the `ota_image_tool.py` to generate the OTA image. This tool will add Matter OTA header to the image.
+After building the firmware, use the `ota_image_tool.py` to generate the OTA image. This tool will add Matter OTA header to the firmware image.
 
     python3 ota_image_tool.py create -v <VENDORID> -p <PRODUCTID> -vn <VERSION> -vs <VERSIONSTRING> -da <DIGESTALGO> <path to firmware> <output ota image>
 
-For example
+AmebaZ2 example
 
-    cd ambd_matter/tools/matter/ota
-    python3 python_custom_ecdsa_D_gcc.py ../../../project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/asdk/image/km0_km4_image2.bin ota_firmware.bin
-    python3 ota_image_tool.py create -v 0x8888 -p 0x9999 -vn 2 -vs 2.0 -da sha256 ota_firmware.bin ota_image.bin
+    python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ../../../../../../project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin/firmware_is.bin ota_image.bin
+
+AmebaZ2Plus example
+
+    python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ../../../../../../project/realtek_amebaz2plus_v0_example/GCC-RELEASE/application_is/Debug/bin/firmware_is.bin ota_image.bin
+
+</details>
+
+<details>
+  <summary>For AmebaD OTA Image</summary>
+
+Ensure that the OTA address is set correctly according to the device's flash size in the following files:
+
+- `rtl8721d_bootcfg.c`
+- `rtl8721d_ota.h`
+
+These files can be found in the base SDK.
+
+### Example for a 4MB Flash
+
+In `rtl8721d_bootcfg.c`
+```c
+u32 OTA_Region[2] = {
+    0x08006000,     /* OTA1 region start address */
+    0x08206000,     /* OTA2 region start address */
+};
+```
+
+In `rtl8721d_ota.h`
+```c
+    #define LS_IMG2_OTA1_ADDR   0x08006000      /* KM0 OTA1 start address */
+    #define LS_IMG2_OTA2_ADDR   0x08206000      /* KM0 OTA2 start address */
+```
+
+Once you've set the addresses correctly, ensure that you rebuild both the **LP project** and **HP project**.
+
+### Adding AmebaD OTA Header
+
+Add the AmebaD OTA header to the image using the following command:
+
+    python3 python_custom_ecdsa_D_gcc.py <path to km0_km4_image2.bin> <output image with AmebaD header>
+
+Example:
+
+    python3 python_custom_ecdsa_D_gcc.py ../../../../../../project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/asdk/image/km0_km4_image2.bin ota_firmware.bin
+
+### Generating Matter OTA Image
+
+Use the ota_image_tool.py to generate the Matter OTA image, embedding the Matter OTA header:
+
+    python3 ota_image_tool.py create -v <VENDORID> -p <PRODUCTID> -vn <VERSION> -vs <VERSIONSTRING> -da <DIGESTALGO> <path to firmware> <output ota image>
+
+Example:
+
+    python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ota_firmware.bin ota_image.bin
+
+</details>
 
 Ensure that the `VERSION` and `VERSIONSTRING` matches your `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` and `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING` respectively.
 
