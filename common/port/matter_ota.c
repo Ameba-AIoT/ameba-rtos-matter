@@ -1,3 +1,22 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include <platform_opts.h>
 #include <platform/platform_stdlib.h>
 
@@ -34,6 +53,8 @@ uint8_t matter_ota_header[MATTER_OTA_HEADER_SIZE];
 uint8_t matter_ota_header_size = 0; // variable to track size of ota header
 uint8_t matter_ota_buffer[MATTER_OTA_SECTOR_SIZE]; // 4KB buffer to be written to one sector
 uint16_t matter_ota_buffer_size = 0; // variable to track size of buffer
+
+static const char *kOTACompleted = "ota_completed";
 
 uint8_t matter_ota_get_total_header_size(void)
 {
@@ -91,7 +112,7 @@ int8_t matter_ota_flash_burst_write(uint8_t *data, uint32_t size)
     bool overflow = false;
     uint32_t sectorBase = matter_ota_flash_sector_base;
     uint32_t writeLength = MATTER_OTA_SECTOR_SIZE;
-    int16_t bufferRemainSize = (int16_t) (MATTER_OTA_SECTOR_SIZE - matter_ota_buffer_size);
+    int16_t bufferRemainSize = (int16_t)(MATTER_OTA_SECTOR_SIZE - matter_ota_buffer_size);
 
     if (!matter_ota_first_sector_written)
     {
@@ -223,8 +244,25 @@ int8_t matter_ota_update_signature(void)
 #endif
 }
 
+uint8_t matter_get_ota_completed_value(void)
+{
+    uint8_t value = 0;
+    getPref_bool_new(kOTACompleted, kOTACompleted, &value);
+    return value;
+}
+
 void matter_ota_platform_reset(void)
 {
+    uint8_t value = 1;
+
+    deleteKey(kOTACompleted, kOTACompleted);
+
+    if (setPref_new(kOTACompleted, kOTACompleted, &value, sizeof(value)) != DCT_SUCCESS)
+    {
+        printf("[%s] set persist storage failed\n", __FUNCTION__);
+        return;
+    }
+
     ota_platform_reset();
 }
 
@@ -238,7 +276,7 @@ static void matter_ota_abort_task(void *pvParameters)
     if (matter_ota_new_firmware_addr != 0)
     {
         device_mutex_lock(RT_DEV_LOCK_FLASH);
-        for (size_t i=0; i<newFWBlkSize; i++)
+        for (size_t i = 0; i < newFWBlkSize; i++)
         {
             flash_erase_sector(&matter_ota_flash, matter_ota_new_firmware_addr + (i * MATTER_OTA_SECTOR_SIZE));
         }
@@ -251,7 +289,7 @@ static void matter_ota_abort_task(void *pvParameters)
 
     if (matter_ota_new_firmware_addr != 0)
     {
-        for (size_t i=0; i<newFWBlkSize; i++)
+        for (size_t i = 0; i < newFWBlkSize; i++)
         {
             erase_ota_target_flash(matter_ota_new_firmware_addr + SPI_FLASH_BASE + (i * MATTER_OTA_SECTOR_SIZE), MATTER_OTA_SECTOR_SIZE);
         }

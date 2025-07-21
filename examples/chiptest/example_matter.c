@@ -1,3 +1,22 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include <FreeRTOS.h>
 #include <task.h>
 #include <platform/platform_stdlib.h>
@@ -5,15 +24,12 @@
 #include <platform_opts.h>
 #include <wifi_constants.h>
 #include <wifi/wifi_conf.h>
+#include <matter_data_providers.h>
+#include <matter_device_utils.h>
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG)
 #include <matter_fs.h>
 #include <diagnostic_logs/ameba_logging_faultlog.h>
 #include <diagnostic_logs/ameba_logging_redirect_wrapper.h>
-#endif
-#include <matter_data_providers.h>
-
-#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
-extern void matter_op_hours_wrapper(void);
 #endif
 
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
@@ -47,8 +63,10 @@ static void example_matter_task_thread(void *pvParameters)
     matter_data_provider_init();
 
 #if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
-    matter_op_hours_wrapper();
+    matter_op_hours();
 #endif
+
+    matter_store_boot_reason();
 
     vTaskDelete(NULL);
     return;

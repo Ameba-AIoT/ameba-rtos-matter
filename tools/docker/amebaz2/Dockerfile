@@ -3,7 +3,7 @@ FROM ameba-rtos-matter:common
 
 # Redefine following build arguments to respective repo and tag/branch
 ARG AMEBA_MATTER_REPO=https://github.com/xshuqun/ameba-rtos-matter.git
-ARG TAG_NAME=ameba/ota_update_250724
+ARG TAG_NAME=ameba/update_bootreason_250801
 
 # Define fixed build arguments
 ARG AMBZ2_REPO=https://github.com/Ameba-AIoT/ameba-rtos-z2.git

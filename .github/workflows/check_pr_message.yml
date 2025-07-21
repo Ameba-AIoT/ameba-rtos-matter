@@ -15,5 +15,5 @@ jobs:
             const body = context.payload.pull_request.body || "";
 
             if (!body.includes("This PR addresses:") || !body.includes("Verification:")) {
-              core.setFailed(`❌ PR description must include both "This commit addresses:" and "Verification:" sections.`);
+              core.setFailed(`❌ PR description must include both "This PR addresses:" and "Verification:" sections.`);
             }

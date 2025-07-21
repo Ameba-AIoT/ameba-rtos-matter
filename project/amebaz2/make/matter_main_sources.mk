@@ -47,6 +47,7 @@ endif
 SRC_CPP += $(CHIPDIR)/src/app/server-cluster/AttributeListBuilder.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server-cluster/DefaultServerCluster.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
+SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
 
 # connectedhomeip - src - app - util
 SRC_CPP += $(CHIPDIR)/src/app/util/attribute-storage.cpp
@@ -69,8 +70,6 @@ SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/Instance.cpp
-SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/ServerClusterInterfaceRegistry.cpp
-
 # connectedhomeip - src - setup_payload
 SRC_CPP += $(CHIPDIR)/src/setup_payload/OnboardingCodesUtil.cpp
 
