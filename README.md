@@ -1,8 +1,8 @@
 # Realtek's Matter Solution
 
 - [Introduction ameba-matter](#introduction-ameba-matter)
-- [Ameba RTOS Matter Repo Integration](#ameba-rtos-matter-repo-integration)
 - [Supported Integrated Circuits (ICs)](#supported-integrated-circuits-ics)
+- [Ameba RTOS Matter Repo Integration](#ameba-rtos-matter-repo-integration)
 - [Documentation](#documentation)
 - [Release History](#release-history)
 - [Important Notice](#important-notice)
@@ -12,6 +12,27 @@
 
 Welcome to the `ameba-rtos-matter` repository, your go-to resource for Realtek's Matter Solution. This repository is designed to provide a standardized interface for integrating Realtek's Matter Solution into embedded systems. By offering a unified and adaptable framework, `ameba-rtos-matter` simplifies the process of implementing Matter-compliant devices. Whether you're a developer, manufacturer, or researcher, this repository equips you with the tools and documentation needed to seamlessly integrate Matter into your projects.
 
+## Supported Integrated Circuits (ICs)
+
+Feel free to explore our curated list of supported ICs below to find the best match for your project.
+
+| Platform Name         | Chipset(s)                        |
+|-----------------------|-----------------------------------|
+| AmebaZ2 / AmebaZ2plus | RTL8720CM                         |
+| AmebaD                | RTL8721DM                         |
+| AmebaDplus            | RTL8721Dx                         |
+| AmebaLite             | RTL8720E / RTL8726E / RTL8713E    |
+| AmebaSmart            | RTL8730E                          |
+
+> ⚠️ **Notice**: This `main`(default) branch supports **AmebaZ2**, **AmebaZ2plus** and **AmebaD**.
+>
+> For details, examples, and support targeting **AmebaDplus**, **AmebaLite**, and **AmebaSmart**, please switch to the appropriate release branches:
+>
+> - [ameba-rtos/release/v1.3](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/ameba-rtos/release/v1.3)
+> - [ameba-rtos/release/v1.4](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/ameba-rtos/release/v1.4)
+
+Checkout the [Application Notes](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/AN0204%20Realtek%20Matter%20application%20note.en.pdf) to learn more about Realtek's Matter solution.
+
 ## Ameba RTOS Matter Repo Integration
 
 Learn how to integrate Realtek's Matter solution with the Ameba RTOS platform. Explore the integration details [here](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/ameba_matter_integration.md)
@@ -19,15 +40,6 @@ Learn how to integrate Realtek's Matter solution with the Ameba RTOS platform. E
 ## Important Notice
 
 Please read the [Important Notice](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_important_notice.md) for important updates and announcements.
-
-## Supported Integrated Circuits (ICs)
-
-Feel free to explore our curated list of supported ICs below to find the best match for your project.
-
-1. AmebaZ2 (RTL8710C)
-2. AmebaD  (RTL8721D)
-
-Checkout the [Application Notes](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/AN0204%20Realtek%20Matter%20application%20note.en.pdf) to learn more about Realtek's Matter solution.
 
 ## Documentation
 
@@ -78,9 +90,9 @@ The directory structure is organized to facilitate development, documentation, a
 |--------------|----------------------------------------------------------------------------------------------------------------|
 |  api         | Essential functions for interfacing with Matter, including device status checks and information retrieval such as vendor ID and product ID. |
 |  docs        | Documentation files, including guides, references, and API documentation for Matter integration with the Ameba SDK. |
-|  driver      | Device-specific drivers enabling smooth operation of Matter devices with the Ameba SDK, tailored to each device type's requirements. |
+|  drivers      | Device-specific drivers enabling smooth operation of Matter devices with the Ameba SDK, tailored to each device type's requirements. |
 |  common      | Common code for Matter functionalities in the Ameba SDK, covering Bluetooth, Wi-Fi, time management, and data storage. Includes configuration headers for easy project integration. |
 |  core        | Fundamental code for powering Matter in the Ameba SDK's Porting Layer, providing the foundation for seamless integration. |
-|  example     | Code snippets and projects demonstrating Matter device usage in the Ameba SDK, organized into subfolders for various device types. |
+|  examples     | Code snippets and projects demonstrating Matter device usage in the Ameba SDK, organized into subfolders for various device types. |
 |  project     | Makefiles and compilation scripts for Matter libraries within the Ameba SDK, categorized by different chip builds for various device types. |
 |  tools       | Tools and utilities for development, testing, and deployment in the context of Matter integration with the Ameba SDK. |
