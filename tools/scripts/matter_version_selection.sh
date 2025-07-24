@@ -8,11 +8,7 @@ echo "Setting up for $AMEBA"
 
 if [[ "$AMEBA" == "amebaz2" || "$AMEBA" == "amebaz2plus" || "$AMEBA" == "amebad" ]]; then
     git fetch --all --prune
-    if [[ "$BASE_REPO" == "ameba-rtos-z2" || "$BASE_REPO" == "ameba-rtos-d" ]]; then
-        available_version=($(git branch -r | grep -o 'origin/release/v[0-9.]*' | sed 's|origin/release/||' | grep -v '^v1.3$' | sort -u))
-    else
-        available_version=($(git branch -r | grep -o 'origin/release/v[0-9.]*' | sed 's|origin/release/||' | sort -u))
-    fi
+    available_version=($(git branch -r | grep -o 'origin/release/v[0-9.]*' | sed 's|origin/release/||' | grep -v '^v1.3$' | sort -u))
 fi
 
 available_version+=("main")
