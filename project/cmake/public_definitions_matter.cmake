@@ -21,7 +21,7 @@ ameba_list_append(matter_defintions
 	LWIP_IPV6_ROUTE_TABLE_SUPPORT=1
 
 	# Mbedtls options
-	# MBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
+	MBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
 )
 
 if(CONFIG_MATTER_TC_EN)

@@ -21,7 +21,7 @@ extern "C" {
 
 #include <wifi_conf.h>
 #include <lwip_netconf.h>
-#include "rtw_wifi_constants.h"
+#include <wifi_api_event.h>
 
 /******************************************************
  *               WiFi Modes

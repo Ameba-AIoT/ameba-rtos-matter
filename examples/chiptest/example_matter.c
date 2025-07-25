@@ -2,7 +2,7 @@
 #include <task.h>
 #include <basic_types.h>
 #include <platform_stdlib.h>
-#include <rtw_wifi_constants.h>
+#include <wifi_api_event.h>
 #include <chip_porting.h>
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG)

@@ -70,7 +70,7 @@ ameba_list_append(lib_chip_main ${c_SDK_LIB_APPLICATION_DIR}/lib_chip_main.a)
 #WARNING: Fixed section, DO NOT change!
 ameba_global_include(${public_includes})
 ameba_global_define(${public_definitions})
-ameba_global_library(${lib_chip_main}) #default: whole-archived
+#ameba_global_library(${lib_chip_main}) #default: whole-archived
 ameba_global_library(p_NO_WHOLE_ARCHIVE ${lib_chip_core})
 
 # Generate cluster file during setup
@@ -168,7 +168,7 @@ add_custom_command(
 #WARNING: Select right API based on your component's release/not-release/standalone
 
 ###NOTE: For open-source component, always build from source
-ameba_add_external_app_library(chip_main
+ameba_add_internal_library(chip_main
     p_SOURCES
         ${private_sources}
     p_INCLUDES
@@ -198,7 +198,7 @@ add_custom_target(
 )
 
 # before compiling lib_chip_main, make sure lib_chip_core is compiled
-add_dependencies(
+ameba_target_depend(
 	${c_CURRENT_TARGET_NAME}
 	lib_chip_core
 )
