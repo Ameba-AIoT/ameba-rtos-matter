@@ -38,8 +38,6 @@ IFLAGS += -I$(CHIPDIR)/zzz_generated/app-common
 CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
 CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
 
-CPPSRC += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
-
 # connectedhomeip - src - app
 CPPSRC += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
 CPPSRC += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
@@ -61,8 +59,9 @@ CPPSRC += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
 endif
 
 # connectedhomeip - src - app - server-cluster
-CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
+CPPSRC += $(CHIPDIR)/src/app/server-cluster/AttributeListBuilder.cpp
 CPPSRC += $(CHIPDIR)/src/app/server-cluster/DefaultServerCluster.cpp
+CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
 
 # connectedhomeip - src - app - util
 CPPSRC += $(CHIPDIR)/src/app/util/attribute-storage.cpp
@@ -104,3 +103,4 @@ CPPSRC += $(MATTER_DIR)/api/matter_api.cpp
 
 # matter - core
 CPPSRC += $(MATTER_DIR)/core/matter_device_utils.cpp
+CPPSRC += $(MATTER_DIR)/core/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
