@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include <matter_core.h>
+#include <matter_data_providers.h>
 #include <matter_events.h>
 #include <matter_interaction.h>
 #include <matter_ota_initializer.h>
@@ -88,10 +89,11 @@ DeferredAttribute gDeferredAttributeArray[] =
 
 // Deferred persistence will be auto-initialized as soon as the default persistence is initialized
 DefaultAttributePersistenceProvider gSimpleAttributePersistence;
-DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence, Span<DeferredAttribute>(gDeferredAttributeArray, 6), System::Clock::Milliseconds32(5000));
+DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence, Span<DeferredAttribute>(gDeferredAttributeArray, 6),
+        System::Clock::Milliseconds32(5000));
 
 app::Clusters::NetworkCommissioning::Instance
-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
+sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
@@ -139,7 +141,7 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
         break;
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
-            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
+                (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
         {
             // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
             // will not trigger a 'internet connectivity change' as there is no internet
@@ -226,8 +228,8 @@ void matter_core_init_server(intptr_t context)
 
 #if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
     const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
-        app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
-    PersistentStorageDelegate & persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
+                app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
+    PersistentStorageDelegate &persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
     chip::app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, termsAndConditions);
 #endif
 
@@ -325,6 +327,8 @@ CHIP_ERROR matter_core_start(void)
 #endif
 
     wifi_set_autoreconnect(0); //Disable default autoreconnect
+
+    matter_data_provider_init(); // initialize data
 
     return matter_core_init();
 }

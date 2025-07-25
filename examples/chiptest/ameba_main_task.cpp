@@ -17,7 +17,9 @@
 
 #include <CHIPDeviceManager.h>
 
+#include <matter_attribute_callbacks.h>
 #include <matter_command.h>
+
 #include <device_energy_management/ameba_energy_management_common_main.h>
 #include <valve_control/ameba_valve_control_delegate.h>
 #include <water_heater_management/ameba_water_heater_management_main.h>
@@ -40,9 +42,16 @@ namespace {
 app::Clusters::ModeSelect::AmebaSupportedModesManager sAmebaSupportedModesManager;
 } // namespace
 
+static void InitAmebaDeviceManager(void)
+{
+    AmebaDeviceManager::InitInstance(1);  // for Endpoint 1
+}
+
 void AppTaskInit(void)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
+
+    InitAmebaDeviceManager();
 
 #if CONFIG_ENABLE_CHIP_SHELL
     InitManualOperation();

@@ -59,7 +59,6 @@ CHIP_ERROR AmebaOperationalStateDelegate::GetOperationalPhaseAtIndex(size_t inde
 
 void AmebaOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalError & err)
 {
-    // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused));
     if (error == CHIP_NO_ERROR)
     {
@@ -74,7 +73,6 @@ void AmebaOperationalStateDelegate::HandlePauseStateCallback(GenericOperationalE
 
 void AmebaOperationalStateDelegate::HandleResumeStateCallback(GenericOperationalError & err)
 {
-    // placeholder implementation
     auto error = GetInstance()->SetOperationalState(to_underlying(OperationalStateEnum::kRunning));
     if (error == CHIP_NO_ERROR)
     {

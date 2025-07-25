@@ -26,15 +26,15 @@ uint8_t matter_get_total_operational_hour(uint32_t *totalOperationalHours)
     }
 
     CHIP_ERROR err;
-    DiagnosticDataProvider & diagProvider = chip::DeviceLayer::GetDiagnosticDataProviderImpl();
+    DiagnosticDataProvider &diagProvider = chip::DeviceLayer::GetDiagnosticDataProviderImpl();
 
     if (&diagProvider != NULL)
     {
         err = diagProvider.GetTotalOperationalHours(*totalOperationalHours);
         if (err != CHIP_NO_ERROR)
         {
-             printf("%s: GetTotalOperationalHours Failed err=%d\n", __FUNCTION__, err);
-             return -1;
+            printf("%s: GetTotalOperationalHours Failed err=%d\n", __FUNCTION__, err);
+            return -1;
         }
     }
     else
@@ -60,7 +60,7 @@ static void matter_op_hours_task(void *pvParameters)
     char key[] = "temp_hour";
 
     // 1. Check if "temp_hour" exist in NVS
-    if (checkExist(key, key) != DCT_SUCCESS)
+    if (checkExist(key, key) != true)
     {
         // 2. If "temp_hour" exist, get "temp_hour" and set as "total_hour" into NVS
         if (getPref_u32_new(key, key, &prev_hour) == DCT_SUCCESS)
@@ -76,7 +76,6 @@ static void matter_op_hours_task(void *pvParameters)
         }
         else
         {
-            printf("getPref_u32_new: %s not found\n", key);
             goto loop;
         }
     }
@@ -106,7 +105,7 @@ loop:
 
 void matter_op_hours(void)
 {
-    if (xTaskCreate(matter_op_hours_task, ((const char*)"matter_op_hours_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
+    if (xTaskCreate(matter_op_hours_task, ((const char *)"matter_op_hours_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
     {
         printf("\n\r%s xTaskCreate(matter_op_hours) failed", __FUNCTION__);
     }

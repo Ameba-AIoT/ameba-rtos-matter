@@ -1,0 +1,381 @@
+diff --git a/core/matter_core.cpp b/core/matter_core.cpp
+index 141e012..ddf6ca6 100644
+--- a/core/matter_core.cpp
++++ b/core/matter_core.cpp
+@@ -2,6 +2,7 @@
+ #include <stdint.h>
+ 
+ #include <matter_core.h>
++#include <matter_data_providers.h>
+ #include <matter_events.h>
+ #include <matter_interaction.h>
+ #include <matter_ota_initializer.h>
+@@ -88,10 +89,11 @@ DeferredAttribute gDeferredAttributeArray[] =
+ 
+ // Deferred persistence will be auto-initialized as soon as the default persistence is initialized
+ DefaultAttributePersistenceProvider gSimpleAttributePersistence;
+-DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence, Span<DeferredAttribute>(gDeferredAttributeArray, 6), System::Clock::Milliseconds32(5000));
++DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence, Span<DeferredAttribute>(gDeferredAttributeArray, 6),
++        System::Clock::Milliseconds32(5000));
+ 
+ app::Clusters::NetworkCommissioning::Instance
+-    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
++sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::AmebaWiFiDriver::GetInstance()));
+ 
+ chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
+ chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
+@@ -139,7 +141,7 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
+         break;
+     case DeviceEventType::kInterfaceIpAddressChanged:
+         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
+-            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
++                (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
+         {
+             // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
+             // will not trigger a 'internet connectivity change' as there is no internet
+@@ -226,8 +228,8 @@ void matter_core_init_server(intptr_t context)
+ 
+ #if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
+     const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
+-        app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
+-    PersistentStorageDelegate & persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
++                app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
++    PersistentStorageDelegate &persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
+     chip::app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, termsAndConditions);
+ #endif
+ 
+@@ -326,5 +328,7 @@ CHIP_ERROR matter_core_start(void)
+ 
+     wifi_set_autoreconnect(0); //Disable default autoreconnect
+ 
++    matter_data_provider_init(); // initialize data
++
+     return matter_core_init();
+ }
+diff --git a/core/matter_device_utils.cpp b/core/matter_device_utils.cpp
+index 9bfd882..ba189ff 100644
+--- a/core/matter_device_utils.cpp
++++ b/core/matter_device_utils.cpp
+@@ -26,15 +26,15 @@ uint8_t matter_get_total_operational_hour(uint32_t *totalOperationalHours)
+     }
+ 
+     CHIP_ERROR err;
+-    DiagnosticDataProvider & diagProvider = chip::DeviceLayer::GetDiagnosticDataProviderImpl();
++    DiagnosticDataProvider &diagProvider = chip::DeviceLayer::GetDiagnosticDataProviderImpl();
+ 
+     if (&diagProvider != NULL)
+     {
+         err = diagProvider.GetTotalOperationalHours(*totalOperationalHours);
+         if (err != CHIP_NO_ERROR)
+         {
+-             printf("%s: GetTotalOperationalHours Failed err=%d\n", __FUNCTION__, err);
+-             return -1;
++            printf("%s: GetTotalOperationalHours Failed err=%d\n", __FUNCTION__, err);
++            return -1;
+         }
+     }
+     else
+@@ -60,7 +60,7 @@ static void matter_op_hours_task(void *pvParameters)
+     char key[] = "temp_hour";
+ 
+     // 1. Check if "temp_hour" exist in NVS
+-    if (checkExist(key, key) != DCT_SUCCESS)
++    if (checkExist(key, key) != true)
+     {
+         // 2. If "temp_hour" exist, get "temp_hour" and set as "total_hour" into NVS
+         if (getPref_u32_new(key, key, &prev_hour) == DCT_SUCCESS)
+@@ -76,7 +76,6 @@ static void matter_op_hours_task(void *pvParameters)
+         }
+         else
+         {
+-            printf("getPref_u32_new: %s not found\n", key);
+             goto loop;
+         }
+     }
+@@ -106,7 +105,7 @@ loop:
+ 
+ void matter_op_hours(void)
+ {
+-    if (xTaskCreate(matter_op_hours_task, ((const char*)"matter_op_hours_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
++    if (xTaskCreate(matter_op_hours_task, ((const char *)"matter_op_hours_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
+     {
+         printf("\n\r%s xTaskCreate(matter_op_hours) failed", __FUNCTION__);
+     }
+diff --git a/examples/chiptest/ameba_main_task.cpp b/examples/chiptest/ameba_main_task.cpp
+index db3e993..ff0d26b 100644
+--- a/examples/chiptest/ameba_main_task.cpp
++++ b/examples/chiptest/ameba_main_task.cpp
+@@ -17,7 +17,9 @@
+ 
+ #include <CHIPDeviceManager.h>
+ 
++#include <matter_attribute_callbacks.h>
+ #include <matter_command.h>
++
+ #include <device_energy_management/ameba_energy_management_common_main.h>
+ #include <valve_control/ameba_valve_control_delegate.h>
+ #include <water_heater_management/ameba_water_heater_management_main.h>
+@@ -40,10 +42,17 @@ namespace {
+ app::Clusters::ModeSelect::AmebaSupportedModesManager sAmebaSupportedModesManager;
+ } // namespace
+ 
++static void InitAmebaDeviceManager(void)
++{
++    AmebaDeviceManager::InitInstance(1);  // for Endpoint 1
++}
++
+ void AppTaskInit(void)
+ {
+     CHIP_ERROR ret = CHIP_NO_ERROR;
+ 
++    InitAmebaDeviceManager();
++
+ #if CONFIG_ENABLE_CHIP_SHELL
+     InitManualOperation();
+ #endif
+diff --git a/examples/chiptest/example_matter.c b/examples/chiptest/example_matter.c
+index b4a574d..30811a8 100644
+--- a/examples/chiptest/example_matter.c
++++ b/examples/chiptest/example_matter.c
+@@ -10,6 +10,7 @@
+ #include <diagnostic_logs/ameba_logging_faultlog.h>
+ #include <diagnostic_logs/ameba_logging_redirect_wrapper.h>
+ #endif
++#include <matter_data_providers.h>
+ 
+ #if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+ extern void matter_op_hours_wrapper(void);
+@@ -43,6 +44,8 @@ static void example_matter_task_thread(void *pvParameters)
+ 
+     ChipTest();
+ 
++    matter_data_provider_init();
++
+ #if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+     matter_op_hours_wrapper();
+ #endif
+diff --git a/project/amebad/make/application/Makefile b/project/amebad/make/application/Makefile
+index d0342ab..5dba058 100755
+--- a/project/amebad/make/application/Makefile
++++ b/project/amebad/make/application/Makefile
+@@ -30,6 +30,7 @@ CSRC += $(BTDIR)/matter_blemgr_common.c
+ 
+ # Matter Common code porting
+ CSRC += $(PORTDIR)/DsoHandle.c \
++        $(PORTDIR)/matter_data_providers.c \
+         $(PORTDIR)/matter_dcts.c \
+         $(PORTDIR)/matter_lwip.c \
+         $(PORTDIR)/matter_timers.c \
+diff --git a/project/amebad/make/chip_main/all_clusters_app/Makefile b/project/amebad/make/chip_main/all_clusters_app/Makefile
+index 4a9abbd..7540247 100644
+--- a/project/amebad/make/chip_main/all_clusters_app/Makefile
++++ b/project/amebad/make/chip_main/all_clusters_app/Makefile
+@@ -54,7 +54,8 @@ CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DI
+ GLOBAL_CFLAGS += -DCHIP_PROJECT=1
+ GLOBAL_CFLAGS += -DSTD_PRINTF=1
+ GLOBAL_CFLAGS += -DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\"lib/address_resolve/AddressResolve_DefaultImpl.h\"
+-GLOBAL_CFLAGS += -DCHIP_AMEBA_APP_TASK=1
++GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_APP_TASK=1
++GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_ATTRIBUTE_CALLBACK=1
+ 
+ # matter blemgr adapter options
+ ifeq ($(CONFIG_BLE_MATTER_ADAPTER),y)
+@@ -169,11 +170,13 @@ CPPSRC += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management
+ CPPSRC += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_instance.cpp
+ CPPSRC += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_main.cpp
+ CPPSRC += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_manufacturer.cpp
++
+ # water heater mode cluster
+ CPPSRC += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode_delegate.cpp
+ CPPSRC += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode_instance.cpp
+ 
+ CPPSRC += $(MATTER_DIR)/drivers/matter_consoles/matter_command.cpp
++CPPSRC += $(MATTER_DIR)/core/matter_attribute_callbacks.cpp
+ CPPSRC += $(MATTER_DIR)/examples/chiptest/ameba_main_task.cpp
+ 
+ CPPSRC += $(CHIPDIR)/examples/all-clusters-app/ameba/main/chipinterface.cpp
+@@ -188,7 +191,6 @@ ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
+ CPPSRC += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
+ endif
+ CPPSRC += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
+-CPPSRC += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
+ 
+ #*****************************************************************************#
+ #                              OBJECT FILE LIST                               #
+diff --git a/project/amebad/make/chip_main/matter_main_sources.mk b/project/amebad/make/chip_main/matter_main_sources.mk
+index 28d38ca..f0b8c93 100644
+--- a/project/amebad/make/chip_main/matter_main_sources.mk
++++ b/project/amebad/make/chip_main/matter_main_sources.mk
+@@ -38,8 +38,6 @@ IFLAGS += -I$(CHIPDIR)/zzz_generated/app-common
+ CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
+ CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
+ 
+-CPPSRC += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
+-
+ # connectedhomeip - src - app
+ CPPSRC += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
+ CPPSRC += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
+@@ -61,8 +59,8 @@ CPPSRC += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
+ endif
+ 
+ # connectedhomeip - src - app - server-cluster
+-CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
+ CPPSRC += $(CHIPDIR)/src/app/server-cluster/DefaultServerCluster.cpp
++CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
+ 
+ # connectedhomeip - src - app - util
+ CPPSRC += $(CHIPDIR)/src/app/util/attribute-storage.cpp
+@@ -106,4 +104,5 @@ CPPSRC += $(MATTER_DIR)/api/matter_api.cpp
+ CPPSRC += $(MATTER_DIR)/core/matter_device_utils.cpp
+ 
+ # matter - drivers
+-CPPSRC += $(MATTER_DIR)/drivers/matter_drivers/ameba_app_cluster_main.cpp
+\ No newline at end of file
++CPPSRC += $(MATTER_DIR)/drivers/matter_drivers/ameba_app_cluster_main.cpp
++CPPSRC += $(MATTER_DIR)/core/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
+diff --git a/project/amebaz2/Makefile.include.app.list b/project/amebaz2/Makefile.include.app.list
+index 67332bb..b3f26a6 100644
+--- a/project/amebaz2/Makefile.include.app.list
++++ b/project/amebaz2/Makefile.include.app.list
+@@ -35,6 +35,7 @@ SRC_C += ../../../component/common/application/matter/common/atcmd/atcmd_matter.
+ SRC_C += ../../../component/common/application/matter/common/bluetooth/matter_blemgr_common.c
+ 
+ #matter - app - port
++SRC_C += ../../../component/common/application/matter/common/port/matter_data_providers.c
+ SRC_C += ../../../component/common/application/matter/common/port/matter_dcts.c
+ SRC_C += ../../../component/common/application/matter/common/port/matter_fs.c
+ SRC_C += ../../../component/common/application/matter/common/port/matter_lwip.c
+diff --git a/project/amebaz2/make/all_clusters/lib_chip_main.mk b/project/amebaz2/make/all_clusters/lib_chip_main.mk
+index a0831c6..b63a6c2 100644
+--- a/project/amebaz2/make/all_clusters/lib_chip_main.mk
++++ b/project/amebaz2/make/all_clusters/lib_chip_main.mk
+@@ -173,6 +173,7 @@ SRC_CPP += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode_delegate.c
+ SRC_CPP += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode_instance.cpp
+ 
+ SRC_CPP += $(MATTER_DIR)/drivers/matter_consoles/matter_command.cpp
++SRC_CPP += $(MATTER_DIR)/core/matter_attribute_callbacks.cpp
+ SRC_CPP += $(MATTER_DIR)/examples/chiptest/ameba_main_task.cpp
+ 
+ # all-clusters-app ameba source files
+@@ -188,7 +189,6 @@ ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
+ SRC_CPP += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
+ endif
+ SRC_CPP += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
+-SRC_CPP += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
+ 
+ # Matter Main Common Source file list
+ # -------------------------------------------------------------------
+@@ -230,7 +230,8 @@ CFLAGS += -DV8M_STKOVF
+ include $(MATTER_INCLUDE)
+ 
+ CFLAGS += -DCHIP_PROJECT=1
+-CFLAGS += -DCHIP_AMEBA_APP_TASK=1
++CFLAGS += -DCONFIG_ENABLE_AMEBA_APP_TASK=1
++CFLAGS += -DCONFIG_ENABLE_AMEBA_ATTRIBUTE_CALLBACK=1
+ 
+ # Matter Shell Flags
+ ifeq ($(CHIP_ENABLE_SHELL), true)
+diff --git a/project/amebaz2/make/matter_main_sources.mk b/project/amebaz2/make/matter_main_sources.mk
+index bec5a5d..3776a09 100644
+--- a/project/amebaz2/make/matter_main_sources.mk
++++ b/project/amebaz2/make/matter_main_sources.mk
+@@ -23,8 +23,6 @@ INCLUDES += -I$(CHIPDIR)/zzz_generated/app-common
+ SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
+ SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
+ 
+-SRC_CPP += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
+-
+ # connectedhomeip - src - app
+ SRC_CPP += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
+ SRC_CPP += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
+@@ -46,8 +44,8 @@ SRC_CPP += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
+ endif
+ 
+ # connectedhomeip - src - app - server-cluster
+-SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
+ SRC_CPP += $(CHIPDIR)/src/app/server-cluster/DefaultServerCluster.cpp
++SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
+ 
+ # connectedhomeip - src - app - util
+ SRC_CPP += $(CHIPDIR)/src/app/util/attribute-storage.cpp
+@@ -90,6 +88,7 @@ SRC_CPP += $(MATTER_DIR)/api/matter_log_api.cpp
+ 
+ # matter - core
+ SRC_CPP += $(MATTER_DIR)/core/matter_device_utils.cpp
++SRC_CPP += $(MATTER_DIR)/core/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
+ 
+ # matter - drivers
+ SRC_CPP += $(MATTER_DIR)/drivers/matter_drivers/ameba_app_cluster_main.cpp
+diff --git a/project/amebaz2plus/Makefile.include.app.list b/project/amebaz2plus/Makefile.include.app.list
+index 0567acc..5045cbc 100644
+--- a/project/amebaz2plus/Makefile.include.app.list
++++ b/project/amebaz2plus/Makefile.include.app.list
+@@ -35,6 +35,7 @@ SRC_C += ../../../component/common/application/matter/common/atcmd/atcmd_matter.
+ SRC_C += ../../../component/common/application/matter/common/bluetooth/matter_blemgr_common.c
+ 
+ #matter - app - port
++SRC_C += ../../../component/common/application/matter/common/port/matter_data_providers.c
+ SRC_C += ../../../component/common/application/matter/common/port/matter_dcts.c
+ SRC_C += ../../../component/common/application/matter/common/port/matter_fs.c
+ SRC_C += ../../../component/common/application/matter/common/port/matter_lwip.c
+diff --git a/project/amebaz2plus/make/all_clusters/lib_chip_main.mk b/project/amebaz2plus/make/all_clusters/lib_chip_main.mk
+index fd452b2..f938219 100644
+--- a/project/amebaz2plus/make/all_clusters/lib_chip_main.mk
++++ b/project/amebaz2plus/make/all_clusters/lib_chip_main.mk
+@@ -173,6 +173,7 @@ SRC_CPP += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode_delegate.c
+ SRC_CPP += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode_instance.cpp
+ 
+ SRC_CPP += $(MATTER_DIR)/drivers/matter_consoles/matter_command.cpp
++SRC_CPP += $(MATTER_DIR)/core/matter_attribute_callbacks.cpp
+ SRC_CPP += $(MATTER_DIR)/examples/chiptest/ameba_main_task.cpp
+ 
+ # all-clusters-app ameba source files
+@@ -188,7 +189,6 @@ ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
+ SRC_CPP += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
+ endif
+ SRC_CPP += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
+-SRC_CPP += $(CHIPDIR)/examples/platform/ameba/test_event_trigger/AmebaTestEventTriggerDelegate.cpp
+ 
+ # Matter Main Common Source file list
+ # -------------------------------------------------------------------
+@@ -230,7 +230,8 @@ CFLAGS += -DV8M_STKOVF
+ include $(MATTER_INCLUDE)
+ 
+ CFLAGS += -DCHIP_PROJECT=1
+-CFLAGS += -DCHIP_AMEBA_APP_TASK=1
++CFLAGS += -DCONFIG_ENABLE_AMEBA_APP_TASK=1
++CFLAGS += -DCONFIG_ENABLE_AMEBA_ATTRIBUTE_CALLBACK=1
+ 
+ # Matter Shell Flags
+ ifeq ($(CHIP_ENABLE_SHELL), true)
+diff --git a/project/amebaz2plus/make/matter_main_sources.mk b/project/amebaz2plus/make/matter_main_sources.mk
+index bec5a5d..3776a09 100644
+--- a/project/amebaz2plus/make/matter_main_sources.mk
++++ b/project/amebaz2plus/make/matter_main_sources.mk
+@@ -23,8 +23,6 @@ INCLUDES += -I$(CHIPDIR)/zzz_generated/app-common
+ SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
+ SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
+ 
+-SRC_CPP += $(CHIPDIR)/examples/providers/DeviceInfoProviderImpl.cpp
+-
+ # connectedhomeip - src - app
+ SRC_CPP += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
+ SRC_CPP += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
+@@ -46,8 +44,8 @@ SRC_CPP += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
+ endif
+ 
+ # connectedhomeip - src - app - server-cluster
+-SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
+ SRC_CPP += $(CHIPDIR)/src/app/server-cluster/DefaultServerCluster.cpp
++SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
+ 
+ # connectedhomeip - src - app - util
+ SRC_CPP += $(CHIPDIR)/src/app/util/attribute-storage.cpp
+@@ -90,6 +88,7 @@ SRC_CPP += $(MATTER_DIR)/api/matter_log_api.cpp
+ 
+ # matter - core
+ SRC_CPP += $(MATTER_DIR)/core/matter_device_utils.cpp
++SRC_CPP += $(MATTER_DIR)/core/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
+ 
+ # matter - drivers
+ SRC_CPP += $(MATTER_DIR)/drivers/matter_drivers/ameba_app_cluster_main.cpp

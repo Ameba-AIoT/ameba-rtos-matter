@@ -35,6 +35,7 @@ SRC_C += ../../../component/common/application/matter/common/atcmd/atcmd_matter.
 SRC_C += ../../../component/common/application/matter/common/bluetooth/matter_blemgr_common.c
 
 #matter - app - port
+SRC_C += ../../../component/common/application/matter/common/port/matter_data_providers.c
 SRC_C += ../../../component/common/application/matter/common/port/matter_dcts.c
 SRC_C += ../../../component/common/application/matter/common/port/matter_fs.c
 SRC_C += ../../../component/common/application/matter/common/port/matter_lwip.c

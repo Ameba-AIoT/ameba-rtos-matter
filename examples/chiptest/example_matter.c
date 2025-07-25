@@ -10,6 +10,7 @@
 #include <diagnostic_logs/ameba_logging_faultlog.h>
 #include <diagnostic_logs/ameba_logging_redirect_wrapper.h>
 #endif
+#include <matter_data_providers.h>
 
 #if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
 extern void matter_op_hours_wrapper(void);
@@ -42,6 +43,8 @@ static void example_matter_task_thread(void *pvParameters)
 #endif
 
     ChipTest();
+
+    matter_data_provider_init();
 
 #if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
     matter_op_hours_wrapper();
