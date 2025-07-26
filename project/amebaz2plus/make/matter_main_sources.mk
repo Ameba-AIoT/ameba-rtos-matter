@@ -47,6 +47,7 @@ SRC_CPP += $(CHIPDIR)/src/app/server-cluster/AttributeListBuilder.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server-cluster/DefaultServerCluster.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
+SRC_CPP += $(CHIPDIR)/src/app/server-cluster/SingleEndpointServerClusterRegistry.cpp
 
 # connectedhomeip - src - app - util
 SRC_CPP += $(CHIPDIR)/src/app/util/attribute-storage.cpp
