@@ -104,6 +104,9 @@ GLOBAL_CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
 # Mbedtls options
 GLOBAL_CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
 
+# matter acl extension options
+GLOBAL_CFLAGS += -DCHIP_CONFIG_ENABLE_ACL_EXTENSIONS=1
+
 # matter ota options
 GLOBAL_CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1
 
