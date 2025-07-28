@@ -104,3 +104,6 @@ CPPSRC += $(MATTER_DIR)/api/matter_api.cpp
 
 # matter - core
 CPPSRC += $(MATTER_DIR)/core/matter_device_utils.cpp
+
+# matter - drivers
+CPPSRC += $(MATTER_DIR)/drivers/matter_drivers/ameba_app_cluster_main.cpp

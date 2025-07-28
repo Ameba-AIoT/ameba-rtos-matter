@@ -1,6 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,31 +19,58 @@
 
 #include <air_quality/ameba_air_quality_instance.h>
 
+using namespace chip;
+using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AirQuality;
 
-Instance * gAirQualityCluster = nullptr;
+namespace {
+static Instance * gAmebaAirQualityInstance = nullptr;
+} // namespace
 
-Instance * AirQuality::GetInstance()
+void AirQuality::SetAirQuality(AirQualityEnum aNewAirQuality)
 {
-    return gAirQualityCluster;
-}
-
-void AirQuality::Shutdown()
-{
-    if (gAirQualityCluster != nullptr)
-    {
-        delete gAirQualityCluster;
-        gAirQualityCluster = nullptr;
+    if (gAmebaAirQualityInstance != nullptr) {
+        ChipLogProgress(DeviceLayer, "Update AirQuality to 0x%x", aNewAirQuality);
+        gAmebaAirQualityInstance->UpdateAirQuality(aNewAirQuality);
     }
 }
 
-void emberAfAirQualityClusterInitCallback(chip::EndpointId endpointId)
+AirQualityEnum AirQuality::CurrentAirQuality(void)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
-    VerifyOrDie(gAirQualityCluster == nullptr);
-    chip::BitMask<Feature, uint32_t> airQualityFeatures(Feature::kModerate, Feature::kFair, Feature::kVeryPoor,
-                                                        Feature::kExtremelyPoor);
-    gAirQualityCluster = new Instance(1, airQualityFeatures);
-    gAirQualityCluster->Init();
+    if (gAmebaAirQualityInstance != nullptr) {
+        return gAmebaAirQualityInstance->GetAirQuality();
+    }
+    return AirQualityEnum::kUnknown;
+}
+
+Instance * AirQuality::GetAmebaAirQualityInstance(void)
+{
+    return gAmebaAirQualityInstance;
+}
+
+CHIP_ERROR AirQuality::AmebaAirQualityInstanceInit(EndpointId endpoint)
+{
+    VerifyOrReturnError(gAmebaAirQualityInstance == nullptr, CHIP_ERROR_INTERNAL);
+
+    chip::BitMask<AirQuality::Feature, uint32_t> Features(
+        AirQuality::Feature::kModerate,
+        AirQuality::Feature::kFair,
+        AirQuality::Feature::kVeryPoor,
+        AirQuality::Feature::kExtremelyPoor);
+
+    gAmebaAirQualityInstance = new AirQuality::Instance(endpoint, Features);
+    VerifyOrReturnError(gAmebaAirQualityInstance != nullptr, CHIP_ERROR_INTERNAL);
+
+    gAmebaAirQualityInstance->Init();
+
+    return CHIP_NO_ERROR;
+}
+
+void AirQuality::AmebaAirQualityInstanceShutdown(void)
+{
+    if (gAmebaAirQualityInstance != nullptr) {
+        delete gAmebaAirQualityInstance;
+        gAmebaAirQualityInstance = nullptr;
+    }
 }

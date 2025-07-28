@@ -85,7 +85,8 @@ endif
 
 # dishwasher-app source files
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/dishwasher_driver.cpp
-SRC_CPP += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode.cpp
+SRC_CPP += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode_main.cpp
 SRC_CPP += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate_impl.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/dishwasher/example_matter_dishwasher.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/dishwasher/matter_drivers.cpp

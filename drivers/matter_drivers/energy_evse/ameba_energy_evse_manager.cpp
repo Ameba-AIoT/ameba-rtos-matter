@@ -53,7 +53,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     }
     else
     {
-        ChipLogError(AppServer, "EVSE: Unable to restore persisted ChargingEnabledUntil value");
+        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted ChargingEnabledUntil value");
     }
 
     // Restore DischargingEnabledUntil value
@@ -67,7 +67,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     }
     else
     {
-        ChipLogError(AppServer, "EVSE: Unable to restore persisted DischargingEnabledUntil value");
+        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted DischargingEnabledUntil value");
     }
 
     // Restore UserMaximumChargeCurrent value
@@ -81,7 +81,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     }
     else
     {
-        ChipLogError(AppServer, "EVSE: Unable to restore persisted UserMaximumChargeCurrent value");
+        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted UserMaximumChargeCurrent value");
     }
 
     // Restore RandomizationDelayWindow value
@@ -95,7 +95,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     }
     else
     {
-        ChipLogError(AppServer, "EVSE: Unable to restore persisted RandomizationDelayWindow value");
+        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted RandomizationDelayWindow value");
     }
 
     // Restore ApproximateEVEfficiency value
@@ -109,7 +109,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
     }
     else
     {
-        ChipLogError(AppServer, "EVSE: Unable to restore persisted ApproximateEVEfficiency value");
+        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted ApproximateEVEfficiency value");
     }
 
     return CHIP_NO_ERROR; // It is ok to have no value loaded here

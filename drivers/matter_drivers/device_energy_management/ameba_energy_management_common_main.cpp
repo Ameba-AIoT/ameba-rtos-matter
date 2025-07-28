@@ -26,7 +26,8 @@
 #include <power_topology/ameba_power_topology_delegate.h>
 #include <water_heater_management/ameba_water_heater_management_main.h>
 #include <water_heater_management/ameba_water_heater_management_manufacturer.h>
-#include <water_heater_mode/ameba_water_heater_mode.h>
+#include <water_heater_mode/ameba_water_heater_mode_delegate.h>
+#include <water_heater_mode/ameba_water_heater_mode_instance.h>
 
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -152,23 +153,8 @@ CHIP_ERROR ElectricalPowerMeasurementInit(chip::EndpointId endpointId)
     gEPMInstance = std::make_unique<ElectricalPowerMeasurementInstance>(
         EndpointId(endpointId), *gEPMDelegate,
         BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
-            ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
-            ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
-            ElectricalPowerMeasurement::Feature::kPowerQuality),
-        BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactiveCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactivePower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSVoltage,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
-            ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
+            ElectricalPowerMeasurement::Feature::kDirectCurrent),
+        BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(0));
 
     if (!gEPMInstance)
     {
@@ -231,10 +217,9 @@ CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId)
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    chip::BitMask<DeviceEnergyManagement::Feature> featureMap = 0x0;
-
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(endpointId, *gDEMDelegate, featureMap);
+    gDEMInstance = std::make_unique<DeviceEnergyManagementManager>(endpointId, *gDEMDelegate, 
+        BitMask<DeviceEnergyManagement::Feature, uint32_t>(DeviceEnergyManagement::Feature::kPowerForecastReporting));
 
     if (!gDEMInstance)
     {
@@ -298,7 +283,7 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
        that include the EEM endpoint (even the one we disable dynamically). So here, we only
        proceed when it's called for the right endpoint determined by GetEnergyDeviceEndpointId().
     */
-    if (endpointId != GetEnergyDeviceEndpointId())
+    if (endpointId != 1)
     {
         return;
     }
@@ -307,6 +292,7 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
 
     gEEMAttrAccess = std::make_unique<ElectricalEnergyMeasurementAttrAccess>(
         BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
+            ElectricalEnergyMeasurement::Feature::kImportedEnergy,
             ElectricalEnergyMeasurement::Feature::kCumulativeEnergy),
         BitMask<ElectricalEnergyMeasurement::OptionalAttributes, uint32_t>(
             ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
@@ -332,9 +318,7 @@ void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endp
     // but the manufacturer may want to store these in non volatile storage for timestamp (based on epoch_s)
     ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type resetStruct = {
         .importedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
-        .exportedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
         .importedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
-        .exportedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
     };
 
     if (gEEMAttrAccess)
@@ -355,7 +339,7 @@ DeviceEnergyManagement::DeviceEnergyManagementDelegate * GetDEMDelegate()
 
 void EvseApplicationInit()
 {
-    auto endpointId = GetEnergyDeviceEndpointId();
+    auto endpointId = 1;
     VerifyOrDie(EnergyManagementCommonClustersInit(endpointId) == CHIP_NO_ERROR);
     VerifyOrDie(EnergyEvseInit(endpointId) == CHIP_NO_ERROR);
     VerifyOrDie(EVSEManufacturerInit(endpointId, *gEPMInstance.get(), *gPTInstance.get(), *gDEMInstance.get(),
@@ -379,7 +363,7 @@ void EvseApplicationShutdown()
 
 void WaterHeaterApplicationInit()
 {
-    auto endpointId = GetEnergyDeviceEndpointId();
+    auto endpointId = 1;
     VerifyOrDie(EnergyManagementCommonClustersInit(endpointId) == CHIP_NO_ERROR);
     VerifyOrDie(WhmApplicationInit(endpointId) == CHIP_NO_ERROR);
 
@@ -404,5 +388,6 @@ void WaterHeaterApplicationShutdown()
     WhmApplicationShutdown();
 
     Clusters::DeviceEnergyManagementMode::Shutdown();
-    Clusters::WaterHeaterMode::Shutdown();
+    WaterHeaterMode::AmebaWaterHeaterModeInstanceShutdown();
+    WaterHeaterMode::AmebaWaterHeaterModeDelegateShutdown();
 }

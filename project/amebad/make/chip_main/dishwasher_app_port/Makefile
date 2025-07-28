@@ -80,7 +80,8 @@ endif
 
 # dishwasher-app source files
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/dishwasher_driver.cpp
-CPPSRC += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode.cpp
+CPPSRC += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode_delegate.cpp
+CPPSRC += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode_main.cpp
 CPPSRC += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate_impl.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/dishwasher/example_matter_dishwasher.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/dishwasher/matter_drivers.cpp
