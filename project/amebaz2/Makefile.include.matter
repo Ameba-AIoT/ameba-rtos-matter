@@ -11,6 +11,11 @@ MATTER_MAKEDIR      = $(MATTER_BUILDDIR)/make
 MATTER_TOOLDIR      = $(MATTER_DIR)/tools
 MATTER_TOOLCHAINDIR = $(MATTER_DIR)/tools/toolchain
 
+# MbedTLS Configuration
+MBEDTLS_DIR_SELECTION = matter
+DEFAULT_MBEDTLS_DIR = $(SDKROOTDIR)/component/common/network/ssl
+MATTER_MBEDTLS_DIR  = $(SDKROOTDIR)/component/common/application/matter/common/mbedtls
+
 # -------------------------------------------------------------------
 # Toolchain Definition
 # -------------------------------------------------------------------
@@ -74,7 +79,9 @@ CFLAGS += -DFD_SETSIZE=10
 CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
 
 # Mbedtls options
-CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
+# Removal of mbedtls config file, to use the default mbedtls_config.h for all new mbedtls version.
+# Mbedtls 2.28.1 will still use matter_mbedtls_config.h declared in mbedtls/config.h
+#CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
 
 # other options
 CFLAGS += -DCHIP_HAVE_CONFIG_H
