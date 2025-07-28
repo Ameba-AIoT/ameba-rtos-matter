@@ -18,10 +18,13 @@ for i in "${!available_version[@]}"; do
     echo "$((i+1))) ${available_version[$i]}"
 done
 
-read -p "Enter Matter Version (number or name, default: $DEFAULT_MATTER_VERSION): " USER_INPUT
-USER_INPUT=${USER_INPUT:-$DEFAULT_MATTER_VERSION}
+echo "Enter a number to select the Matter Version or 'C' to skip the selection"
+read -p "Enter Matter Version: " USER_INPUT
 
-if [[ "$USER_INPUT" =~ ^[0-9]+$ ]]; then
+if [[ "$USER_INPUT" =~ ^[Cc]$ ]]; then
+    echo "Skipping Matter version selection."
+    exit
+elif [[ "$USER_INPUT" =~ ^[0-9]+$ ]]; then
     INDEX=$((USER_INPUT - 1))
     if [[ $INDEX -ge 0 && $INDEX -lt ${#available_version[@]} ]]; then
         MATTER_VERSION="${available_version[$INDEX]}"
