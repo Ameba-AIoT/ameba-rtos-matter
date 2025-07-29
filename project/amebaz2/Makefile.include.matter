@@ -14,7 +14,13 @@ MATTER_TOOLCHAINDIR = $(MATTER_DIR)/tools/toolchain
 # MbedTLS Configuration
 MBEDTLS_DIR_SELECTION = matter
 DEFAULT_MBEDTLS_DIR = $(SDKROOTDIR)/component/common/network/ssl
-MATTER_MBEDTLS_DIR  = $(SDKROOTDIR)/component/common/application/matter/common/mbedtls
+MATTER_MBEDTLS_DIR  = $(MATTER_DIR)/common/mbedtls
+
+ifeq ($(MBEDTLS_DIR_SELECTION), matter)
+MBEDTLS_DIR = $(MATTER_MBEDTLS_DIR)
+else
+MBEDTLS_DIR = $(DEFAULT_MBEDTLS_DIR)
+endif
 
 # -------------------------------------------------------------------
 # Toolchain Definition

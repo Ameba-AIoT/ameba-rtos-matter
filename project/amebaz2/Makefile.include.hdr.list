@@ -3,24 +3,24 @@ include $(MATTER_INCLUDE)
 # Ameba Matter Common Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/api
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/bluetooth/bt_matter_adapter
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/include
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/src/include
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/src/include/lwip
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/port/realtek
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/port/realtek/include
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/lwip/$(LWIP_VERSION)/port/realtek/freertos
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/include/mbedtls
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/mbedtls/$(MBEDTLS_VERSION)/library
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/common/port
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/core
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/device
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/matter_consoles
-INCLUDES += -I$(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers
+INCLUDES += -I$(MATTER_DIR)/api
+INCLUDES += -I$(MATTER_DIR)/common/bluetooth
+INCLUDES += -I$(MATTER_DIR)/common/bluetooth/bt_matter_adapter
+INCLUDES += -I$(MATTER_DIR)/common/include
+INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include
+INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include/lwip
+INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek
+INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/include
+INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/freertos
+INCLUDES += -I$(MATTER_DIR)/common/mbedtls
+INCLUDES += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/include
+INCLUDES += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/include/mbedtls
+INCLUDES += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/library
+INCLUDES += -I$(MATTER_DIR)/common/port
+INCLUDES += -I$(MATTER_DIR)/core
+INCLUDES += -I$(MATTER_DIR)/drivers/device
+INCLUDES += -I$(MATTER_DIR)/drivers/matter_consoles
+INCLUDES += -I$(MATTER_DIR)/drivers/matter_drivers
 
 # Include folder list
 # -------------------------------------------------------------------
