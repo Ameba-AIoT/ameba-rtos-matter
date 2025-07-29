@@ -1,20 +1,11 @@
 include $(MATTER_INCLUDE)
 
-DEFAULT_MBEDTLS_DIR = ../../../component/common/network/ssl
-MATTER_MBEDTLS_DIR = ../../../component/common/application/matter/common/mbedtls
-
-ifeq ($(MBEDTLS_DIR_SELECTION), matter)
-MBEDTLS_DIR = $(MATTER_MBEDTLS_DIR)
-else
-MBEDTLS_DIR = $(DEFAULT_MBEDTLS_DIR)
-endif
-
 # Matter Include file list
 # -------------------------------------------------------------------
 
-INCLUDES += -I../../../component/common/application/matter/common/port
-INCLUDES += -I../../../component/common/application/matter/common/include
-INCLUDES += -I../../../component/common/application/matter/common/mbedtls
+INCLUDES += -I$(MATTER_DIR)/common/port
+INCLUDES += -I$(MATTER_DIR)/common/include
+INCLUDES += -I$(MATTER_DIR)/common/mbedtls
 INCLUDES += -I$(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/include
 INCLUDES += -I$(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/include/mbedtls
 INCLUDES += -I$(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library
@@ -102,6 +93,7 @@ SRC_C += $(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/rsa_internal.c
 SRC_C += $(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_srv.c
 SRC_C += $(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/xtea.c
 else ifeq ($(MBEDTLS_VERSION), mbedtls-3.6.1)
+SRC_C += $(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aes_alt.c
 SRC_C += $(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aesce.c
 SRC_C += $(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/bignum_core.c
 SRC_C += $(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/bignum_mod.c
