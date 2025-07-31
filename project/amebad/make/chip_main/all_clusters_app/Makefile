@@ -91,6 +91,7 @@ CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_manageme
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_manager.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_mode.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_energy_management_common_main.cpp
+CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_device_management_test_event_trigger.cpp
 CPPSRC += $(MATTER_DRIVER)/device_energy_management/ameba_energy_time_utils.cpp
 # dishwasher alarm cluster
 CPPSRC += $(MATTER_DRIVER)/dishwasher_alarm/ameba_dishwasher_alarm_delegate.cpp
@@ -110,6 +111,7 @@ CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manufacturer_impl.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_mode.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_stub.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_targets_store.cpp
+CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_test_event_trigger.cpp
 CPPSRC += $(MATTER_DRIVER)/energy_evse/ameba_energy_preference_delegate.cpp
 # fan control cluster
 CPPSRC += $(MATTER_DRIVER)/fan_control/ameba_fan_control_delegate.cpp
