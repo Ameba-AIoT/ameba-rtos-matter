@@ -59,6 +59,7 @@ void AppTaskInit(void)
 
     app::Clusters::ModeSelect::setSupportedModesManager(&sAmebaSupportedModesManager);
     WaterHeaterApplicationInit();
+    EvseApplicationInit();
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
     ret = SmokeCoAlarm::AmebaSmokeCoAlarmTestEventInit(1);

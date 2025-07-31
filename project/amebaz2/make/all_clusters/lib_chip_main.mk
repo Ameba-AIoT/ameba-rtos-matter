@@ -159,6 +159,8 @@ SRC_CPP += $(MATTER_DRIVER)/rvc_operational_state/ameba_rvc_operational_state_in
 # smoke co alram cluster 
 SRC_CPP += $(MATTER_DRIVER)/smoke_co_alarm/ameba_smoke_co_alarm_test_event.cpp
 SRC_CPP += $(MATTER_DRIVER)/smoke_co_alarm/ameba_smoke_co_alarm_manager.cpp
+# soil measurement cluster
+SRC_CPP += $(MATTER_DRIVER)/soil_measurement/ameba_soil_measurement_instance.cpp
 # switch cluster
 SRC_CPP += $(MATTER_DRIVER)/switch/ameba_switch_event.cpp
 # temperature controls cluster

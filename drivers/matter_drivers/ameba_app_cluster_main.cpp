@@ -715,6 +715,21 @@ void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint)
     return;
 }
 
+/* Soil Measurement Cluster */
+void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
+{
+    matter_dbg("[%d]%s\n", __LINE__, __FUNCTION__);
+
+    CHIP_ERROR ret = CHIP_NO_ERROR;
+
+    ret = SoilMeasurement::AmebaSoilMeasurementInstanceInit(endpointId);
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Zcl, "AmebaSoilMeasurementInstanceInit Failed");
+        return;
+    }
+}
+
 // Temperature Control Cluster
 void emberAfTemperatureControlClusterInitCallback(chip::EndpointId endpoint)
 {

@@ -142,6 +142,11 @@ CHIP_ERROR EnergyEvseShutdown()
         gEvseDelegate.reset();
     }
 
+    if (gEvseTargetsDelegate)
+    {
+        gEvseTargetsDelegate.reset();
+    }
+
     return CHIP_NO_ERROR;
 }
 

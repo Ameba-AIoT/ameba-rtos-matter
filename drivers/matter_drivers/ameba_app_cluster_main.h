@@ -95,6 +95,9 @@
 /* Smoke CO Alarm Cluster*/
 #include <smoke_co_alarm/ameba_smoke_co_alarm_test_event.h>
 
+/* Soil Measurement Cluster */
+#include <soil_measurement/ameba_soil_measurement_instance.h>
+
 /* Temperature Control Cluster */
 #include <temperature_control/ameba_temperature_control_delegate.h>
 

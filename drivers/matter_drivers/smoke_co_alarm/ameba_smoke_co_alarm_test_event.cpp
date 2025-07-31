@@ -190,4 +190,6 @@ CHIP_ERROR SmokeCoAlarm::AmebaSmokeCoAlarmTestEventInit(EndpointId endpoint)
 {
     static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;
     Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sSmokeCOTestEventTriggerHandler);
+
+    return CHIP_NO_ERROR;
 }
