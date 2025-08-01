@@ -1,3 +1,22 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include <platform_stdlib.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -12,41 +31,6 @@
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
-
-extern "C" uint8_t matter_get_total_operational_hour(uint32_t *totalOperationalHours)
-{
-    if (totalOperationalHours == nullptr)
-    {
-        printf("%s: nullptr\n", __FUNCTION__);
-        return -1;
-    }
-
-    CHIP_ERROR err;
-    DiagnosticDataProvider &diagProvider = chip::DeviceLayer::GetDiagnosticDataProviderImpl();
-
-    if (&diagProvider != NULL)
-    {
-        err = diagProvider.GetTotalOperationalHours(*totalOperationalHours);
-        if (err != CHIP_NO_ERROR)
-        {
-            printf("%s: GetTotalOperationalHours Failed err=%d\n", __FUNCTION__, err);
-            return -1;
-        }
-    }
-    else
-    {
-        printf("%s: DiagnosticDataProvider is invalid\n", __FUNCTION__);
-        return -1;
-    }
-    return 0;
-}
-
-extern "C" uint8_t matter_set_total_operational_hour(uint32_t time)
-{
-    CHIP_ERROR err = ConfigurationMgr().StoreTotalOperationalHours(time);
-
-    return (err == CHIP_NO_ERROR) ? 0 : -1;
-}
 
 bool matter_server_is_commissioned()
 {
