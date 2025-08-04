@@ -69,7 +69,7 @@ Navigate to the `amebalite_gcc_project` directory:
 Menuconfig for matter:
 - To enable Matter, select `MENUCONFIG FOR KM4 CONFIG`, then select `Matter Config`, and enable `Enable Matter`.
 - Change mbedtls version to matter. Under `MENUCONFIG FOR KM4 CONFIG`, select `SSL Config`, then enable `Matter MBEDTLS Enable`
-- If you want to support Matter BLE, under `CONFIG BT`, select `BLE_Matter_Adapter` and save the configuration.
+- If you want to support Matter BLE, under `CONFIG BT`, enable `BT Example Demo`, then select `BLE_Matter_Adapter`, and save the configuration.
 - If you want to support [Matter ESF](matter_commissioning_and_control_guide.md#enable-matter-esf), under `Matter Config`, enable `Enable Matter Terms and Condition`
 
 ```
@@ -84,7 +84,21 @@ Start building the Matter libraries with:
 
     make -C asdk all_clusters
 
-### Make project_km4
+### Make Final Firmware
+
+#### Make all projects in one go
+
+Ensure the same menuconfig settings as described in `Make Matter Libraries`and continue building the final firmware.
+
+    cd ameba-rtos/amebalite_gcc_project/
+
+Build the final firmware:
+
+    make all MATTER_EXAMPLE=chiptest
+
+#### Make each project seperately
+
+##### Make project_km4
 
 Ensure the same menuconfig settings as described in `Make Matter Libraries` and continue building the `project_km4` images.
 
@@ -92,9 +106,9 @@ Ensure the same menuconfig settings as described in `Make Matter Libraries` and 
 
 Build `project_km4`:
 
-    make EXAMPLE=chiptest
+    make all MATTER_EXAMPLE=chiptest
 
-### Make project_kr4
+##### Make project_kr4
 
 Navigate to the `project_kr4` directory:
 

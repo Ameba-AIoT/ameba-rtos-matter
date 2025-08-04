@@ -4,6 +4,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
+MATTER_MBEDTLSDIR = $(MATTER_DIR)/common/mbedtls
+ifeq ($(MBEDTLS_MATTER_V_2_28_1_ENABLE), y)
+MBEDTLS_DIR       = $(MATTER_DIR)/common/mbedtls/mbedtls-2.28.1
+else ifeq ($(MBEDTLS_MATTER_V_3_6_1_ENABLE), y)
+MBEDTLS_DIR       = $(MATTER_DIR)/common/mbedtls/mbedtls-3.6.1
+endif
+
 ifneq (${MATTER_SECURE_MBEDTLS_MK},1)
 MATTER_SECURE_MBEDTLS_MK := 1
 
@@ -77,8 +84,7 @@ LIBMBEDTLS_SRCS+= $(addprefix ${MBEDTLS_DIR}/library/, \
                     )
 endif
 
-LIBMBEDTLS_SRCS += ${MATTER_MBEDTLSDIR}/matter_mbedtls_nsc.c \
-                   ${MBEDTLS_DIR}/library_s/mbedtls_nsc.c
+LIBMBEDTLS_SRCS += ${MATTER_MBEDTLSDIR}/matter_mbedtls_nsc.c
 
 $(eval $(call MAKE_LIB,mbedtls))
 

@@ -17,21 +17,33 @@
  *    limitations under the License.
  */
 
-#ifndef _MATTER_KV_H_
-#define _MATTER_KV_H_
+#include <FreeRTOS.h>
+#include <task.h>
+
+#ifndef _MATTER_FREERTOS_H_
+#define _MATTER_FREERTOS_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*============================================================================*
-  *                                Functions
-  *============================================================================*/
-int rt_kv_deinit(void);
-int32_t rt_kv_size(const char *key);
+/*
+ * @brief To get total heap size.
+ */
+size_t xPortGetTotalHeapSize( void ) PRIVILEGED_FUNCTION;
+
+/*
+ * @brief To get task stack size.
+ */
+uint32_t uxTaskGetStackSize( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
+
+/*
+ * @brief To get free stack size.
+ */
+uint32_t uxTaskGetFreeStackSize( TaskHandle_t xTask ) PRIVILEGED_FUNCTION;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // _MATTER_KV_H_
+#endif // _MATTER_FREERTOS_H_

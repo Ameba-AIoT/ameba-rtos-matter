@@ -3,7 +3,6 @@
 #include <basic_types.h>
 #include <platform_stdlib.h>
 #include <rtw_wifi_constants.h>
-#include <wifi_intf_drv_to_app_basic.h>
 
 #include <chip_porting.h>
 #include <matter_core.h>
@@ -14,10 +13,7 @@
 
 static void example_matter_thermostat_task(void *pvParameters)
 {
-    while (!(wifi_is_running(WLAN0_IDX) || wifi_is_running(WLAN1_IDX)))
-    {
-        vTaskDelay(500);
-    }
+    matter_wifi_wait();
 
     ChipLogProgress(DeviceLayer, "Matter Thermostat Example!");
 
