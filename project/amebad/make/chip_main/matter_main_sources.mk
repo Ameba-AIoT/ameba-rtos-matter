@@ -63,6 +63,7 @@ CPPSRC += $(CHIPDIR)/src/app/server-cluster/AttributeListBuilder.cpp
 CPPSRC += $(CHIPDIR)/src/app/server-cluster/DefaultServerCluster.cpp
 CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
 CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
+CPPSRC += $(CHIPDIR)/src/app/server-cluster/SingleEndpointServerClusterRegistry.cpp
 
 # connectedhomeip - src - app - util
 CPPSRC += $(CHIPDIR)/src/app/util/attribute-storage.cpp

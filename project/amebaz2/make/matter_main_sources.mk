@@ -63,6 +63,7 @@ SRC_CPP += $(CHIPDIR)/src/app/util/privilege-storage.cpp
 SRC_CPP += $(CHIPDIR)/src/app/persistence/AttributePersistenceProviderInstance.cpp
 SRC_CPP += $(CHIPDIR)/src/app/persistence/DefaultAttributePersistenceProvider.cpp
 SRC_CPP += $(CHIPDIR)/src/app/persistence/DeferredAttributePersistenceProvider.cpp
+SRC_CPP += $(CHIPDIR)/src/app/server-cluster/SingleEndpointServerClusterRegistry.cpp
 
 # connectedhomeip - src - data-model-providers
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
