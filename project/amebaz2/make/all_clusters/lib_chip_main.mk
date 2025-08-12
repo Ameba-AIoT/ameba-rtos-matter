@@ -77,17 +77,29 @@ SRC_C =
 SRC_CPP =
 
 # all-clusters-app clusters source files
-SRC_CPP += $(MATTER_DRIVER)/action/ameba_bridged_actions_stubs.cpp
+# actions cluster
+SRC_CPP += $(MATTER_DRIVER)/actions/ameba_actions_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/actions/ameba_actions_server.cpp
+# air quality cluster
 SRC_CPP += $(MATTER_DRIVER)/air_quality/ameba_air_quality_instance.cpp
-SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_concentration_measurement_instances.cpp
+# concentration measurement cluster
+SRC_CPP += $(MATTER_DRIVER)/concentration_measurement/ameba_concentration_measurement_instance.cpp
+# device energy management cluster
 SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_delegate_impl.cpp
 SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_manager.cpp
 SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_device_energy_management_mode.cpp
 SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_energy_management_common_main.cpp
+SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_device_management_test_event_trigger.cpp
 SRC_CPP += $(MATTER_DRIVER)/device_energy_management/ameba_energy_time_utils.cpp
-SRC_CPP += $(MATTER_DRIVER)/dishwasher_alarm/ameba_dishwasher_alarm_stubs.cpp
-SRC_CPP += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode.cpp
+# dishwasher alarm cluster
+SRC_CPP += $(MATTER_DRIVER)/dishwasher_alarm/ameba_dishwasher_alarm_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/dishwasher_alarm/ameba_dishwasher_alarm_instance.cpp
+# dishwasher mode cluster
+SRC_CPP += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode_instance.cpp
+# eletrical power measurement cluster
 SRC_CPP += $(MATTER_DRIVER)/electrical_power_measurement/ameba_electrical_power_measurement_delegate.cpp
+# energy evse cluster - Not Yet
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_charging_targets_mem_manager.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_fake_readings.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_delegate_impl.cpp
@@ -97,32 +109,74 @@ SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_manufacturer_impl.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_mode.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_stub.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_targets_store.cpp
+SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_evse_test_event_trigger.cpp
 SRC_CPP += $(MATTER_DRIVER)/energy_evse/ameba_energy_preference_delegate.cpp
-SRC_CPP += $(MATTER_DRIVER)/fan/ameba_fan_stubs.cpp
-SRC_CPP += $(MATTER_DRIVER)/laundry_dryer_controls/ameba_laundry_dryer_controls_delegate_impl.cpp
-SRC_CPP += $(MATTER_DRIVER)/laundry_washer_controls/ameba_laundry_washer_controls_delegate_impl.cpp
-SRC_CPP += $(MATTER_DRIVER)/laundry_washer_mode/ameba_laundry_washer_mode.cpp
-SRC_CPP += $(MATTER_DRIVER)/microwave_oven/ameba_microwave_oven_device.cpp
-SRC_CPP += $(MATTER_DRIVER)/microwave_oven/ameba_microwave_oven_mode.cpp
-SRC_CPP += $(MATTER_DRIVER)/mode_select/ameba_modes_manager.cpp
-SRC_CPP += $(MATTER_DRIVER)/occupancy_sensing/ameba_occupancy_sensing.cpp
-SRC_CPP += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate_impl.cpp
-SRC_CPP += $(MATTER_DRIVER)/oven_mode/ameba_oven_modes.cpp
-SRC_CPP += $(MATTER_DRIVER)/oven_operational_state/ameba_oven_operational_state_delegate.cpp
+# fan control cluster
+SRC_CPP += $(MATTER_DRIVER)/fan_control/ameba_fan_control_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/fan_control/ameba_fan_control_manager.cpp
+# laundry dryer control cluster
+SRC_CPP += $(MATTER_DRIVER)/laundry_dryer_controls/ameba_laundry_dryer_controls_delegate.cpp
+# laundry washer control cluster
+SRC_CPP += $(MATTER_DRIVER)/laundry_washer_controls/ameba_laundry_washer_controls_delegate.cpp
+# laundry washer mode cluster
+SRC_CPP += $(MATTER_DRIVER)/laundry_washer_mode/ameba_laundry_washer_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/laundry_washer_mode/ameba_laundry_washer_mode_instance.cpp
+# microwave oven controls cluster
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven_control/ameba_microwave_oven_control_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven_control/ameba_microwave_oven_control_instance.cpp
+# microwave oven mode cluster
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven_mode/ameba_microwave_oven_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven_mode/ameba_microwave_oven_mode_instance.cpp
+# mode select cluster
+SRC_CPP += $(MATTER_DRIVER)/mode_select/ameba_mode_select_manager.cpp
+# occupancy sensing cluster
+SRC_CPP += $(MATTER_DRIVER)/occupancy_sensing/ameba_occupancy_sensing_instance.cpp
+# operational state cluster
+SRC_CPP += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/operational_state/ameba_operational_state_instance.cpp
+# oven mode cluster
+SRC_CPP += $(MATTER_DRIVER)/oven_mode/ameba_oven_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/oven_mode/ameba_oven_mode_instance.cpp
+# oven operational state cluster
+SRC_CPP += $(MATTER_DRIVER)/oven_cavity_operational_state/ameba_oven_cavity_operational_state_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/oven_cavity_operational_state/ameba_oven_cavity_operational_state_instance.cpp
+# power topology cluster
 SRC_CPP += $(MATTER_DRIVER)/power_topology/ameba_power_topology_delegate.cpp
+# resource monitoring cluster
 SRC_CPP += $(MATTER_DRIVER)/resource_monitoring/ameba_resource_monitoring_delegate.cpp
-SRC_CPP += $(MATTER_DRIVER)/refrigerator_mode/ameba_tcc_mode.cpp
-SRC_CPP += $(MATTER_DRIVER)/rvc_modes/ameba_rvc_modes.cpp
-SRC_CPP += $(MATTER_DRIVER)/rvc_operational_state/ameba_rvc_operational_state_delegate_impl.cpp
-SRC_CPP += $(MATTER_DRIVER)/smoke_co_alarm/ameba_smco_stub.cpp
-SRC_CPP += $(MATTER_DRIVER)/switch/ameba_switch.cpp
-SRC_CPP += $(MATTER_DRIVER)/temperature_levels/ameba_temperature_levels.cpp
+SRC_CPP += $(MATTER_DRIVER)/resource_monitoring/ameba_resource_monitoring_instance.cpp
+# refrigerator mode cluster
+SRC_CPP += $(MATTER_DRIVER)/refrigerator_mode/ameba_refrigerator_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/refrigerator_mode/ameba_refrigerator_mode_instance.cpp
+# rvc clean mode cluster
+SRC_CPP += $(MATTER_DRIVER)/rvc_clean_mode/ameba_rvc_clean_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/rvc_clean_mode/ameba_rvc_clean_mode_instance.cpp
+# rvc run mode cluster
+SRC_CPP += $(MATTER_DRIVER)/rvc_run_mode/ameba_rvc_run_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/rvc_run_mode/ameba_rvc_run_mode_instance.cpp
+# rvc operational state cluster
+SRC_CPP += $(MATTER_DRIVER)/rvc_operational_state/ameba_rvc_operational_state_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/rvc_operational_state/ameba_rvc_operational_state_instance.cpp
+# smoke co alram cluster 
+SRC_CPP += $(MATTER_DRIVER)/smoke_co_alarm/ameba_smoke_co_alarm_test_event.cpp
+SRC_CPP += $(MATTER_DRIVER)/smoke_co_alarm/ameba_smoke_co_alarm_manager.cpp
+# soil measurement cluster
+SRC_CPP += $(MATTER_DRIVER)/soil_measurement/ameba_soil_measurement_instance.cpp
+# switch cluster
+SRC_CPP += $(MATTER_DRIVER)/switch/ameba_switch_event.cpp
+# temperature controls cluster
+SRC_CPP += $(MATTER_DRIVER)/temperature_control/ameba_temperature_control_delegate.cpp
+# valve control cluster
 SRC_CPP += $(MATTER_DRIVER)/valve_control/ameba_valve_control_delegate.cpp
+# water heater management cluster
 SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_delegate.cpp
 SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_instance.cpp
 SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_main.cpp
 SRC_CPP += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_manufacturer.cpp
-SRC_CPP += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode.cpp
+# water heater mode cluster
+SRC_CPP += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode_instance.cpp
+
 SRC_CPP += $(MATTER_DIR)/drivers/matter_consoles/matter_command.cpp
 SRC_CPP += $(MATTER_DIR)/core/matter_attribute_callbacks.cpp
 SRC_CPP += $(MATTER_DIR)/examples/chiptest/ameba_main_task.cpp

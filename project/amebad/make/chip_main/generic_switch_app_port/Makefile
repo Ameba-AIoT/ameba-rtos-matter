@@ -75,7 +75,7 @@ CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_ota_initial
 endif
 
 # generic-switch-app source files
-CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/matter_drivers/switch/ameba_switch.cpp
+CPPSRC += $(MATTER_DRIVER)/switch/ameba_switch_event.cpp
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/switch_driver.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/generic_switch/example_matter_generic_switch.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/generic_switch/matter_drivers.cpp

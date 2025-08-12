@@ -1,7 +1,12 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <microwaveoven_driver.h>
-#include <microwave_oven/ameba_microwave_oven_device.h>
+#include <microwave_oven_control/ameba_microwave_oven_control_delegate.h>
+#include <microwave_oven_control/ameba_microwave_oven_control_instance.h>
+#include <microwave_oven_mode/ameba_microwave_oven_mode_delegate.h>
+#include <microwave_oven_mode/ameba_microwave_oven_mode_instance.h>
+#include <operational_state/ameba_operational_state_delegate.h>
+#include <operational_state/ameba_operational_state_instance.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -42,7 +47,6 @@ CHIP_ERROR matter_driver_microwave_oven_set_startup_value(void)
     Status status;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    MatterMicrowaveOvenServerInit();
     MicrowaveOven.setOpState((uint8_t) Clusters::OperationalState::OperationalStateEnum::kStopped);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -108,7 +112,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
         {
             ChipLogProgress(DeviceLayer, "Set Oven Operational State 0x%x", event->value._u8);
             CHIP_ERROR err;
-            err = GetMatterMicrowaveOvenServer()->GetOperationalStateInstance()->SetOperationalState(event->value._u8);
+            err = OperationalState::GetAmebaOperationalStateInstance()->SetOperationalState(event->value._u8);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "ManualMicrowaveOvenOperationalStateSetStateCommandHandler Failed!\r\n");

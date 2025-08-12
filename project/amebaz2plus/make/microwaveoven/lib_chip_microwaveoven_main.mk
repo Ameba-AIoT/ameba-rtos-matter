@@ -77,8 +77,6 @@ INCLUDES += -I$(CODEGENDIR)
 SRC_C =
 SRC_CPP =
 
-SRC_CPP += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/src/microwave-oven-mode.cpp
-
 # porting layer source files
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_core.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_interaction.cpp
@@ -88,7 +86,12 @@ endif
 
 # microwaveoven-app source files
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/microwaveoven_driver.cpp
-SRC_CPP += $(MATTER_DRIVER)/microwave_oven/ameba_microwave_oven_device.cpp
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven_control/ameba_microwave_oven_control_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven_control/ameba_microwave_oven_control_instance.cpp
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven_mode/ameba_microwave_oven_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/microwave_oven_mode/ameba_microwave_oven_mode_instance.cpp
+SRC_CPP += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER)/operational_state/ameba_operational_state_instance.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/microwaveoven/example_matter_microwave_oven.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/microwaveoven/matter_drivers.cpp
 

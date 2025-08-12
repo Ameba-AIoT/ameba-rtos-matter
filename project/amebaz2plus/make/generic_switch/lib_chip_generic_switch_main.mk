@@ -10,6 +10,7 @@ AMEBAZ2_TOOLDIR     = $(SDKROOTDIR)/component/soc/realtek/8710c/misc/iar_utility
 CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
 MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
 MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2plus
+MATTER_DRIVER       = $(MATTER_DIR)/drivers/matter_drivers
 MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
 OUTPUT_DIR          = $(MATTER_EXAMPLEDIR)/generic_switch/build/chip
 CODEGENDIR          = $(OUTPUT_DIR)/codegen
@@ -83,7 +84,7 @@ SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/core/matter_ota_ini
 endif
 
 # aircon-app source files
-SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/matter_drivers/switch/ameba_switch.cpp
+SRC_CPP += $(MATTER_DRIVER)/switch/ameba_switch_event.cpp
 SRC_CPP += $(SDKROOTDIR)/component/common/application/matter/drivers/device/switch_driver.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/generic_switch/example_matter_generic_switch.cpp
 SRC_CPP += $(MATTER_EXAMPLEDIR)/generic_switch/matter_drivers.cpp

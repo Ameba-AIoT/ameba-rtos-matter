@@ -20,15 +20,13 @@
 #include <matter_attribute_callbacks.h>
 #include <matter_command.h>
 
+#include <fan_control/ameba_fan_control_manager.h>
 #include <device_energy_management/ameba_energy_management_common_main.h>
-#include <microwave_oven/ameba_microwave_oven_device.h>
 #include <valve_control/ameba_valve_control_delegate.h>
 #include <water_heater_management/ameba_water_heater_management_main.h>
-#include <mode_select/ameba_modes_manager.h>
-#include <temperature_levels/ameba_temperature_levels.h>
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
+#include <mode_select/ameba_mode_select_manager.h>
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
-#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
+#include <smoke_co_alarm/ameba_smoke_co_alarm_test_event.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #include <test_event_trigger/AmebaTestEventTriggerDelegate.h>
 #include <app/server/Server.h>
@@ -42,33 +40,39 @@ using namespace chip::app::Clusters::DeviceEnergyManagement::Attributes;
 using namespace chip::app::Clusters::WaterHeaterManagement;
 
 namespace {
-app::Clusters::TemperatureControl::AppSupportedTemperatureLevelsDelegate sAppSupportedTemperatureLevelsDelegate;
-app::Clusters::ModeSelect::StaticSupportedModesManager sStaticSupportedModesManager;
-app::Clusters::ValveConfigurationAndControl::ValveControlDelegate sValveDelegate;
+app::Clusters::ModeSelect::AmebaSupportedModesManager sAmebaSupportedModesManager;
 } // namespace
 
+#if CONFIG_ENABLE_AMEBA_ATTRIBUTE_CALLBACK
 static void InitAmebaDeviceManager(void)
 {
     AmebaDeviceManager::InitInstance(1);  // for Endpoint 1
+    FanControl::AmebaFanControlManager::Init();
 }
+#endif
 
 void AppTaskInit(void)
 {
+    CHIP_ERROR ret = CHIP_NO_ERROR;
+
+#if CONFIG_ENABLE_AMEBA_ATTRIBUTE_CALLBACK
     InitAmebaDeviceManager();
+#endif
+
 #if CONFIG_ENABLE_CHIP_SHELL
     InitManualOperation();
 #endif
 
-    app::Clusters::TemperatureControl::SetInstance(&sAppSupportedTemperatureLevelsDelegate);
-    app::Clusters::ModeSelect::setSupportedModesManager(&sStaticSupportedModesManager);
-    app::Clusters::ValveConfigurationAndControl::SetDefaultDelegate(chip::EndpointId(1), &sValveDelegate);
+    app::Clusters::ModeSelect::setSupportedModesManager(&sAmebaSupportedModesManager);
     WaterHeaterApplicationInit();
-    MatterMicrowaveOvenServerInit();
+    EvseApplicationInit();
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
-    static SmokeCOTestEventTriggerHandler sSmokeCOTestEventTriggerHandler;
-    Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sSmokeCOTestEventTriggerHandler);
-
+    ret = SmokeCoAlarm::AmebaSmokeCoAlarmTestEventInit(1);
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(Zcl, "AmebaSmokeCoAlarmTestEventInit Failed");
+    }
     static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
     Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
 #endif

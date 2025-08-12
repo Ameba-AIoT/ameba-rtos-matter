@@ -19,7 +19,7 @@
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
 #include <app/clusters/switch-server/switch-server.h>
-#include <switch/ameba_switch.h>
+#include <switch/ameba_switch_event.h>
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
@@ -29,7 +29,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Switch;
-using namespace Ameba::Clusters::GenericSwitch::Event;
+using namespace chip::app::Clusters::GenericSwitch::Event;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 using Shell::Engine;
@@ -64,8 +64,8 @@ CHIP_ERROR ManualSwitchInitialPressCommandHandler(int argc, char ** argv)
     {
         return ManualSwitchCommandHelpHandler(argc, argv);
     }
-    Ameba::Clusters::GenericSwitch::Event::GenericSwitchEventHandler handler;
-    GenericSwitchEventHandler::SwitchInitialPress switchInitialPressInstance(&handler);
+    AmebaGenericSwitchEventHandler handler;
+    AmebaGenericSwitchEventHandler::SwitchInitialPress switchInitialPressInstance(&handler);
     switchInitialPressInstance.Set(1, (uint8_t) atoi(argv[0]));
     return CHIP_NO_ERROR;
 }

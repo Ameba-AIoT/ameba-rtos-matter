@@ -46,6 +46,12 @@ bool AmebaTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan &enableKey
 CHIP_ERROR AmebaTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
 {
     eventTrigger = clearEndpointInEventTrigger(eventTrigger);
+    if ((AmebaHandleDeviceEnergyManagementTestEventTrigger(eventTrigger)) ||
+        (AmebaHandleEnergyEvseTestEventTrigger(eventTrigger)))
+    {
+        return CHIP_NO_ERROR;
+    }
+
     if (AmebaHandleGlobalTestEventTrigger(eventTrigger))
     {
         return CHIP_NO_ERROR;

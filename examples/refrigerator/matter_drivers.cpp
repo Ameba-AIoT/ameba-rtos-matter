@@ -1,7 +1,8 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <refrigerator_driver.h>
-#include <refrigerator_mode/ameba_tcc_mode.h>
+#include <refrigerator_mode/ameba_refrigerator_mode_delegate.h>
+#include <refrigerator_mode/ameba_refrigerator_mode_instance.h>
 
 #include <gpio_api.h>
 #include <gpio_irq_api.h>
@@ -74,12 +75,12 @@ CHIP_ERROR matter_driver_refrigerator_set_startup_value(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status;
     ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
-    ModeBase::Instance & refrigeratorObject = RefrigeratorAndTemperatureControlledCabinetMode::Instance();
+    ModeBase::Instance * refrigeratorObject = GetAmebaRefrigeratorModeInstance();
     RefrigeratorAlarmServer & refrigeratorAlarmObject = RefrigeratorAlarmServer::Instance();
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    modeChangedResponse.status = to_underlying(refrigeratorObject.UpdateCurrentMode(to_underlying(ModeTag::kRapidCool))); // Set refrigerator mode
+    modeChangedResponse.status = to_underlying(refrigeratorObject->UpdateCurrentMode(to_underlying(ModeTag::kRapidCool))); // Set refrigerator mode
     if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
     {
         ChipLogProgress(DeviceLayer, "Failed to set Refrigerator Mode!\n");
@@ -167,7 +168,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
     Status alarmChangedStatus;
-    ModeBase::Instance & refrigeratorObject = RefrigeratorAndTemperatureControlledCabinetMode::Instance();
+    ModeBase::Instance * refrigeratorObject = GetAmebaRefrigeratorModeInstance();
     RefrigeratorAlarmServer & refrigeratorAlarmObject = RefrigeratorAlarmServer::Instance();
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -176,7 +177,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     {
     case AppEvent::kEventType_Downlink_Refrigerator_Mode:
         {
-            modeChangedResponse.status = to_underlying(refrigeratorObject.UpdateCurrentMode(event->value._u16));
+            modeChangedResponse.status = to_underlying(refrigeratorObject->UpdateCurrentMode(event->value._u16));
             if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
             {
                 ChipLogProgress(DeviceLayer, "Failed to set refrigerator mode!\n");

@@ -24,8 +24,6 @@ static void example_matter_fan_task(void *pvParameters)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    initPref();     // init NVS
-
     err = matter_core_start();
     if (err != CHIP_NO_ERROR)
     {

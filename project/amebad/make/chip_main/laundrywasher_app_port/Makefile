@@ -76,9 +76,11 @@ endif
 
 # laundrywasher-app src files
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/washer_driver.cpp
-CPPSRC += $(MATTER_DRIVER)/laundry_washer_controls/ameba_laundry_washer_controls_delegate_impl.cpp
-CPPSRC += $(MATTER_DRIVER)/laundry_washer_mode/ameba_laundry_washer_mode.cpp
-CPPSRC += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate_impl.cpp
+CPPSRC += $(MATTER_DRIVER)/laundry_washer_controls/ameba_laundry_washer_controls_delegate.cpp
+CPPSRC += $(MATTER_DRIVER)/laundry_washer_mode/ameba_laundry_washer_mode_delegate.cpp
+CPPSRC += $(MATTER_DRIVER)/laundry_washer_mode/ameba_laundry_washer_mode_instance.cpp
+CPPSRC += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate.cpp
+CPPSRC += $(MATTER_DRIVER)/operational_state/ameba_operational_state_instance.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/laundrywasher/example_matter_laundrywasher.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/laundrywasher/matter_drivers.cpp
 

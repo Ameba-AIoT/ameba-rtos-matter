@@ -31,6 +31,7 @@
 #include <diagnostic_logs/ameba_logging_faultlog.h>
 #include <diagnostic_logs/ameba_logging_redirect_wrapper.h>
 #endif
+#include <matter_data_providers.h>
 
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
 extern void ChipTest(void);

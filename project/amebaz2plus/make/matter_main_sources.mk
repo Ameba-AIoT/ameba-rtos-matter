@@ -22,6 +22,7 @@ INCLUDES += -I$(CHIPDIR)/zzz_generated/app-common
 # connectedhomeip - examples
 SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
 SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
+
 # connectedhomeip - src - app
 SRC_CPP += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
 SRC_CPP += $(CHIPDIR)/src/app/StorageDelegateWrapper.cpp
