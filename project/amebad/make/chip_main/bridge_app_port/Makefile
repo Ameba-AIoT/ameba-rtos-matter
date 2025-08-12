@@ -81,7 +81,8 @@ endif
 
 # bridge-app source files
 CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/bridge_driver.cpp
-CPPSRC += $(MATTER_DRIVER)/action/ameba_bridged_actions_stubs.cpp
+CPPSRC += $(MATTER_DRIVER)/actions/ameba_actions_delegate.cpp
+CPPSRC += $(MATTER_DRIVER)/actions/ameba_actions_server.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/bridge_port/example_matter_bridge.cpp
 CPPSRC += $(MATTER_EXAMPLEDIR)/bridge/matter_drivers.cpp
 
