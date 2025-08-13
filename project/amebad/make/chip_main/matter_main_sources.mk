@@ -59,11 +59,8 @@ CPPSRC += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
 endif
 
 # connectedhomeip - src - app - server-cluster
-CPPSRC += $(CHIPDIR)/src/app/server-cluster/AttributeListBuilder.cpp
 CPPSRC += $(CHIPDIR)/src/app/server-cluster/DefaultServerCluster.cpp
 CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
-CPPSRC += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
-CPPSRC += $(CHIPDIR)/src/app/server-cluster/SingleEndpointServerClusterRegistry.cpp
 
 # connectedhomeip - src - app - util
 CPPSRC += $(CHIPDIR)/src/app/util/attribute-storage.cpp
@@ -76,9 +73,9 @@ CPPSRC += $(CHIPDIR)/src/app/util/util.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/privilege-storage.cpp
 
 # connectedhomeip - src - app - persistence
-CPPSRC += $(CHIPDIR)/src/app/persistence/AttributePersistenceProviderInstance.cpp
-CPPSRC += $(CHIPDIR)/src/app/persistence/DefaultAttributePersistenceProvider.cpp
-CPPSRC += $(CHIPDIR)/src/app/persistence/DeferredAttributePersistenceProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/persistence/AttributePersistenceProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/persistence/DefaultAttributePersistenceProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/util/persistence/DeferredAttributePersistenceProvider.cpp
 
 # connectedhomeip - src - data-model-providers
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
@@ -86,6 +83,8 @@ CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_R
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/Instance.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/ServerClusterInterfaceRegistry.cpp
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/EmberMetadata.cpp
 
 # connectedhomeip - src - setup_payload
 CPPSRC += $(CHIPDIR)/src/setup_payload/OnboardingCodesUtil.cpp
