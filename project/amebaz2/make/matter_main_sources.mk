@@ -44,10 +44,8 @@ SRC_CPP += $(CHIPDIR)/src/app/server/TermsAndConditionsManager.cpp
 endif
 
 # connectedhomeip - src - app - server-cluster
-SRC_CPP += $(CHIPDIR)/src/app/server-cluster/AttributeListBuilder.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server-cluster/DefaultServerCluster.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterface.cpp
-SRC_CPP += $(CHIPDIR)/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
 
 # connectedhomeip - src - app - util
 SRC_CPP += $(CHIPDIR)/src/app/util/attribute-storage.cpp
@@ -60,10 +58,9 @@ SRC_CPP += $(CHIPDIR)/src/app/util/util.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/privilege-storage.cpp
 
 # connectedhomeip - src - app - persistence
-SRC_CPP += $(CHIPDIR)/src/app/persistence/AttributePersistenceProviderInstance.cpp
-SRC_CPP += $(CHIPDIR)/src/app/persistence/DefaultAttributePersistenceProvider.cpp
-SRC_CPP += $(CHIPDIR)/src/app/persistence/DeferredAttributePersistenceProvider.cpp
-SRC_CPP += $(CHIPDIR)/src/app/server-cluster/SingleEndpointServerClusterRegistry.cpp
+SRC_CPP += $(CHIPDIR)/src/app/util/persistence/AttributePersistenceProvider.cpp
+SRC_CPP += $(CHIPDIR)/src/app/util/persistence/DefaultAttributePersistenceProvider.cpp
+SRC_CPP += $(CHIPDIR)/src/app/util/persistence/DeferredAttributePersistenceProvider.cpp
 
 # connectedhomeip - src - data-model-providers
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
@@ -71,6 +68,9 @@ SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/EmberAttributeDataBuffer.cpp
 SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/Instance.cpp
+SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/ServerClusterInterfaceRegistry.cpp
+SRC_CPP += $(CHIPDIR)/src/data-model-providers/codegen/EmberMetadata.cpp
+
 # connectedhomeip - src - setup_payload
 SRC_CPP += $(CHIPDIR)/src/setup_payload/OnboardingCodesUtil.cpp
 
