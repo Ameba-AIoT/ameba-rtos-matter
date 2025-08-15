@@ -81,3 +81,13 @@ int get_mbedtls_heap_helper(void **heap_addr, size_t *heap_size)
     *heap_size = sizeof(heap);
     return 0;
 }
+
+void matter_secure_mbedtls_heap_status(void)
+{
+#if defined(MBEDTLS_MEMORY_DEBUG)
+    printf("MATTER_MBEDTLS_SECURE_HEAP_SIZE = %d\n", MATTER_MBEDTLS_SECURE_HEAP_SIZE);
+    mbedtls_memory_buffer_alloc_status();
+#else
+    printf("Enable MBEDTLS_MEMORY_DEBUG to check the secure mbedtls heap status!\n");
+#endif
+}

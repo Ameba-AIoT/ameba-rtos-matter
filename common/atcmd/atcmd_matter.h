@@ -17,21 +17,17 @@
  *    limitations under the License.
  */
 
-#ifndef _MATTER_KV_H_
-#define _MATTER_KV_H_
+#ifndef _RTK_ATCMD_MATTER_H_
+#define _RTK_ATCMD_MATTER_H_
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*============================================================================*
-  *                                Functions
-  *============================================================================*/
-int rt_kv_deinit(void);
-int32_t rt_kv_size(const char *key);
+void matter_shell_init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // _MATTER_KV_H_
+#endif /* _RTK_ATCMD_MATTER_H_ */

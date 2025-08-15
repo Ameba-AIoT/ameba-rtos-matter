@@ -10,13 +10,13 @@ DIR = $(MBEDTLSDIR)
 
 MODULE_IFLAGS += -DCONFIG_BUILD_SECURE=1
 
-vpath %.c $(DIR) $(shell find $(DIR) -type d) $(MATTER_MBEDTLSDIR) $(shell find $(MATTER_MBEDTLSDIR) -type d)
+vpath %.c $(DIR) $(shell find $(DIR) -type d) $(shell find $(MATTER_MBEDTLSDIR) -type d) $(shell find $(MATTER_DIR)/common/os/ -type d)
 
 #*****************************************************************************#
 #                               Source FILE LIST                              #
 #*****************************************************************************#
-CSRC = $(DIR)/library_s/mbedtls_nsc.c \
-       $(MATTER_MBEDTLSDIR)/matter_mbedtls_nsc.c
+CSRC = $(MATTER_MBEDTLSDIR)/matter_mbedtls_nsc.c \
+       $(MATTER_DIR)/common/os/freertos_secure_additions.c
 
 #*****************************************************************************#
 #                               Object FILE LIST                              #

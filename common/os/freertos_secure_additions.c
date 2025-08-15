@@ -17,21 +17,33 @@
  *    limitations under the License.
  */
 
-#ifndef _MATTER_KV_H_
-#define _MATTER_KV_H_
+#include <string.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include "ameba.h"
+#include "FreeRTOS.h"
+#include "secure_heap.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+IMAGE3_ENTRY_SECTION
+void NS_ENTRY vMatterPrintSecureHeapStatus(void)
+{
+	DiagPrintf("secureconfigTOTAL_SRAM_HEAP_SIZE = %d\n", secureconfigTOTAL_SRAM_HEAP_SIZE);
+	DiagPrintf("xPortGetMinimumEverFreeHeapSize  = %d\n", xPortGetMinimumEverFreeHeapSize());
+	DiagPrintf("xPortGetFreeHeapSize             = %d\n", xPortGetFreeHeapSize());
+}
+/*-----------------------------------------------------------*/
 
-/*============================================================================*
-  *                                Functions
-  *============================================================================*/
-int rt_kv_deinit(void);
-int32_t rt_kv_size(const char *key);
+#if defined(CONFIG_AMEBALITE)
+void *rtos_mem_malloc(uint32_t size)
+{
+	return pvPortMalloc(size);
+}
 
-#ifdef __cplusplus
+void rtos_mem_free(void *pbuf)
+{
+	if (pbuf == NULL) {
+		return;
+	}
+	vPortFree(pbuf);
 }
 #endif
-
-#endif // _MATTER_KV_H_

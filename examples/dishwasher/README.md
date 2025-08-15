@@ -45,10 +45,8 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
 
 #### Build the Final Firmware
 
-    cd ameba-rtos/amebadplus_gcc_project/project_km4
-    make EXAMPLE=dishwasher
-    cd ameba-rtos/amebadplus_gcc_project/project_km0
-    make all
+    cd ameba-rtos/amebadplus_gcc_project
+    make all MATTER_EXAMPLE=dishwasher
 
 #### Flash the Image
 Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
@@ -71,10 +69,8 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/READM
 
 #### Build the Final Firmware
 
-    cd ameba-rtos/amebalite_gcc_project/project_km4
-    make EXAMPLE=dishwasher
-    cd ameba-rtos/amebalite_gcc_project/project_kr4
-    make all
+    cd ameba-rtos/amebalite_gcc_project
+    make all MATTER_EXAMPLE=dishwasher
 
 #### Flash the Image
 Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
@@ -97,12 +93,8 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/READM
 
 #### Build the Final Firmware
 
-    cd ameba-rtos/amebasmart_gcc_project/project_ap
-    make EXAMPLE=dishwasher
-    cd ameba-rtos/amebasmart_gcc_project/project_hp
-    make all
-    cd ameba-rtos/amebasmart_gcc_project/project_lp
-    make all
+    cd ameba-rtos/amebasmart_gcc_project
+    make all MATTER_EXAMPLE=dishwasher
 
 #### Flash the Image
 Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool

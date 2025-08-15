@@ -86,7 +86,7 @@
 
 #include "device_lock.h"
 
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE))
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE))
 #if defined(__ICCARM__)
 extern void (__cmse_nonsecure_call *ns_device_mutex_lock)(uint32_t);
 extern void (__cmse_nonsecure_call *ns_device_mutex_unlock)(uint32_t);

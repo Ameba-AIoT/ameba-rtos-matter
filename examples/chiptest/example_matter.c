@@ -1,9 +1,28 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include <FreeRTOS.h>
 #include <task.h>
 #include <basic_types.h>
 #include <platform_stdlib.h>
 #include <rtw_wifi_constants.h>
-#include <wifi_intf_drv_to_app_basic.h>
+#include <chip_porting.h>
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG)
 #include <matter_fs.h>
@@ -16,12 +35,7 @@ extern void ChipTest(void);
 
 static void example_matter_task_thread(void *pvParameters)
 {
-    while (!(wifi_is_running(WLAN0_IDX) || wifi_is_running(WLAN1_IDX)))
-    {
-        vTaskDelay(500);
-    }
-
-    wifi_config_autoreconnect(0);
+    matter_wifi_wait();
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
     fault_handler_override(matter_fault_log, matter_bt_log);

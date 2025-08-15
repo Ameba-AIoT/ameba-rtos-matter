@@ -1,16 +1,21 @@
-/********************************************************************************
- * @file    matter_utils.h
- * @author
- * @version
- * @brief   Utility API which includes Factory Data and Key protection.
- ********************************************************************************
- * @attention
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- * This module is a confidential and proprietary property of RealTek and
- * possession or use of this module requires written permission of RealTek.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
- * Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
-********************************************************************************/
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #ifndef _RTK_MATTER_UTILS_H_
 #define _RTK_MATTER_UTILS_H_
@@ -188,6 +193,12 @@ int matter_serialize(uint8_t *output_buf, size_t output_size);
  * @returns  0 on success, negative value otherwise.
  */
 int matter_deserialize(uint8_t *buf, size_t size);
+
+/**
+ * @brief Print secure heap status.
+ */
+void matter_check_secure_heap_status(void);
+
 #endif /* configENABLE_TRUSTZONE */
 
 #ifdef __cplusplus

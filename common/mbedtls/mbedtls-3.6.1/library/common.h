@@ -19,7 +19,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#if !(defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_PLATFORM_AMEBASMART))
+#if !(defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_AMEBASMART))
 #if defined(__ARM_NEON)
 #include <arm_neon.h>
 #define MBEDTLS_HAVE_NEON_INTRINSICS

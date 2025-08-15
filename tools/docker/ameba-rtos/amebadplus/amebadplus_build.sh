@@ -52,7 +52,7 @@ echo "Building all_clusters"
 make -C asdk all_clusters || handle_error "Failed to build all_clusters"
 
 echo "Building firmware image"
-make EXAMPLE=all_clusters || handle_error "Failed to build project_km4 firmware image"
+make MATTER_EXAMPLE=chiptest || handle_error "Failed to build project_km4 firmware image"
 
 echo "Build all-clusters-app completed"
 make clean || handle_error "Failed to clean"
@@ -61,7 +61,7 @@ echo "Building lighting"
 make -C asdk light_port || handle_error "Failed to build light_port"
 
 echo "Building firmware image"
-make EXAMPLE=light || handle_error "Failed to build project_km4 firmware image"
+make MATTER_EXAMPLE=light || handle_error "Failed to build project_km4 firmware image"
 
 echo "Build light_port completed"
 make clean || handle_error "Failed to clean"
