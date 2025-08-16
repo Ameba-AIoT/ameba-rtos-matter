@@ -1,6 +1,8 @@
-/**
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,13 +21,14 @@
 
 #include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ValveConfigurationAndControl {
 
-class ValveControlDelegate : public Delegate
+class AmebaValveControlDelegate : public Delegate
 {
 public:
     DataModel::Nullable<chip::Percent> HandleOpenValve(DataModel::Nullable<chip::Percent> level) override;
@@ -33,11 +36,15 @@ public:
     void HandleRemainingDurationTick(uint32_t duration) override;
 };
 
+AmebaValveControlDelegate * GetAmebaValveControlDelegate(void);
+CHIP_ERROR AmebaValveControlDelegateInit(EndpointId endpoint);
+void AmebaValveControlDelegateShutdown(void);
+
 } // namespace ValveConfigurationAndControl
 
 namespace TimeSynchronization {
 
-class ExtendedTimeSyncDelegate : public DefaultTimeSyncDelegate
+class AmebaExtendedTimeSyncDelegate : public DefaultTimeSyncDelegate
 {
 public:
     void UTCTimeAvailabilityChanged(uint64_t time) override;

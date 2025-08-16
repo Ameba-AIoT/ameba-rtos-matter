@@ -1,8 +1,10 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <dishwasher_driver.h>
-#include <dishwasher_mode/ameba_dishwasher_mode.h>
-#include <operational_state/ameba_operational_state_delegate_impl.h>
+#include <dishwasher_mode/ameba_dishwasher_mode_delegate.h>
+#include <dishwasher_mode/ameba_dishwasher_mode_instance.h>
+#include <operational_state/ameba_operational_state_delegate.h>
+#include <operational_state/ameba_operational_state_instance.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -41,7 +43,7 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status;
     ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
-    ModeBase::Instance & dishwasherInstance = DishwasherMode::Instance();
+    ModeBase::Instance * dishwasherInstance = GetAmebaDishwasherModeInstance();
     DishwasherAlarmServer & dishwasherAlarmInstance = DishwasherAlarmServer::Instance();
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -75,7 +77,7 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
         err = CHIP_ERROR_INTERNAL;
     }
 
-    modeChangedResponse.status = to_underlying(dishwasherInstance.UpdateCurrentMode(to_underlying(ModeTag::kNormal))); // Set dishwasher mode
+    modeChangedResponse.status = to_underlying(dishwasherInstance->UpdateCurrentMode(to_underlying(ModeTag::kNormal))); // Set dishwasher mode
     if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
     {
         ChipLogProgress(DeviceLayer, "Failed to set Dishwasher Mode!\n");
@@ -243,7 +245,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     Status status;
     CHIP_ERROR error;
     ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
-    ModeBase::Instance & dishwasherInstance = DishwasherMode::Instance();
+    ModeBase::Instance * dishwasherInstance = GetAmebaDishwasherModeInstance();
     DishwasherAlarmServer & dishwasherAlarmInstance = DishwasherAlarmServer::Instance();
     
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -263,7 +265,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     case AppEvent::kEventType_Downlink_Opstate_State:
         {
             ChipLogProgress(DeviceLayer, "Set Operational State 0x%x", event->value._u8);
-            error = Clusters::OperationalState::GetOperationalStateInstance()->SetOperationalState(event->value._u8);
+            error = Clusters::OperationalState::GetAmebaOperationalStateInstance()->SetOperationalState(event->value._u8);
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer, "Failed to set Operational State!\n");
@@ -274,7 +276,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
         {
             ChipLogProgress(DeviceLayer, "Set Operational State Error 0x%x", event->value._u8);
             Clusters::detail::Structs::ErrorStateStruct::Type errStateObj = {.errorStateID = event->value._u8};
-            Clusters::OperationalState::GetOperationalStateInstance()->OnOperationalErrorDetected(errStateObj);
+            Clusters::OperationalState::GetAmebaOperationalStateInstance()->OnOperationalErrorDetected(errStateObj);
         }
         break;
     case AppEvent::kEventType_Downlink_DW_Alarm_Set:
@@ -290,7 +292,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     case AppEvent::kEventType_Downlink_DW_Mode:
         {
             ChipLogProgress(DeviceLayer, "Set Dishwasher Mode 0x%x", event->value._u8);
-            modeChangedResponse.status = to_underlying(dishwasherInstance.UpdateCurrentMode(event->value._u8));
+            modeChangedResponse.status = to_underlying(dishwasherInstance->UpdateCurrentMode(event->value._u8));
             if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
             {
                 ChipLogProgress(DeviceLayer, "Failed to set Dishwasher mode!\n");

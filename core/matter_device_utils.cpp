@@ -20,7 +20,7 @@
 #include <platform_stdlib.h>
 #if defined(CONFIG_PLATFORM_8710C)
 #include <reset_reason_api.h>
-#else
+#elif defined(CONFIG_PLATFORM_8721D)
 #include <rtl8721dlp_sysreg.h>
 #endif
 

@@ -39,10 +39,12 @@ public:
         }
     };
 
-    static AmebaDeviceManager *GetInstance()
+    static AmebaDeviceManager *GetInstance(void)
     {
         return mInstance;
     };
+
+    EndpointId GetEndpointId() const { return mEndpointId; }
 
     void AmebaPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
                                           uint8_t type, uint16_t size, uint8_t *value);

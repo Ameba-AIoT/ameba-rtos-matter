@@ -24,3 +24,6 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
+
+#include <device_energy_management/ameba_device_management_test_event_trigger.h>
+#include <energy_evse/ameba_energy_evse_test_event_trigger.h>

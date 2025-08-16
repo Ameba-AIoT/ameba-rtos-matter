@@ -24,8 +24,6 @@ static void example_matter_bridge_task(void *pvParameters)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    initPref();     // init NVS
-
     err = matter_driver_bridge_light_init();
     if (err != CHIP_NO_ERROR)
     {
