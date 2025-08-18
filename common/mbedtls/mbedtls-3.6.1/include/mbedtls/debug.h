@@ -120,7 +120,7 @@
     /* (defined(__MINGW32__)  && __USE_MINGW_ANSI_STDIO == 0) || (defined(_MSC_VER) && _MSC_VER < 1800) */
 
 #if !defined(MBEDTLS_PRINTF_MS_TIME)
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_PLATFORM_AMEBASMART)
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_AMEBASMART)
 #include <stdint.h>
 #else
 #include <inttypes.h>
