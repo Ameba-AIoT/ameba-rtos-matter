@@ -16,13 +16,16 @@
  *    limitations under the License.
  */
 
-#include "controller/InvokeInteraction.h"
-#include "controller/ReadInteraction.h"
-#include <rvc_modes/ameba_rvc_modes.h>
+#include <controller/InvokeInteraction.h>
+#include <controller/ReadInteraction.h>
+#include <rvc_clean_mode/ameba_rvc_clean_mode_delegate.h>
+#include <rvc_clean_mode/ameba_rvc_clean_mode_instance.h>
+#include <rvc_run_mode/ameba_rvc_run_mode_delegate.h>
+#include <rvc_run_mode/ameba_rvc_run_mode_instance.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
-#include "lib/shell/Engine.h"
-#include "lib/shell/commands/Help.h"
+#include <lib/shell/Engine.h>
+#include <lib/shell/commands/Help.h>
 #endif // ENABLE_CHIP_SHELL
 
 using namespace chip;
@@ -87,7 +90,7 @@ CHIP_ERROR ManualRVCRunModeSetModeCommandHandler(int argc, char ** argv)
         return ManualRVCRunModeCommandHelpHandler(argc, argv);
     }
     Protocols::InteractionModel::Status status;
-    status = RvcRunMode::Instance()->UpdateCurrentMode((uint8_t) atoi(argv[0]));
+    status = RvcRunMode::GetAmebaRvcRunModeInstance()->UpdateCurrentMode((uint8_t) atoi(argv[0]));
     if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(DeviceLayer, "ManualRVCRunModeSetModeCommandHandler Error!");
@@ -123,7 +126,7 @@ CHIP_ERROR ManualRVCCleanModeSetModeCommandHandler(int argc, char ** argv)
         return ManualRVCCleanModeCommandHelpHandler(argc, argv);
     }
     Protocols::InteractionModel::Status status;
-    status = RvcCleanMode::Instance()->UpdateCurrentMode((uint8_t) atoi(argv[0]));
+    status = RvcCleanMode::GetAmebaRvcCleanModeInstance()->UpdateCurrentMode((uint8_t) atoi(argv[0]));
     if (status != Protocols::InteractionModel::Status::Success)
     {
         ChipLogError(DeviceLayer, "ManualRVCCleanModeSetModeCommandHandler Error!");

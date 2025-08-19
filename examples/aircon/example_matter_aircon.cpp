@@ -25,8 +25,6 @@ static void example_matter_aircon_task(void *pvParameters)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EndpointId endpoint = 1;
 
-    initPref();     // init NVS
-
     err = matter_core_start();
     if (err != CHIP_NO_ERROR)
     {

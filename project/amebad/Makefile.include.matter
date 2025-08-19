@@ -123,7 +123,7 @@ endif
 # matter factory data encryption options
 GLOBAL_CFLAGS += -DCONFIG_ENABLE_FACTORY_DATA_ENCRYPTION=0
 
-# matter test event options
+# matter test event trigger options
 GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
 
 # matter timer

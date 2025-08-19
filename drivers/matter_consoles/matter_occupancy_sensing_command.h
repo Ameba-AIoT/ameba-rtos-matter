@@ -46,6 +46,11 @@ Engine sShellManualOccupancySensingSubCommands;
 CHIP_ERROR ManualOccupancySensingCommandHelpHandler(int argc, char ** argv)
 {
     sShellManualOccupancySensingSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
+
+    printf("Occupancy values:\n");
+    printf("    0: Unoccupied\n");
+    printf("    1: kOccupied\n\n");
+
     return CHIP_NO_ERROR;
 }
 

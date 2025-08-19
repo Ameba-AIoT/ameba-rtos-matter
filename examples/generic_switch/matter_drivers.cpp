@@ -5,7 +5,7 @@
 #include <gpio_irq_ex_api.h>
 #include <us_ticker_api.h>
 #include <switch_driver.h>
-#include <switch/ameba_switch.h>
+#include <switch/ameba_switch_event.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -13,7 +13,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <protocols/interaction_model/StatusCode.h>
 
-using namespace Ameba::Clusters::GenericSwitch::Event;
+using namespace chip::app::Clusters::GenericSwitch::Event;
 using namespace ::chip::app;
 using chip::Protocols::InteractionModel::Status;
 
@@ -243,7 +243,7 @@ exit:
 void matter_driver_downlink_update_handler(AppEvent *event)
 {
     chip::app::ConcreteAttributePath path = event->path;
-    Ameba::Clusters::GenericSwitch::Event::GenericSwitchEventHandler handler;
+    chip::app::Clusters::GenericSwitch::Event::AmebaGenericSwitchEventHandler handler;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
@@ -251,28 +251,28 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     {
     case AppEvent::kEventType_Downlink_SwitchInitialPress:
         {
-            GenericSwitchEventHandler::SwitchInitialPress switchInitialPressInstance(&handler);
+            AmebaGenericSwitchEventHandler::SwitchInitialPress switchInitialPressInstance(&handler);
             switchInitialPressInstance.Set(path.mEndpointId, event->value._u8);
             swtch.SetCurrentPosition(event->value._u8);
         }
         break;
     case AppEvent::kEventType_Downlink_SwitchLongPress:
         {
-            GenericSwitchEventHandler::SwitchLongPress switchLongPressInstance(&handler);
+            AmebaGenericSwitchEventHandler::SwitchLongPress switchLongPressInstance(&handler);
             switchLongPressInstance.Set(path.mEndpointId, event->value._u8);
             swtch.SetCurrentPosition(event->value._u8);
         }
         break;
     case AppEvent::kEventType_Downlink_SwitchShortRelease:
         {
-            GenericSwitchEventHandler::SwitchShortRelease switchShortPressInstance(&handler);
+            AmebaGenericSwitchEventHandler::SwitchShortRelease switchShortPressInstance(&handler);
             switchShortPressInstance.Set(path.mEndpointId, event->value._u8);
             swtch.SetCurrentPosition(event->value._u8);
         }
         break;
     case AppEvent::kEventType_Downlink_SwitchLongRelease:
         {
-            GenericSwitchEventHandler::SwitchLongRelease switchLongReleaseInstance(&handler);
+            AmebaGenericSwitchEventHandler::SwitchLongRelease switchLongReleaseInstance(&handler);
             switchLongReleaseInstance.Set(path.mEndpointId, event->value._u8);
             swtch.SetCurrentPosition(event->value._u8);
         }

@@ -1,7 +1,8 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <washer_driver.h>
-#include <operational_state/ameba_operational_state_delegate_impl.h>
+#include <operational_state/ameba_operational_state_delegate.h>
+#include <operational_state/ameba_operational_state_instance.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -126,7 +127,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     case AppEvent::kEventType_Downlink_Opstate_State:
         {
             ChipLogProgress(DeviceLayer, "Set Operational State 0x%x", event->value._u8);
-            GetOperationalStateInstance()->SetOperationalState(event->value._u8);
+            GetAmebaOperationalStateInstance()->SetOperationalState(event->value._u8);
         }
         break;
     case AppEvent::kEventType_Downlink_LW_SpinSpeed:
