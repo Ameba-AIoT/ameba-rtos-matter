@@ -603,8 +603,7 @@ int mbedtls_ctr_drbg_random( void *p_rng, unsigned char *output,
 
     device_mutex_lock(RT_DEV_LOCK_CRYPTO);
     ret = crypto_init();
-    if (ret != SUCCESS)
-    {
+    if (ret != SUCCESS) {
         printf("crypto_init() failed\r\n");
         device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
         return ret;
@@ -612,8 +611,9 @@ int mbedtls_ctr_drbg_random( void *p_rng, unsigned char *output,
 
     ret = crypto_random_generate(output, output_len);
     device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
-    if (ret != 0)
+    if (ret != 0) {
         ret = 0xac; // CHIP_ERROR_INTERNAL
+    }
 #else
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     mbedtls_ctr_drbg_context *ctx = (mbedtls_ctr_drbg_context *) p_rng;
