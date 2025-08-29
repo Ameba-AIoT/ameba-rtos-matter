@@ -3,7 +3,7 @@ FROM ameba-rtos-matter:common
 
 # Redefine following build arguments to respective repo and tag/branch
 ARG AMEBA_MATTER_REPO=https://github.com/xshuqun/ameba-rtos-matter.git
-ARG TAG_NAME=ameba/update_mbedtls_250729
+ARG TAG_NAME=ameba/update_mbedtls_v1.4_250828
 
 # Define fixed build arguments
 ARG AMBD_REPO=https://github.com/Ameba-AIoT/ameba-rtos-d.git
