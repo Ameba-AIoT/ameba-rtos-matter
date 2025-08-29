@@ -21,6 +21,7 @@
 #include <stdint.h>
 
 #include <matter_core.h>
+#include <matter_dcts.h>
 #include <matter_data_providers.h>
 #include <matter_events.h>
 #include <matter_interaction.h>
@@ -53,8 +54,10 @@
 #include <app/util/attribute-storage.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>
-#include <app/util/persistence/DeferredAttributePersistenceProvider.h>
-#include <app/util/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/DeferredAttributePersistenceProvider.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/Dnssd.h>
@@ -308,10 +311,6 @@ CHIP_ERROR matter_core_init(void)
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
 
-#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
-    matter_op_hours();
-#endif
-
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
     SuccessOrExit(err);
@@ -324,12 +323,25 @@ CHIP_ERROR matter_core_init(void)
     PlatformMgr().ScheduleWork(matter_core_init_server, reinterpret_cast<intptr_t>(xTaskGetCurrentTaskHandle()));
     xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
 
+    matter_data_provider_init(); // initialize data provider
+
+    matter_store_boot_reason();
+
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+    matter_op_hours();
+#endif
+
 exit:
     return err;
 }
 
 CHIP_ERROR matter_core_start(void)
 {
+    if (initPref() != 0)
+    {
+        return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    }
+
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
     fault_handler_override(matter_fault_log, matter_bt_log);
     int res = matter_fs_init();
@@ -346,8 +358,6 @@ CHIP_ERROR matter_core_start(void)
 #endif
 
     wifi_set_autoreconnect(0); //Disable default autoreconnect
-
-    matter_data_provider_init(); // initialize data
 
     return matter_core_init();
 }

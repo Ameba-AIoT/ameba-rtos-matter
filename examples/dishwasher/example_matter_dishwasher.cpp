@@ -24,14 +24,12 @@ static void example_matter_dishwasher_task(void *pvParameters)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    initPref();     // init NVS
-
     err = matter_core_start();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "matter_core_start failed!");
     }
-
+#if 0
     err = matter_driver_dishwasher_init();
     if (err != CHIP_NO_ERROR)
     {
@@ -43,7 +41,7 @@ static void example_matter_dishwasher_task(void *pvParameters)
     {
         ChipLogProgress(DeviceLayer, "matter_driver_dishwasher_set_startup_value failed!");
     }
-
+#endif
     err = matter_interaction_start_downlink();
     if (err != CHIP_NO_ERROR)
     {
