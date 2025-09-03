@@ -280,10 +280,6 @@ CHIP_ERROR matter_core_init(void)
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
 
-#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
-    matter_op_hours();
-#endif
-
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
     SuccessOrExit(err);
@@ -295,6 +291,10 @@ CHIP_ERROR matter_core_init(void)
     // PlatformMgr().ScheduleWork(matter_core_init_server, 0);
     PlatformMgr().ScheduleWork(matter_core_init_server, reinterpret_cast<intptr_t>(xTaskGetCurrentTaskHandle()));
     xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
+
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+    matter_op_hours();
+#endif
 
 exit:
     return err;
