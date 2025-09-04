@@ -67,8 +67,6 @@ void DownlinkTask(void *pvParameter)
 {
     AppEvent event;
 
-    ChipLogProgress(DeviceLayer, "Downlink Task started");
-
     // Loop here and keep listening on the queue for Downlink (Firmware application to matter)
     while (true)
     {
@@ -135,8 +133,6 @@ void DispatchUplinkEvent(AppEvent *aEvent)
 void UplinkTask(void *pvParameter)
 {
     AppEvent event;
-
-    ChipLogProgress(DeviceLayer, "Uplink Task started");
 
     // Loop here and keep listening on the queue for Uplink (matter to Firmware application)
     while (true)
