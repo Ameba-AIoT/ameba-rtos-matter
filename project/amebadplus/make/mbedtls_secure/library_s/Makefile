@@ -16,6 +16,7 @@ vpath %.c $(DIR) $(shell find $(DIR) -type d) $(shell find $(MATTER_MBEDTLSDIR) 
 #                               Source FILE LIST                              #
 #*****************************************************************************#
 CSRC = $(MATTER_MBEDTLSDIR)/matter_mbedtls_nsc.c \
+       $(MBEDTLSDIR)/library_s/mbedtls_nsc.c \
        $(MATTER_DIR)/common/os/freertos_secure_additions.c
 
 #*****************************************************************************#

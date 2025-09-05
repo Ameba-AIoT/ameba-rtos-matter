@@ -17,6 +17,7 @@
  *    limitations under the License.
  */
 
+#include "platform_autoconf.h"
 #if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
 #include "cmsis.h"
 #include "platform_stdlib.h"
@@ -108,16 +109,6 @@ static int _random(void *p_rng, unsigned char *output, size_t output_len)
 }
 
 #endif //defined(CONFIG_XXX)
-
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
-IMAGE3_ENTRY_SECTION
-int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void)
-#elif defined(CONFIG_AMEBASMART)
-int secure_mbedtls_platform_set_calloc_free(void)
-#endif
-{
-	return 	mbedtls_platform_set_calloc_free(_calloc, _free);
-}
 
 /**
  * @brief Clears the Key Pair associated with the specified Matter Key Type.

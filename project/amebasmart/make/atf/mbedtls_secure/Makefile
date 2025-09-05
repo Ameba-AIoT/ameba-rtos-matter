@@ -84,7 +84,8 @@ LIBMBEDTLS_SRCS+= $(addprefix ${MBEDTLS_DIR}/library/, \
                     )
 endif
 
-LIBMBEDTLS_SRCS += ${MATTER_MBEDTLSDIR}/matter_mbedtls_nsc.c
+LIBMBEDTLS_SRCS += ${MATTER_MBEDTLSDIR}/matter_mbedtls_nsc.c \
+                   ${MBEDTLS_DIR}/library_s/mbedtls_nsc.c
 
 $(eval $(call MAKE_LIB,mbedtls))
 

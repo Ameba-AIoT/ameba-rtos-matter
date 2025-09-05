@@ -18,6 +18,7 @@
  */
 
 #include <platform_stdlib.h>
+#include <platform_autoconf.h>
 // These addresses are located right after VFS1
 #if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
 #define MATTER_FACTORY_DATA (0x08400000 - SPI_FLASH_BASE)

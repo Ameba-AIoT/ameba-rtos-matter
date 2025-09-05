@@ -42,7 +42,7 @@
 int strstr(const char *s1, const char *s2);
 #define __weak __attribute__((weak))
 #define u32 uint32_t
-#define MATTER_MBEDTLS_SECURE_HEAP_SIZE		U(4 * 1024)
+#define MATTER_MBEDTLS_SECURE_HEAP_SIZE		U(8 * 1024)
 
 #endif
 
