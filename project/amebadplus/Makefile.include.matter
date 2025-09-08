@@ -26,6 +26,7 @@ IFLAGS               += -I$(BASEDIR)/component/ssl/mbedtls_ram_map/rom
 endif
 
 IFLAGS               += -I$(MATTER_DIR)/api
+IFLAGS               += -I$(MATTER_DIR)/common/atcmd
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/api
 IFLAGS               += -I$(MATTER_DIR)/common/lwip/include
 IFLAGS               += -I$(MATTER_DIR)/common/port
@@ -129,38 +130,41 @@ GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_MDNS_FILTER=1
 # other options
 GLOBAL_CFLAGS += -DCHIP_HAVE_CONFIG_H
 
+# Additional FreeRTOS task API for Matter
+GLOBAL_CFLAGS += -DconfigINCLUDE_FREERTOS_TASK_C_ADDITIONS_H=1
+
 # example options
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER=1
-ifneq ($(EXAMPLE),)
-GLOBAL_CFLAGS += -DCONFIG_PLATFORM_AMEBADPLUS=1
-ifeq ($(EXAMPLE), chiptest)
+ifneq ($(MATTER_EXAMPLE),)
+GLOBAL_CFLAGS += -DCONFIG_AMEBADPLUS=1
+ifeq ($(MATTER_EXAMPLE), chiptest)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_CHIPTEST=1
 endif
-ifeq ($(EXAMPLE), aircon)
+ifeq ($(MATTER_EXAMPLE), aircon)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_AIRCON=1
 endif
-ifeq ($(EXAMPLE), bridge)
+ifeq ($(MATTER_EXAMPLE), bridge)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_BRIDGE=1
 endif
-ifeq ($(EXAMPLE), dishwasher)
+ifeq ($(MATTER_EXAMPLE), dishwasher)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_DISHWASHER=1
 endif
-ifeq ($(EXAMPLE), fan)
+ifeq ($(MATTER_EXAMPLE), fan)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_FAN=1
 endif
-ifeq ($(EXAMPLE), light)
+ifeq ($(MATTER_EXAMPLE), light)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_LIGHT=1
 endif
-ifeq ($(EXAMPLE), laundrywasher)
+ifeq ($(MATTER_EXAMPLE), laundrywasher)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER=1
 endif
-ifeq ($(EXAMPLE), microwaveoven)
+ifeq ($(MATTER_EXAMPLE), microwaveoven)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN=1
 endif
-ifeq ($(EXAMPLE), refrigerator)
+ifeq ($(MATTER_EXAMPLE), refrigerator)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_REFRIGERATOR=1
 endif
-ifeq ($(EXAMPLE), thermostat)
+ifeq ($(MATTER_EXAMPLE), thermostat)
 GLOBAL_CFLAGS += -DCONFIG_EXAMPLE_MATTER_THERMOSTAT=1
 endif
 endif

@@ -1,16 +1,21 @@
-/********************************************************************************
- * @file    matter_wifi.h
- * @author
- * @version
- * @brief   WiFi API to support Matter protocol.
- ********************************************************************************
- * @attention
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- * This module is a confidential and proprietary property of RealTek and
- * possession or use of this module requires written permission of RealTek.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
- * Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
-********************************************************************************/
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #ifndef _RTK_MATTER_WIFIS_H_
 #define _RTK_MATTER_WIFIS_H_
@@ -20,18 +25,12 @@ extern "C" {
 #endif
 
 #include <wifi_conf.h>
+#include <wifi_ind.h>
 #include <lwip_netconf.h>
 #include "rtw_wifi_constants.h"
 
 /******************************************************
- *               Other Variables
- ******************************************************/
-extern u32 apNum;
-extern uint32_t rtw_join_status;
-extern rtw_mode_t wifi_mode;
-
-/******************************************************
- *               WiFi Mode
+ *               WiFi Modes
  ******************************************************/
 #define RTW_MODE_STA_AP RTW_MODE_STA
 
@@ -53,7 +52,7 @@ extern rtw_mode_t wifi_mode;
 #define IW_ENCODE_ALG_AES_CMAC         5
 
 /******************************************************
- *         Wifi Network Mode (BGN)
+ *         WiFi Network Mode (BGN)
  ******************************************************/
 typedef int rtw_network_mode_t;
 
@@ -71,15 +70,7 @@ typedef struct rtw_wifi_config {
 } rtw_wifi_config_t;
 
 /******************************************************
- *               WiFi Interface
- ******************************************************/
-
-typedef u8 rtw_interface_t;
-#define RTW_STA_INTERFACE WLAN0_IDX
-#define RTW_AP_INTERFACE WLAN1_IDX
-
-/******************************************************
- *               Wifi Connect Error
+ *               WiFi Connect Error
  ******************************************************/
 
 enum rtw_connect_error_flag_t {
@@ -92,18 +83,40 @@ enum rtw_connect_error_flag_t {
     RTW_UNKNOWN,                /**< unknown*/
 };
 
-/******************************************************
- *               Matter WiFi Event
- ******************************************************/
 typedef enum {
-    MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE = WIFI_EVENT_MATTER_STA_CONN,
-    MATTER_WIFI_EVENT_CONNECT                = WIFI_EVENT_MATTER_STA_CONN,
+    MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE = 0,
+    MATTER_WIFI_EVENT_CONNECT                = 0,
     // both MATTER_WIFI_EVENT_FOURWAY_HANDSHAKE_DONE and MATTER_WIFI_EVENT_CONNECT
     // are registered to the same handler, so it does not need to report the event twice
     // both matter_wifi_event are declared because both are used in the connectedhomeip SDK
-    MATTER_WIFI_EVENT_DISCONNECT             = WIFI_EVENT_MATTER_STA_DISCONN,
-    MATTER_WIFI_EVENT_DHCP6_DONE             = WIFI_EVENT_DHCP6_DONE,
+    MATTER_WIFI_EVENT_DISCONNECT,
+    MATTER_WIFI_EVENT_DHCP6_DONE,
+    MATTER_WIFI_EVENT_MAX,
 } matter_wifi_event;
+
+/******************************************************
+ *               WiFi Interface
+ ******************************************************/
+
+typedef u8 rtw_interface_t;
+#define RTW_STA_INTERFACE WLAN0_IDX
+#define RTW_AP_INTERFACE WLAN1_IDX
+
+/******************************************************
+ *               Other Variables
+ ******************************************************/
+extern u32 apNum;
+extern uint32_t rtw_join_status;
+extern rtw_mode_t wifi_mode;
+
+/******************************************************
+ * Undefine WiFi Macro to avoid conflict when compiling Matter Project
+ ******************************************************/
+#if defined(CHIP_PROJECT) && CHIP_PROJECT
+#ifdef GetPriority
+#undef GetPriority
+#endif
+#endif // CHIP_PROJECT
 
 /******************************************************
  *               Matter WiFi Functions
@@ -299,17 +312,31 @@ int matter_wifi_get_wifi_channel_number(uint8_t wlan_idx, uint8_t *ch);
 int matter_get_sta_wifi_info(rtw_wifi_setting_t *pSetting);
 
 /**
- * @brief  Register an event handler for a specific WiFi event.
- * @param[in]  event_cmds: The specific WiFi event to register the handler for.
+ * @brief  Register a Matter WiFi event handler for a specific Matter WiFi event.
+ * @param[in]  event_cmds: The specific Matter WiFi event to register the handler for.
  * @param[in]  handler_func: The function to be called when the event occurs.
  * @param[in]  handler_user_data: User data to be passed to the handler function (optional).
  */
 void matter_wifi_reg_event_handler(matter_wifi_event event_cmds, rtw_event_handler_t handler_func, void *handler_user_data);
 
 /**
- * @brief  Initialize matter wifis module
+ * @brief  Indicate a Matter WiFi event to trigger the corresponding handler.
+ * @param[in]  event_cmd: The specific WiFi event to be triggered.
+ * @param[in]  buf: Buffer to be passed to the handler function (optional).
+ * @param[in]  buf_len: Lengrh of buffer to be passed to the handler function (optional).
+ * @param[in]  flags: WiFi flags to be passed to the handler function (optional).
+ */
+int matter_wifi_indication(u32 event_cmd, u8 *buf, s32 buf_len, s32 flags);
+
+/**
+ * @brief  Initialize matter WiFis module
  */
 void matter_wifi_init(void);
+
+/**
+ * @brief  Wait until WiFi module are ready
+ */
+void matter_wifi_wait(void);
 
 #ifdef __cplusplus
 }

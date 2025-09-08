@@ -31,7 +31,7 @@
 #include <hal_crypto.h>
 #include "device_lock.h"
 
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE))
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE))
 #if defined(__ICCARM__)
 extern void (__cmse_nonsecure_call *ns_device_mutex_lock)(uint32_t);
 extern void (__cmse_nonsecure_call *ns_device_mutex_unlock)(uint32_t);
@@ -3973,7 +3973,7 @@ void mbedtls_ssl_init( mbedtls_ssl_context *ssl )
 /*
  * Setup an SSL context
  */
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE))
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE))
 #if defined(__ICCARM__)
 extern void* (__cmse_nonsecure_call *ns_calloc)(size_t, size_t);
 extern void (__cmse_nonsecure_call *ns_free)(void *);
@@ -4005,7 +4005,7 @@ int mbedtls_ssl_setup( mbedtls_ssl_context *ssl,
     ssl->in_buf_len = in_buf_len;
 #endif
     ssl->in_buf = mbedtls_calloc( 1, in_buf_len );
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE))
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE))
     if( ( ssl-> in_buf = ns_calloc( 1, len ) ) == NULL)
 #else
     if( ssl->in_buf == NULL )
@@ -4039,7 +4039,7 @@ int mbedtls_ssl_setup( mbedtls_ssl_context *ssl,
     return( 0 );
 
 error:
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE))
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE))
     ns_free( ssl->in_buf );
 #else
     mbedtls_free( ssl->in_buf );
@@ -6931,7 +6931,7 @@ void mbedtls_ssl_free( mbedtls_ssl_context *ssl )
 #endif
 
         mbedtls_platform_zeroize( ssl->out_buf, out_buf_len );
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE))
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE))
         ns_free( ssl->out_buf );
 #else
         mbedtls_free( ssl->out_buf );
@@ -6948,7 +6948,7 @@ void mbedtls_ssl_free( mbedtls_ssl_context *ssl )
 #endif
 
         mbedtls_platform_zeroize( ssl->in_buf, in_buf_len );
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_PLATFORM_AMEBADPLUS) || defined(CONFIG_PLATFORM_AMEBALITE))
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && (defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE))
         ns_free( ssl->in_buf  );
 #else
         mbedtls_free( ssl->in_buf );
