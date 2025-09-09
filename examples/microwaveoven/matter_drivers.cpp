@@ -1,26 +1,12 @@
-/*
- *    This module is a confidential and proprietary property of RealTek and
- *    possession or use of this module requires written permission of RealTek.
- *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <microwaveoven_driver.h>
-#include <microwave_oven/ameba_microwave_oven_device.h>
+#include <microwave_oven_control/ameba_microwave_oven_control_delegate.h>
+#include <microwave_oven_control/ameba_microwave_oven_control_instance.h>
+#include <microwave_oven_mode/ameba_microwave_oven_mode_delegate.h>
+#include <microwave_oven_mode/ameba_microwave_oven_mode_instance.h>
+#include <operational_state/ameba_operational_state_delegate.h>
+#include <operational_state/ameba_operational_state_instance.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -63,12 +49,12 @@ CHIP_ERROR matter_driver_microwave_oven_set_startup_value(void)
     Status status;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    MatterMicrowaveOvenServerInit();
     MicrowaveOven.setOpState((uint8_t) Clusters::OperationalState::OperationalStateEnum::kStopped);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL) {
+    if (err == CHIP_ERROR_INTERNAL)
+    {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
 
@@ -92,23 +78,24 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId) {
-    case Clusters::OperationalState::Id: {
-        ChipLogProgress(DeviceLayer, "OvenOperationalState(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
-                        path.mAttributeId);
-        MicrowaveOven.setOpState(aEvent->value._u8);
-    }
-    break;
-    case Clusters::MicrowaveOvenMode::Id: {
-        ChipLogProgress(DeviceLayer, "MicrowaveOvenMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
-                        path.mAttributeId);
-    }
-    break;
-    case Clusters::MicrowaveOvenControl::Id: {
-        ChipLogProgress(DeviceLayer, "MicrowaveOvenControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
-                        path.mAttributeId);
-    }
-    break;
+    switch (path.mClusterId)
+    {
+    case Clusters::OperationalState::Id:
+        {
+            ChipLogProgress(DeviceLayer, "OvenOperationalState(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+            MicrowaveOven.setOpState(aEvent->value._u8);
+        }
+        break;
+    case Clusters::MicrowaveOvenMode::Id:
+        {
+            ChipLogProgress(DeviceLayer, "MicrowaveOvenMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        }
+        break;
+    case Clusters::MicrowaveOvenControl::Id:
+        {
+            ChipLogProgress(DeviceLayer, "MicrowaveOvenControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        }
+        break;
     default:
         break;
     }
@@ -121,16 +108,19 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type) {
-    case AppEvent::kEventType_Downlink_Opstate_State: {
-        ChipLogProgress(DeviceLayer, "Set Oven Operational State 0x%x", event->value._u8);
-        CHIP_ERROR err;
-        err = GetMatterMicrowaveOvenServer()->GetOperationalStateInstance()->SetOperationalState(event->value._u8);
-        if (err != CHIP_NO_ERROR) {
-            ChipLogError(DeviceLayer, "ManualMicrowaveOvenOperationalStateSetStateCommandHandler Failed!\r\n");
+    switch (event->Type)
+    {
+    case AppEvent::kEventType_Downlink_Opstate_State:
+        {
+            ChipLogProgress(DeviceLayer, "Set Oven Operational State 0x%x", event->value._u8);
+            CHIP_ERROR err;
+            err = OperationalState::GetAmebaOperationalStateInstance()->SetOperationalState(event->value._u8);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "ManualMicrowaveOvenOperationalStateSetStateCommandHandler Failed!\r\n");
+            }
         }
-    }
-    break;
+        break;
     default:
         break;
     }

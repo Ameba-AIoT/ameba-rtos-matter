@@ -51,7 +51,7 @@ WhmManufacturer * GetWhmManufacturer()
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-CHIP_ERROR WhmInit(chip::EndpointId endpointId)
+CHIP_ERROR WhmInit(EndpointId endpointId)
 {
     CHIP_ERROR err;
 
@@ -70,7 +70,7 @@ CHIP_ERROR WhmInit(chip::EndpointId endpointId)
 
     /* Manufacturer may optionally not support all features, commands & attributes */
     gWhmInstance = std::make_unique<WaterHeaterManagementInstance>(
-        EndpointId(endpointId), *gWhmDelegate, BitMask<Feature>(0x0));
+        EndpointId(endpointId), *gWhmDelegate, BitMask<Feature>(0));
     if (!gWhmInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for WaterHeaterManagementInstance");
@@ -165,7 +165,7 @@ CHIP_ERROR WhmManufacturerShutdown()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WhmApplicationInit(chip::EndpointId endpointId)
+CHIP_ERROR WhmApplicationInit(EndpointId endpointId)
 {
     ReturnErrorOnFailure(WhmInit(endpointId));
 

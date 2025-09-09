@@ -15,7 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <device_energy_management/ameba_energy_management_common_main.h>
 #include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
 #include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
 #include <device_energy_management/ameba_device_energy_management_test_event_trigger.h>
@@ -37,7 +37,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::ElectricalPowerMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
@@ -144,7 +143,7 @@ void FakeReadings::FakeReadingsUpdate()
     int64_t current = (static_cast<int64_t>(rand()) % (2 * mCurrentRandomness_mA)) - mCurrentRandomness_mA;
     current += mCurrent_mA; // add in the base current
 
-    GetEvseManufacturer()->SendPowerReading(mEndpointId, power, voltage, current);
+    GetDEMDelegate()->GetDEMManufacturerDelegate()->SendPowerReading(mEndpointId, power, voltage, current);
 
     // update the energy meter - we'll assume that the power has been constant during the previous interval
     if (mPower_mW > 0)
@@ -162,9 +161,11 @@ void FakeReadings::FakeReadingsUpdate()
         mTotalEnergyExported += mPeriodicEnergyExported;
     }
 
-    GetEvseManufacturer()->SendPeriodicEnergyReading(mEndpointId, mPeriodicEnergyImported, mPeriodicEnergyExported);
+    GetDEMDelegate()->GetDEMManufacturerDelegate()->SendPeriodicEnergyReading(mEndpointId, mPeriodicEnergyImported,
+                                                                              mPeriodicEnergyExported);
 
-    GetEvseManufacturer()->SendCumulativeEnergyReading(mEndpointId, mTotalEnergyImported, mTotalEnergyExported);
+    GetDEMDelegate()->GetDEMManufacturerDelegate()->SendCumulativeEnergyReading(mEndpointId, mTotalEnergyImported,
+                                                                                mTotalEnergyExported);
 
     // start/restart the timer
     DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(mInterval_s), FakeReadingsTimerExpiry, this);

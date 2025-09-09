@@ -1,0 +1,37 @@
+menu "Matter Config"
+    config MATTER_EN
+        bool "Enable Matter"
+        default n
+    if MATTER_EN
+        config MBEDTLS_V_3_6_2_ENABLE
+            bool
+            default y
+        config BLE_MATTER_ADAPTER
+            bool "BLE Matter Adapter"
+            default n
+            depends on BT_MENU
+        config MATTER_ENABLE_IPV4
+            bool "Enable Matter IPv4"
+            default n
+        config MATTER_TC_EN
+            bool "Enable Matter Terms and Condition"
+            default n
+        config MATTER_SECURE_EN
+            bool "Enable Matter Secure"
+            default n
+            depends on ((AMEBADPLUS || AMEBALITE) && TRUSTZONE_FOR_KM4) || (AMEBASMART)
+        config MATTER_SECURE
+            bool
+            default y
+            depends on MATTER_SECURE_EN
+        config TZ_S_SIZE
+            int
+            default 136 if AMEBADPLUS
+            default 120 if AMEBALITE
+            depends on MATTER_SECURE_EN
+        config SECURE_HEAP_SIZE
+            int
+            default 14336
+            depends on MATTER_SECURE_EN
+    endif
+endmenu

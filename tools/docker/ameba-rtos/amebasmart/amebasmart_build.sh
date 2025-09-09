@@ -26,44 +26,38 @@ if [ ! -d "$amebadir" ]; then
 fi
 
 cd ${chipdir}
-source ${chipdir}/scripts/bootstrap.sh
 source ${chipdir}/scripts/activate.sh
 
 cd ${amebadir}
 
 chmod u+x matter_setup.sh
-.//matter_setup.sh ameba-rtos v1.4 || handle_error "Failed to run matter_setup.sh for ameba-rtos"
+.//matter_setup.sh ameba-rtos v1.5 || handle_error "Failed to run matter_setup.sh for ameba-rtos"
 
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/inc/lp/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/project_lp/inc/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/inc/hp/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/project_hp/inc/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/inc/ap/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/project_ap/inc/
+mkdir ${amebadir}/amebasmart_gcc_project/menuconfig/
+mkdir ${amebadir}/amebasmart_gcc_project/menuconfig/project_lp/
+mkdir ${amebadir}/amebasmart_gcc_project/menuconfig/project_hp/
+mkdir ${amebadir}/amebasmart_gcc_project/menuconfig/project_ap/
 
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/menuconfig/.config    ${amebadir}/amebasmart_gcc_project/menuconfig/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/menuconfig/.config_lp ${amebadir}/amebasmart_gcc_project/menuconfig/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/menuconfig/.config_hp ${amebadir}/amebasmart_gcc_project/menuconfig/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/menuconfig/.config_ap ${amebadir}/amebasmart_gcc_project/menuconfig/
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/inc/lp/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/menuconfig/project_lp/
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/inc/hp/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/menuconfig/project_hp/
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/inc/ap/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/menuconfig/project_ap/
 
-echo "Clean SDK"
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/menuconfig/.config      ${amebadir}/amebasmart_gcc_project/menuconfig/
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/menuconfig/.config_km0  ${amebadir}/amebasmart_gcc_project/menuconfig/
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/menuconfig/.config_km4  ${amebadir}/amebasmart_gcc_project/menuconfig/
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebasmart/menuconfig/.config_ca32 ${amebadir}/amebasmart_gcc_project/menuconfig/
+
+echo "Build firmware"
 cd ${amebadir}/amebasmart_gcc_project/
-make clean || handle_error "Failed to clean SDK"
 
-echo "Build project_ap"
-cd ${amebadir}/amebasmart_gcc_project/project_ap/
+echo "Building all_clusters examples"
+python build.py -D MATTER_EXAMPLE=all_clusters || handle_error "Failed to build all_clusters"
 
-echo "Building all_clusters"
-make -C asdk all_clusters || handle_error "Failed to build all_clusters"
+echo "Build all_clusters examples completed"
+cd build/ && ninja clean_matter_libs clean && cd ../ && rm -rf build/ || handle_error "Failed to clean"
 
-echo "Building firmware image"
-make MATTER_EXAMPLE=chiptest || handle_error "Failed to build project_ap firmware image"
+echo "Building light_port example"
+python build.py -D MATTER_EXAMPLE=light_port || handle_error "Failed to build light_port"
 
-echo "Build all-clusters-app completed"
-make clean || handle_error "Failed to clean"
-
-echo "Building lighting"
-make -C asdk light_port || handle_error "Failed to build light_port"
-
-echo "Building firmware image"
-make MATTER_EXAMPLE=light || handle_error "Failed to build project_ap firmware image"
-
-echo "Build light_port completed"
-make clean || handle_error "Failed to clean"
+echo "Build light_port example completed"
+cd build/ && ninja clean_matter_libs clean && cd ../ && rm -rf build/ || handle_error "Failed to clean"

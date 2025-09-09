@@ -1,22 +1,4 @@
-/*
- *    This module is a confidential and proprietary property of RealTek and
- *    possession or use of this module requires written permission of RealTek.
- *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
+#include <matter_data_model.h>
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <led_driver.h>
@@ -46,9 +28,9 @@ using chip::Protocols::InteractionModel::Status;
 MatterLED led;
 gpio_irq_t gpio_btn;
 
-// Set identify cluster and its callback on ep1
+// Set identify cluster and its callback on FIRST_DYNAMIC_ENDPOINT_ID
 static Identify gIdentify1 = {
-    chip::EndpointId{ 1 }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
+    chip::EndpointId{ FIRST_DYNAMIC_ENDPOINT_ID }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
 };
 
 void matter_driver_button_callback(uint32_t id, gpio_irq_event event)
@@ -86,10 +68,10 @@ CHIP_ERROR matter_driver_led_set_startup_value(void)
     Status getcurrentlevelstatus;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    getonoffstatus = Clusters::OnOff::Attributes::OnOff::Get(1, &LEDOnOffValue);
+    getonoffstatus = Clusters::OnOff::Attributes::OnOff::Get(FIRST_DYNAMIC_ENDPOINT_ID, &LEDOnOffValue);
     VerifyOrExit(getonoffstatus == Status::Success, err = CHIP_ERROR_INTERNAL);
 
-    getcurrentlevelstatus = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, LEDCurrentLevelValue);
+    getcurrentlevelstatus = Clusters::LevelControl::Attributes::CurrentLevel::Get(FIRST_DYNAMIC_ENDPOINT_ID, LEDCurrentLevelValue);
     VerifyOrExit(getcurrentlevelstatus == Status::Success, err = CHIP_ERROR_INTERNAL);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -100,7 +82,8 @@ CHIP_ERROR matter_driver_led_set_startup_value(void)
     led.SetBrightness(LEDCurrentLevelValue.Value());
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL) {
+    if (err == CHIP_ERROR_INTERNAL)
+    {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     return err;
@@ -118,7 +101,8 @@ void matter_driver_on_identify_stop(Identify *identify)
 
 void matter_driver_on_trigger_effect(Identify *identify)
 {
-    switch (identify->mCurrentEffectIdentifier) {
+    switch (identify->mCurrentEffectIdentifier)
+    {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
@@ -141,18 +125,21 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
 {
     chip::app::ConcreteAttributePath path = aEvent->path;
 
-    // this example only considers endpoint1
-    VerifyOrExit(aEvent->path.mEndpointId == 1,
-                 ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
+    if (aEvent->path.mEndpointId == 0) {
+        return;
+    }
 
-    switch (path.mClusterId) {
+    switch (path.mClusterId)
+    {
     case Clusters::OnOff::Id:
-        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id) {
+        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id)
+        {
             led.Set(aEvent->value._u8);
         }
         break;
     case Clusters::LevelControl::Id:
-        if (path.mAttributeId == Clusters::LevelControl::Attributes::CurrentLevel::Id) {
+        if (path.mAttributeId == Clusters::LevelControl::Attributes::CurrentLevel::Id)
+        {
             led.SetBrightness(aEvent->value._u8);
         }
         break;
@@ -168,24 +155,28 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type) {
-    case AppEvent::kEventType_Downlink_OnOff: {
-        led.Toggle();
-        ChipLogProgress(DeviceLayer, "Writing to OnOff cluster");
-        Status status = Clusters::OnOff::Attributes::OnOff::Set(1, led.IsTurnedOn());
+    switch (event->Type)
+    {
+    case AppEvent::kEventType_Downlink_OnOff:
+        {
+            led.Toggle();
+            ChipLogProgress(DeviceLayer, "Writing to OnOff cluster");
+            Status status = Clusters::OnOff::Attributes::OnOff::Set(FIRST_DYNAMIC_ENDPOINT_ID, led.IsTurnedOn());
 
-        if (status != Status::Success) {
-            ChipLogError(DeviceLayer, "Updating on/off cluster failed: %x", status);
+            if (status != Status::Success)
+            {
+                ChipLogError(DeviceLayer, "Updating on/off cluster failed: %x", status);
+            }
+
+            ChipLogProgress(DeviceLayer, "Writing to LevelControl cluster");
+            status = Clusters::LevelControl::Attributes::CurrentLevel::Set(FIRST_DYNAMIC_ENDPOINT_ID, led.GetLevel());
+
+            if (status != Status::Success)
+            {
+                ChipLogError(DeviceLayer, "Updating level cluster failed: %x", status);
+            }
         }
-
-        ChipLogProgress(DeviceLayer, "Writing to LevelControl cluster");
-        status = Clusters::LevelControl::Attributes::CurrentLevel::Set(1, led.GetLevel());
-
-        if (status != Status::Success) {
-            ChipLogError(DeviceLayer, "Updating level cluster failed: %x", status);
-        }
-    }
-    break;
+        break;
     }
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();

@@ -25,9 +25,7 @@ extern "C" {
 #endif
 
 #include <wifi_conf.h>
-#include <wifi_ind.h>
 #include <lwip_netconf.h>
-#include "rtw_wifi_constants.h"
 
 /******************************************************
  *               WiFi Modes
@@ -38,6 +36,14 @@ extern "C" {
  *               WiFi Security
  ******************************************************/
 #define RTW_SECURITY_WPA_WPA2_MIXED    RTW_SECURITY_WPA_WPA2_MIXED_PSK
+
+#define MATTER_WIFI_VERSION_11B       0x01
+#define MATTER_WIFI_VERSION_11G       0x02
+#define MATTER_WIFI_VERSION_11A       0x04
+#define MATTER_WIFI_VERSION_11N       0x18  // 0x8: 2.4G, 0x10: 5Gs
+#define MATTER_WIFI_VERSION_11AC      0x40
+#define MATTER_WIFI_VERSION_11AX      0x80
+#define MATTER_WIFI_VERSION_11AH      0x100
 
 /******************************************************
  *               WiFi Connection Status
@@ -95,12 +101,106 @@ typedef enum {
 } matter_wifi_event;
 
 /******************************************************
+ *         WiFi Modes
+ ******************************************************/
+typedef uint8_t rtw_mode_t;
+
+/******************************************************
+ *         WiFi Interface
+ ******************************************************/
+#define WLAN0_IDX   STA_WLAN_INDEX
+#define WLAN1_IDX   SOFTAP_WLAN_INDEX
+
+/******************************************************
+ *         WiFi Result
+ ******************************************************/
+typedef int rtw_result_t;
+
+/******************************************************
+ *         WiFi Scan Result
+ ******************************************************/
+#pragma pack(1) /*scan related structs are 1 byte alignment for some issues long long ago*/
+struct matter_scan_result {
+    struct rtw_ssid    SSID;             /**< SSID of the AP. */
+    struct rtw_mac     BSSID;            /**< BSSID (MAC address) of the AP. */
+    s16                signal_strength;  /**< Receive Signal Strength Indication (RSSI) in dBm: <-90 Very poor, >-30 Excellent. */
+    u8                 bss_type;         /**< BSS type. Common value: @ref RTW_BSS_TYPE_INFRASTRUCTURE.*/
+    u32                security;         /**< Security type of the AP: @ref RTW_SECURITY_OPEN, @ref RTW_SECURITY_WEP_PSK, etc. */
+    u8                 wps_type;         /**< WPS types supported by the AP: @ref RTW_WPS_TYPE_DEFAULT, @ref RTW_WPS_TYPE_USER_SPECIFIED, etc. */
+    u32                channel;          /**< Radio channel where the AP beacon was detected.*/
+    u8                 band;             /**< Frequency band used by the AP: @ref RTW_BAND_ON_5G, @ref RTW_BAND_ON_24G. */
+
+    /** The wireless spectrum management regulations followed by the AP. Coded according to ISO 3166 standard. \n
+     *  Reference: ameba_wifi_country_code_table_usrcfg.c for specific values. \n
+     *  Example: For China, country_code[0] = 'C', country_code[1] = 'N'. */
+    u8                 country_code[2];
+    u8                 wireless_mode;    /**< Wireless mode: @ref RTW_80211_B, @ref RTW_80211_A, etc.*/
+    u8                 rom_rsvd[3];
+};
+typedef struct matter_scan_result rtw_scan_result_t;
+#pragma pack()
+
+/******************************************************
+ *         WiFi Security
+ ******************************************************/
+typedef uint32_t rtw_security_t;
+
+/******************************************************
+ *         WiFi Settings
+ ******************************************************/
+typedef struct rtw_wifi_setting rtw_wifi_setting_t;
+
+/******************************************************
+ *         WiFi Event Handler
+ ******************************************************/
+typedef void (*rtw_event_handler_t)(char *buf, int buf_len, int flags, void *handler_user_data);
+
+/******************************************************
+ *         WiFi Mac Address
+ ******************************************************/
+typedef struct rtw_mac rtw_mac_t;
+
+/******************************************************
+ *         WiFi Network Info
+ ******************************************************/
+typedef struct rtw_network_info rtw_network_info_t;
+
+/******************************************************
+ *         WiFi Scan Parameter
+ ******************************************************/
+typedef struct rtw_scan_param rtw_scan_param_t;
+
+/******************************************************
+ *         WiFi Auto Reconnect
+ ******************************************************/
+#define wifi_config_autoreconnect wifi_set_autoreconnect
+
+/******************************************************
+ *         WiFi is connected to AP
+ ******************************************************/
+#define wifi_is_connected_to_ap matter_wifi_is_connected_to_ap
+
+/******************************************************
  *               WiFi Interface
  ******************************************************/
 
 typedef u8 rtw_interface_t;
 #define RTW_STA_INTERFACE WLAN0_IDX
 #define RTW_AP_INTERFACE WLAN1_IDX
+
+/******************************************************
+ *               WiFi Structure
+ ******************************************************/
+#if defined(CONFIG_AUTO_RECONNECT) && CONFIG_AUTO_RECONNECT
+struct matter_wifi_autoreconnect_param {
+    rtw_security_t security_type;
+    char *ssid;
+    int ssid_len;
+    char *password;
+    int password_len;
+    int key_id;
+};
+#endif /* CONFIG_AUTO_RECONNECT */
 
 /******************************************************
  *               Other Variables
@@ -133,14 +233,14 @@ void chip_connmgr_set_callback_func(chip_connmgr_callback p, void *data);
 /**
  * @brief  Initialize a WiFi scan to search for all 802.11 networks.
  */
-void matter_scan_networks(void);
+void matter_wifi_scan_networks(void);
 
 /**
  * @brief  Initialize a WiFi scan to search for specific 802.11 networks using SSID.
  * @param[in]  ssid:   The targeted SSID to scan.
  * @param[in]  length: The length of the SSID.
  */
-void matter_scan_networks_with_ssid(const unsigned char *ssid, size_t length);
+void matter_wifi_scan_networks_with_ssid(const unsigned char *ssid, size_t length);
 
 /**
  * @brief  The results of WiFi scan.
@@ -152,7 +252,7 @@ rtw_scan_result_t *matter_get_scan_results(void);
  * @brief  Handle WiFi auto-reconnect.
  * @param[in]  param  Dummy parameter.
  */
-void matter_reconn_task_hdl(void *param);
+void matter_wifi_reconn_task_hdl(void *param);
 
 /**
  * @brief  Set the auto-reconnect mode for WiFi.
@@ -161,7 +261,7 @@ void matter_reconn_task_hdl(void *param);
                     1: Set finite times for autoreconnect.
                     2: Set infinite times for autoreconnect.
  */
-void matter_set_autoreconnect(uint8_t mode);
+void matter_wifi_set_autoreconnect(uint8_t mode);
 
 /**
  * @brief  Connect to a WiFi network.
@@ -235,13 +335,6 @@ int matter_wifi_is_up(rtw_interface_t interface);
 int matter_wifi_is_station_mode(void);
 
 /**
- * @brief  Get the BSSID of the connected access point.
- * @param[out]  bssid: Pointer to store the BSSID.
- * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
- */
-int matter_wifi_get_ap_bssid(unsigned char *bssid);
-
-/**
  * @brief  Get the last WiFi error.
  * @return The last WiFi error code.
  *         - RTW_NO_ERROR
@@ -269,22 +362,7 @@ int matter_wifi_get_mac_address(char *mac);
  * @param[out]  pmode: Pointer to store the network mode.
  * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
  */
-int matter_wifi_get_network_mode(rtw_network_mode_t *pmode);
-
-/**
- * @brief  Get the RSSI (signal strength) of the connected access point.
- * @param[out]  prssi: Pointer to store the RSSI value.
- * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
- */
-int matter_wifi_get_rssi(int *prssi);
-
-/**
- * @brief  Get the security type of the specified WLAN index.
- * @param[in]  wlan_idx: The WLAN index.
- * @param[out] wifi_security: Pointer to store the wifi security algorithm.
- * @return  Non-zero on success, zero on failure.
- */
-int matter_wifi_get_security_type(uint8_t wlan_idx, uint32_t *wifi_security);
+int matter_wifi_sta_get_network_mode(rtw_network_mode_t *pmode);
 
 /**
  * @brief  Get the current WiFi settings of the specified WLAN index.
@@ -293,14 +371,6 @@ int matter_wifi_get_security_type(uint8_t wlan_idx, uint32_t *wifi_security);
  * @return  Non-zero on success, zero on failure.
  */
 int matter_wifi_get_setting(unsigned char wlan_idx, rtw_wifi_setting_t *psetting);
-
-/**
- * @brief  Get the WiFi channel number of the specified WLAN index.
- * @param[in]  wlan_idx: The WLAN index.
- * @param[out]  ch: Pointer to store the channel number.
- * @return  Non-zero on success, zero on failure.
- */
-int matter_wifi_get_wifi_channel_number(uint8_t wlan_idx, uint8_t *ch);
 
 /**
  * @brief  Get the STA (station) WiFi information.
@@ -335,6 +405,45 @@ void matter_wifi_init(void);
  * @brief  Wait until WiFi module are ready
  */
 void matter_wifi_wait(void);
+
+/******************************************************
+ * Matter Feature: Wi-Fi Network Diagnostics
+ ******************************************************/
+
+/**
+ * @brief  Get the BSSID of the connected access point.
+ * @param[out]  bssid: Pointer to store the BSSID.
+ * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
+ */
+int matter_wifi_sta_get_ap_bssid(unsigned char *bssid);
+
+/**
+ * @brief  Get the security type of the specified WLAN index.
+ * @param[out] wifi_security: Pointer to store the wifi security algorithm.
+ * @return  Non-zero on success, zero on failure.
+ */
+int matter_wifi_sta_get_security_type(uint32_t *wifi_security);
+
+/**
+ * @brief  Get the WiFi channel number of the specified WLAN index.
+ * @param[out]  ch: Pointer to store the channel number.
+ * @return  Non-zero on success, zero on failure.
+ */
+int matter_wifi_sta_get_channel_number(uint8_t *ch);
+
+/**
+ * @brief  Get the RSSI (signal strength) of the connected access point.
+ * @param[out]  prssi: Pointer to store the RSSI value.
+ * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
+ */
+int matter_wifi_sta_get_rssi(int *prssi);
+
+/**
+ * @brief  Get the WiFi Version of the connected access point.
+ * @param[out]  mode: Pointer to store the WiFi Version value.
+ * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
+ */
+int matter_wifi_sta_get_wifi_version(uint8_t *mode);
 
 #ifdef __cplusplus
 }

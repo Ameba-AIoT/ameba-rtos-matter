@@ -4,39 +4,16 @@ Integrate the `ameba-rtos-matter` repository using the following steps:
 
 ## Getting `ameba-rtos-matter`
 
-### Method 1: Clone the Repository
-
-Navigate to `application/matter`:
-
-1. Navigate to the directory `application/matter`.
-2. Clone the repository `ameba-rtos-matter` from GitHub:
+1. Navigate to the directory `ameba-rtos`.
+2. Execute matter_setup.sh to setup the SDK
 
 ```bash
-    cd sdk
+    cd ameba-rtos
 
-    git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/application/matter
+    chmod u+x matter_setup.sh
 
-    cd component/application/matter
-
-    git checkout ameba-rtos/release/v1.4
+    ./matter_setup.sh ameba-rtos v1.5
 ```
-
-### Method 2: Add Repository as a Submodule
-
-1. Navigate to the directory `sdk`.
-2. Add `ameba-rtos-matter` as a submodule:
-
-```bash
-    cd sdk
-
-    git submodule add https://github.com/Ameba-AIoT/ameba-rtos-matter.git component/application/matter
-
-    cd component/application/matter
-
-    git checkout ameba-rtos/release/v1.4
-```
-
-Ensure to checkout to the respective branch/tag.
 
 ## Creating the `third_party` Folder for Linking to `connectedhomeip`
 

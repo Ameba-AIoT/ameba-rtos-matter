@@ -16,8 +16,8 @@
 /**
  * @brief  Choose which device should be compiled along the Energy Management example.
  */
-#define CONFIG_EXAMPLE_MATTER_EVSE_DEVICE 0
-#define CONFIG_EXAMPLE_MATTER_WHM_DEVICE  1
+#define CONFIG_EXAMPLE_MATTER_EVSE_DEVICE 1
+#define CONFIG_EXAMPLE_MATTER_WHM_DEVICE  0
 
 /**
  * @brief  Choose which DEM feature support should be enabled, or both can be disabled.

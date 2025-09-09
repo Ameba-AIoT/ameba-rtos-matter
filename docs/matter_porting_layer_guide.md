@@ -32,13 +32,13 @@ This structure and approach simplify the process of building and extending Matte
 
 ### Porting Layer Example Documentations
 
- - [Room Air-Conditioner](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/aircon/README.md) - Room air-conditioner device type implementation
- - [Bridge App](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
- - [Bridge App with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Fan](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/fan/README.md) - Fan device type implementation
- - [Laundry Washer](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/laundrywasher/README.md) - Dishwasher device type implementation
- - [Dimmable Light](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
- - [Dimmable Light with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Microwave Oven](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/microwaveoven/README.md) - Microwave oven device type implementation
- - [Refrigerator](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/refrigerator/README.md) - Refrigerator device type implementation
- - [Thermostat](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/thermostat/README.md) - Thermostat device type implementation
+ - [Room Air-Conditioner](../examples/aircon/README.md) - Room air-conditioner device type implementation
+ - [Bridge App](../examples/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
+ - [Bridge App with Dynamic Endpoint](../examples/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Fan](../examples/fan/README.md) - Fan device type implementation
+ - [Laundry Washer](../examples/laundrywasher/README.md) - Dishwasher device type implementation
+ - [Dimmable Light](../examples/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
+ - [Dimmable Light with Dynamic Endpoint](../examples/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Microwave Oven](../examples/microwaveoven/README.md) - Microwave oven device type implementation
+ - [Refrigerator](../examples/refrigerator/README.md) - Refrigerator device type implementation
+ - [Thermostat](../examples/thermostat/README.md) - Thermostat device type implementation

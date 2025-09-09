@@ -37,7 +37,7 @@ public:
         char address[BRIDGE_DEVICE_ADDRESS_LENGTH];
     };
     void Init(Node &node);
-    void addBridgedEndpoint(EndpointConfig bridgedConfig, Span<const EmberAfDeviceType> bridgedDeviceType);
+    chip::EndpointId addBridgedEndpoint(EndpointConfig bridgedConfig, Span<const EmberAfDeviceType> bridgedDeviceType);
     void removeBridgedEndpoint(chip::EndpointId endpointID);
 
 private:

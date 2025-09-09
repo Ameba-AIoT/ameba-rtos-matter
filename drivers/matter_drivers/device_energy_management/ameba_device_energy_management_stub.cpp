@@ -17,6 +17,7 @@
  */
 
 #include <device_energy_management/ameba_device_energy_management_manager.h>
+#include <device_energy_management/ameba_energy_management_common_main.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -28,7 +29,16 @@ static std::unique_ptr<DeviceEnergyManagementManager> gInstance;
 
 void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    /* emberAfDeviceEnergyManagementClusterInitCallback() is called for all endpoints
+    that include this cluster (even the one we disable dynamically). So here, we only
+    proceed when it's called for the right endpoint determined by GetEnergyDeviceEndpointId()
+    (a cmd line argument on linux or #define on other platforms).
+    */
+    if (endpointId != GetEnergyDeviceEndpointId())
+    {
+        return;
+    }
+
     VerifyOrDie(gInstance == nullptr);
 
     CHIP_ERROR err;
@@ -49,7 +59,7 @@ void emberAfDeviceEnergyManagementClusterInitCallback(chip::EndpointId endpointI
     /* Manufacturer may optionally not support all features, commands & attributes */
     gInstance = std::make_unique<DeviceEnergyManagementManager>(
         endpointId, *gDelegate,
-        BitMask<DeviceEnergyManagement::Feature, uint32_t>(1));
+        BitMask<DeviceEnergyManagement::Feature, uint32_t>(0));
 
     if (!gInstance)
     {

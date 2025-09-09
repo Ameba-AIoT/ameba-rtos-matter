@@ -1,3 +1,4 @@
 app/PluginApplicationCallbacks.h
 app/callback-stub.cpp
-app/cluster-init-callback.cpp
+app/cluster-callbacks.cpp
+app/static-cluster-config/{{server_cluster_name}}.h

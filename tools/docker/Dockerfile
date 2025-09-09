@@ -13,6 +13,8 @@ RUN set -x \
     python3-pip \
     wget \
     bzip2 \
+    cmake \
+    curl \
     libgirepository1.0-dev \
     libcairo2-dev \
     libreadline-dev \
@@ -20,12 +22,17 @@ RUN set -x \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Set python3 as the default python version, and then check the version
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1 \
+    && python --version \
+    && python3 --version
+
 # Link `sh` to `bash`
 RUN ln -sf /bin/bash /bin/sh
 
 # Define build arguments for repositories
 ARG CHIP_REPO=https://github.com/project-chip/connectedhomeip.git
-ARG CHIP_REF=v1.4-branch
+ARG CHIP_REF=v1.5-branch
 ARG AMEBA_DIR=/opt/ameba
 
 # Create the necessary directory, clone the connectedhomeip repo

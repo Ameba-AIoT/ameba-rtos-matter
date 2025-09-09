@@ -2,6 +2,16 @@
 
 This page provides clear instructions for using AT commands on Realtek devices, specifically for factory reset and accessing the Matter shell (client).
 
+To view all available AT Commands for Matter, enter `ATMH`
+
+    Matter AT Commands List
+
+        ATM$ : factory reset. (Usage: ATM$)
+        ATM% : matter ota query image. (Usage: ATM%)
+        ATM^ : matter ota apply update. (Usage: ATM^)
+        ATMH : matter help. (Usage: ATMH)
+        ATMS : matter client console. (Usage: ATMS=switch / ATMS=manual)
+
 ## Factory Reset
 
 To perform a factory reset on the device:
@@ -12,7 +22,7 @@ To perform a factory reset on the device:
 
 To interact with the Matter shell (client) via AT commands, use the following syntax:
 
-    ATMS=switch
+    ATMS switch
 
 ### Examples:
 
@@ -35,7 +45,3 @@ To interact with the Matter shell (client) via AT commands, use the following sy
 #### Read Attribute
 
 `ATMS=switch <cluster> read <attribute>`
-
-
-
-

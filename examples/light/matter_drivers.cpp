@@ -1,22 +1,3 @@
-/*
- *    This module is a confidential and proprietary property of RealTek and
- *    possession or use of this module requires written permission of RealTek.
- *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <led_driver.h>
@@ -99,7 +80,8 @@ CHIP_ERROR matter_driver_led_set_startup_value(void)
     led.SetBrightness(LEDCurrentLevelValue.Value());
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL) {
+    if (err == CHIP_ERROR_INTERNAL)
+    {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     return err;
@@ -117,7 +99,8 @@ void matter_driver_on_identify_stop(Identify *identify)
 
 void matter_driver_on_trigger_effect(Identify *identify)
 {
-    switch (identify->mCurrentEffectIdentifier) {
+    switch (identify->mCurrentEffectIdentifier)
+    {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
@@ -144,14 +127,17 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId) {
+    switch (path.mClusterId)
+    {
     case Clusters::OnOff::Id:
-        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id) {
+        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id)
+        {
             led.Set(aEvent->value._u8);
         }
         break;
     case Clusters::LevelControl::Id:
-        if (path.mAttributeId == Clusters::LevelControl::Attributes::CurrentLevel::Id) {
+        if (path.mAttributeId == Clusters::LevelControl::Attributes::CurrentLevel::Id)
+        {
             led.SetBrightness(aEvent->value._u8);
         }
         break;
@@ -167,24 +153,28 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type) {
-    case AppEvent::kEventType_Downlink_OnOff: {
-        led.Toggle();
-        ChipLogProgress(DeviceLayer, "Writing to OnOff cluster");
-        Status status = Clusters::OnOff::Attributes::OnOff::Set(1, led.IsTurnedOn());
+    switch (event->Type)
+    {
+    case AppEvent::kEventType_Downlink_OnOff:
+        {
+            led.Toggle();
+            ChipLogProgress(DeviceLayer, "Writing to OnOff cluster");
+            Status status = Clusters::OnOff::Attributes::OnOff::Set(1, led.IsTurnedOn());
 
-        if (status != Status::Success) {
-            ChipLogError(DeviceLayer, "Updating on/off cluster failed: %x", status);
+            if (status != Status::Success)
+            {
+                ChipLogError(DeviceLayer, "Updating on/off cluster failed: %x", status);
+            }
+
+            ChipLogProgress(DeviceLayer, "Writing to LevelControl cluster");
+            status = Clusters::LevelControl::Attributes::CurrentLevel::Set(1, led.GetLevel());
+
+            if (status != Status::Success)
+            {
+                ChipLogError(DeviceLayer, "Updating level cluster failed: %x", status);
+            }
         }
-
-        ChipLogProgress(DeviceLayer, "Writing to LevelControl cluster");
-        status = Clusters::LevelControl::Attributes::CurrentLevel::Set(1, led.GetLevel());
-
-        if (status != Status::Success) {
-            ChipLogError(DeviceLayer, "Updating level cluster failed: %x", status);
-        }
-    }
-    break;
+        break;
     }
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();

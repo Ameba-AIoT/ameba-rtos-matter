@@ -20,6 +20,7 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 
+#include <app/util/endpoint-config-api.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -34,12 +35,15 @@
 #include <app/server/Server.h>
 #endif
 #include <energy_evse/ameba_energy_evse_main.h>
-#include <water_heater/ameba_water_heater_main.h>
+#include <device_energy_management/ameba_energy_management_common_main.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::WaterHeaterManagement;
 using chip::Protocols::InteractionModel::Status;
+
+constexpr chip::EndpointId kEvseEndpoint        = 1;
+constexpr chip::EndpointId kWaterHeaterEndpoint = 2;
 
 namespace chip {
 namespace app {
@@ -80,23 +84,28 @@ chip::BitMask<Feature> AmebaGetDEMFeatureMap()
 #error "Please set either one of CONFIG_EXAMPLE_MATTER_EVSE_DEVICE or CONFIG_EXAMPLE_MATTER_WHM_DEVICE to 1!"
 #endif
 
+EndpointId GetEnergyDeviceEndpointId()
+{
+#if (CONFIG_EXAMPLE_MATTER_EVSE_DEVICE)
+    return kEvseEndpoint;
+#elif (CONFIG_EXAMPLE_MATTER_WHM_DEVICE)
+    return kWaterHeaterEndpoint;
+#endif
+}
+
 CHIP_ERROR matter_driver_application_init(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 #if (CONFIG_EXAMPLE_MATTER_EVSE_DEVICE)
-    err = EvseApplicationInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "EvseApplicationInit failed");
-    }
+    EvseApplicationInit();
+    // Disable Water Heater Endpoint
+    emberAfEndpointEnableDisable(kWaterHeaterEndpoint, false);
 #elif (CONFIG_EXAMPLE_MATTER_WHM_DEVICE)
-    err = FullWhmApplicationInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "FullWhmApplicationInit failed");
-    }
+    WaterHeaterApplicationInit();
+    // Disable EVSE Endpoint
+    emberAfEndpointEnableDisable(kEvseEndpoint, false);
 #endif
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 

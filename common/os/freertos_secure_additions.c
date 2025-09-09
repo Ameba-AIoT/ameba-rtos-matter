@@ -32,18 +32,3 @@ void NS_ENTRY vMatterPrintSecureHeapStatus(void)
 	DiagPrintf("xPortGetFreeHeapSize             = %d\n", xPortGetFreeHeapSize());
 }
 /*-----------------------------------------------------------*/
-
-#if defined(CONFIG_AMEBALITE)
-void *rtos_mem_malloc(uint32_t size)
-{
-	return pvPortMalloc(size);
-}
-
-void rtos_mem_free(void *pbuf)
-{
-	if (pbuf == NULL) {
-		return;
-	}
-	vPortFree(pbuf);
-}
-#endif

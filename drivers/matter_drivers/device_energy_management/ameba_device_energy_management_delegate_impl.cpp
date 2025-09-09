@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
-#include "device_energy_management/ameba_device_energy_management_delegate_impl.h"
-#include "device_energy_management/ameba_device_energy_management_manufacturer_delegate.h"
-#include "device_energy_management/ameba_energy_time_utils.h"
+#include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
+#include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
+#include <device_energy_management/ameba_energy_time_utils.h>
 #include <app/EventLogging.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -62,6 +62,11 @@ void DeviceEnergyManagementDelegate::SetDEMManufacturerDelegate(
     mpDEMManufacturerDelegate = &deviceEnergyManagementManufacturerDelegate;
 }
 
+chip::app::Clusters::DeviceEnergyManagement::DEMManufacturerDelegate * DeviceEnergyManagementDelegate::GetDEMManufacturerDelegate()
+{
+    return mpDEMManufacturerDelegate;
+}
+
 /**
  * @brief Delegate handler for PowerAdjustRequest
  *
@@ -95,7 +100,7 @@ Status DeviceEnergyManagementDelegate::PowerAdjustRequest(const int64_t powerMw,
         generateEvent = true;
 
         // Record when this PowerAdjustment starts. Note if we do not set this value if a PowerAdjustment is in progress
-        CHIP_ERROR err = GetEpochTS(mPowerAdjustmentStartTimeUtc);
+        CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(mPowerAdjustmentStartTimeUtc);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "Unable to get time: %" CHIP_ERROR_FORMAT, err.Format());
@@ -264,7 +269,6 @@ CHIP_ERROR DeviceEnergyManagementDelegate::CancelPowerAdjustRequestAndGenerateEv
     SetESAState(ESAStateEnum::kOnline);
 
     mPowerAdjustmentInProgress = false;
-
     SetPowerAdjustmentCapabilityPowerAdjustReason(PowerAdjustReasonEnum::kNoAdjustment);
 
     CHIP_ERROR err = GeneratePowerAdjustEndEvent(cause);
@@ -291,7 +295,7 @@ CHIP_ERROR DeviceEnergyManagementDelegate::GeneratePowerAdjustEndEvent(CauseEnum
     event.cause = cause;
 
     uint32_t timeNowUtc;
-    CHIP_ERROR err = GetEpochTS(timeNowUtc);
+    CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(timeNowUtc);
     if (err == CHIP_NO_ERROR)
     {
         event.duration = timeNowUtc - mPowerAdjustmentStartTimeUtc;
