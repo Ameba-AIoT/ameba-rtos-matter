@@ -33,7 +33,7 @@
 
 #include <platform_autoconf.h>
 #include <stdio.h>
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_PLATFORM_AMEBASMART)
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_AMEBASMART)
 #include <stdlib.h>
 #include <string.h>
 #include <rand.h>
@@ -42,7 +42,7 @@ int strstr(const char *s1, const char *s2);
 #define __weak __attribute__((weak))
 #define u32 uint32_t
 
-#define MATTER_MBEDTLS_SECURE_HEAP_SIZE		U(13 * 1024)
+#define MATTER_MBEDTLS_SECURE_HEAP_SIZE		U(8 * 1024)
 #endif
 
 #define MBEDTLS_VERSION_CONVERT(a,b,c) (((a) << 16) + ((b) << 8) + (c))
@@ -55,7 +55,7 @@ int strstr(const char *s1, const char *s2);
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
-#if !(defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_PLATFORM_AMEBASMART))
+#if !(defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_AMEBASMART))
 #include <rom_ssl_ram_map.h>
 #endif
 
@@ -532,7 +532,7 @@ int strstr(const char *s1, const char *s2);
  * Requires MBEDTLS_ENTROPY_C, MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
  *
  */
-#define MBEDTLS_TEST_NULL_ENTROPY
+// #define MBEDTLS_TEST_NULL_ENTROPY
 
 /**
  * \def MBEDTLS_ENTROPY_HARDWARE_ALT
@@ -1233,6 +1233,9 @@ int strstr(const char *s1, const char *s2);
  * Uncomment this macro to let the buffer allocator print out error messages.
  */
 //#define MBEDTLS_MEMORY_DEBUG
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_AMEBASMART)
+#define MBEDTLS_MEMORY_DEBUG
+#endif
 
 /**
  * \def MBEDTLS_MEMORY_BACKTRACE
@@ -2624,7 +2627,7 @@ int strstr(const char *s1, const char *s2);
  */
 //#define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 //Ameba Smart Matter Secure needs to use MbedTLS memory management
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_PLATFORM_AMEBASMART)
+#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_AMEBASMART)
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 #endif
 

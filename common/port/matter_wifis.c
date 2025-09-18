@@ -1,3 +1,22 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include <platform_stdlib.h>
 #include <FreeRTOS.h>
 #include <task.h>
@@ -44,6 +63,13 @@ extern char wps_profile_ssid[33];
 extern char wps_profile_password[65];
 #endif /* CONFIG_ENABLE_WPS */
 
+struct event_list_elem_t {
+    void (*handler)(u8 *buf, s32 len, s32 flags, void *user_data);
+    void  *handler_user_data;
+};
+#define MATTER_WIFI_EVENT_MAX_ROW 2
+static struct event_list_elem_t matter_event_callback_list[MATTER_WIFI_EVENT_MAX][MATTER_WIFI_EVENT_MAX_ROW] = {0};
+
 chip_connmgr_callback chip_connmgr_callback_func = NULL;
 void *chip_connmgr_callback_data = NULL;
 void chip_connmgr_set_callback_func(chip_connmgr_callback p, void *data)
@@ -71,11 +97,11 @@ int matter_initiate_wifi_and_connect(rtw_network_info_t *connect_param)
 
 static void print_matter_scan_result(rtw_scan_result_t *record)
 {
-    RTW_API_INFO("%s\t ", (record->bss_type == RTW_BSS_TYPE_ADHOC) ? "Adhoc" : "Infra");
-    RTW_API_INFO(MAC_FMT, MAC_ARG(record->BSSID.octet));
-    RTW_API_INFO(" %d\t ", record->signal_strength);
-    RTW_API_INFO(" %d\t  ", record->channel);
-    RTW_API_INFO("%s\t\t ", (record->security == RTW_SECURITY_OPEN) ? "Open" :
+    DiagPrintf("%s\t ", (record->bss_type == RTW_BSS_TYPE_INFRASTRUCTURE) ? "Infra" : "Adhoc");
+    DiagPrintf(MAC_FMT, MAC_ARG(record->BSSID.octet));
+    DiagPrintf(" %d\t ", record->signal_strength);
+    DiagPrintf(" %d\t  ", record->channel);
+    DiagPrintf("%s\t\t ", (record->security == RTW_SECURITY_OPEN) ? "Open" :
                  (record->security == RTW_SECURITY_WEP_PSK) ? "WEP" :
                  (record->security == RTW_SECURITY_WPA_TKIP_PSK) ? "WPA TKIP" :
                  (record->security == RTW_SECURITY_WPA_AES_PSK) ? "WPA AES" :
@@ -88,8 +114,8 @@ static void print_matter_scan_result(rtw_scan_result_t *record)
                  (record->security == RTW_SECURITY_WPA_WPA2_MIXED_PSK) ? "WPA/WPA2 Mixed" :
                  "Unknown");
 
-    RTW_API_INFO(" %s ", record->SSID.val);
-    RTW_API_INFO("\n");
+    DiagPrintf(" %s ", record->SSID.val);
+    DiagPrintf("\n");
 }
 
 static rtw_result_t matter_scan_result_handler(unsigned int scanned_AP_num, void *user_data)
@@ -115,7 +141,7 @@ static rtw_result_t matter_scan_result_handler(unsigned int scanned_AP_num, void
         for (int i = 0; i < scanned_AP_num; i++) {
             scanned_AP_info = (rtw_scan_result_t *)(scan_buf + i * sizeof(rtw_scan_result_t));
 
-            RTW_API_INFO("%d\t ", ++apNum);
+            DiagPrintf("%d\t ", ++apNum);
             memcpy(&matter_userdata[i], scanned_AP_info, sizeof(rtw_scan_result_t));
             print_matter_scan_result(&matter_userdata[i]);
         }
@@ -151,7 +177,7 @@ void matter_scan_networks(void)
     ret = wifi_scan_networks(&scan_param, 0);
     if (ret != RTW_SUCCESS)
     {
-        RTW_API_INFO("ERROR: wifi scan failed\n");
+        RTK_LOGE(TAG, "ERROR: wifi scan failed\n");
     }
 }
 
@@ -175,7 +201,7 @@ void matter_scan_networks_with_ssid(const unsigned char *ssid, size_t length)
     ret = wifi_scan_networks(&scan_param, 0);
     if (ret != RTW_SUCCESS)
     {
-        RTW_API_INFO("ERROR: wifi scan failed\n");
+        RTK_LOGE(TAG, "ERROR: wifi scan failed\n");
     }
 }
 
@@ -197,6 +223,19 @@ void matter_reconn_task_hdl(void *param)
     // matter_wifi_autoreconnect_task.task = 0;
     rtos_task_delete(NULL);
 }
+
+void matter_reconn_timer_hdl(rtos_timer_t timer_hdl)
+{
+    (void) timer_hdl;
+
+    rtw_reconn.b_waiting = 0;
+    /*Creat a task to do wifi reconnect because call WIFI API in WIFI event is not safe*/
+    if (rtos_task_create(NULL, ((const char *)"matter_reconn_task_hdl"), matter_reconn_task_hdl, NULL, 1024, 6) != RTW_SUCCESS) {
+        RTK_LOGE(TAG, "Create reconn task failed\n");
+    } else {
+        RTK_LOGI(TAG, "auto reconn %d\n", rtw_reconn.cnt);
+    }
+}
 #endif /* CONFIG_AUTO_RECONNECT */
 
 void matter_set_autoreconnect(uint8_t mode)
@@ -211,7 +250,23 @@ void matter_set_autoreconnect(uint8_t mode)
     //if wifi-ssid exist in NVS, it has been commissioned before, CHIP will do autoreconnection
     s32 ret = getPref_bin_new(kWiFiSSIDKeyName, kWiFiSSIDKeyName, buf, sizeof(buf), &ssidLen);
     if (ret == DCT_SUCCESS) {
-        wifi_config_autoreconnect(mode);
+        if ((mode == 0) && rtw_reconn.b_enable) {
+            rtos_timer_stop(rtw_reconn.timer, 1000);
+            rtos_timer_delete(rtw_reconn.timer, 1000);
+            rtw_reconn.timer = NULL;
+            rtw_reconn.b_waiting = 0;
+            rtw_reconn.b_enable = 0;
+        } else if ((mode != 0) && (rtw_reconn.b_enable == 0)) {
+            if (rtos_timer_create(&(rtw_reconn.timer), "matter_reconn_timer", NULL, wifi_user_config.auto_reconnect_interval * 1000, FALSE,
+                                matter_reconn_timer_hdl) != RTW_SUCCESS) {
+                RTK_LOGI(TAG, "matter_reconn_timer create fail\n");
+                return RTW_ERROR;
+            }
+            rtw_reconn.b_enable = 1;
+            rtw_reconn.cnt = 0;
+        }
+
+        rtw_reconn.b_infinite = (wifi_user_config.auto_reconnect_count == 0xff) ? 1 : 0;
     }
 #endif /* CONFIG_AUTO_RECONNECT */
     return;
@@ -344,7 +399,7 @@ int matter_wifi_connect(
 
     err = matter_initiate_wifi_and_connect(&connect_param);
     if (err != RTW_SUCCESS) {
-        RTW_API_INFO("ERROR: wifi Connect failed\n");
+        RTK_LOGE(TAG, "ERROR: wifi Connect failed\n");
     }
 
     return err;
@@ -508,11 +563,9 @@ int matter_wifi_get_setting(unsigned char wlan_idx, rtw_wifi_setting_t *psetting
 int matter_wifi_get_wifi_channel_number(uint8_t wlan_idx, uint8_t *ch)
 {
     int ret = RTW_SUCCESS;
-
     if (wifi_get_channel(wlan_idx, ch) < 0) {
         ret = RTW_ERROR;
     }
-
     return ret;
 }
 
@@ -521,9 +574,43 @@ int matter_get_sta_wifi_info(rtw_wifi_setting_t *pSetting)
     return wifi_get_setting(WLAN0_IDX, pSetting);
 }
 
+int matter_wifi_indication(u32 event_cmd, u8 *buf, s32 buf_len, s32 flags)
+{
+    void (*handle)(u8 * buf, s32 len, s32 flags, void *user_data) = NULL;
+    int i = 0;
+
+    /*user callback handle*/
+    if (event_cmd < MATTER_WIFI_EVENT_MAX) {
+        for (i = 0; i < MATTER_WIFI_EVENT_MAX_ROW; i++) {
+            handle = matter_event_callback_list[event_cmd][i].handler;
+            if (handle == NULL) {
+                continue;
+            }
+            handle(buf, buf_len, flags, matter_event_callback_list[event_cmd][i].handler_user_data);
+        }
+    }
+    return RTW_SUCCESS;
+}
+
 void matter_wifi_reg_event_handler(matter_wifi_event event_cmds, rtw_event_handler_t handler_func, void *handler_user_data)
 {
-    wifi_reg_event_handler(event_cmds, handler_func, handler_user_data);
+    int i = 0, j = 0;
+    if (event_cmds < MATTER_WIFI_EVENT_MAX) {
+        for (i = 0; i < MATTER_WIFI_EVENT_MAX_ROW; i++) {
+            if (matter_event_callback_list[event_cmds][i].handler == NULL) { //there exists an empty position for new handler
+                for (j = 0; j < MATTER_WIFI_EVENT_MAX_ROW; j++) {
+                    if (matter_event_callback_list[event_cmds][j].handler == handler_func) { //the new handler already exists in the table
+                        return;
+                    }
+                }
+                matter_event_callback_list[event_cmds][i].handler = handler_func;
+                matter_event_callback_list[event_cmds][i].handler_user_data = handler_user_data;
+                return;
+            }
+        }
+        //there is no empty position for new handler
+        RTK_LOGE(TAG, "%s fail: %d %d \n", __func__, event_cmds, MATTER_WIFI_EVENT_MAX_ROW);
+    }
 }
 
 static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags, void *userdata)
@@ -538,7 +625,7 @@ static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags,
         case RTW_JOINSTATUS_SUCCESS: // Connecting --> Connected Succesfully
             error_flag = RTW_NO_ERROR;
             RTK_LOGI(TAG, "Join success!\n");
-            wifi_indication(WIFI_EVENT_MATTER_STA_CONN, NULL, 0, 0);
+            matter_wifi_indication(MATTER_WIFI_EVENT_CONNECT, NULL, 0, flags);
             break;
         case RTW_JOINSTATUS_FAIL: // Connecting --> Failed to Connect
             RTK_LOGI(TAG, "Join fail, error_flag = ");
@@ -563,12 +650,12 @@ static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags,
                     RTK_LOGI(NOTAG, "%d (Unknown Error)\n", error_flag);
                     break;
             }
-            wifi_indication(WIFI_EVENT_MATTER_STA_DISCONN, NULL, 0, 0);
+            matter_wifi_indication(MATTER_WIFI_EVENT_DISCONNECT, NULL, 0, flags);
             break;
         case RTW_JOINSTATUS_DISCONNECT: // Connected --> Disconnected
             error_flag = RTW_CONNECT_FAIL;
             RTK_LOGI(TAG, "Disconnected, try to reconnect...\n");
-            wifi_indication(WIFI_EVENT_MATTER_STA_DISCONN, NULL, 0, 0);
+            matter_wifi_indication(MATTER_WIFI_EVENT_DISCONNECT, NULL, 0, flags);
             break;
         default:
             break;
@@ -588,6 +675,17 @@ void matter_wifi_init(void)
     //setup reconnection flag
     matter_set_autoreconnect(1);
 #endif
+}
+
+void matter_wifi_wait(void)
+{
+    do // Wait first to avoid hang issue for ameba-smart cmake
+    {
+        vTaskDelay(10);
+    }
+    while (!(wifi_is_running(WLAN0_IDX) || wifi_is_running(WLAN1_IDX)));
+
+    matter_wifi_init();
 }
 
 #ifdef __cplusplus
