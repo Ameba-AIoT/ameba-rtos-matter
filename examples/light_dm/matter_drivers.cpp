@@ -121,9 +121,9 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
 {
     chip::app::ConcreteAttributePath path = aEvent->path;
 
-    // this example only considers endpoint1
-    VerifyOrExit(aEvent->path.mEndpointId == 1,
-                 ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
+    if (aEvent->path.mEndpointId == 0) {
+        return;
+    }
 
     switch (path.mClusterId)
     {

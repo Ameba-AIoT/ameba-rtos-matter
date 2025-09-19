@@ -67,7 +67,7 @@ void DownlinkTask(void *pvParameter)
 {
     AppEvent event;
 
-    ChipLogProgress(DeviceLayer, "Downlink Task started");
+    ChipLogDetail(DeviceLayer, "Downlink Task started");
 
     // Loop here and keep listening on the queue for Downlink (Firmware application to matter)
     while (true)
@@ -81,7 +81,7 @@ void DownlinkTask(void *pvParameter)
     }
 }
 
-CHIP_ERROR matter_interaction_start_downlink()
+CHIP_ERROR matter_interaction_start_downlink(void)
 {
     DownlinkEventQueue = xQueueCreate(10, sizeof(AppEvent));
     if (DownlinkEventQueue == NULL)
@@ -136,7 +136,7 @@ void UplinkTask(void *pvParameter)
 {
     AppEvent event;
 
-    ChipLogProgress(DeviceLayer, "Uplink Task started");
+    ChipLogDetail(DeviceLayer, "Uplink Task started");
 
     // Loop here and keep listening on the queue for Uplink (matter to Firmware application)
     while (true)
@@ -150,7 +150,7 @@ void UplinkTask(void *pvParameter)
     }
 }
 
-CHIP_ERROR matter_interaction_start_uplink()
+CHIP_ERROR matter_interaction_start_uplink(void)
 {
     UplinkEventQueue = xQueueCreate(10, sizeof(AppEvent));
     if (UplinkEventQueue == NULL)

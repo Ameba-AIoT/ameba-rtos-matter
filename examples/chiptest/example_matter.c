@@ -31,6 +31,7 @@
 #include <diagnostic_logs/ameba_logging_faultlog.h>
 #include <diagnostic_logs/ameba_logging_redirect_wrapper.h>
 #endif
+#include <matter_data_providers.h>
 
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
 extern void ChipTest(void);
@@ -62,11 +63,11 @@ static void example_matter_task_thread(void *pvParameters)
 
     matter_data_provider_init();
 
+    matter_store_boot_reason();
+
 #if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
     matter_op_hours();
 #endif
-
-    matter_store_boot_reason();
 
     vTaskDelete(NULL);
     return;

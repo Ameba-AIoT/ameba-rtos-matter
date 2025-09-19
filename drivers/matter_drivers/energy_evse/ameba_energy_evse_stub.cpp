@@ -37,25 +37,4 @@ void emberAfEnergyEvseClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(!gDelegate);
     VerifyOrDie(!gEvseTargetsDelegate);
     VerifyOrDie(!gInstance);
-
-    gEvseTargetsDelegate = std::make_unique<EvseTargetsDelegate>();
-    if (!gEvseTargetsDelegate)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for EvseTargetsDelegate");
-        return;
-    }
-
-    gDelegate = std::make_unique<EnergyEvseDelegate>(*gEvseTargetsDelegate);
-    if (gDelegate)
-    {
-        gInstance = std::make_unique<EnergyEvseManager>(
-            endpointId, *gDelegate,
-            BitMask<EnergyEvse::Feature, uint32_t>(0),
-            BitMask<OptionalAttributes, uint32_t>(OptionalAttributes::kSupportsUserMaximumChargingCurrent,
-                                                  OptionalAttributes::kSupportsRandomizationWindow,
-                                                  OptionalAttributes::kSupportsApproximateEvEfficiency),
-            BitMask<OptionalCommands, uint32_t>(OptionalCommands::kSupportsStartDiagnostics));
-
-        gInstance->Init(); /* Register Attribute & Command handlers */
-    }
 }

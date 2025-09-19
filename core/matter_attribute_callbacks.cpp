@@ -16,7 +16,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #include <matter_attribute_callbacks.h>
+#include <fan_control/ameba_fan_control_manager.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 
 using namespace chip;
@@ -29,6 +31,14 @@ void AmebaDeviceManager::AmebaPostAttributeChangeCallback(EndpointId endpoint, C
 {
     switch (clusterId)
     {
+    case FanControl::Id: {
+        FanControl::AmebaFanControlManager::GetInstance()->HandleFanControlAttributeChange(attributeId, value);
+        break;
+    }
+    case OnOff::Id: {
+        FanControl::AmebaFanControlManager::GetInstance()->HandleFanOnOffAttributeChange(attributeId, value);
+        break;
+    }
     default:
         break;
     }

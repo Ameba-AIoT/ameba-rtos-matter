@@ -76,11 +76,14 @@ CPPSRC += $(CHIPDIR)/src/app/util/util.cpp
 CPPSRC += $(CHIPDIR)/src/app/util/privilege-storage.cpp
 
 # connectedhomeip - src - app - persistence
+CPPSRC += $(CHIPDIR)/src/app/persistence/AttributePersistence.cpp
 CPPSRC += $(CHIPDIR)/src/app/persistence/AttributePersistenceProviderInstance.cpp
 CPPSRC += $(CHIPDIR)/src/app/persistence/DefaultAttributePersistenceProvider.cpp
 CPPSRC += $(CHIPDIR)/src/app/persistence/DeferredAttributePersistenceProvider.cpp
+CPPSRC += $(CHIPDIR)/src/app/persistence/String.cpp
 
 # connectedhomeip - src - data-model-providers
+CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/ClusterIntegration.cpp
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider.cpp
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Read.cpp
 CPPSRC += $(CHIPDIR)/src/data-model-providers/codegen/CodegenDataModelProvider_Write.cpp
