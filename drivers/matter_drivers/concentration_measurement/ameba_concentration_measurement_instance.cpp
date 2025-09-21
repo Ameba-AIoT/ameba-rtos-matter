@@ -66,6 +66,21 @@ static Instance gAmebaFormaldehydeCMInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), FormaldehydeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
+void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
+{
+     gAmebaCarbonDioxideCMInstance.Init();
+
+     gAmebaCarbonDioxideCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+     gAmebaCarbonDioxideCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+     gAmebaCarbonDioxideCMInstance.SetMeasuredValue(MakeNullable(2.0f));
+     gAmebaCarbonDioxideCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+     gAmebaCarbonDioxideCMInstance.SetPeakMeasuredValueWindow(320);
+     gAmebaCarbonDioxideCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+     gAmebaCarbonDioxideCMInstance.SetAverageMeasuredValueWindow(320);
+     gAmebaCarbonDioxideCMInstance.SetUncertainty(0.0f);
+     gAmebaCarbonDioxideCMInstance.SetLevelValue(LevelValueEnum::kLow);
+}
+
 void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     gAmebaCarbonMonoxideCMInstance.Init();
@@ -200,3 +215,14 @@ void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId e
     gAmebaFormaldehydeCMInstance.SetUncertainty(0.0f);
     gAmebaFormaldehydeCMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
+
+void emberAfCarbonDioxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfCarbonMonoxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfNitrogenDioxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfPm1ConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfPm10ConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfPm25ConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfRadonConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfOzoneConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfFormaldehydeConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}

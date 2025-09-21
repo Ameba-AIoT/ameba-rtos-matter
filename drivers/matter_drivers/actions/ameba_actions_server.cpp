@@ -44,6 +44,8 @@ CHIP_ERROR Actions::AmebaActionsServerInit(EndpointId endpoint)
     sAmebaActionsServer = std::make_unique<Actions::ActionsServer>(endpoint, *delegate);
     VerifyOrReturnError(sAmebaActionsServer != nullptr, CHIP_ERROR_INTERNAL);
 
+    sAmebaActionsServer->Init();
+
     return CHIP_NO_ERROR;
 }
 

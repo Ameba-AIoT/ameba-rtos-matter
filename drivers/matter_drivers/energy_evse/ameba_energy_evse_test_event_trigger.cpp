@@ -139,7 +139,7 @@ void SetTestEventTrigger_EVSEDiagnosticsComplete()
     dg->HwDiagnosticsComplete();
 }
 
-bool HandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
+bool AmebaHandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
 {
     EnergyEvseTrigger trigger = static_cast<EnergyEvseTrigger>(eventTrigger);
 
