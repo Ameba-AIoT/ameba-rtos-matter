@@ -31,6 +31,9 @@ SRC_CPP += $(CHIPDIR)/src/app/icd/server/ICDConfigurationData.cpp
 SRC_CPP += $(CHIPDIR)/src/app/reporting/Engine.cpp
 SRC_CPP += $(CHIPDIR)/src/app/reporting/reporting.cpp
 
+# connectedhomeip - src - app - clusters
+CPPSRC += $(CHIPDIR)/src/app/clusters/bindings/binding-table.cpp
+
 # connectedhomeip - src - app - server
 SRC_CPP += $(CHIPDIR)/src/app/server/AclStorage.cpp
 SRC_CPP += $(CHIPDIR)/src/app/server/DefaultAclStorage.cpp
@@ -53,7 +56,6 @@ SRC_CPP += $(CHIPDIR)/src/app/server-cluster/SingleEndpointServerClusterRegistry
 # connectedhomeip - src - app - util
 SRC_CPP += $(CHIPDIR)/src/app/util/attribute-storage.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/attribute-table.cpp
-SRC_CPP += $(CHIPDIR)/src/app/util/binding-table.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/DataModelHandler.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/ember-io-storage.cpp
 SRC_CPP += $(CHIPDIR)/src/app/util/generic-callback-stubs.cpp
@@ -85,6 +87,7 @@ SRC_CPP += $(CHIPDIR)/zzz_generated/app-common/app-common/zap-generated/cluster-
 SRC_CPP += $(shell cat $(CODEGENDIR)/cluster-file.txt)
 SRC_CPP += $(CODEGENDIR)/app/callback-stub.cpp
 SRC_CPP += $(CODEGENDIR)/app/cluster-callbacks.cpp
+SRC_CPP += $(CODEGENDIR)/zap-generated/CodeDrivenInitShutdown.cpp
 SRC_CPP += $(CODEGENDIR)/zap-generated/IMClusterCommandHandler.cpp
 
 # matter - api
