@@ -1,5 +1,7 @@
 #include "lwip_default_hooks.h"
 
+#if LWIP_IPV6  /* don't build if not configured for use in lwipopts.h */
+
 #define __weak __attribute__((weak))
 
 struct netif *__weak
@@ -18,3 +20,5 @@ const ip6_addr_t *__weak lwip_hook_nd6_get_gw(struct netif *netif, const ip6_add
 
     return 0;
 }
+
+#endif /* LWIP_IPV6 */

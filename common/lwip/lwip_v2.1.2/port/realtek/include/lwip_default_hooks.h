@@ -4,6 +4,8 @@
 #include "lwip/arch.h"
 #include "lwip/err.h"
 
+#if LWIP_IPV6  /* don't build if not configured for use in lwipopts.h */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,4 +20,5 @@ const ip6_addr_t *lwip_hook_nd6_get_gw(struct netif *netif, const ip6_addr_t *de
 }
 #endif
 
+#endif /* LWIP_IPV6 */
 #endif /* _LWIP_DEFAULT_HOOKS_H_ */

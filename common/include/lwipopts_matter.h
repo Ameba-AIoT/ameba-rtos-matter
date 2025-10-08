@@ -63,6 +63,12 @@ extern "C" {
 #undef PBUF_POOL_BUFSIZE
 #define PBUF_POOL_BUFSIZE               1500
 
+#undef MEM_LIBC_MALLOC
+#define MEM_LIBC_MALLOC                 1
+
+#undef MEMP_MEM_MALLOC
+#define MEMP_MEM_MALLOC                 1
+
 /* UDP and Timeout Options */
 #undef MEMP_NUM_UDP_PCB
 #define MEMP_NUM_UDP_PCB                10
