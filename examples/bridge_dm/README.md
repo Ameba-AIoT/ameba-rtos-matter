@@ -15,8 +15,7 @@ Additionally a new thread will be created for user to input their code to commun
 ## How to build
 
 ### Configurations
-Enable `CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_BRIDGE` in `platform_opts_matter.h`.
-Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
+`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_BRIDGE` are automatically enabled in the Makefiles.
 
 ### Setup the Build Environment
   
@@ -30,8 +29,8 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
 
 #### Build Matter Libraries
 
-    cd ameba-rtos/amebadplus_gcc_project/project_km4
-    make -C asdk bridge_dm
+    cd ameba-rtos/amebadplus_gcc_project
+    make -C project_km4/asdk bridge_dm
 
 #### Build the Final Firmware
 
@@ -54,8 +53,8 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/READM
 
 #### Build Matter Libraries
 
-    cd ameba-rtos/amebalite_gcc_project/project_km4
-    make -C asdk bridge_dm
+    cd ameba-rtos/amebalite_gcc_project
+    make -C project_km4/asdk bridge_dm
 
 #### Build the Final Firmware
 
@@ -78,8 +77,8 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/READM
 
 #### Build Matter Libraries
 
-    cd ameba-rtos/amebasmart_gcc_project/project_ap
-    make -C asdk bridge_dm
+    cd ameba-rtos/amebasmart_gcc_project
+    make -C project_ap/asdk bridge_dm
 
 #### Build the Final Firmware
 

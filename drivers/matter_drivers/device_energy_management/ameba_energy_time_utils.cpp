@@ -21,6 +21,11 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 
+#if CONFIG_ENABLE_AMEBA_SNTP
+#include <time.h>
+#include <matter_timers.h>
+#endif
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
@@ -37,6 +42,55 @@ namespace Clusters {
 namespace DeviceEnergyManagement {
 
 /**
+ * @brief   Ameba helper function to get current timestamp in System::Clock::Microseconds64 format
+ *
+ * @param[out]   curTime reference to hold return timestamp.
+ */
+CHIP_ERROR AmebaGetClock_RealTime(System::Clock::Microseconds64 & curTime)
+{
+#if CONFIG_ENABLE_AMEBA_SNTP
+    time_t seconds = 0, uSeconds = 0;
+
+    if (matter_sntp_rtc_is_sync()) // if RTC is already sync with SNTP, read directly from RTC
+    {
+        seconds = matter_rtc_read(); // ameba rtc precission is in seconds only
+    }
+    else // read from SNTP and sync RTC with SNTP
+    {
+        matter_sntp_get_current_time(&seconds, &uSeconds);
+    }
+
+    if (seconds < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    if (uSeconds < 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative uSeconds values!");
+    curTime = System::Clock::Microseconds64((static_cast<uint64_t>(seconds) * UINT64_C(1000000)) + static_cast<uint64_t>(uSeconds));
+
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+#endif
+}
+
+/**
+ * @brief   Ameba helper function to get current timestamp in System::Clock::Milliseconds64 format
+ *
+ * @param[out]   aCurTime reference to hold return timestamp.
+ */
+CHIP_ERROR AmebaGetClock_RealTimeMS(System::Clock::Milliseconds64 & aCurTime)
+{
+    System::Clock::Microseconds64 curTimeUs;
+    auto err = AmebaGetClock_RealTime(curTimeUs);
+    aCurTime = std::chrono::duration_cast<System::Clock::Milliseconds64>(curTimeUs);
+    return err;
+}
+
+/**
  * @brief   Helper function to get current timestamp in Epoch format
  *
  * @param[out]   chipEpoch reference to hold return timestamp. Set to 0 if an error occurs.
@@ -46,9 +100,9 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
     chipEpoch = 0;
 
     System::Clock::Milliseconds64 cTMs;
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
+    CHIP_ERROR err = AmebaGetClock_RealTimeMS(cTMs);
 
-    /* If the GetClock_RealTimeMS returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, then
+    /* If the AmebaGetClock_RealTimeMS returns CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE, then
      * This platform cannot ever report real time !
      * This should not be certifiable since getting time is a Mandatory
      * feature of EVSE Cluster

@@ -16,17 +16,19 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <water_heater/ameba_water_heater_management_instance.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WaterHeaterManagement {
+using namespace chip::app;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WaterHeaterManagement;
 
-CHIP_ERROR WhmApplicationInit();
-CHIP_ERROR WhmApplicationShutdown();
+CHIP_ERROR WaterHeaterManagementInstance::Init()
+{
+    ChipLogDetail(AppServer, "WaterHeaterManagementInstance::Init()");
+    return Instance::Init();
+}
 
-} // namespace WaterHeaterManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+void WaterHeaterManagementInstance::Shutdown()
+{
+    Instance::Shutdown();
+}

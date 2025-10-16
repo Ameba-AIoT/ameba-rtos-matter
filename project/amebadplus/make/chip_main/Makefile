@@ -37,6 +37,7 @@ clean: CLEAN_OBJS
 	@make -C bridge_app_port clean
 	@make -C bridge_app_port_dm clean
 	@make -C dishwasher_app_port clean
+	@make -C energy_management_app_port clean
 	@make -C fan_app_port clean
 	@make -C laundrywasher_app_port clean
 	@make -C lighting_app clean

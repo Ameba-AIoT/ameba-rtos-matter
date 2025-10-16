@@ -19,8 +19,8 @@
 #pragma once
 
 #include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
-#include <water_heater_management/ameba_water_heater_management_delegate.h>
-#include <water_heater_management/ameba_water_heater_management_instance.h>
+#include <water_heater/ameba_water_heater_management_delegate.h>
+#include <water_heater/ameba_water_heater_management_instance.h>
 
 namespace chip {
 namespace app {

@@ -202,11 +202,11 @@ CPPSRC += $(MATTER_DRIVER)/smoke_co_alarm/ameba_smco_stub.cpp
 CPPSRC += $(MATTER_DRIVER)/switch/ameba_switch.cpp
 CPPSRC += $(MATTER_DRIVER)/temperature_levels/ameba_temperature_levels.cpp
 CPPSRC += $(MATTER_DRIVER)/valve_control/ameba_valve_control_delegate.cpp
-CPPSRC += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_delegate.cpp
-CPPSRC += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_instance.cpp
-CPPSRC += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_main.cpp
-CPPSRC += $(MATTER_DRIVER)/water_heater_management/ameba_water_heater_management_manufacturer.cpp
-CPPSRC += $(MATTER_DRIVER)/water_heater_mode/ameba_water_heater_mode.cpp
+CPPSRC += $(MATTER_DRIVER)/water_heater/ameba_water_heater_management_delegate.cpp
+CPPSRC += $(MATTER_DRIVER)/water_heater/ameba_water_heater_management_instance.cpp
+CPPSRC += $(MATTER_DRIVER)/water_heater/ameba_water_heater_management_main.cpp
+CPPSRC += $(MATTER_DRIVER)/water_heater/ameba_water_heater_management_manufacturer.cpp
+CPPSRC += $(MATTER_DRIVER)/water_heater/ameba_water_heater_mode.cpp
 CPPSRC += $(BASEDIR)/component/application/matter/examples/chiptest/ameba_main_task.cpp
 
 CPPSRC += $(CHIPDIR)/examples/all-clusters-app/ameba/main/chipinterface.cpp

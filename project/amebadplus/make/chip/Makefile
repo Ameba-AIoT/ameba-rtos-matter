@@ -38,6 +38,7 @@ clean: CLEAN_OBJS
 	@make -C bridge_app clean
 	@make -C bridge_app_dm clean
 	@make -C dishwasher_app clean
+	@make -C energy_management_app clean
 	@make -C fan_app clean
 	@make -C laundrywasher_app clean
 	@make -C lighting_app clean

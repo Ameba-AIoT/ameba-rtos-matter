@@ -41,6 +41,9 @@
 #if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
 #include <app/server/TermsAndConditionsManager.h>
 #endif
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+#include <test_event_trigger/AmebaTestEventTriggerDelegate.h>
+#endif
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -113,6 +116,11 @@ chip::DeviceLayer::FactoryDataProvider mFactoryDataProvider;
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
 constexpr size_t kMaxPendingMdnsPackets = 10u;
 chip::Inet::DropIfTooManyQueuedPacketsFilter sMdnsPacketFilter(kMaxPendingMdnsPackets);
+#endif
+
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 #endif
 
 void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t arg)
@@ -213,6 +221,11 @@ void matter_core_init_server(intptr_t context)
 #if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
+#endif
+
+#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+    static AmebaTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
 
     chip::Server::GetInstance().Init(initParams);
