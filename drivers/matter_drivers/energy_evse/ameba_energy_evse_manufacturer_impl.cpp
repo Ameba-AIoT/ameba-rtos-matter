@@ -18,16 +18,16 @@
 
 #include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
 #include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
+#include <device_energy_management/ameba_device_energy_management_test_event_trigger.h>
 #include <device_energy_management/ameba_energy_time_utils.h>
+#include <electrical_energy_measurement/ameba_electrical_energy_measurement_test_event_trigger.h>
 #include <energy_evse/ameba_energy_evse_manufacturer_impl.h>
 #include <energy_evse/ameba_energy_evse_delegate_impl.h>
 #include <energy_evse/ameba_energy_evse_manager.h>
+#include <energy_evse/ameba_energy_evse_test_event_trigger.h>
 #include <energy_evse/ameba_fake_readings.h>
 
-#include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
-#include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
-#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #include <app/clusters/power-source-server/power-source-server.h>
 #include <app/server/Server.h>
 

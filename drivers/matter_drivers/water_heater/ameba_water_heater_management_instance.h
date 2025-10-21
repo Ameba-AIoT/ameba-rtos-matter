@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <water_heater_management/ameba_water_heater_management_delegate.h>
+#include <water_heater/ameba_water_heater_management_delegate.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>

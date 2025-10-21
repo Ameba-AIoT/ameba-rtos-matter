@@ -15,31 +15,33 @@ include $(MAKE_INCLUDE_GEN)
 #                            MATTER ZAP files                                 #
 #*****************************************************************************#
 
-ALL_CLUSTERS_FILE       = $(CHIPDIR)/examples/all-clusters-app/ameba/build/chip/codegen/cluster-file.txt
-ALL_CLUSTERS_ZAP        = $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/all-clusters-app.zap
-AIR_PURIFIER_FILE       = $(CHIPDIR)/examples/air-purifier-app/ameba/build/chip/codegen/cluster-file.txt
-AIR_PURIFIER_ZAP        = $(CHIPDIR)/examples/air-purifier-app/air-purifier-common/air-purifier-app.zap
-BRIDGE_PORT_FILE        = $(CHIPDIR)/examples/bridge-app/ameba/build/chip/codegen/cluster-file.txt
-BRIDGE_PORT_ZAP         = $(CHIPDIR)/examples/bridge-app/bridge-common/bridge-app.zap
-LIGHTING_FILE           = $(CHIPDIR)/examples/lighting-app/ameba/build/chip/codegen/cluster-file.txt
-LIGHTING_ZAP            = $(CHIPDIR)/examples/lighting-app/lighting-common/lighting-app.zap
-THERMOSTAT_PORT_FILE    = $(CHIPDIR)/examples/thermostat/ameba/build/chip/codegen/cluster-file.txt
-THERMOSTAT_PORT_ZAP     = $(CHIPDIR)/examples/thermostat/thermostat-common/thermostat.zap
+ALL_CLUSTERS_FILE           = $(CHIPDIR)/examples/all-clusters-app/ameba/build/chip/codegen/cluster-file.txt
+ALL_CLUSTERS_ZAP            = $(CHIPDIR)/examples/all-clusters-app/all-clusters-common/all-clusters-app.zap
+AIR_PURIFIER_FILE           = $(CHIPDIR)/examples/air-purifier-app/ameba/build/chip/codegen/cluster-file.txt
+AIR_PURIFIER_ZAP            = $(CHIPDIR)/examples/air-purifier-app/air-purifier-common/air-purifier-app.zap
+BRIDGE_PORT_FILE            = $(CHIPDIR)/examples/bridge-app/ameba/build/chip/codegen/cluster-file.txt
+BRIDGE_PORT_ZAP             = $(CHIPDIR)/examples/bridge-app/bridge-common/bridge-app.zap
+ENERGY_MANAGEMENT_PORT_FILE = $(CHIPDIR)/examples/energy-management-app/ameba/build/chip/codegen/cluster-file.txt
+ENERGY_MANAGEMENT_PORT_ZAP  = $(CHIPDIR)/examples/energy-management-app/energy-management-common/energy-management-app.zap
+LIGHTING_FILE               = $(CHIPDIR)/examples/lighting-app/ameba/build/chip/codegen/cluster-file.txt
+LIGHTING_ZAP                = $(CHIPDIR)/examples/lighting-app/lighting-common/lighting-app.zap
+THERMOSTAT_PORT_FILE        = $(CHIPDIR)/examples/thermostat/ameba/build/chip/codegen/cluster-file.txt
+THERMOSTAT_PORT_ZAP         = $(CHIPDIR)/examples/thermostat/thermostat-common/thermostat.zap
 
-AIRCON_PORT_FILE        = $(MATTER_EXAMPLEDIR)/aircon/build/chip/codegen/cluster-file.txt
-AIRCON_PORT_ZAP         = $(MATTER_EXAMPLEDIR)/aircon/aircon-app.zap
-BRIDGE_DM_FILE          = $(MATTER_EXAMPLEDIR)/bridge_dm/build/chip/codegen/cluster-file.txt
-BRIDGE_DM_ZAP           = $(MATTER_EXAMPLEDIR)/bridge_dm/bridge-app.zap
-DISHWASHER_PORT_FILE    = $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cluster-file.txt
-DISHWASHER_PORT_ZAP     = $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.zap
-FAN_PORT_FILE           = $(MATTER_EXAMPLEDIR)/fan/build/chip/codegen/cluster-file.txt
-FAN_PORT_ZAP            = $(MATTER_EXAMPLEDIR)/fan/fan-app.zap
-LAUNDRYWASHER_PORT_FILE = $(MATTER_EXAMPLEDIR)/laundrywasher/build/chip/codegen/cluster-file.txt
-LAUNDRYWASHER_PORT_ZAP  = $(MATTER_EXAMPLEDIR)/laundrywasher/laundrywasher-app.zap
-MICROWAVEOVEN_PORT_FILE = $(MATTER_EXAMPLEDIR)/microwaveoven/build/chip/codegen/cluster-file.txt
-MICROWAVEOVEN_PORT_ZAP  = $(MATTER_EXAMPLEDIR)/microwaveoven/microwaveoven-app.zap
-REFRIGERATOR_PORT_FILE  = $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/cluster-file.txt
-REFRIGERATOR_PORT_ZAP   = $(MATTER_EXAMPLEDIR)/refrigerator/refrigerator-app.zap
+AIRCON_PORT_FILE            = $(MATTER_EXAMPLEDIR)/aircon/build/chip/codegen/cluster-file.txt
+AIRCON_PORT_ZAP             = $(MATTER_EXAMPLEDIR)/aircon/aircon-app.zap
+BRIDGE_DM_FILE              = $(MATTER_EXAMPLEDIR)/bridge_dm/build/chip/codegen/cluster-file.txt
+BRIDGE_DM_ZAP               = $(MATTER_EXAMPLEDIR)/bridge_dm/bridge-app.zap
+DISHWASHER_PORT_FILE        = $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cluster-file.txt
+DISHWASHER_PORT_ZAP         = $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.zap
+FAN_PORT_FILE               = $(MATTER_EXAMPLEDIR)/fan/build/chip/codegen/cluster-file.txt
+FAN_PORT_ZAP                = $(MATTER_EXAMPLEDIR)/fan/fan-app.zap
+LAUNDRYWASHER_PORT_FILE     = $(MATTER_EXAMPLEDIR)/laundrywasher/build/chip/codegen/cluster-file.txt
+LAUNDRYWASHER_PORT_ZAP      = $(MATTER_EXAMPLEDIR)/laundrywasher/laundrywasher-app.zap
+MICROWAVEOVEN_PORT_FILE     = $(MATTER_EXAMPLEDIR)/microwaveoven/build/chip/codegen/cluster-file.txt
+MICROWAVEOVEN_PORT_ZAP      = $(MATTER_EXAMPLEDIR)/microwaveoven/microwaveoven-app.zap
+REFRIGERATOR_PORT_FILE      = $(MATTER_EXAMPLEDIR)/refrigerator/build/chip/codegen/cluster-file.txt
+REFRIGERATOR_PORT_ZAP       = $(MATTER_EXAMPLEDIR)/refrigerator/refrigerator-app.zap
 
 #*****************************************************************************#
 #                         MATTER MAKE DEFINES                                 #
@@ -68,6 +70,10 @@ bridge_port: prebuild copy_ld_img2 $(BRIDGE_PORT_FILE)
 dishwasher_port: prebuild copy_ld_img2 $(DISHWASHER_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/dishwasher_app all
 	@make -C $(MATTER_BUILDDIR)/make/chip_main/dishwasher_app_port all
+
+energy_management_port: prebuild copy_ld_img2 $(ENERGY_MANAGEMENT_PORT_FILE)
+	@make -C $(MATTER_BUILDDIR)/make/chip/energy_management_app all
+	@make -C $(MATTER_BUILDDIR)/make/chip_main/energy_management_app_port all
 
 fan_port: prebuild copy_ld_img2 $(FAN_PORT_FILE)
 	@make -C $(MATTER_BUILDDIR)/make/chip/fan_app all
@@ -159,6 +165,15 @@ $(DISHWASHER_PORT_FILE): $(DISHWASHER_PORT_ZAP)
 	python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.matter
 	python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.zap > $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cluster-file.txt
 	python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $(MATTER_EXAMPLEDIR)/dishwasher/build/chip/codegen/cluster-file.txt --chip_path $(CHIPDIR)
+
+$(ENERGY_MANAGEMENT_PORT_FILE): $(ENERGY_MANAGEMENT_PORT_ZAP)
+	@ rm -f $(RAM_OBJS_LIST)
+	mkdir -p $(CHIPDIR)/examples/energy-management-app/ameba/build/chip/codegen/zap-generated
+	python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/matter-idl-server.json --output-dir examples/energy-management-app/ameba/build/chip/codegen/zap-generated $^
+	python3 $(CHIPDIR)/scripts/tools/zap/generate.py --no-prettify-output --templates src/app/zap-templates/app-templates.json --output-dir examples/energy-management-app/ameba/build/chip/codegen/zap-generated $^
+	python3 $(CHIPDIR)/scripts/codegen.py --generator cpp-app --output-dir $(CHIPDIR)/examples/energy-management-app/ameba/build/chip/codegen --expected-outputs $(MATTER_TOOLDIR)/codegen_helpers/expected.outputs $(CHIPDIR)/examples/energy-management-app/energy-management-common/energy-management-app.matter
+	python3 $(CHIPDIR)/src/app/zap_cluster_list.py --zap_file $(CHIPDIR)/examples/energy-management-app/energy-management-common/energy-management-app.zap > $(CHIPDIR)/examples/energy-management-app/ameba/build/chip/codegen/cluster-file.txt
+	python3 $(MATTER_TOOLDIR)/codegen_helpers/parse_clusters.py --cluster_file $(CHIPDIR)/examples/energy-management-app/ameba/build/chip/codegen/cluster-file.txt --chip_path $(CHIPDIR)
 
 $(FAN_PORT_FILE): $(FAN_PORT_ZAP)
 	@ rm -f $(RAM_OBJS_LIST)

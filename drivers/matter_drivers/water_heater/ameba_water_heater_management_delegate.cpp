@@ -17,9 +17,9 @@
  */
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 
-#include <water_heater_management/ameba_water_heater_management_delegate.h>
-#include <water_heater_management/ameba_water_heater_management_manufacturer.h>
-#include <water_heater_mode/ameba_water_heater_mode.h>
+#include <water_heater/ameba_water_heater_management_delegate.h>
+#include <water_heater/ameba_water_heater_management_manufacturer.h>
+#include <water_heater/ameba_water_heater_mode.h>
 
 #include <algorithm>
 

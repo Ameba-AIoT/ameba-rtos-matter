@@ -16,15 +16,13 @@
  *    limitations under the License.
  */
 
-#include <water_heater_management/ameba_water_heater_management_instance.h>
-#include <water_heater_management/ameba_water_heater_management_manufacturer.h>
+#include <water_heater/ameba_water_heater_management_instance.h>
+#include <water_heater/ameba_water_heater_management_manufacturer.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 #include <lib/support/logging/CHIPLogging.h>
-
-static constexpr int WHM_ENDPOINT = 1;
 
 using namespace chip;
 using namespace chip::app;
@@ -53,7 +51,7 @@ WhmManufacturer * GetWhmManufacturer()
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-CHIP_ERROR WhmInit()
+CHIP_ERROR WhmInit(chip::EndpointId endpointId)
 {
     CHIP_ERROR err;
 
@@ -63,7 +61,7 @@ CHIP_ERROR WhmInit()
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    gWhmDelegate = std::make_unique<WaterHeaterManagementDelegate>(WHM_ENDPOINT);
+    gWhmDelegate = std::make_unique<WaterHeaterManagementDelegate>(endpointId);
     if (!gWhmDelegate)
     {
         ChipLogError(AppServer, "Failed to allocate memory for WaterHeaterManagementDelegate");
@@ -72,7 +70,7 @@ CHIP_ERROR WhmInit()
 
     /* Manufacturer may optionally not support all features, commands & attributes */
     gWhmInstance = std::make_unique<WaterHeaterManagementInstance>(
-        EndpointId(WHM_ENDPOINT), *gWhmDelegate, BitMask<Feature>(0x0));
+        EndpointId(endpointId), *gWhmDelegate, BitMask<Feature>(0x0));
     if (!gWhmInstance)
     {
         ChipLogError(AppServer, "Failed to allocate memory for WaterHeaterManagementInstance");
@@ -167,9 +165,9 @@ CHIP_ERROR WhmManufacturerShutdown()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WhmApplicationInit()
+CHIP_ERROR WhmApplicationInit(chip::EndpointId endpointId)
 {
-    ReturnErrorOnFailure(WhmInit());
+    ReturnErrorOnFailure(WhmInit(endpointId));
 
     /* Do this last so that the instances for other clusters can be wrapped inside */
     ReturnErrorOnFailure(WhmManufacturerInit());

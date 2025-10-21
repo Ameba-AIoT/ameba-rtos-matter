@@ -11,8 +11,7 @@ After another 20 second delay, the `Dimmable Light` endpoint on Endpoint2 will b
 ## How to build
 
 ### Configurations
-Enable `CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_LIGHT` in `platform_opts_matter.h`.
-Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
+`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_LIGHT` are automatically enabled in the Makefiles.
 
 ### Setup the Build Environment
   
@@ -33,8 +32,8 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
 
 #### Build Matter Libraries
 
-    cd ameba-rtos/amebadplus_gcc_project/project_km4
-    make -C asdk light_dm
+    cd ameba-rtos/amebadplus_gcc_project
+    make -C project_km4/asdk light_dm
 
 #### Build the Final Firmware
 
@@ -64,8 +63,8 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/READM
 
 #### Build Matter Libraries
 
-    cd ameba-rtos/amebalite_gcc_project/project_km4
-    make -C asdk light_dm
+    cd ameba-rtos/amebalite_gcc_project
+    make -C project_km4/asdk light_dm
 
 #### Build the Final Firmware
 
@@ -95,8 +94,8 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/READM
 
 #### Build Matter Libraries
 
-    cd ameba-rtos/amebasmart_gcc_project/project_ap
-    make -C asdk light_dm
+    cd ameba-rtos/amebasmart_gcc_project
+    make -C project_ap/asdk light_dm
 
 #### Build the Final Firmware
 

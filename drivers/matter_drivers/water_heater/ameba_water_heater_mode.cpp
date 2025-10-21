@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <water_heater_mode/ameba_water_heater_mode.h>
+#include <water_heater/ameba_water_heater_mode.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WaterHeaterMode;

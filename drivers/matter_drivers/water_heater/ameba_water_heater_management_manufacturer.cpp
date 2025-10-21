@@ -16,12 +16,12 @@
  *    limitations under the License.
  */
 
-#include <water_heater_management/ameba_water_heater_management_instance.h>
-#include <water_heater_management/ameba_water_heater_management_manufacturer.h>
-#include <water_heater_mode/ameba_water_heater_mode.h>
+#include <water_heater/ameba_water_heater_management_instance.h>
+#include <water_heater/ameba_water_heater_management_manufacturer.h>
+#include <water_heater/ameba_water_heater_management_test_event_trigger.h>
+#include <water_heater/ameba_water_heater_mode.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 
 using namespace chip;
@@ -237,7 +237,7 @@ void SetTestEventTrigger_DrawOffHotWaterTestEvent()
 
 using namespace chip::app::Clusters::WaterHeaterManagement;
 
-bool HandleWaterHeaterManagementTestEventTrigger(uint64_t eventTrigger)
+bool AmebaHandleWaterHeaterManagementTestEventTrigger(uint64_t eventTrigger)
 {
     WaterHeaterManagementTrigger trigger = static_cast<WaterHeaterManagementTrigger>(eventTrigger);
 
