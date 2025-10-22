@@ -23,6 +23,7 @@
 #include "matter_refrigerator_alarm_command.h"
 #include "matter_rvc_modes_command.h"
 #include "matter_switch_command.h"
+#include "matter_soil_command.h"
 
 #include "app/server/Server.h"
 #include "platform/CHIPDeviceLayer.h"
@@ -90,6 +91,7 @@ static void RegisterManualOperationCommands()
         { &ManualRefrigeratorAlarmCommandHandler, "refalm", " Usage: manual refalm <subcommand>" },
         { &ManualRVCCommandHandler, "rvc", " Usage: manual rvc <subcommand>" },
         { &ManualSwitchCommandHandler, "switch", " Usage: manual switch <subcommand>" },
+        { &ManualSoilCommandHandler, "soil", " Usage: manual soil <subcommand>" },
     };
 
     static const shell_command_t sManualOccupancySensingSubCommands[] = {
@@ -146,6 +148,11 @@ static void RegisterManualOperationCommands()
         { &ManualSwitchInitialPressCommandHandler, "initial-press", "initial-press Usage: manual switch initial-press <subcommand>" },
     };
 
+    static const shell_command_t sManualSoilSubCommands[] = {
+        { &ManualSoilCommandHelpHandler, "help", "Usage: manual soil <subcommand>" },
+        { &ManualSoilChangeMoistureCommandHandler, "change-moisture", "change-moisture Usage: manual soil change-moisture <value>" },
+    };
+    
     static const shell_command_t sManualOperationCommand = { &ManualOperationCommandHandler, "manual",
                                                              "Manual Operation commands. Usage: manual <subcommand>" };
 
@@ -166,7 +173,7 @@ static void RegisterManualOperationCommands()
     sShellManualRVCRunModeSubCommands.RegisterCommands(sManualRVCRunModeSubCommands, MATTER_ARRAY_SIZE(sManualRVCRunModeSubCommands));
 
     sShellManualSwitchSubCommands.RegisterCommands(sManualSwitchSubCommands, MATTER_ARRAY_SIZE(sManualSwitchSubCommands));
-
+    sShellManualSoilSubCommands.RegisterCommands(sManualSoilSubCommands, MATTER_ARRAY_SIZE(sManualSoilSubCommands));
     Engine::Root().RegisterCommands(&sManualOperationCommand, 1);
 }
 #endif // ENABLE_CHIP_SHELL
