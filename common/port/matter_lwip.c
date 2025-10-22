@@ -16,7 +16,7 @@ extern struct netif xnetif[NET_IF_NUM];
 void matter_lwip_dhcp(void)
 {
     netif_set_link_up(&xnetif[0]);
-    matter_set_autoreconnect(0);
+    matter_wifi_set_autoreconnect(0);
 
     LwIP_DHCP(0, DHCP_START);
 }
@@ -85,9 +85,13 @@ uint8_t *matter_LwIP_GetIPv6_global(uint8_t idx)
 #endif
 }
 
-void matter_check_valid_ipv6(void)
+static void matter_ip_monitor(void *pvParameters)
 {
     int timeout = 0;
+
+    while (ip4_addr_isany_val(*netif_ip4_addr(&xnetif[0])) && ip4_addr_isany_val(*netif_ip4_gw(&xnetif[0]))) {
+        vTaskDelay(pdMS_TO_TICKS(20));
+    }
 
     while (!ip6_addr_isvalid(netif_ip6_addr_state(&xnetif[0], 0)))
     {
@@ -100,6 +104,14 @@ void matter_check_valid_ipv6(void)
     }
 
     wifi_indication(WIFI_EVENT_DHCP6_DONE, NULL, 0, 0);
+    vTaskDelete(NULL);
+}
+
+void matter_check_valid_ipv6(void)
+{
+    if (xTaskCreate(matter_ip_monitor, ((const char *)"matter_ip_monitor"), 256, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+        printf("\n\r%s xTaskCreate(matter_ip_monitor) failed", __FUNCTION__);
+    }
 }
 
 #endif // LWIP_IPV6

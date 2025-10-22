@@ -57,6 +57,8 @@ CHIP_ERROR SoilMeasurement::AmebaSoilMeasurementInstanceInit(EndpointId endpoint
         ChipLogError(AppServer, "SoilMeasurement cluster error registration");
     }
 
+    gAmebaSoilMeasurementInstance.Cluster().SetSoilMoistureMeasuredValue(kDefaultSoilMoistureMeasurementLimits.minMeasuredValue);
+
     return CHIP_NO_ERROR;
 }
 

@@ -88,11 +88,11 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
     /* Manufacturer may optionally not support all features, commands & attributes */
     gEvseInstance = std::make_unique<EnergyEvseManager>(
         EndpointId(endpointId), *gEvseDelegate,
-        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences, EnergyEvse::Feature::kRfid),
+        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences),
         BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
                                                           EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
                                                           EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
-        BitMask<EnergyEvse::OptionalCommands, uint32_t>(EnergyEvse::OptionalCommands::kSupportsStartDiagnostics));
+        BitMask<EnergyEvse::OptionalCommands, uint32_t>(0));
 
     if (!gEvseInstance)
     {

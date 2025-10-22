@@ -30,9 +30,31 @@ extern uint32_t rtw_join_status;
 extern rtw_mode_t wifi_mode;
 
 /******************************************************
+ *               WiFi Structure
+ ******************************************************/
+#if defined(CONFIG_AUTO_RECONNECT) && CONFIG_AUTO_RECONNECT
+struct matter_wifi_autoreconnect_param {
+    rtw_security_t security_type;
+    char *ssid;
+    int ssid_len;
+    char *password;
+    int password_len;
+    int key_id;
+};
+#endif /* CONFIG_AUTO_RECONNECT */
+
+/******************************************************
  *               WiFi Security
  ******************************************************/
 #define RTW_SECURITY_WPA_WPA2_MIXED    RTW_SECURITY_WPA_WPA2_MIXED_PSK
+
+#define MATTER_WIFI_VERSION_11B       0x01
+#define MATTER_WIFI_VERSION_11G       0x02
+#define MATTER_WIFI_VERSION_11A       0x04
+#define MATTER_WIFI_VERSION_11N       0x18  // 0x8: 2.4G, 0x10: 5Gs
+#define MATTER_WIFI_VERSION_11AC      0x40
+#define MATTER_WIFI_VERSION_11AX      0x80
+#define MATTER_WIFI_VERSION_11AH      0x100
 
 /******************************************************
  *               WiFi Connection Status
@@ -59,7 +81,7 @@ typedef enum{
 } matter_wifi_event;
 
 /******************************************************
- *               Matter WiFi Functions
+ *               Matter Wi-Fi Functions
  ******************************************************/
 
 /**
@@ -73,14 +95,14 @@ void chip_connmgr_set_callback_func(chip_connmgr_callback p, void *data);
 /**
  * @brief  Initialize a WiFi scan to search for all 802.11 networks.
  */
-void matter_scan_networks(void);
+void matter_wifi_scan_networks(void);
 
 /**
  * @brief  Initialize a WiFi scan to search for specific 802.11 networks using SSID.
  * @param[in]  ssid:   The targeted SSID to scan.
  * @param[in]  length: The length of the SSID.
  */
-void matter_scan_networks_with_ssid(const unsigned char *ssid, size_t length);
+void matter_wifi_scan_networks_with_ssid(const unsigned char *ssid, size_t length);
 
 /**
  * @brief  The results of WiFi scan.
@@ -97,11 +119,8 @@ rtw_scan_result_t *matter_get_scan_results(void);
  * @param[in]  password_len   The length of the password.
  * @param[in]  key_id         The key ID used for the WiFi network.
  */
-void matter_wifi_autoreconnect_hdl(
-    rtw_security_t security_type,
-    char *ssid, int ssid_len,
-    char *password, int password_len,
-    int key_id);
+void matter_wifi_autoreconnect_hdl(rtw_security_t security_type, char *ssid, int ssid_len,
+                                   char *password, int password_len, int key_id);
 
 /**
  * @brief  Set the auto-reconnect mode for WiFi.
@@ -110,7 +129,7 @@ void matter_wifi_autoreconnect_hdl(
                     1: Set finite times for autoreconnect.
                     2: Set infinite times for autoreconnect.
  */
-void matter_set_autoreconnect(uint8_t mode);
+void matter_wifi_set_autoreconnect(uint8_t mode);
 
 /**
  * @brief  Connect to a WiFi network.
@@ -123,14 +142,8 @@ void matter_set_autoreconnect(uint8_t mode);
  * @param[in]  semaphore       A pointer to a semaphore for synchronization.
  * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
  */
-int matter_wifi_connect(
-    char              *ssid,
-    rtw_security_t    security_type,
-    char              *password,
-    int               ssid_len,
-    int               password_len,
-    int               key_id,
-    void              *semaphore);
+int matter_wifi_connect(char *ssid, rtw_security_t security_type, char *password,
+                        int ssid_len, int password_len, int key_id, void *semaphore);
 /**
  * @brief  Disconnect from the currently connected WiFi network.
  * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
@@ -182,12 +195,6 @@ int matter_wifi_is_up(rtw_interface_t interface);
  * @return  RTW_SUCCESS if wifi_mode is station, RTW_ERROR otherwise.
  */
 int matter_wifi_is_station_mode(void);
-/**
- * @brief  Get the BSSID of the connected access point.
- * @param[out]  bssid: Pointer to store the BSSID.
- * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
- */
-int matter_wifi_get_ap_bssid(unsigned char *bssid);
 
 /**
  * @brief  Get the last WiFi error.
@@ -217,22 +224,7 @@ int matter_wifi_get_mac_address(char *mac);
  * @param[out]  pmode: Pointer to store the network mode.
  * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
  */
-int matter_wifi_get_network_mode(rtw_network_mode_t *pmode);
-
-/**
- * @brief  Get the RSSI (signal strength) of the connected access point.
- * @param[out]  prssi: Pointer to store the RSSI value.
- * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
- */
-int matter_wifi_get_rssi(int *prssi);
-
-/**
- * @brief  Get the security type of the specified WLAN index.
- * @param[in]  wlan_idx: The WLAN index.
- * @param[out]  wifi_security: Pointer to store the wifi security algorithm.
- * @return  Non-zero on success, zero on failure.
- */
-int matter_wifi_get_security_type(uint8_t wlan_idx, uint32_t *wifi_security);
+int matter_wifi_sta_get_network_mode(rtw_network_mode_t *pmode);
 
 /**
  * @brief  Get the current WiFi settings of the specified WLAN index.
@@ -241,14 +233,6 @@ int matter_wifi_get_security_type(uint8_t wlan_idx, uint32_t *wifi_security);
  * @return  Non-zero on success, zero on failure.
  */
 int matter_wifi_get_setting(unsigned char wlan_idx, rtw_wifi_setting_t *psetting);
-
-/**
- * @brief  Get the WiFi channel number of the specified WLAN index.
- * @param[in]  wlan_idx: The WLAN index.
- * @param[out]  ch: Pointer to store the channel number.
- * @return  Non-zero on success, zero on failure.
- */
-int matter_wifi_get_wifi_channel_number(uint8_t wlan_idx, uint8_t *ch);
 
 /**
  * @brief  Get the STA (station) WiFi information.
@@ -265,6 +249,46 @@ int matter_get_sta_wifi_info(rtw_wifi_setting_t *pSetting);
  */
 void matter_wifi_reg_event_handler(matter_wifi_event event_cmds, rtw_event_handler_t handler_func, void *handler_user_data);
 
+/******************************************************
+ * Matter Feature: Wi-Fi Network Diagnostics
+ ******************************************************/
+
+/**
+ * @brief  Get the BSSID of the connected access point.
+ * @param[out]  bssid: Pointer to store the BSSID.
+ * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
+ */
+int matter_wifi_sta_get_ap_bssid(unsigned char *bssid);
+
+/**
+ * @brief  Get the security type of the specified WLAN index.
+ * @param[in]  wlan_idx: The WLAN index.
+ * @param[out]  wifi_security: Pointer to store the wifi security algorithm.
+ * @return  Non-zero on success, zero on failure.
+ */
+int matter_wifi_sta_get_security_type(uint32_t *wifi_security);
+
+/**
+ * @brief  Get the WiFi channel number of the specified WLAN index.
+ * @param[in]  wlan_idx: The WLAN index.
+ * @param[out]  ch: Pointer to store the channel number.
+ * @return  Non-zero on success, zero on failure.
+ */
+int matter_wifi_sta_get_channel_number(uint8_t *ch);
+
+/**
+ * @brief  Get the RSSI (signal strength) of the connected access point.
+ * @param[out]  prssi: Pointer to store the RSSI value.
+ * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
+ */
+int matter_wifi_sta_get_rssi(int *prssi);
+
+/**
+ * @brief  Get the WiFi Version of the connected access point.
+ * @param[out]  mode: Pointer to store the WiFi Version value.
+ * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
+ */
+int matter_wifi_sta_get_wifi_version(uint8_t *mode);
 #ifdef __cplusplus
 }
 #endif
