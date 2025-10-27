@@ -23,7 +23,7 @@ extern "C" {
   * @brief  Matter OTA error number.
   */
 enum {
-    OTA_SUCCESS = 0,            /**< Matter OTA success */
+    OTA_SUCCESS = 1,            /**< Matter OTA success */
     OTA_ERROR = -1,             /**< Matter OTA error */
 };
 
