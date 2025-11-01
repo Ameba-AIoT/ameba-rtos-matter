@@ -1,134 +1,55 @@
-#
-#    Copyright (c) 2020 Project CHIP Authors
-#    All rights reserved.
-#
-#    Licensed under the Apache License, Version 2.0 (the "License");
-#    you may not use this file except in compliance with the License.
-#    You may obtain a copy of the License at
-#
-#        http://www.apache.org/licenses/LICENSE-2.0
-#
-#    Unless required by applicable law or agreed to in writing, software
-#    distributed under the License is distributed on an "AS IS" BASIS,
-#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#    See the License for the specific language governing permissions and
-#    limitations under the License.
-
-#
-# This is a project Makefile. It is assumed the directory this Makefile resides in is a
-# project subdirectory.
-#
-
-include $(MAKE_INCLUDE_GEN)
-include $(MATTER_BUILDDIR)/make/chip_main/matter_main_sources.mk
-
 .PHONY: all clean
 
-#*****************************************************************************#
-#                              VARIABLES                                      #
-#*****************************************************************************#
-OUTPUT_DIR = $(MATTER_EXAMPLEDIR)/dishwasher/build/chip
-CODEGEN_DIR = $(OUTPUT_DIR)/codegen
+# -------------------------------------------------------------------
+# Includes
+# -------------------------------------------------------------------
+include $(MAKE_INCLUDE_GEN)
+include $(MATTER_MAIN_SRC)
 
-DIR += $(SRCDIR)
-DIR += $(CODEGEN_DIR)/app
-DIR += $(CODEGEN_DIR)/zap-generated
-DIR += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common
-DIR += $(CHIPDIR)/examples/all-clusters-app/ameba/main
-DIR += $(MATTER_EXAMPLEDIR)/dishwasher
+# -------------------------------------------------------------------
+# Variable Declaration
+# -------------------------------------------------------------------
+DEVICE_TYPE  := dishwasher
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
+CODEGEN_DIR  := $(OUTPUT_DIR)/codegen
+
+# -------------------------------------------------------------------
+# Search Directory
+# -------------------------------------------------------------------
+DIR += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
+DIR += $(CODEGEN_DIR)
 
 vpath %.cpp $(DIR) $(shell find $(DIR) -type d)
 vpath %.c $(DIR) $(shell find $(DIR) -type d)
 
-#*****************************************************************************#
-#                              BUILD DEFINITIONS                              #
-#*****************************************************************************#
-
-CHIP_ENABLE_AMEBA_TC = $(shell grep '\#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION ' $(MATTER_DIR)/common/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
-CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
-
-#*****************************************************************************#
-#                              CFLAGS                                         #
-#*****************************************************************************#
-
-GLOBAL_CFLAGS += -DCHIP_PROJECT=1
-GLOBAL_CFLAGS += -DSTD_PRINTF=1
-GLOBAL_CFLAGS += -DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\"lib/address_resolve/AddressResolve_DefaultImpl.h\"
-
-# matter blemgr adapter options
-ifeq ($(CONFIG_BLE_MATTER_ADAPTER),y)
-GLOBAL_CFLAGS += -DCONFIG_MATTER_BLEMGR_ADAPTER=1
-endif
-
-#*****************************************************************************#
-#                              INCLUDE FILE LIST                              #
-#*****************************************************************************#
+# -------------------------------------------------------------------
+# Include Path
+# -------------------------------------------------------------------
+IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
+IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip/gen/include
 IFLAGS += -I$(CODEGEN_DIR)
-IFLAGS += -I$(CODEGEN_DIR)/zap-generated
-IFLAGS += -I$(MATTER_EXAMPLEDIR)/dishwasher
-IFLAGS += -I$(MATTER_EXAMPLEDIR)/dishwasher/build/chip/gen/include
 
-#*****************************************************************************#
-#                              SOURCE FILE LIST                               #
-#*****************************************************************************#
-# porting layer src files
-CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_core.cpp
-CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_interaction.cpp
+# -------------------------------------------------------------------
+# Source Files (Porting Layer Core)
+# -------------------------------------------------------------------
+CPPSRC += $(MATTER_CORE_DIR)/matter_core.cpp
+CPPSRC += $(MATTER_CORE_DIR)/matter_interaction.cpp
 ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
-CPPSRC += $(BASEDIR)/component/common/application/matter/core/matter_ota_initializer.cpp
+CPPSRC += $(MATTER_CORE_DIR)/matter_ota_initializer.cpp
 endif
 
-# dishwasher-app source files
-CPPSRC += $(BASEDIR)/component/common/application/matter/drivers/device/dishwasher_driver.cpp
-CPPSRC += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode_delegate.cpp
-CPPSRC += $(MATTER_DRIVER)/dishwasher_mode/ameba_dishwasher_mode_instance.cpp
-CPPSRC += $(MATTER_DRIVER)/operational_state/ameba_operational_state_delegate.cpp
-CPPSRC += $(MATTER_DRIVER)/operational_state/ameba_operational_state_instance.cpp
-CPPSRC += $(MATTER_EXAMPLEDIR)/dishwasher/example_matter_dishwasher.cpp
-CPPSRC += $(MATTER_EXAMPLEDIR)/dishwasher/matter_drivers.cpp
+# -------------------------------------------------------------------
+# Source Files (Example)
+# -------------------------------------------------------------------
+CPPSRC += $(MATTER_DRIVER_DIR)/device/dishwasher_driver.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/dishwasher_mode/ameba_dishwasher_mode_delegate.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/dishwasher_mode/ameba_dishwasher_mode_instance.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_delegate.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_instance.cpp
+CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_$(DEVICE_TYPE).cpp
+CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/matter_drivers.cpp
 
-#*****************************************************************************#
-#                              OBJECT FILE LIST                               #
-#*****************************************************************************#
-CPPOBJS = $(CPPSRC:.cpp=.o)
-COBJS = $(notdir $(CSRC:.c=.o))
-OBJS = $(CPPOBJS) $(COBJS)
-STATIC_LIB = lib_main.a
-
-#*****************************************************************************#
-#                              INCLUDE DEPENDENCY                             #
-#*****************************************************************************#
--include $(OBJS:.o=.d)
-
-#*****************************************************************************#
-#                              RULES TO GENERATE TARGETS                      #
-#*****************************************************************************#
-all: CORE_TARGETS
-
-#*****************************************************************************#
-#                              GENERATE OBJECT FILE                           #
-#*****************************************************************************#
-CORE_TARGETS: $(CPPOBJS) $(COBJS) $(STATIC_LIB)
-
-$(CPPOBJS): %.o: %.cpp
-	$(CC) -ffunction-sections $(CPPFLAGS) $(MODULE_IFLAGS) -c $< -o $@
-	@foldername=$$(basename $$(dirname $<)); \
-	mkdir -p $${foldername}; \
-	cp $@ $${foldername}/$(notdir $@)
-
-$(STATIC_LIB):$(OBJS)
-	$(AR) rvs $@ *.o */*.o
-	$(MOVE) -f $@ $(ROOTDIR)/lib/application
-
-#*****************************************************************************#
-#                              CLEAN GENERATED FILES                          #
-#*****************************************************************************#
-clean:
-	find $(MATTER_BUILDDIR)/make/chip_main/dishwasher_app_port/ -mindepth 1 -type d -exec rm -r {} +
-	rm -f $(patsubst %.cpp,%.d,$(CPPSRC:.cpp=.d))
-	rm -f $(patsubst %.cpp,%.su,$(CPPSRC:.cpp=.su))
-	rm -f $(patsubst %.cpp,%.o,$(CPPSRC:.cpp=.o))
-	rm -f *.d *.su *.o
-	rm -f $(MATTER_EXAMPLEDIR)/dishwasher/dishwasher-app.matter
-
--include $(DEPS)
+# -------------------------------------------------------------------
+# Build Rules
+# -------------------------------------------------------------------
+include $(MATTER_MAIN_RULES)

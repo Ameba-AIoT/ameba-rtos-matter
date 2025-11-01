@@ -9,18 +9,15 @@ include $(MATTER_MAIN_SRC)
 # -------------------------------------------------------------------
 # Variable Declaration
 # -------------------------------------------------------------------
-DEVICE_TYPE  := light_port
-OUTPUT_DIR = $(CHIPDIR)/examples/lighting-app/ameba/build/chip
-CODEGEN_DIR = $(OUTPUT_DIR)/codegen
+DEVICE_TYPE  := room_air_conditioner
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
+CODEGEN_DIR  := $(OUTPUT_DIR)/codegen
 
 # -------------------------------------------------------------------
 # Search Directory
 # -------------------------------------------------------------------
-DIR += $(MATTER_EXAMPLE_DIR)/light
-DIR += $(CODEGEN_DIR)/app
-DIR += $(CODEGEN_DIR)/zap-generated
-DIR += $(CHIPDIR)/examples/lighting-app/lighting-common
-DIR += $(CHIPDIR)/examples/lighting-app/ameba/main
+DIR += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
+DIR += $(CODEGEN_DIR)
 
 vpath %.cpp $(DIR) $(shell find $(DIR) -type d)
 vpath %.c $(DIR) $(shell find $(DIR) -type d)
@@ -28,10 +25,8 @@ vpath %.c $(DIR) $(shell find $(DIR) -type d)
 # -------------------------------------------------------------------
 # Include Path
 # -------------------------------------------------------------------
-IFLAGS += -I$(MATTER_EXAMPLE_DIR)/light
-IFLAGS += -I$(CHIPDIR)/examples/lighting-app/lighting-common/include
-IFLAGS += -I$(CHIPDIR)/examples/lighting-app/ameba/main/include
-IFLAGS += -I$(CHIPDIR)/examples/lighting-app/ameba/build/chip/gen/include
+IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
+IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip/gen/include
 IFLAGS += -I$(CODEGEN_DIR)
 
 # -------------------------------------------------------------------
@@ -46,9 +41,10 @@ endif
 # -------------------------------------------------------------------
 # Source Files (Example)
 # -------------------------------------------------------------------
-CPPSRC += $(MATTER_DRIVER_DIR)/device/led_driver.cpp
-CPPSRC += $(MATTER_EXAMPLE_DIR)/light/example_matter_light.cpp
-CPPSRC += $(MATTER_EXAMPLE_DIR)/light/matter_drivers.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/device/room_aircon_driver.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/device/temp_hum_sensor_driver.cpp
+CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_$(DEVICE_TYPE).cpp
+CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/matter_drivers.cpp
 
 # -------------------------------------------------------------------
 # Build Rules
