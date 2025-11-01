@@ -11,9 +11,9 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 
-#if defined(CONFIG_EXAMPLE_MATTER_AIRCON) && CONFIG_EXAMPLE_MATTER_AIRCON
+#if defined(CONFIG_EXAMPLE_MATTER_ROOM_AIR_CONDITIONER) && CONFIG_EXAMPLE_MATTER_ROOM_AIR_CONDITIONER
 
-static void example_matter_aircon_task(void *pvParameters)
+static void example_matter_room_air_conditioner_task(void *pvParameters)
 {
     while (!(wifi_is_up(RTW_STA_INTERFACE) || wifi_is_up(RTW_AP_INTERFACE)))
     {
@@ -52,12 +52,12 @@ static void example_matter_aircon_task(void *pvParameters)
     vTaskDelete(NULL);
 }
 
-extern "C" void example_matter_aircon(void)
+extern "C" void example_matter_room_air_conditioner(void)
 {
-    if (xTaskCreate(example_matter_aircon_task, ((const char*)"example_matter_aircon_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
+    if (xTaskCreate(example_matter_room_air_conditioner_task, ((const char*)"example_matter_room_air_conditioner_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
     {
-        ChipLogProgress(DeviceLayer, "%s xTaskCreate(example_matter_aircon_task) failed", __FUNCTION__);
+        ChipLogProgress(DeviceLayer, "%s xTaskCreate(example_matter_room_air_conditioner_task) failed", __FUNCTION__);
     }
 }
 
-#endif /* CONFIG_EXAMPLE_MATTER_AIRCON */
+#endif /* CONFIG_EXAMPLE_MATTER_ROOM_AIR_CONDITIONER */
