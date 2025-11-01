@@ -34,7 +34,7 @@
 #include <string.h>
 #include <limits.h>
 
-#if (CONFIG_MATTER) && (CONFIG_ENABLE_MATTER_PRNG)
+#if defined(CONFIG_ENABLE_AMEBA_PRNG) && (CONFIG_ENABLE_AMEBA_PRNG == 1)
 #include <crypto_api.h>
 #include <device_lock.h>
 #endif
@@ -598,7 +598,7 @@ exit:
 int mbedtls_ctr_drbg_random( void *p_rng, unsigned char *output,
                              size_t output_len )
 {
-#if (CONFIG_MATTER) && (CONFIG_ENABLE_MATTER_PRNG)
+#if defined(CONFIG_ENABLE_AMEBA_PRNG) && (CONFIG_ENABLE_AMEBA_PRNG == 1)
     int ret = 0;
 
     device_mutex_lock(RT_DEV_LOCK_CRYPTO);
@@ -629,7 +629,7 @@ int mbedtls_ctr_drbg_random( void *p_rng, unsigned char *output,
     if( mbedtls_mutex_unlock( &ctx->mutex ) != 0 )
         return( MBEDTLS_ERR_THREADING_MUTEX_ERROR );
 #endif
-#endif /* CONFIG_MATTER */
+#endif /* CONFIG_ENABLE_AMEBA_PRNG */
 
     return( ret );
 }
