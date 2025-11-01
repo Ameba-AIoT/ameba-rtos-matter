@@ -5,8 +5,8 @@ include $(MAKE_INCLUDE_GEN)
 # -------------------------------------------------------------------
 # Variable Declaration
 # -------------------------------------------------------------------
-DEVICE_TYPE := light
-OUTPUT_DIR  := $(CHIPDIR)/examples/lighting-app/ameba/build/chip
+DEVICE_TYPE := microwave_oven
+OUTPUT_DIR  := $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
 
 # -------------------------------------------------------------------
 # Build Declaration and Source

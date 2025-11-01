@@ -1,9 +1,22 @@
-# Matter (CHIP) Search Directory
 # -------------------------------------------------------------------
+# Build Definition
+# -------------------------------------------------------------------
+CHIP_ENABLE_AMEBA_TC = $(shell grep '\#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION ' $(MATTER_COMMON_DIR)/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
+CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 
+# -------------------------------------------------------------------
+# Compilation flag
+# -------------------------------------------------------------------
+GLOBAL_CFLAGS += -DCHIP_PROJECT=1
+GLOBAL_CFLAGS += -DSTD_PRINTF=1
+GLOBAL_CFLAGS += -DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\"lib/address_resolve/AddressResolve_DefaultImpl.h\"
+
+# -------------------------------------------------------------------
+# Search Directory
+# -------------------------------------------------------------------
 DIR =
-DIR += $(CHIPDIR)/src/app/clusters/software-diagnostics-server
 DIR += $(CHIPDIR)/src
+DIR += $(CHIPDIR)/src/app/clusters/software-diagnostics-server
 DIR += $(CHIPDIR)/src/app/server
 DIR += $(CHIPDIR)/src/lib/dnssd/minimal_mdns/responders
 DIR += $(CHIPDIR)/examples/platform/ameba
@@ -15,8 +28,8 @@ DIR += $(BASEDIR)/component/common/application/matter/drivers
 
 # Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
-
 IFLAGS += -I$(CHIPDIR)/examples/platform/ameba
+IFLAGS += -I$(CHIPDIR)/examples/platform/ameba/observer
 IFLAGS += -I$(CHIPDIR)/examples/providers
 IFLAGS += -I$(CHIPDIR)/src/
 IFLAGS += -I$(CHIPDIR)/src/app/
@@ -31,12 +44,13 @@ IFLAGS += -I$(CHIPDIR)/third_party/nlunit-test/repo/src
 IFLAGS += -I$(CHIPDIR)/zzz_generated
 IFLAGS += -I$(CHIPDIR)/zzz_generated/app-common
 
+# -------------------------------------------------------------------
 # Source file list
 # -------------------------------------------------------------------
-
-# connectedhomeip - examples
+# connectedhomeip - examples - platform
 CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
 CSRC += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
+
 
 # connectedhomeip - src - app
 CPPSRC += $(CHIPDIR)/src/app/SafeAttributePersistenceProvider.cpp
@@ -99,8 +113,8 @@ CPPSRC += $(CODEGEN_DIR)/app/cluster-callbacks.cpp
 CPPSRC += $(CODEGEN_DIR)/zap-generated/IMClusterCommandHandler.cpp
 
 # matter - api
-CPPSRC += $(MATTER_DIR)/api/matter_api.cpp
+CPPSRC += $(MATTER_API_DIR)/matter_api.cpp
 
 # matter - core
-CPPSRC += $(MATTER_DIR)/core/matter_device_utils.cpp
-CPPSRC += $(MATTER_DIR)/core/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
+CPPSRC += $(MATTER_CORE_DIR)/matter_device_utils.cpp
+CPPSRC += $(MATTER_CORE_DIR)/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
