@@ -9,9 +9,9 @@ include $(MATTER_MAIN_SRC)
 # -------------------------------------------------------------------
 # Variable Declaration
 # -------------------------------------------------------------------
-DEVICE_TYPE  := fan
-OUTPUT_DIR = $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
-CODEGEN_DIR = $(OUTPUT_DIR)/codegen
+DEVICE_TYPE  := microwave_oven
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
+CODEGEN_DIR  := $(OUTPUT_DIR)/codegen
 
 # -------------------------------------------------------------------
 # Search Directory
@@ -41,7 +41,8 @@ endif
 # -------------------------------------------------------------------
 # Source Files (Example)
 # -------------------------------------------------------------------
-CPPSRC += $(MATTER_DRIVER_DIR)/device/fan_driver.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/device/microwaveoven_driver.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/microwave_oven/ameba_microwave_oven_device.cpp
 CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_$(DEVICE_TYPE).cpp
 CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/matter_drivers.cpp
 

@@ -1,18 +1,36 @@
-include $(MATTER_BUILDDIR)/Makefile.toolchain.matter
-
 #*****************************************************************************#
 #                              PATH DECLARATION                               #
 #*****************************************************************************#
 
-CHIPDIR               = $(BASEDIR)/third_party/connectedhomeip
-HP_TOOLCHAINDIR       = $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/toolchain
-LP_TOOLCHAINDIR       = $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp/toolchain
-MATTER_DIR            = $(BASEDIR)/component/common/application/matter
-MATTER_BUILDDIR       = $(MATTER_DIR)/project/amebad
-MATTER_DRIVER         = $(MATTER_DIR)/drivers/matter_drivers
-MATTER_EXAMPLEDIR     = $(MATTER_DIR)/examples
-MATTER_TOOLDIR        = $(MATTER_DIR)/tools
-MATTER_TOOLCHAINDIR   = $(MATTER_TOOLDIR)/toolchain
+CHIPDIR              := $(BASEDIR)/third_party/connectedhomeip
+HP_TOOLCHAINDIR      := $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/toolchain
+LP_TOOLCHAINDIR      := $(BASEDIR)/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp/toolchain
+MATTER_DIR           := $(BASEDIR)/component/common/application/matter
+
+# Matter Subdirectories
+MATTER_BUILD_DIR     := $(MATTER_DIR)/project/amebad
+MATTER_API_DIR       := $(MATTER_DIR)/api
+MATTER_CORE_DIR      := $(MATTER_DIR)/core
+MATTER_COMMON_DIR    := $(MATTER_DIR)/common
+MATTER_DRIVER_DIR    := $(MATTER_DIR)/drivers
+MATTER_EXAMPLE_DIR   := $(MATTER_DIR)/examples
+MATTER_TOOL_DIR      := $(MATTER_DIR)/tools
+
+# Networking and Security Directories
+LWIP_DIR             := $(MATTER_COMMON_DIR)/lwip
+MBEDTLS_DIR          := $(MATTER_COMMON_DIR)/mbedtls
+
+MATTER_LWIP_DIR      := $(LWIP_DIR)
+MATTER_MBEDTLS_DIR   := $(MBEDTLS_DIR)
+
+# Build System Directories
+MATTER_MAKE_DIR      := $(MATTER_BUILD_DIR)/make
+MATTER_TOOLCHAIN_DIR := $(MATTER_TOOL_DIR)/toolchain
+
+MATTER_CORE_RULES    := $(MATTER_BUILD_DIR)/make/chip/chip_core_rules.mk
+MATTER_CORE_SRC      := $(MATTER_BUILD_DIR)/make/chip/chip_core_sources.mk
+MATTER_MAIN_RULES    := $(MATTER_BUILD_DIR)/make/chip_main/chip_main_rules.mk
+MATTER_MAIN_SRC      := $(MATTER_BUILD_DIR)/make/chip_main/chip_main_sources.mk
 
 #*****************************************************************************#
 #                              VERSION CONTROL                                #
@@ -27,33 +45,33 @@ endif
 #                              INCLUDE DIRECTORY                              #
 #*****************************************************************************#
 
-IFLAGS               += -I$(MATTER_DIR)/api
-IFLAGS               += -I$(MATTER_DIR)/core
-IFLAGS               += -I$(MATTER_DIR)/drivers/device
-IFLAGS               += -I$(MATTER_DIR)/drivers/matter_consoles
-IFLAGS               += -I$(MATTER_DIR)/drivers/matter_drivers
+IFLAGS               += -I$(MATTER_API_DIR)
+IFLAGS               += -I$(MATTER_CORE_DIR)
+IFLAGS               += -I$(MATTER_DRIVER_DIR)/device
+IFLAGS               += -I$(MATTER_DRIVER_DIR)/matter_consoles
+IFLAGS               += -I$(MATTER_DRIVER_DIR)/matter_drivers
 
-IFLAGS               += -I$(MATTER_DIR)/common/atcmd
-IFLAGS               += -I$(MATTER_DIR)/common/include
-IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include
-IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include/lwip
-IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include/netif
-IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek
-IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/include
-IFLAGS               += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/freertos
-IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
+IFLAGS               += -I$(MATTER_COMMON_DIR)/atcmd
+IFLAGS               += -I$(MATTER_COMMON_DIR)/include
+IFLAGS               += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/include
+IFLAGS               += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/include/lwip
+IFLAGS               += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/include/netif
+IFLAGS               += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/port/realtek
+IFLAGS               += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/port/realtek/include
+IFLAGS               += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/port/realtek/freertos
+IFLAGS               += -I$(MATTER_MBEDTLS_DIR)
 ifeq ($(MBEDTLS_MATTER_ENABLE), y)
-IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/include
-IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/include/mbedtls
-IFLAGS               += -I$(MATTER_DIR)/common/mbedtls/$(MBEDTLS_VERSION)/library
+IFLAGS               += -I$(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/include
+IFLAGS               += -I$(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/include/mbedtls
+IFLAGS               += -I$(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library
 endif
-IFLAGS               += -I$(MATTER_DIR)/common/port
-IFLAGS               += -I$(MATTER_DIR)/common/protobuf
-IFLAGS               += -I$(MATTER_DIR)/common/protobuf/nanopb
-IFLAGS               += -I$(MATTER_DIR)/examples
+IFLAGS               += -I$(MATTER_COMMON_DIR)/port
+IFLAGS               += -I$(MATTER_COMMON_DIR)/protobuf
+IFLAGS               += -I$(MATTER_COMMON_DIR)/protobuf/nanopb
+IFLAGS               += -I$(MATTER_EXAMPLE_DIR)
 
 ifeq ($(CONFIG_BT_EN), y)
-IFLAGS               += -I$(MATTER_DIR)/common/bluetooth
+IFLAGS               += -I$(MATTER_COMMON_DIR)/bluetooth
 endif
 
 #*****************************************************************************#
@@ -66,7 +84,7 @@ CPPFLAGS += -fno-rtti
 
 GLOBAL_CFLAGS += -DCONFIG_MATTER=1
 
-# Compile Warnings
+# compiler warnings
 GLOBAL_CFLAGS += -Wno-deprecated-declarations
 GLOBAL_CFLAGS += -Wno-format
 GLOBAL_CFLAGS += -Wno-format-nonliteral
@@ -82,7 +100,7 @@ GLOBAL_CFLAGS += -Wno-unused-parameter
 GLOBAL_CFLAGS += -DCHIP_DEVICE_LAYER_TARGET=Ameba
 GLOBAL_CFLAGS += -DCHIP_DEVICE_LAYER_NONE=0
 
-# chip System options
+# chip system configurations
 GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
 GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=0
 GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS=0
@@ -90,44 +108,34 @@ GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_LWIP=1
 GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_SOCKETS=0
 GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=0
 GLOBAL_CFLAGS += -DCHIP_SYSTEM_CONFIG_POSIX_LOCKING=0
+
 GLOBAL_CFLAGS += -DCHIP_SHELL_MAX_TOKENS=11
 
-# chip IPv4 options
-GLOBAL_CFLAGS += -DINET_CONFIG_ENABLE_IPV4=0
-
 GLOBAL_CFLAGS += -DCHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1
-
-# LwIP options
+GLOBAL_CFLAGS += -DINET_CONFIG_ENABLE_IPV4=0
 GLOBAL_CFLAGS += -DFD_SETSIZE=10
 GLOBAL_CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
-
-# Mbedtls options
 GLOBAL_CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
-
-# matter ota options
-GLOBAL_CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1
-
-ifeq ($(CONFIG_MATTER_SECURE_EN), y)
-# matter factory data options
-GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_CRYPTO=1
-# matter additional secure options
-GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=1
-else
-# matter factory data options
-GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
-endif
-
-# matter factory data encryption options
-GLOBAL_CFLAGS += -DCONFIG_ENABLE_FACTORY_DATA_ENCRYPTION=0
-
-# matter test event options
-GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
-
-# matter timer
-GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_SNTP=1
-
-# matter dct options
-GLOBAL_CFLAGS += -DCONFIG_ENABLE_DCT_ENCRYPTION=0
-
-# other options
 GLOBAL_CFLAGS += -DCHIP_HAVE_CONFIG_H
+
+GLOBAL_CFLAGS += -DCONFIG_BT=1
+GLOBAL_CFLAGS += -DCONFIG_MATTER_BLEMGR_ADAPTER=1
+
+# ameba configuration
+CFLAGS += -DCONFIG_ENABLE_AMEBA_CRYPTO=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_DCT_ENC=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA_ENC=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_PRNG=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_SNTP=1
+CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
+
+# -------------------------------------------------------------------
+# Matter Cluster Flags
+# -------------------------------------------------------------------
+
+# Access Control Cluster (Server) - Extension
+CFLAGS += -DCHIP_CONFIG_ENABLE_ACL_EXTENSIONS=1
+
+# OTA Requestor Cluster (Server)
+CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1

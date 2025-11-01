@@ -9,7 +9,7 @@ include $(MATTER_MAIN_SRC)
 # -------------------------------------------------------------------
 # Variable Declaration
 # -------------------------------------------------------------------
-DEVICE_TYPE  := fan
+DEVICE_TYPE  := laundry_washer
 OUTPUT_DIR = $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
 CODEGEN_DIR = $(OUTPUT_DIR)/codegen
 
@@ -41,7 +41,10 @@ endif
 # -------------------------------------------------------------------
 # Source Files (Example)
 # -------------------------------------------------------------------
-CPPSRC += $(MATTER_DRIVER_DIR)/device/fan_driver.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/device/washer_driver.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/laundry_washer_controls/ameba_laundry_washer_controls_delegate_impl.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/laundry_washer_mode/ameba_laundry_washer_mode.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_delegate_impl.cpp
 CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_$(DEVICE_TYPE).cpp
 CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/matter_drivers.cpp
 
