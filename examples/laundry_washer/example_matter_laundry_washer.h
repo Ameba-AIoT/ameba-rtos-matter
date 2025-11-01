@@ -7,12 +7,12 @@
   *
 ********************************************************************************/
 
-#ifndef EXAMPLE_MATTER_TEMPERATURE_SENSOR_H
-#define EXAMPLE_MATTER_TEMPERATURE_SENSOR_H
+#ifndef EXAMPLE_MATTER_LAUNDRY_WASHER_H
+#define EXAMPLE_MATTER_LAUNDRY_WASHER_H
 
 /**
- * @brief  Create Matter Task (for Matter Temperature Sensor).
+ * @brief  Create Matter Task (for Matter Laundry Washer).
  */
-void example_matter_temp_sensor_task(void);
+void example_matter_laundry_washer(void);
 
-#endif /* EXAMPLE_MATTER_TEMPERATURE_SENSOR_H */
+#endif /* EXAMPLE_MATTER_LAUNDRY_WASHER_H */

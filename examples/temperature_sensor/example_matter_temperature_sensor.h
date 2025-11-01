@@ -7,12 +7,12 @@
   *
 ********************************************************************************/
 
-#ifndef EXAMPLE_MATTER_AIRCON_H
-#define EXAMPLE_MATTER_AIRCON_H
+#ifndef EXAMPLE_MATTER_TEMPERATURE_SENSOR_H
+#define EXAMPLE_MATTER_TEMPERATURE_SENSOR_H
 
 /**
- * @brief  Create Matter Task (for Matter Room Air-Conditioner).
+ * @brief  Create Matter Task (for Matter Temperature Sensor).
  */
-void example_matter_aircon(void);
+void example_matter_temperature_sensor(void);
 
-#endif /* EXAMPLE_MATTER_AIRCON_H */
+#endif /* EXAMPLE_MATTER_TEMPERATURE_SENSOR_H */
