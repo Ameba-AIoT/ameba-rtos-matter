@@ -7,12 +7,12 @@
   *
 ********************************************************************************/
 
-#ifndef EXAMPLE_MATTER_LAUNDRY_WASHER_H
-#define EXAMPLE_MATTER_LAUNDRY_WASHER_H
+#ifndef EXAMPLE_MATTER_MICROWAVEOVEN_H
+#define EXAMPLE_MATTER_MICROWAVEOVEN_H
 
 /**
- * @brief  Create Matter Task (for Matter Laundry Washer).
+ * @brief  Create Matter Task (for Matter Microwave Oven).
  */
-void example_matter_laundrywasher(void);
+void example_matter_microwave_oven(void);
 
-#endif /* EXAMPLE_MATTER_LAUNDRY_WASHER_H */
+#endif /* EXAMPLE_MATTER_MICROWAVEOVEN_H */

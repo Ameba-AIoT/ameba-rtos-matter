@@ -11,16 +11,16 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 
-#if defined(CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER) && CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER
+#if defined(CONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN) && CONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN
 
-static void example_matter_laundrywasher_task(void *pvParameters)
+static void example_matter_microwave_oven_task(void *pvParameters)
 {
     while (!(wifi_is_up(RTW_STA_INTERFACE) || wifi_is_up(RTW_AP_INTERFACE)))
     {
         vTaskDelay(500);
     }
 
-    ChipLogProgress(DeviceLayer, "Matter Laundry Washer Example!");
+    ChipLogProgress(DeviceLayer, "Matter Microwave Oven Example!");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -32,16 +32,16 @@ static void example_matter_laundrywasher_task(void *pvParameters)
         ChipLogProgress(DeviceLayer, "matter_core_start failed!");
     }
 
-    err = matter_driver_laundry_washer_init();
+    err = matter_driver_microwave_oven_init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "matter_driver_laundry_washer_init failed!");
+        ChipLogProgress(DeviceLayer, "matter_driver_microwave_oven_init failed!");
     }
 
-    err = matter_driver_laundry_washer_set_startup_value();
+    err = matter_driver_microwave_oven_set_startup_value();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "matter_driver_laundry_washer_set_startup_value failed!");
+        ChipLogProgress(DeviceLayer, "matter_driver_microwave_oven_set_startup_value failed!");
     }
 
     err = matter_interaction_start_downlink();
@@ -59,12 +59,12 @@ static void example_matter_laundrywasher_task(void *pvParameters)
     vTaskDelete(NULL);
 }
 
-extern "C" void example_matter_laundrywasher(void)
+extern "C" void example_matter_microwave_oven(void)
 {
-    if (xTaskCreate(example_matter_laundrywasher_task, ((const char*)"example_matter_laundrywasher_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
+    if (xTaskCreate(example_matter_microwave_oven_task, ((const char*)"example_matter_microwave_oven_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
     {
-        ChipLogProgress(DeviceLayer, "%s xTaskCreate(example_matter_laundrywasher_task) failed", __FUNCTION__);
+        ChipLogProgress(DeviceLayer, "%s xTaskCreate(example_matter_microwave_oven_task) failed", __FUNCTION__);
     }
 }
 
-#endif /* CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER */
+#endif /* CONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN */

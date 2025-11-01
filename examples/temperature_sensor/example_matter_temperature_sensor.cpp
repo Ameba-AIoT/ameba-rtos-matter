@@ -11,9 +11,9 @@
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 
-#if defined(CONFIG_EXAMPLE_MATTER_TEMP_SENSOR) && CONFIG_EXAMPLE_MATTER_TEMP_SENSOR
+#if defined(CONFIG_EXAMPLE_MATTER_TEMPERATURE_SENSOR) && CONFIG_EXAMPLE_MATTER_TEMPERATURE_SENSOR
 
-static void example_matter_temp_sensor_task(void *pvParameters)
+static void example_matter_temperature_sensor_task(void *pvParameters)
 {
     while(!(wifi_is_up(RTW_STA_INTERFACE) || wifi_is_up(RTW_AP_INTERFACE)))
     {
@@ -53,12 +53,12 @@ static void example_matter_temp_sensor_task(void *pvParameters)
     vTaskDelete(NULL);
 }
 
-extern "C" void example_matter_temp_sensor(void)
+extern "C" void example_matter_temperature_sensor(void)
 {
-    if (xTaskCreate(example_matter_temp_sensor_task, ((const char*)"example_matter_temp_sensor_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
+    if (xTaskCreate(example_matter_temperature_sensor_task, ((const char*)"example_matter_temperature_sensor_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
     {
-        ChipLogProgress(DeviceLayer, "xTaskCreate(example_matter_temp_sensor) failed");
+        ChipLogProgress(DeviceLayer, "xTaskCreate(example_matter_temperature_sensor_task) failed");
     }
 }
 
-#endif /* CONFIG_EXAMPLE_MATTER_TEMP_SENSOR */
+#endif /* CONFIG_EXAMPLE_MATTER_TEMPERATURE_SENSOR */

@@ -7,12 +7,12 @@
   *
 ********************************************************************************/
 
-#ifndef EXAMPLE_MATTER_MICROWAVEOVEN_H
-#define EXAMPLE_MATTER_MICROWAVEOVEN_H
+#ifndef EXAMPLE_MATTER_ROOM_AIR_CONDITIONER_H
+#define EXAMPLE_MATTER_ROOM_AIR_CONDITIONER_H
 
 /**
- * @brief  Create Matter Task (for Matter Microwave Oven).
+ * @brief  Create Matter Task (for Matter Room Air-Conditioner).
  */
-void example_matter_microwaveoven(void);
+void example_matter_room_air_conditioner(void);
 
-#endif /* EXAMPLE_MATTER_MICROWAVEOVEN_H */
+#endif /* EXAMPLE_MATTER_ROOM_AIR_CONDITIONER_H */
