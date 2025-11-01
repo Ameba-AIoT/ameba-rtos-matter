@@ -12,7 +12,7 @@ extern "C" {
 #include <dct2.h>
 #include <chip_porting.h>
 
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
 #include <mbedtls/aes.h>
 #endif
 
@@ -29,7 +29,7 @@ extern "C" {
 #define ENABLE_BACKUP           MATTER_KVS_ENABLE_BACKUP
 #define ENABLE_WEAR_LEVELING    MATTER_KVS_ENABLE_WEAR_LEVELING
 
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
 #if defined(MBEDTLS_CIPHER_MODE_CTR)
 mbedtls_aes_context aes;
 
@@ -142,7 +142,7 @@ s32 initPref(void)
         printf("dct_init2 success\n");
     }
 
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
     // Initialize mbedtls aes context and set encryption key
     mbedtls_aes_init(&aes);
     if (mbedtls_aes_setkey_enc(&aes, key, 256) != 0)
@@ -178,7 +178,7 @@ s32 deinitPref(void)
         printf("dct_init2 success\n");
     }
 
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
     // free aes context
     mbedtls_aes_free(&aes);
 #endif
@@ -439,7 +439,7 @@ s32 setPref_new(const char *domain, const char *key, u8 *value, size_t byteCount
 
             if (dct_remain_variable(&handle) > 0)
             {
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
                 ret = dct_set_encrypted_variable(&handle, (char *)key, value, byteCount, DCT_REGION_1);
 #else
                 ret = dct_set_variable_new(&handle, (char *)key, (char *)value, (uint16_t)byteCount);
@@ -472,7 +472,7 @@ s32 setPref_new(const char *domain, const char *key, u8 *value, size_t byteCount
 
             if (dct_remain_variable2(&handle) > 0)
             {
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
                 ret = dct_set_encrypted_variable(&handle, (char *)key, value, byteCount, DCT_REGION_2);
 #else
                 ret = dct_set_variable_new2(&handle, (char *)key, (char *)value, (uint16_t)byteCount);
@@ -513,7 +513,7 @@ s32 getPref_bool_new(const char *domain, const char *key, u8 *val)
             printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, (char *)val, &len, DCT_REGION_1);
 #else
         ret = dct_get_variable_new(&handle, (char *)key, (char *)val, &len);
@@ -536,7 +536,7 @@ s32 getPref_bool_new(const char *domain, const char *key, u8 *val)
             printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, (char *)val, &len, DCT_REGION_2);
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, (char *)val, &len);
@@ -571,7 +571,7 @@ s32 getPref_u32_new(const char *domain, const char *key, u32 *val)
             printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, (char *)val, &len, DCT_REGION_1);
 #else
         ret = dct_get_variable_new(&handle, (char *)key, (char *)val, &len);
@@ -595,7 +595,7 @@ s32 getPref_u32_new(const char *domain, const char *key, u32 *val)
             printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, (char *)val, &len, DCT_REGION_2);
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, (char *)val, &len);
@@ -630,7 +630,7 @@ s32 getPref_u64_new(const char *domain, const char *key, u64 *val)
             printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, (char *)val, &len, DCT_REGION_1);
 #else
         ret = dct_get_variable_new(&handle, (char *)key, (char *)val, &len);
@@ -654,7 +654,7 @@ s32 getPref_u64_new(const char *domain, const char *key, u64 *val)
             printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, (char *)val, &len, DCT_REGION_2);
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, (char *)val, &len);
@@ -689,7 +689,7 @@ s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSi
             printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, buf, len, DCT_REGION_1);
 #else
         ret = dct_get_variable_new(&handle, (char *)key, buf, len);
@@ -714,7 +714,7 @@ s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSi
             printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, buf, len, DCT_REGION_2);
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, buf, len);
@@ -750,7 +750,7 @@ s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize
             printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, (char *)buf, len, DCT_REGION_1);
 #else
         ret = dct_get_variable_new(&handle, (char *)key, (char *)buf, len);
@@ -775,7 +775,7 @@ s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize
             printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
             goto exit;
         }
-#if CONFIG_ENABLE_DCT_ENCRYPTION
+#if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
         ret = dct_get_encrypted_variable(&handle, (char *)key, (char *)buf, len, DCT_REGION_2);
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, (char *)buf, len);
