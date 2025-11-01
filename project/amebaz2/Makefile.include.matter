@@ -1,31 +1,38 @@
+SHELL = /bin/bash
+OS := $(shell uname)
+
 # -------------------------------------------------------------------
 # Directory Definition
 # -------------------------------------------------------------------
+# Root Directory and Main Paths
+SDKROOTDIR           := $(shell pwd)/../../..
+CHIPDIR              := $(SDKROOTDIR)/third_party/connectedhomeip
+MATTER_DIR           := $(SDKROOTDIR)/component/common/application/matter
 
-SDKROOTDIR         := $(shell pwd)/../../..
-CHIPDIR             = $(SDKROOTDIR)/third_party/connectedhomeip
-MATTER_DIR          = $(SDKROOTDIR)/component/common/application/matter
-MATTER_BUILDDIR     = $(MATTER_DIR)/project/amebaz2
-MATTER_EXAMPLEDIR   = $(MATTER_DIR)/examples
-MATTER_MAKEDIR      = $(MATTER_BUILDDIR)/make
-MATTER_TOOLDIR      = $(MATTER_DIR)/tools
-MATTER_TOOLCHAINDIR = $(MATTER_DIR)/tools/toolchain
+# Matter Subdirectories
+MATTER_BUILD_DIR     := $(MATTER_DIR)/project/amebaz2
+MATTER_API_DIR       := $(MATTER_DIR)/api
+MATTER_CORE_DIR      := $(MATTER_DIR)/core
+MATTER_COMMON_DIR    := $(MATTER_DIR)/common
+MATTER_DRIVER_DIR    := $(MATTER_DIR)/drivers
+MATTER_EXAMPLE_DIR   := $(MATTER_DIR)/examples
+MATTER_TOOL_DIR      := $(MATTER_DIR)/tools
 
-# MbedTLS Configuration
-MBEDTLS_DIR_SELECTION = matter
-DEFAULT_MBEDTLS_DIR = $(SDKROOTDIR)/component/common/network/ssl
-MATTER_MBEDTLS_DIR  = $(MATTER_DIR)/common/mbedtls
+# Networking and Security Directories
+LWIP_DIR             := $(MATTER_COMMON_DIR)/lwip
+MBEDTLS_DIR          := $(MATTER_COMMON_DIR)/mbedtls
 
-ifeq ($(MBEDTLS_DIR_SELECTION), matter)
-MBEDTLS_DIR = $(MATTER_MBEDTLS_DIR)
-else
-MBEDTLS_DIR = $(DEFAULT_MBEDTLS_DIR)
-endif
+MATTER_LWIP_DIR       = $(LWIP_DIR)
+MATTER_MBEDTLS_DIR    = $(MBEDTLS_DIR)
+
+# Build System Directories
+MATTER_MAKE_DIR      := $(MATTER_BUILD_DIR)/make
+MATTER_TOOLCHAIN_DIR := $(MATTER_TOOL_DIR)/toolchain
 
 # -------------------------------------------------------------------
-# Toolchain Definition
+# Toolchain and Compilation Definition
 # -------------------------------------------------------------------
-MATTER_INCLUDE_TOOLCHAIN = $(MATTER_BUILDDIR)/Makefile.include.toolchain
+MATTER_INCLUDE_TOOLCHAIN = $(MATTER_BUILD_DIR)/Makefile.include.toolchain
 
 include $(MATTER_INCLUDE_TOOLCHAIN)
 
@@ -38,14 +45,15 @@ LWIP_VERSION       = lwip_v2.1.2
 MBEDTLS_VERSION    = mbedtls-2.28.1
 
 # -------------------------------------------------------------------
-# CHIP options
+# Compiler Flags
 # -------------------------------------------------------------------
 
-# CPP standards and language
 CPPFLAGS += -std=gnu++17
 CPPFLAGS += -fno-rtti
 
-# Compile Warnings
+CFLAGS += -DCONFIG_MATTER=1
+
+# compiler warnings
 CFLAGS += -Wno-deprecated-declarations
 CFLAGS += -Wno-format
 CFLAGS += -Wno-format-nonliteral
@@ -57,11 +65,11 @@ CFLAGS += -Wno-unused-variable
 CFLAGS += -Wno-unused-label
 CFLAGS += -Wno-unused-parameter
 
-# Chip device options
+# compiler warnings
 CFLAGS += -DCHIP_DEVICE_LAYER_TARGET=Ameba
 CFLAGS += -DCHIP_DEVICE_LAYER_NONE=0
 
-# Chip System options
+# chip device configuration
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=0
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS=0
@@ -69,60 +77,41 @@ CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_LWIP=1
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_SOCKETS=0
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK=0
 CFLAGS += -DCHIP_SYSTEM_CONFIG_POSIX_LOCKING=0
+
 CFLAGS += -DCHIP_SHELL_MAX_TOKENS=11
 
-# Matter OTA Flags
-CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1
-
-# Chip BLE options
 CFLAGS += -DCHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1
-
-# Chip IPv4 
 CFLAGS += -DINET_CONFIG_ENABLE_IPV4=0
-
-# LwIP options
 CFLAGS += -DFD_SETSIZE=10
 CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
-
-# Mbedtls options
-# Removal of mbedtls config file, to use the default mbedtls_config.h for all new mbedtls version.
-# Mbedtls 2.28.1 will still use matter_mbedtls_config.h declared in mbedtls/config.h
-#CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
-
-# other options
+CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
 CFLAGS += -DCHIP_HAVE_CONFIG_H
 
-# -------------------------------------------------------------------
-# Ameba plaftorm matter options
-# -------------------------------------------------------------------
-CFLAGS += -DCONFIG_MATTER=1
-
-# Ameba platform blemgr adapter
 CFLAGS += -DCONFIG_BT=1
 CFLAGS += -DCONFIG_MATTER_BLEMGR_ADAPTER=1
 
-# Ameba platform factory data options
-CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
-CFLAGS += -DCONFIG_ENABLE_FACTORY_DATA_ENCRYPTION=0
-
-# Ameba platform additional secure feature
+# Matter
 CFLAGS += -DCONFIG_ENABLE_AMEBA_CRYPTO=0
-
-# Ameba platform TestEvent Trigger EnableKey
+CFLAGS += -DCONFIG_ENABLE_AMEBA_DCT_ENC=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA_ENC=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_PRNG=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_SNTP=1
 CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
 
-# Ameba plaform matter timer
-CFLAGS += -DCONFIG_ENABLE_AMEBA_SNTP=1
+# -------------------------------------------------------------------
+# Matter Cluster Flags
+# -------------------------------------------------------------------
 
-# Ameba platform dct options
-CFLAGS += -DCONFIG_ENABLE_DCT_ENCRYPTION=0
+# Access Control Cluster (Server) - Extension
+CFLAGS += -DCHIP_CONFIG_ENABLE_ACL_EXTENSIONS=1
 
-# Ameba platform PRNG options
-CFLAGS += -DCONFIG_ENABLE_MATTER_PRNG=1
-
+# Diagnostic Logs Cluster (Server)
 ifeq ($(CHIP_ENABLE_AMEBA_DLOG), 1)
-# Ameba Diagnostic Logs Support
-CFLAGS += -DCHIP_CONFIG_ERROR_SOURCE=1
-CFLAGS += -DCHIP_CONFIG_ERROR_FORMAT_AS_STRING=1
-CFLAGS += -DCHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER=1
+  CFLAGS += -DCHIP_CONFIG_ERROR_SOURCE=1
+  CFLAGS += -DCHIP_CONFIG_ERROR_FORMAT_AS_STRING=1
+  CFLAGS += -DCHIP_CONFIG_ENABLE_BDX_LOG_TRANSFER=1
 endif
+
+# OTA Requestor Cluster (Server)
+CFLAGS += -DCONFIG_ENABLE_OTA_REQUESTOR=1
