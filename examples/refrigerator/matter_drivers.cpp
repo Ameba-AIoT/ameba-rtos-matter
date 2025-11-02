@@ -18,7 +18,6 @@
 using namespace ::chip::app;
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::RefrigeratorAlarm;
 using namespace chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
 using chip::Protocols::InteractionModel::Status;
@@ -34,6 +33,11 @@ using chip::Protocols::InteractionModel::Status;
 MatterRefrigerator refrigerator;
 gpio_irq_t gpio_level;
 uint32_t current_level = IRQ_LOW;
+
+// Set identify cluster and its callback on ep1
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
+};
 
 void matter_driver_gpio_level_irq_handler(uint32_t id, gpio_irq_event event)
 {
@@ -74,14 +78,14 @@ CHIP_ERROR matter_driver_refrigerator_set_startup_value(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status;
-    ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
-    ModeBase::Instance * refrigeratorObject = GetAmebaRefrigeratorModeInstance();
+    Clusters::ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
+    Clusters::ModeBase::Instance & refrigeratorObject = *GetAmebaRefrigeratorModeInstance();
     RefrigeratorAlarmServer & refrigeratorAlarmObject = RefrigeratorAlarmServer::Instance();
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    modeChangedResponse.status = to_underlying(refrigeratorObject->UpdateCurrentMode(to_underlying(ModeTag::kRapidCool))); // Set refrigerator mode
-    if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
+    modeChangedResponse.status = to_underlying(refrigeratorObject.UpdateCurrentMode(to_underlying(ModeTag::kRapidCool))); // Set refrigerator mode
+    if (modeChangedResponse.status != to_underlying(Clusters::ModeBase::StatusCode::kSuccess))
     {
         ChipLogProgress(DeviceLayer, "Failed to set Refrigerator Mode!\n");
         err = CHIP_ERROR_INTERNAL;
@@ -128,6 +132,38 @@ void matter_driver_set_door_callback(uint32_t id)
     PostDownlinkEvent(&downlink_event);
 }
 
+void matter_driver_on_identify_start(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void matter_driver_on_identify_stop(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+void matter_driver_on_trigger_effect(Identify *identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        return;
+    }
+}
+
 void matter_driver_uplink_update_handler(AppEvent *aEvent)
 {
     chip::app::ConcreteAttributePath path = aEvent->path;
@@ -166,9 +202,9 @@ exit:
 
 void matter_driver_downlink_update_handler(AppEvent *event)
 {
-    ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
+    Clusters::ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
     Status alarmChangedStatus;
-    ModeBase::Instance * refrigeratorObject = GetAmebaRefrigeratorModeInstance();
+    Clusters::ModeBase::Instance & refrigeratorObject = *GetAmebaRefrigeratorModeInstance();
     RefrigeratorAlarmServer & refrigeratorAlarmObject = RefrigeratorAlarmServer::Instance();
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -177,8 +213,8 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     {
     case AppEvent::kEventType_Downlink_Refrigerator_Mode:
         {
-            modeChangedResponse.status = to_underlying(refrigeratorObject->UpdateCurrentMode(event->value._u16));
-            if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
+            modeChangedResponse.status = to_underlying(refrigeratorObject.UpdateCurrentMode(event->value._u16));
+            if (modeChangedResponse.status != to_underlying(Clusters::ModeBase::StatusCode::kSuccess))
             {
                 ChipLogProgress(DeviceLayer, "Failed to set refrigerator mode!\n");
             }

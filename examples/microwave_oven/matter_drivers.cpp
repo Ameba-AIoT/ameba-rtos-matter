@@ -16,7 +16,6 @@
 
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::MicrowaveOvenMode;
 using namespace chip::app::Clusters::MicrowaveOvenControl;
@@ -34,6 +33,10 @@ using Status            = Protocols::InteractionModel::Status;
 #endif
 
 MatterMicrowaveOven MicrowaveOven;
+
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
+};
 
 CHIP_ERROR matter_driver_microwave_oven_init(void)
 {
@@ -66,6 +69,38 @@ void matter_driver_set_opstate_callback(uint32_t id)
     downlink_event.value._u8 = (uint8_t) id; // 0: Stop; 1:Running ,2:Paused; 3: Error
     downlink_event.mHandler = matter_driver_downlink_update_handler;
     PostDownlinkEvent(&downlink_event);
+}
+
+void matter_driver_on_identify_start(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void matter_driver_on_identify_stop(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+void matter_driver_on_trigger_effect(Identify *identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        return;
+    }
 }
 
 void matter_driver_uplink_update_handler(AppEvent *aEvent)
@@ -112,7 +147,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
         {
             ChipLogProgress(DeviceLayer, "Set Oven Operational State 0x%x", event->value._u8);
             CHIP_ERROR err;
-            err = OperationalState::GetAmebaOperationalStateInstance()->SetOperationalState(event->value._u8);
+            err = Clusters::OperationalState::GetAmebaOperationalStateInstance()->SetOperationalState(event->value._u8);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "ManualMicrowaveOvenOperationalStateSetStateCommandHandler Failed!\r\n");

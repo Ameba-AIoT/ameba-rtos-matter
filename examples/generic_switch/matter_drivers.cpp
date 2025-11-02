@@ -33,6 +33,11 @@ uint32_t pressStartTime = 0;        // Time when the switch was pressed
 bool isShortRelease = false;        // Flag to indicate short release
 bool isLongRelease = false;         // Flag to indicate long release
 
+/* Set identify cluster and its callback on ep1 */
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
+};
+
 void matter_driver_switch_callback(uint32_t value, gpio_irq_event event)
 {
     AppEvent downlink_event;
@@ -164,12 +169,6 @@ exit:
     }
     return err;
 }
-
-/* Set identify cluster and its callback on ep1 */
-
-static Identify gIdentify1 = {
-    chip::EndpointId{ 1 }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
-};
 
 void matter_driver_on_identify_start(Identify *identify)
 {
