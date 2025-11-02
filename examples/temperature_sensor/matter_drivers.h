@@ -15,6 +15,12 @@
 #include <app/clusters/identify-server/identify-server.h>
 
 /**
+ * @brief  Initialize the Temperature Sensor driver.
+ * @return  CHIP_NO_ERROR set successfully, CHIP_ERROR_INTERNAL otherwise (if necessary).
+ */
+CHIP_ERROR matter_driver_temperature_sensor_init(void);
+
+/**
  * @brief  Callback function for starting the identify process.
  * @param[in]  identify: Pointer to the Identify structure.
  */
@@ -31,12 +37,6 @@ void matter_driver_on_identify_stop(Identify *identify);
  * @param[in]  identify: Pointer to the Identify structure.
  */
 void matter_driver_on_trigger_effect(Identify *identify);
-
-/**
- * @brief  Initialize the Temperature Sensor driver.
- * @return  CHIP_NO_ERROR set successfully, CHIP_ERROR_INTERNAL otherwise (if necessary).
- */
-CHIP_ERROR matter_driver_temperature_sensor_init(void);
 
 /**
  * @brief  Update uplink handler when receiving commands from Matter Controller.

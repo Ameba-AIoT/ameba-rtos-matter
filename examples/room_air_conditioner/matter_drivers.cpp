@@ -49,6 +49,27 @@ void matter_driver_set_measured_humidity_cb(uint16_t value)
     PostDownlinkEvent(&downlink_event);
 }
 
+void matter_driver_take_measurement(void *pvParameters)
+{
+    // User implementation to take measurement
+    uint16_t humidity = 0;
+    int16_t temperature = 0;
+
+    while (1)
+    {
+        humidity = DHTSensor.readHumidity();
+        temperature = DHTSensor.readTemperature();
+
+        matter_driver_set_measured_humidity_cb(humidity * 100);
+        DHTSensor.setMeasuredHumidity(humidity * 100);
+
+        matter_driver_set_measured_temp_cb(temperature * 100);
+        DHTSensor.setMeasuredTemperature(temperature * 100);
+
+        vTaskDelay(10000);
+    }
+}
+
 CHIP_ERROR matter_driver_fan_init(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -150,39 +171,6 @@ exit:
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     return err;
-}
-
-int32_t expect_pulse (uint32_t expect_level, uint32_t max_cycle, gpio_t gpio_device)
-{
-    uint32_t cycle = 1;
-    while (expect_level == gpio_read(&gpio_device)) {
-        if (cycle++ >= max_cycle) {
-            return 0;
-        }
-    }
-    return cycle;
-}
-
-void matter_driver_take_measurement(void *pvParameters)
-{
-    // User implementation to take measurement
-    uint16_t humidity = 0;
-    int16_t temperature = 0;
-
-    while (1)
-    {
-        humidity = DHTSensor.readHumidity();
-        temperature = DHTSensor.readTemperature();
-        //printf("Humidity: %i %%\t Temperature: %i *C \r\n", humidity, temperature);
-
-        matter_driver_set_measured_humidity_cb(humidity * 100);
-        DHTSensor.setMeasuredHumidity(humidity * 100);
-
-        matter_driver_set_measured_temp_cb(temperature * 100);
-        DHTSensor.setMeasuredTemperature(temperature * 100);
-
-        vTaskDelay(10000);
-    }
 }
 
 CHIP_ERROR matter_driver_room_aircon_init(void)

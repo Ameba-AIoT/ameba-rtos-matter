@@ -36,7 +36,7 @@ static void example_matter_room_air_conditioner_task(void *pvParameters)
     err = matter_driver_room_aircon_init();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(DeviceLayer, "matter_driver_fan_init failed!");
+        ChipLogProgress(DeviceLayer, "matter_driver_room_aircon_init failed!");
     }
 
     err = matter_interaction_start_downlink();

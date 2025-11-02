@@ -14,6 +14,12 @@
 #include <platform/CHIPDeviceLayer.h>
 
 /**
+ * @brief  Initialize the Room Aircon driver.
+ * @return  CHIP_NO_ERROR set successfully, CHIP_ERROR_INTERNAL otherwise (if necessary).
+ */
+CHIP_ERROR matter_driver_room_aircon_init(void);
+
+/**
  * @brief  Callback function for starting the identify process.
  * @param[in]  identify: Pointer to the Identify structure.
  */
@@ -30,12 +36,6 @@ void matter_driver_on_identify_stop(Identify *identify);
  * @param[in]  identify: Pointer to the Identify structure.
  */
 void matter_driver_on_trigger_effect(Identify *identify);
-
-/**
- * @brief  Initialize the Room Aircon driver.
- * @return  CHIP_NO_ERROR set successfully, CHIP_ERROR_INTERNAL otherwise (if necessary).
- */
-CHIP_ERROR matter_driver_room_aircon_init(void);
 
 /**
  * @brief  Update uplink handler when receiving commands from Matter Controller.
