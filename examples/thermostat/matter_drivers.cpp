@@ -25,57 +25,6 @@ static Identify gIdentify1 = {
     chip::EndpointId{ 1 }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
 };
 
-void matter_driver_on_identify_start(Identify *identify)
-{
-    ChipLogProgress(Zcl, "OnIdentifyStart");
-}
-
-void matter_driver_on_identify_stop(Identify *identify)
-{
-    ChipLogProgress(Zcl, "OnIdentifyStop");
-}
-
-void matter_driver_on_trigger_effect(Identify *identify)
-{
-    switch (identify->mCurrentEffectIdentifier)
-    {
-    case Clusters::Identify::EffectIdentifierEnum::kBlink:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kOkay:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-        return;
-    }
-}
-
-void IdentifyTimerHandler(chip::System::Layer *systemLayer, void *appState, CHIP_ERROR error)
-{
-    if (identifyTimerCount)
-    {
-        identifyTimerCount--;
-    }
-}
-
-void matter_driver_OnIdentifyPostAttributeChangeCallback(uint8_t *value)
-{
-    // timerCount represents the number of callback executions before we stop the timer.
-    // value is expressed in seconds and the timer is fired every 250ms, so just multiply value by 4.
-    // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
-    identifyTimerCount = (*value) * 4;
-
-exit:
-    return;
-}
-
 CHIP_ERROR matter_driver_thermostat_init(void)
 {
     thermostat.Init();
@@ -132,6 +81,57 @@ exit:
     return err;
 }
 
+void matter_driver_on_identify_start(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void matter_driver_on_identify_stop(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+void matter_driver_on_trigger_effect(Identify *identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        return;
+    }
+}
+
+void IdentifyTimerHandler(chip::System::Layer *systemLayer, void *appState, CHIP_ERROR error)
+{
+    if (identifyTimerCount)
+    {
+        identifyTimerCount--;
+    }
+}
+
+void matter_driver_OnIdentifyPostAttributeChangeCallback(uint8_t *value)
+{
+    // timerCount represents the number of callback executions before we stop the timer.
+    // value is expressed in seconds and the timer is fired every 250ms, so just multiply value by 4.
+    // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
+    identifyTimerCount = (*value) * 4;
+
+exit:
+    return;
+}
+
 void matter_driver_uplink_update_handler(AppEvent *aEvent)
 {
     chip::app::ConcreteAttributePath path = aEvent->path;
@@ -179,4 +179,17 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
 
 exit:
     return;
+}
+
+void matter_driver_downlink_update_handler(AppEvent *event)
+{
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+
+    switch (event->Type)
+    {
+    default:
+        break;
+    }
+
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 }
