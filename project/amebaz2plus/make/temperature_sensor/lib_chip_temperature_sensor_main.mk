@@ -18,13 +18,13 @@ include $(MATTER_INCLUDE_HDR)
 # -------------------------------------------------------------------
 # Initialize Compiler
 # -------------------------------------------------------------------
-CROSS_COMPILE = $(ARM_GCC_TOOLCHAIN)/arm-none-eabi-
+CROSS_COMPILE := arm-none-eabi-
 
 # -------------------------------------------------------------------
 # Variable Declaration
 # -------------------------------------------------------------------
-DEVICE_TYPE  := light_dm
-OUTPUT_DIR   := $(CHIPDIR)/examples/lighting-app/ameba/build/chip
+DEVICE_TYPE  := temperature_sensor
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
 CODEGENDIR   := $(OUTPUT_DIR)/codegen
 
 # -------------------------------------------------------------------
@@ -49,16 +49,10 @@ SRC_CPP += $(MATTER_CORE_DIR)/matter_ota_initializer.cpp
 endif
 
 # -------------------------------------------------------------------
-# Source Files (Dynamic Endpoint)
-# -------------------------------------------------------------------
-SRC_CPP += $(MATTER_CORE_DIR)/matter_data_model.cpp
-SRC_CPP += $(MATTER_CORE_DIR)/matter_data_model_presets.cpp
-
-# -------------------------------------------------------------------
 # Source Files (Example)
 # -------------------------------------------------------------------
-SRC_CPP += $(MATTER_DRIVER_DIR)/device/led_driver.cpp
-SRC_CPP += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_light.cpp
+SRC_CPP += $(MATTER_DRIVER_DIR)/device/temp_sensor_driver.cpp
+SRC_CPP += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_$(DEVICE_TYPE).cpp
 SRC_CPP += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/matter_drivers.cpp
 
 # -------------------------------------------------------------------
