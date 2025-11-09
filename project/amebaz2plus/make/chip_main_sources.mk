@@ -1,7 +1,49 @@
-# Matter (CHIP) Include folder list
 # -------------------------------------------------------------------
+# Toolchain Definition
+# -------------------------------------------------------------------
+AR = $(CROSS_COMPILE)ar
+CC = $(CROSS_COMPILE)gcc
+AS = $(CROSS_COMPILE)as
+NM = $(CROSS_COMPILE)nm
+LD = $(CROSS_COMPILE)gcc
+GDB = $(CROSS_COMPILE)gdb
+OBJCOPY = $(CROSS_COMPILE)objcopy
+OBJDUMP = $(CROSS_COMPILE)objdump
 
+# -------------------------------------------------------------------
+# Build Definition
+# -------------------------------------------------------------------
+CHIP_ENABLE_AMEBA_DLOG = $(shell grep '\#define CONFIG_ENABLE_AMEBA_DLOG ' $(MATTER_COMMON_DIR)/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
+CHIP_ENABLE_AMEBA_TC = $(shell grep '\#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION ' $(MATTER_COMMON_DIR)/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
+CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
+CHIP_ENABLE_SHELL = $(shell grep 'chip_build_libshell' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
+
+# -------------------------------------------------------------------
+# Compilation flag
+# -------------------------------------------------------------------
+# General Flags for AmebaZ2
+CFLAGS += -march=armv8-m.main+dsp -mthumb -mcmse -mfloat-abi=soft -D__thumb2__ -g -gdwarf-3 -Os
+CFLAGS += -D__ARM_ARCH_8M_MAIN__=1 -gdwarf-3 -fstack-usage -fdata-sections -ffunction-sections 
+CFLAGS += -fdiagnostics-color=always -Wall -Wpointer-arith -Wno-write-strings 
+CFLAGS += -Wno-maybe-uninitialized -c -MMD
+ifneq ($(findstring _dm,$(DEVICE_TYPE)),_dm)
+CFLAGS += --save-temps
+endif
+CFLAGS += -DCONFIG_PLATFORM_8710C -DCONFIG_BUILD_RAM=1
+CFLAGS += -DV8M_STKOVF
+
+# Flags for CHIP (Matter)
+CFLAGS += -DCHIP_PROJECT=1
+CFLAGS += -DCHIP_ADDRESS_RESOLVE_IMPL_INCLUDE_HEADER=\"lib/address_resolve/AddressResolve_DefaultImpl.h\"
+CFLAGS += -DUSE_ZAP_CONFIG
+
+CPPFLAGS += $(CFLAGS)
+
+# -------------------------------------------------------------------
+# Include Path
+# -------------------------------------------------------------------
 INCLUDES += -I$(CHIPDIR)/examples/platform/ameba
+INCLUDES += -I$(CHIPDIR)/examples/platform/ameba/observer
 INCLUDES += -I$(CHIPDIR)/examples/providers
 INCLUDES += -I$(CHIPDIR)/src
 INCLUDES += -I$(CHIPDIR)/src/app
@@ -16,9 +58,9 @@ INCLUDES += -I$(CHIPDIR)/third_party/nlio/repo/include
 INCLUDES += -I$(CHIPDIR)/third_party/nlunit-test/repo/src
 INCLUDES += -I$(CHIPDIR)/zzz_generated/app-common
 
-# Source file list
 # -------------------------------------------------------------------
-
+# Source File
+# -------------------------------------------------------------------
 # connectedhomeip - examples
 SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_hook.c
 SRC_C += $(CHIPDIR)/examples/platform/ameba/route_hook/ameba_route_table.c
@@ -91,16 +133,19 @@ SRC_CPP += $(CODEGENDIR)/zap-generated/CodeDrivenInitShutdown.cpp
 SRC_CPP += $(CODEGENDIR)/zap-generated/IMClusterCommandHandler.cpp
 
 # matter - api
-SRC_CPP += $(MATTER_DIR)/api/matter_api.cpp
-SRC_CPP += $(MATTER_DIR)/api/matter_log_api.cpp
+SRC_CPP += $(MATTER_API_DIR)/matter_api.cpp
+SRC_CPP += $(MATTER_API_DIR)/matter_log_api.cpp
 
 # matter - core
-SRC_CPP += $(MATTER_DIR)/core/matter_device_utils.cpp
-SRC_CPP += $(MATTER_DIR)/core/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
+SRC_CPP += $(MATTER_CORE_DIR)/matter_device_utils.cpp
+SRC_CPP += $(MATTER_CORE_DIR)/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
 
 # matter - drivers
-SRC_CPP += $(MATTER_DIR)/drivers/matter_drivers/diagnostic_logs/ameba_diagnosticlogs_provider_delegate_impl.cpp
-SRC_CPP += $(MATTER_DIR)/drivers/matter_drivers/diagnostic_logs/ameba_logging_faultlog.cpp
-SRC_CPP += $(MATTER_DIR)/drivers/matter_drivers/diagnostic_logs/ameba_logging_insert_logs.cpp
-SRC_CPP += $(MATTER_DIR)/drivers/matter_drivers/diagnostic_logs/ameba_logging_redirect_handler.cpp
-SRC_CPP += $(MATTER_DIR)/drivers/matter_drivers/diagnostic_logs/ameba_logging_redirect_wrapper.cpp
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/diagnostic_logs/ameba_diagnosticlogs_provider_delegate_impl.cpp
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/diagnostic_logs/ameba_logging_faultlog.cpp
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/diagnostic_logs/ameba_logging_insert_logs.cpp
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/diagnostic_logs/ameba_logging_redirect_handler.cpp
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/diagnostic_logs/ameba_logging_redirect_wrapper.cpp
+
+#lib_version
+VER_C += $(TARGET)_version.c
