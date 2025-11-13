@@ -40,7 +40,7 @@ CHIP_ERROR AmebaRvcRunModeDelegate::Init()
 
 void AmebaRvcRunModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
 {
-    uint8_t currentMode = mInstance->GetCurrentMode();
+    uint8_t currentMode = GetInstance()->GetCurrentMode();
 
     if (!GetAmebaRvcRunModeInstance()->HasFeature(static_cast<ModeBase::Feature>(RvcRunMode::Feature::kDirectModeChange)))
     {

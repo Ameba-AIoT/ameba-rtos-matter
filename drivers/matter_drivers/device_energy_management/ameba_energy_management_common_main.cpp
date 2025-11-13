@@ -29,6 +29,7 @@
 #include <water_heater_mode/ameba_water_heater_mode_delegate.h>
 #include <water_heater_mode/ameba_water_heater_mode_instance.h>
 
+#include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
