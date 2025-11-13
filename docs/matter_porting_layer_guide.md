@@ -32,15 +32,53 @@ This structure and approach simplify the process of building and extending Matte
 
 ### Porting Layer Example Documentations
 
- - [Room Air-Conditioner](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/aircon/README.md) - Room air-conditioner device type implementation
- - [Bridge App](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
- - [Bridge App with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Fan](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/fan/README.md) - Fan device type implementation
- - [Generic Switch](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/generic_switch/README.md) - Generic Switch device type implementation
- - [Laundry Washer](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/laundrywasher/README.md) - Dishwasher device type implementation
- - [Dimmable Light](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
- - [Dimmable Light with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Microwave Oven](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/microwaveoven/README.md) - Microwave oven device type implementation
- - [Refrigerator](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/refrigerator/README.md) - Refrigerator device type implementation
- - [Temperature Sensor](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/temperature_sensor/README.md) - Temperature Sensor device type implementation
- - [Thermostat](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/example/thermostat/README.md) - Thermostat device type implementation
+ - [Bridge App](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
+ - [Bridge App with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Dishwasher](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/dishwasher/README.md) - Dishwasher device type implementation
+ - [Fan](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/fan/README.md) - Fan device type implementation
+ - [Generic Switch](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/generic_switch/README.md) - Generic Switch device type implementation
+ - [Laundry Washer](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/laundry_washer/README.md) - Dishwasher device type implementation
+ - [Dimmable Light](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
+ - [Dimmable Light with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Microwave Oven](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/microwave_oven/README.md) - Microwave oven device type implementation
+ - [Refrigerator](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/refrigerator/README.md) - Refrigerator device type implementation
+ - [Room Air-Conditioner](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/room_air_conditioner/README.md) - Room air-conditioner device type implementation
+ - [Temperature Sensor](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/temperature_sensor/README.md) - Temperature Sensor device type implementation
+ - [Thermostat](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/thermostat/README.md) - Thermostat device type implementation
+
+### Porting Layer Example Memory Usage
+
+The following table provides approximate memory usage for the Realtek Porting Layer example.
+
+Example: light_port
+
+#### AmebaZ2 (CM) Memory Usage
+Image size (`flash_is.bin`): 1,246 KB
+
+| Memory Region | Size (Bytes) | Size (KB) | Notes |
+|----------------|--------------|-----------|-------|
+| RAM | 111,520 | 108.9 | Internal SRAM usage (static data, stacks, etc.) |
+| Heap | 171,400 | 167.4 | Dynamic allocation area |
+| **Total** | **282,920** | **276.3** | Approximate total memory usage |
+
+---
+
+#### AmebaZ2plus (CM) Memory Usage
+Image size (`flash_is.bin`): 1,234 KB
+
+| Memory Region | Size (Bytes) | Size (KB) | Notes |
+|----------------|--------------|-----------|-------|
+| RAM | 111,584 | 108.9 | Internal SRAM usage (static data, stacks, etc.) |
+| Heap | 170,568 | 166.6 | Dynamic allocation area |
+| **Total** | **282,152** | **275.5** | Approximate total memory usage |
+
+---
+
+#### AmebaD (DM) Memory Usage
+Image size (`km0_km4_image2.bin`): 1,376 KB
+
+| Memory Region | Size (Bytes) | Size (KB) | Notes |
+|----------------|--------------|-----------|-------|
+| RAM | 170,944 | 167.0 | Internal SRAM usage (static data, stacks, etc.) |
+| Heap | 212,000 | 207.0 | Dynamic allocation area |
+| **Total** | **382,944** | **373.9** | Approximate total memory usage |

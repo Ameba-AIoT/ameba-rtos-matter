@@ -124,3 +124,16 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
 exit:
     return;
 }
+
+void matter_driver_downlink_update_handler(AppEvent *event)
+{
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+
+    switch (event->Type)
+    {
+    default:
+        break;
+    }
+
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+}

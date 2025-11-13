@@ -10,20 +10,20 @@
 #ifndef __PLATFORM_OPTS_MATTER_H__
 #define __PLATFORM_OPTS_MATTER_H__
 
-// Ameba Matter Example
-#define CONFIG_EXAMPLE_MATTER                   1
-#define CONFIG_EXAMPLE_MATTER_CHIPTEST          1
-#define CONFIG_EXAMPLE_MATTER_AIRCON            0
-#define CONFIG_EXAMPLE_MATTER_BRIDGE            0
-#define CONFIG_EXAMPLE_MATTER_DISHWASHER        0
-#define CONFIG_EXAMPLE_MATTER_FAN               0
-#define CONFIG_EXAMPLE_MATTER_GENERIC_SWITCH    0
-#define CONFIG_EXAMPLE_MATTER_LIGHT             0
-#define CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER    0
-#define CONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN    0
-#define CONFIG_EXAMPLE_MATTER_REFRIGERATOR      0
-#define CONFIG_EXAMPLE_MATTER_TEMP_SENSOR       0
-#define CONFIG_EXAMPLE_MATTER_THERMOSTAT        0
+// Ameba Matter Device Type Example
+#define CONFIG_EXAMPLE_MATTER                           1
+#define CONFIG_EXAMPLE_MATTER_CHIPTEST                  1
+#define CONFIG_EXAMPLE_MATTER_BRIDGE                    0
+#define CONFIG_EXAMPLE_MATTER_DISHWASHER                0
+#define CONFIG_EXAMPLE_MATTER_FAN                       0
+#define CONFIG_EXAMPLE_MATTER_GENERIC_SWITCH            0
+#define CONFIG_EXAMPLE_MATTER_LIGHT                     0
+#define CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER            0
+#define CONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN            0
+#define CONFIG_EXAMPLE_MATTER_REFRIGERATOR              0
+#define CONFIG_EXAMPLE_MATTER_ROOM_AIR_CONDITIONER      0
+#define CONFIG_EXAMPLE_MATTER_TEMPERATURE_SENSOR        0
+#define CONFIG_EXAMPLE_MATTER_THERMOSTAT                0
 
 /** CONFIG_ENABLE_AMEBA_CRYPTO is declared and enabled in Makefile.include.matter
  */

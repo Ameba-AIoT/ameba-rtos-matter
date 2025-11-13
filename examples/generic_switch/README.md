@@ -1,109 +1,162 @@
-# Generic Switch
+# Matter Generic Switch Example
 
-## Cluster Requirements (Server)
+This example demonstrates an implementation of the **Matter Generic Switch** device type.
 
-To implement a Generic Switch, the following clusters are required:
+## 📘 ZAP Configuration
 
-1. **Identify (0x0003)**
-2. **Switch (0x003B)**
+- **ZAP File:** `generic-switch-app.zap`
+- **Device Type ID:** `0x000F` (Matter Generic Switch)
 
-## ZAP Configuration
+> **Note:**
+> Before implementation, review the Matter Specification to ensure compliance with required device types and cluster configurations.
 
-There are two types of switches, each with its own ZAP Configuration:
+## 🧩 Endpoint Configuration
+
+The example defines **one endpoints**:
+
+| **Endpoint ID** | **Device Name**        | **Description** |
+|-----------------|------------------------|-----------------|
+| **1** | Generic Switch | Main functional endpoint for the generic switch device |
+
+> **Note:**
+> You can modify the configuration according to your device requirements.
+
+## 🔧 Supported Clusters
+
+The following clusters can be supported by this device type:
+
+| **Cluster Name** | **Function** | **Role**  |
+|------------------|--------------|-----------|
+| **Identify** | Allows the device to be visually or audibly identified during commissioning | Server |
+| **Switch** | Provides switch functionality (latching or momentary) and generates switch events | Server |
+
+> **Note:**
+> You can modify the configuration according to your device requirements.
+
+## 🪄 Types of Switch
+
+The **Generic Switch cluster** supports two main types of switches:
 
 1. **Latching Switch**
 2. **Momentary Switch**
 
-Please refer to the [Matter Specification](https://github.com/CHIP-Specifications/connectedhomeip-spec/blob/master/src/app_clusters/Switch.adoc) to understand more about Generic Switch and its clusters.
+### 🧲 Latching Switch
 
-### Latching Switch
+A **Latching Switch** changes its state each time it is operated — similar to a toggle switch (ON ↔ OFF).
 
-For a Latching Switch, make sure the `SwitchLatched` event is enabled and set the `FeatureMap` to `0x1` (Bit 0) to indicate support for the Latching Switch feature.
+- **FeatureMap:** `0x01` (Bit 0)  
+- **Mandatory Event:** `SwitchLatched`
 
 | Bit  | Feature        | Mandatory Event |
 |------|----------------|-----------------|
 | 0    | LatchingSwitch | SwitchLatched   |
 
-### Momentary Switch
+### ⚡ Momentary Switch
 
-Momentary Switches support several features, as outlined below:
+A **Momentary Switch** generates events while it is pressed or held down.  
+This type supports several optional features depending on the required behavior.
 
-| Bit  | Feature                   | Mandatory Event         | Additional Event                      |
-|------|---------------------------|-------------------------|----------------------------------------|
-| 1    | MomentarySwitch          | N/A                     | InitialPress                           |
-| 2    | MomentarySwitchRelease   | N/A                     | ShortRelease                           |
-| 3    | MomentarySwitchLongPress | N/A                     | LongPress & LongRelease                |
-| 4    | MomentarySwitchMultiPress| MultiPressMax           | MultiPressOngoing, MultiPressComplete  |
+- **FeatureMap:** `0x1E` (Bits 1–4)  
+- **Mandatory Event:** `MultiPressMax` (if multi-press is supported)
 
-The `Featuremap` SHALL be set to `0x1E` to indicate support for the Momentary Switch Feature.
+| **Bit** | **Feature** | **Mandatory Event** | **Additional Events** |
+|----------|--------------|---------------------|------------------------|
+| 1 | MomentarySwitch | *(None)* | InitialPress |
+| 2 | MomentarySwitchRelease | *(None)* | ShortRelease |
+| 3 | MomentarySwitchLongPress | *(None)* | LongPress, LongRelease |
+| 4 | MomentarySwitchMultiPress | MultiPressMax | MultiPressOngoing, MultiPressComplete |
 
-# Ameba Generic Switch Example
+## Example Implementation
 
-This example demonstrates the implementation of the Matter Generic Switch device type.
-The ZAP Configuration is set as Momentary Switch.
+### 🔁 Attribute Change Handling
 
-The example has setup a switch(button) to perform the action, check the GPIO Pin Configuration below.
+The **Attribute Change Handling** layer manages synchronization between the Matter data model and the hardware drivers.
+It ensures that updates from the Matter controller or from external inputs remain consistent across the entire system.
 
-## How it works
+There are two modes of control:
 
-The `Switch` must be 
+1. **Matter Controller** – Controlled through a connected Matter controller (e.g., mobile app, hub, or test tool).
+2. **External Control** – Managed through a physical input, such as a button press, with real-time state synchronization to Matter.
 
-# Two-Way Control Mechanism for Matter Generic Switch
+#### 🧭 Matter Controller–Driven Updates
 
-The Generic Switch device can be controlled in two primary ways:
+When the Matter controller updates an attribute, two callbacks are invoked:
 
-1. **Matter Controller (e.g., SmartHub)**: The controller sends messages to the Device Under Test (DUT) to control its state.
-2. **Device GPIO (e.g., Button)**: The DUT sends messages to the controller to indicate state changes.
+1. **`MatterPreAttributeChangeCallback`** – Triggered *before* the attribute is updated.
+   Use this for validation, filtering, or pre-update logic.
 
-These two communication streams utilize FreeRTOS Queues to manage state changes and invoke appropriate callbacks.
+2. **`MatterPostAttributeChangeCallback`** – Triggered *after* the attribute has been written to the Matter data model.
 
-## Communication Streams and FreeRTOS Queues
+`MatterPostAttributeChangeCallback` is defined in **`core/matter_interaction.cpp`**.
+They post events to the **uplink queue**, which are then handled by **`matter_driver_uplink_update_handler`** in **`matter_drivers.cpp`**.
 
-### 1. Uplink: Matter Controller to DUT
+The handler interprets the **Cluster ID** and **Attribute ID**, then performs the corresponding driver action.
 
-In this direction, the Matter Controller changes the attribute state. The following process occurs:
+> **Note:**
+> Modify the action to be taken in `matter_driver_uplink_update_handler` for application-specific logic.
 
-- **Action**: The Matter Controller sends a message to change the switch state.
-- **Callback Invocation**: A callback is triggered in the DUT.
-- **Driver Action**: The callback invokes the Switch driver to toggle the its state.
+#### 🔘 External or Physical Control
 
-**Diagram:**
+External hardware inputs (e.g., buttons or sensors) can also modify attributes within the Matter stack.
 
-Matter Controller (SmartHub) → [Message: Initial Press] → DUT → [Callback] → Switch Driver → Toggle Switch > Toggle LED
+When a button is pressed, the **GPIO interrupt handler** posts an event to the **downlink queue**, which is processed by **`matter_driver_downlink_update_handler`**.
 
-### 2. Downlink: DUT to Matter Controller
+**Implementation Steps:**
 
-In this direction, the DUT sends messages to the Matter Controller to indicate changes in the button state:
+1. In **`matter_drivers.cpp`**, configure the GPIO pin.
+2. In the GPIO interrupt callback , create and post an event to the downlink queue.
+3. In **`matter_driver_downlink_update_handler`**, define how the event modifies Matter attributes.
 
-- **Action**: A button press event on the DUT toggles the LED state.
-- **Attribute Update**: The DUT updates the Matter On/Off attribute of the LED.
-- **Message Sending**: The new attribute state is sent to the Matter Controller.
+> **Example Use Case:**
+> A button press toggles the **On/Off** cluster state locally, and the change is propagated to all connected Matter controllers.
 
-**Diagram:**
+This ensures full synchronization between **physical inputs** and **digital Matter control**, maintaining consistent device state across all interfaces.
 
-Button Press → DUT → [Message: Initial Press] → Matter Controller (SmartHub) -> [Toggle LED]
+---
 
-### Peripheral Initialization
+### ⚙️ Peripheral Initialization
 
-The initializations of the button are handled in `matter_drivers.cpp`.
-The initialization of the button sets up an IRQ that is triggered whenever the button is pressed.
+Initialization for the generic switch is handled in **`matter_drivers.cpp`**.
+This file contains low-level hardware setup routines and driver initialization code executed during system startup.
 
-### Button Press
-Whenever the button is pressed, the interrupt handler will be invoked.
-The interrupt handler will post an event to the downlink queue, which will be handled by `matter_driver_downlink_update_handler`.
+---
 
-To implement this, under `matter_drivers.cpp`, setup your GPIO interrupt callback to create and post events to the downlink queue. See `matter_driver_switch_callback` for reference.
-When creating the event to post to downlink queue, create a handler function for the event that will update the attributes on the Matter stack. See `matter_driver_downlink_update_handler` for reference.
+### 🧠 Implemented Driver APIs
 
-### Matter Attribute Change Callback
-Whenever the Matter controller changes the attribute state, 2 types of callbacks will be invoked:
-  1. MatterPreAttributeChangeCallback - e.g., Toggle the LED before updating the On/Off attribute (TBD)
-  2. MatterPostAttributeChangeCallback - e.g., Toggle the LED after updating the On/Off attribute
+The following APIs are implemented in **`matter_drivers.cpp`**.
+They provide the main interfaces for peripheral initialization, event handling, and attribute synchronization between the Matter stack and device hardware.
 
-These callbacks are defined in `core/matter_interaction.cpp`.
-These callbacks will post an event to the uplink queue, which will be handled by `matter_driver_uplink_update_handler` in `matter_drivers.cpp`.
-The driver codes will be called to carry out your actions depending on the Cluster and Attribute ID received.
-You may add clusters and attributes handling in `matter_driver_uplink_update_handler` if they are not present. 
+| **API / Task** | **Purpose** | **Function / Description** |
+|----------------|-------------|----------------------------|
+| `matter_driver_switch_callback()` | Switch event callback | Registers a callback function to handle **Switch** cluster |
+| `handleSwitch()` | Switch state handler | Monitors the GPIO input for switch state changes and updates the corresponding Matter attribute to reflect the current hardware state |
+| `matter_driver_switch_init()` | Switch initialization | Initializes the device hardware for **Generic Switch** device |
+| `matter_driver_switch_set_startup_value()` | Startup configuration | Sets initial values for the switch clusters and synchronizes Matter attributes with the device’s hardware state |
+| `matter_driver_on_identify_start()` | Identify start | Notifies that the identify operation has started |
+| `matter_driver_on_identify_stop()` | Identify stop | Notifies that the identify operation has stopped |
+| `matter_driver_on_trigger_effect()` | Identify device | Triggers a visual or functional effect to identify the device |
+| `matter_driver_uplink_update_handler()` | Matter → Driver event handler | Processes cluster/attribute changes from the Matter stack (uplink) and updates hardware peripherals |
+| `matter_driver_downlink_update_handler()` | Driver → Matter event handler | Processes hardware or external input events (downlink) and updates Matter attributes |
+
+---
+
+### 🧩 Summary
+
+| **Component** | **Description** |
+|----------------|-----------------|
+| **ZAP File** | `generic-switch-app.zap` |
+| **Main Example File** | `example_matter_generic_switch.cpp` |
+| **Main Matter Driver File** | `matter_drivers.cpp` |
+| **Main Device Driver File** | `switch_driver.cpp` |
+| **Cluster Implementation File** | `ameba_switch.cpp` |
+
+---
+
+### 💡 Notes
+
+- Adjust the configuration parameters to match your hardware design and application requirements.
+- Always keep the **Matter attribute values** synchronized with **hardware state** to ensure accurate reporting to controllers.
+- Extend functionality by adding support for additional clusters, sensors, or custom application logic as needed.
 
 ## How to build
 
@@ -117,70 +170,66 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
     source scripts/activate.sh
 
 <details>
-  <summary>Building with AmebaZ2</summary>
+  <summary><b>Building with AmebaZ2/AmebaZ2plus</b></summary>
 
-### AmebaZ2 (RTL8710C)
-
-#### GPIO Pin Configuration
+### GPIO Pin Configuration
 
 | Peripheral  | Pin   |
 | ----------- | ----- |
 | Button      | PA_19 |
 
-#### Build Matter Libraries
+### Build Matter Libraries
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd amebaz2_sdk/project/realtek_amebaXX_v0_example/GCC-RELEASE/
     make generic_switch_port
-    
-#### Build the Final Firmware
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+### Build the Final Firmware
+
+    cd amebaz2_sdk/project/realtek_amebaXX_v0_example/GCC-RELEASE/
     make is_matter
-    
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambz2_matter/blob/main/tools/AmebaZ2/Image_Tool_Linux/README.md) to flash the image with the Linux Image Tool
 
-#### Clean Matter Libraries
+### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.4.2/tools/Image_Tool_Linux/AmebaZ2/README.md) to flash the image with the Linux Image Tool
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+### Clean Matter Libraries
+
+    cd amebaz2_sdk/project/realtek_amebaXX_v0_example/GCC-RELEASE/
     make clean_matter_libs
 
-#### Clean Ameba Matter application
+### Clean Ameba Matter application
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd amebaz2_sdk/project/realtek_amebaXX_v0_example/GCC-RELEASE/
     make clean_matter
 
 </details>
 
 <details>
-  <summary>Building with AmebaD</summary>
+  <summary><b>Building with AmebaD</b></summary>
 
-### AmebaD (RTL8721D)
-
-#### GPIO Pin Configuration
+### GPIO Pin Configuration
 
 | Peripheral  | Pin   |
 | ----------- | ----- |
 | Button      | PB_5  |
 
-#### Build Matter Libraries
+### Build Matter Libraries
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd amebad_sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make -C asdk generic_switch_port
 
-#### Build the Final Firmware
+### Build the Final Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
+    cd amebad_sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
     make all
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd amebad_sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make all
 
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambd_matter/blob/main/tools/AmebaD/Image_Tool_Linux/README.txt) to flash the image with the Linux Image Tool
+### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.4.2/tools/Image_Tool_Linux/AmebaD/README.md) to flash the image with the Linux Image Tool
 
-#### Clean Matter Libraries and Firmware
+### Clean Matter Libraries and Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd amebad_sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make clean
 
 </details>
