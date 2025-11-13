@@ -29,38 +29,6 @@ void matter_driver_set_measured_temp_cb(int16_t value)
     PostDownlinkEvent(&downlink_event);
 }
 
-void matter_driver_on_identify_start(Identify *identify)
-{
-    ChipLogProgress(Zcl, "OnIdentifyStart");
-}
-
-void matter_driver_on_identify_stop(Identify *identify)
-{
-    ChipLogProgress(Zcl, "OnIdentifyStop");
-}
-
-void matter_driver_on_trigger_effect(Identify *identify)
-{
-    switch (identify->mCurrentEffectIdentifier)
-    {
-    case Clusters::Identify::EffectIdentifierEnum::kBlink:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kOkay:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-        return;
-    }
-}
-
 void matter_driver_take_measurement(void *pvParameters)
 {
     // User implementation to take measurement
@@ -121,6 +89,39 @@ exit:
     }
     return err;
 }
+
+void matter_driver_on_identify_start(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void matter_driver_on_identify_stop(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+void matter_driver_on_trigger_effect(Identify *identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        return;
+    }
+}
+
 
 void matter_driver_uplink_update_handler(AppEvent *aEvent)
 {

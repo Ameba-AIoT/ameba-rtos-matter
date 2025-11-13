@@ -1,251 +1,252 @@
 include $(MATTER_INCLUDE)
 
-
-
 # Matter Include file list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(MATTER_DIR)/api
-INCLUDES += -I$(MATTER_DIR)/common/bluetooth
-INCLUDES += -I$(MATTER_DIR)/common/include
-INCLUDES += -I$(MATTER_DIR)/common/lwip/include
-INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include
-INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/include/lwip
-INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek
-INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/include
-INCLUDES += -I$(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/freertos
-INCLUDES += -I$(MATTER_DIR)/common/mbedtls
-INCLUDES += -I${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/include
-INCLUDES += -I${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/include/mbedtls
-INCLUDES += -I${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library
-INCLUDES += -I$(MATTER_DIR)/common/port
-INCLUDES += -I$(MATTER_DIR)/common/protobuf
-INCLUDES += -I$(MATTER_DIR)/common/protobuf/nanopb
-INCLUDES += -I$(MATTER_DIR)/core
-INCLUDES += -I$(MATTER_DIR)/drivers/device
-INCLUDES += -I$(MATTER_DIR)/drivers/matter_consoles
-INCLUDES += -I$(MATTER_DIR)/drivers/matter_drivers
-INCLUDES += -I$(MATTER_DIR)/examples
+INCLUDES += -I$(MATTER_API_DIR)
+INCLUDES += -I$(MATTER_COMMON_DIR)/bluetooth
+INCLUDES += -I$(MATTER_COMMON_DIR)/include
+INCLUDES += -I$(MATTER_COMMON_DIR)/port
+INCLUDES += -I$(MATTER_COMMON_DIR)/protobuf
+INCLUDES += -I$(MATTER_COMMON_DIR)/protobuf/nanopb
+INCLUDES += -I$(MATTER_CORE_DIR)
+INCLUDES += -I$(MATTER_DRIVER_DIR)/device
+INCLUDES += -I$(MATTER_DRIVER_DIR)/matter_consoles
+INCLUDES += -I$(MATTER_DRIVER_DIR)/matter_drivers
+INCLUDES += -I$(MATTER_EXAMPLE_DIR)
+
+# LwIP
+INCLUDES += -I$(MATTER_LWIP_DIR)/include
+INCLUDES += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/include
+INCLUDES += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/include/lwip
+INCLUDES += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/port/realtek
+INCLUDES += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/port/realtek/include
+INCLUDES += -I$(MATTER_LWIP_DIR)/$(LWIP_VERSION)/port/realtek/freertos
+
+# MbedTLS
+INCLUDES += -I$(MATTER_MBEDTLS_DIR)
+INCLUDES += -I$(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/include
+INCLUDES += -I$(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/include/mbedtls
+INCLUDES += -I$(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library
 
 # Source file list
 # -------------------------------------------------------------------
 
 #matter - app - atcmd
-SRC_C += $(MATTER_DIR)/common/atcmd/atcmd_matter.c
+SRC_C += $(MATTER_COMMON_DIR)/atcmd/atcmd_matter.c
 
 #matter - app - bluetooth
-SRC_C += $(MATTER_DIR)/common/bluetooth/matter_blemgr_common.c
+SRC_C += $(MATTER_COMMON_DIR)/bluetooth/matter_blemgr_common.c
 
 #matter - app - port
-SRC_C += $(MATTER_DIR)/common/port/matter_dcts.c
-SRC_C += $(MATTER_DIR)/common/port/matter_fs.c
-SRC_C += $(MATTER_DIR)/common/port/matter_lwip.c
-SRC_C += $(MATTER_DIR)/common/port/matter_ota.c
-SRC_C += $(MATTER_DIR)/common/port/matter_timers.c
-SRC_C += $(MATTER_DIR)/common/port/matter_utils.c
-SRC_C += $(MATTER_DIR)/common/port/matter_wifis.c
+SRC_C += $(MATTER_COMMON_DIR)/port/matter_dcts.c
+SRC_C += $(MATTER_COMMON_DIR)/port/matter_fs.c
+SRC_C += $(MATTER_COMMON_DIR)/port/matter_lwip.c
+SRC_C += $(MATTER_COMMON_DIR)/port/matter_ota.c
+SRC_C += $(MATTER_COMMON_DIR)/port/matter_timers.c
+SRC_C += $(MATTER_COMMON_DIR)/port/matter_utils.c
+SRC_C += $(MATTER_COMMON_DIR)/port/matter_wifis.c
 
 #matter - app - mbedtls
-SRC_C += $(MATTER_DIR)/common/mbedtls/net_sockets.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/net_sockets.c
 
 #matter - app - protobuf
-SRC_C += $(MATTER_DIR)/common/protobuf/ameba_factory.pb.c
-SRC_C += $(MATTER_DIR)/common/protobuf/nanopb/pb_encode.c  # The nanopb encoder
-SRC_C += $(MATTER_DIR)/common/protobuf/nanopb/pb_decode.c  # The nanopb decoder
-SRC_C += $(MATTER_DIR)/common/protobuf/nanopb/pb_common.c  # The nanopb common parts
+SRC_C += $(MATTER_COMMON_DIR)/protobuf/ameba_factory.pb.c
+SRC_C += $(MATTER_COMMON_DIR)/protobuf/nanopb/pb_encode.c  # The nanopb encoder
+SRC_C += $(MATTER_COMMON_DIR)/protobuf/nanopb/pb_decode.c  # The nanopb decoder
+SRC_C += $(MATTER_COMMON_DIR)/protobuf/nanopb/pb_common.c  # The nanopb common parts
 
 #matter - app - example
-SRC_C += $(MATTER_DIR)/examples/matter_example_entry.c
-SRC_C += $(MATTER_DIR)/examples/chiptest/example_matter.c
+SRC_C += $(MATTER_EXAMPLE_DIR)/matter_example_entry.c
+SRC_C += $(MATTER_EXAMPLE_DIR)/chiptest/example_matter.c
 
 #matter - common - lwip
 
 #network - lwip
 #network - lwip - api
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/api/api_lib.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/api/api_msg.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/api/err.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/api/netbuf.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/api/netdb.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/api/netifapi.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/api/sockets.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/api/tcpip.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/api/api_lib.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/api/api_msg.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/api/err.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/api/netbuf.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/api/netdb.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/api/netifapi.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/api/sockets.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/api/tcpip.c
 
 #network - lwip - core
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/def.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/dns.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/inet_chksum.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/init.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ip.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/mem.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/memp.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/netif.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/pbuf.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/raw.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/stats.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/sys.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/tcp.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/tcp_in.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/tcp_out.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/timeouts.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/udp.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/def.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/dns.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/inet_chksum.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/init.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ip.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/mem.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/memp.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/netif.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/pbuf.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/raw.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/stats.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/sys.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/tcp.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/tcp_in.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/tcp_out.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/timeouts.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/udp.c
 
 #network - lwip - core - ipv4
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv4/autoip.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv4/dhcp.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv4/etharp.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv4/icmp.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv4/igmp.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv4/ip4.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv4/ip4_addr.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv4/ip4_frag.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv4/autoip.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv4/dhcp.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv4/etharp.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv4/icmp.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv4/igmp.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv4/ip4.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv4/ip4_addr.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv4/ip4_frag.c
 
 #network - lwip - core - ipv6
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv6/dhcp6.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv6/ethip6.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv6/icmp6.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv6/inet6.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv6/ip6.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv6/ip6_addr.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv6/ip6_frag.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv6/mld6.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/core/ipv6/nd6.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv6/dhcp6.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv6/ethip6.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv6/icmp6.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv6/inet6.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv6/ip6.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv6/ip6_addr.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv6/ip6_frag.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv6/mld6.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/core/ipv6/nd6.c
 
 #network - lwip - netif
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/src/netif/ethernet.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/src/netif/ethernet.c
 
 #network - lwip - port
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/freertos/ethernetif.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/freertos/sys_arch.c
-SRC_C += $(MATTER_DIR)/common/lwip/$(LWIP_VERSION)/port/realtek/hooks/lwip_default_hooks.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/port/realtek/freertos/ethernetif.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/port/realtek/freertos/sys_arch.c
+SRC_C += $(MATTER_LWIP_DIR)/$(LWIP_VERSION)/port/realtek/hooks/lwip_default_hooks.c
 
 #matter - common - mbedtls
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/aes.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/aesni.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/aria.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/asn1parse.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/asn1write.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/base64.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/bignum.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/camellia.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ccm.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/chacha20.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/chachapoly.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/cipher.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/cipher_wrap.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/cmac.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/constant_time.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ctr_drbg.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/debug.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/des.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/dhm.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ecdh.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ecdsa.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ecjpake.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ecp.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ecp_curves.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/entropy_poll.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/entropy.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/error.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/gcm.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/hkdf.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/hmac_drbg.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/md.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/md5.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/memory_buffer_alloc.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/nist_kw.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/oid.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/padlock.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pem.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pk.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pk_wrap.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pkcs12.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pkcs5.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pkparse.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pkwrite.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/platform.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/platform_util.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/poly1305.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ripemd160.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/rsa.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/sha1.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/sha256.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/sha512.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_cache.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_ciphersuites.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_cli.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_cookie.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_msg.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_ticket.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_tls.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/threading.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/timing.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/version.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/version_features.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/x509.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/x509_create.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/x509_crl.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/x509_crt.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/x509_csr.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/x509write_crt.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/x509write_csr.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aes.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aesni.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aria.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/asn1parse.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/asn1write.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/base64.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/bignum.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/camellia.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ccm.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/chacha20.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/chachapoly.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/cipher.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/cipher_wrap.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/cmac.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/constant_time.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ctr_drbg.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/debug.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/des.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/dhm.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ecdh.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ecdsa.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ecjpake.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ecp.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ecp_curves.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/entropy_poll.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/entropy.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/error.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/gcm.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/hkdf.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/hmac_drbg.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/md.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/md5.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/memory_buffer_alloc.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/nist_kw.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/oid.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/padlock.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pem.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pk.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pk_wrap.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pkcs12.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pkcs5.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pkparse.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pkwrite.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/platform.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/platform_util.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/poly1305.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ripemd160.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/rsa.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/sha1.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/sha256.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/sha512.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_cache.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_ciphersuites.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_cli.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_cookie.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_msg.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_ticket.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_tls.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/threading.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/timing.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/version.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/version_features.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509_create.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509_crl.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509_crt.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509_csr.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509write_crt.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509write_csr.c
 
 ifeq ($(MBEDTLS_VERSION), mbedtls-2.28.1)
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/arc4.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/blowfish.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/certs.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/havege.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/md2.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/md4.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pkcs11.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/rsa_internal.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_srv.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/xtea.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/arc4.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/blowfish.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/certs.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/havege.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/md2.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/md4.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pkcs11.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/rsa_internal.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_srv.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/xtea.c
 else ifeq ($(MBEDTLS_VERSION), mbedtls-3.6.1)
-SRC_C += $(MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aes_alt.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/aesce.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/bignum_core.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/bignum_mod.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/bignum_mod_raw.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/block_cipher.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ecp_curves_new.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/lmots.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/lms.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/mps_reader.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/mps_trace.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pk_ecc.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/pkcs7.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_aead.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_cipher.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_client.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_driver_wrappers_no_static.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_ecp.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_ffdh.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_hash.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_mac.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_pake.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_rsa.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_se.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_slot_management.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_crypto_storage.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_its_file.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/psa_util.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/rsa_alt_helpers.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/sha3.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_debug_helpers_generated.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_tls12_client.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_tls12_server.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_tls13_client.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_tls13_generic.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_tls13_keys.c
-SRC_C += ${MBEDTLS_DIR}/$(MBEDTLS_VERSION)/library/ssl_tls13_server.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aes_alt.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aesce.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/bignum_core.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/bignum_mod.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/bignum_mod_raw.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/block_cipher.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ecp_curves_new.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/lmots.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/lms.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/mps_reader.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/mps_trace.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pk_ecc.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pkcs7.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_aead.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_cipher.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_client.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_driver_wrappers_no_static.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_ecp.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_ffdh.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_hash.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_mac.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_pake.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_rsa.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_se.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_slot_management.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_crypto_storage.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_its_file.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/psa_util.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/rsa_alt_helpers.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/sha3.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_debug_helpers_generated.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_tls12_client.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_tls12_server.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_tls13_client.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_tls13_generic.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_tls13_keys.c
+SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_tls13_server.c
 endif
 # Libraries
 # -------------------------------------------------------------------
 
 LIBFLAGS += -Wl,--start-group -L../../../component/soc/realtek/8710c/misc/bsp/lib/common/GCC -Wl,--whole-archive -l_main -Wl,--no-whole-archive -lCHIP -Wl,--end-group # --whole-archive forces linker to override weak functions with strong ones
-
 
 # Compile options
 # -------------------------------------------------------------------

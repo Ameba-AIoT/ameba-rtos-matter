@@ -44,6 +44,12 @@ static void example_matter_fan_task(void *pvParameters)
         ChipLogProgress(DeviceLayer, "matter_driver_fan_set_startup_value failed!");
     }
 
+    err = matter_interaction_start_downlink();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogProgress(DeviceLayer, "matter_interaction_start_downlink failed!\n");
+    }
+
     err = matter_interaction_start_uplink();
     if (err != CHIP_NO_ERROR)
     {

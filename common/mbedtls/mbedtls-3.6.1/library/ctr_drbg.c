@@ -696,6 +696,23 @@ exit:
 int mbedtls_ctr_drbg_random(void *p_rng, unsigned char *output,
                             size_t output_len)
 {
+#if defined(CONFIG_ENABLE_AMEBA_PRNG) && (CONFIG_ENABLE_AMEBA_PRNG == 1)
+    int ret = 0;
+
+    device_mutex_lock(RT_DEV_LOCK_CRYPTO);
+    ret = crypto_init();
+    if (ret != SUCCESS) {
+        printf("crypto_init() failed\r\n");
+        device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
+        return ret;
+    }
+
+    ret = crypto_random_generate(output, output_len);
+    device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
+    if (ret != 0) {
+        ret = 0xac; // CHIP_ERROR_INTERNAL
+    }
+#else
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
     mbedtls_ctr_drbg_context *ctx = (mbedtls_ctr_drbg_context *) p_rng;
 
@@ -712,6 +729,7 @@ int mbedtls_ctr_drbg_random(void *p_rng, unsigned char *output,
         return MBEDTLS_ERR_THREADING_MUTEX_ERROR;
     }
 #endif
+#endif /* CONFIG_ENABLE_AMEBA_PRNG */
 
     return ret;
 }
