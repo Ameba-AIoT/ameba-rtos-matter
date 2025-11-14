@@ -21,6 +21,11 @@
 
 #include <string.h>
 
+#if defined(CONFIG_ENABLE_AMEBA_PRNG) && (CONFIG_ENABLE_AMEBA_PRNG == 1)
+#include <crypto_api.h>
+#include <device_lock.h>
+#endif
+
 #if defined(MBEDTLS_FS_IO)
 #include <stdio.h>
 #endif
