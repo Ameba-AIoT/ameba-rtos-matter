@@ -90,7 +90,7 @@ void matter_cluster_basic_information_server(ClusterConfig *clusterConfig)
     EventConfig basicinfoLeave(0x00000002);
 
     clusterConfig->clusterId = 0x00000028;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(basicinfoDataModelRevision);
     clusterConfig->attributeConfigs.push_back(basicinfoVendorName);
     clusterConfig->attributeConfigs.push_back(basicinfoVendorId);
@@ -250,13 +250,20 @@ void matter_cluster_general_diagnostics_server(ClusterConfig *clusterConfig)
     AttributeConfig gendiagFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
     AttributeConfig gendiagClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
 
+    CommandConfig gendiagTestEventTrigger(0x00000000, COMMAND_MASK_ACCEPTED);
+    CommandConfig gendiagTimeSnapshot(0x00000001, COMMAND_MASK_ACCEPTED);
+    CommandConfig gendiagEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
+
+    CommandConfig gendigTimeSnapshotResponse(0x00000002, COMMAND_MASK_GENERATED);
+    CommandConfig gendigEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
+
     EventConfig gendiagHardwareFaultChange(0x00000000);
     EventConfig gendiagRadioFaultChange(0x00000001);
     EventConfig gendiagNetworkFaultChange(0x00000002);
     EventConfig gendiagBootReasonEvent(0x00000003);
 
     clusterConfig->clusterId = 0x00000033;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(gendiagNetworkInterfaces);
     clusterConfig->attributeConfigs.push_back(gendiagRebootCount);
     clusterConfig->attributeConfigs.push_back(gendiagUpTime);
@@ -268,6 +275,11 @@ void matter_cluster_general_diagnostics_server(ClusterConfig *clusterConfig)
     clusterConfig->attributeConfigs.push_back(gendiagTestEventTriggersEnabled);
     clusterConfig->attributeConfigs.push_back(gendiagFeatureMap);
     clusterConfig->attributeConfigs.push_back(gendiagClusterRevision);
+    clusterConfig->commandConfigs.push_back(gendiagTestEventTrigger);
+    clusterConfig->commandConfigs.push_back(gendiagTimeSnapshot);
+    clusterConfig->commandConfigs.push_back(gendiagEndOfGeneratedCommandList);
+    clusterConfig->commandConfigs.push_back(gendigTimeSnapshotResponse);
+    clusterConfig->commandConfigs.push_back(gendigEndOfGeneratedCommandList);
     clusterConfig->eventConfigs.push_back(gendiagHardwareFaultChange);
     clusterConfig->eventConfigs.push_back(gendiagRadioFaultChange);
     clusterConfig->eventConfigs.push_back(gendiagNetworkFaultChange);
@@ -284,7 +296,7 @@ void matter_cluster_software_diagnostics_server(ClusterConfig *clusterConfig)
     AttributeConfig swdiagClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
 
     clusterConfig->clusterId = 0x00000034;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(swdiagThreadMetrics);
     clusterConfig->attributeConfigs.push_back(swdiagCurrentHeapFree);
     clusterConfig->attributeConfigs.push_back(swdiagCurrentHeapUsed);
@@ -308,7 +320,7 @@ void matter_cluster_wifi_diagnostics_server(ClusterConfig *clusterConfig)
     EventConfig wifidiagConnectionStatus(0x00000002);
 
     clusterConfig->clusterId = 0x00000036;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(wifidiagBssid);
     clusterConfig->attributeConfigs.push_back(wifidiagSecurityType);
     clusterConfig->attributeConfigs.push_back(wifidiagWiFiVersion);
@@ -330,7 +342,7 @@ void matter_cluster_administrator_commissioning_server(ClusterConfig *clusterCon
     AttributeConfig admincomAdminClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
 
     clusterConfig->clusterId = 0x0000003C;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(admincomWindowStatus);
     clusterConfig->attributeConfigs.push_back(admincomAdminFabricIndex);
     clusterConfig->attributeConfigs.push_back(admincomAdminVendorId);
@@ -420,7 +432,7 @@ void matter_cluster_identify_server(ClusterConfig *clusterConfig)
     CommandConfig identifyEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
 
     clusterConfig->clusterId = 0x00000003;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(identifyIdentifyTime);
     clusterConfig->attributeConfigs.push_back(identifyIdentifyType);
     clusterConfig->attributeConfigs.push_back(identifyFeatureMap);
