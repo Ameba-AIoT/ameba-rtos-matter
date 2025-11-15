@@ -20,9 +20,14 @@ MATTER_TOOL_DIR      := $(MATTER_DIR)/tools
 
 # Networking and Security Directories
 LWIP_DIR             := $(MATTER_COMMON_DIR)/lwip
-MBEDTLS_DIR          := $(MATTER_COMMON_DIR)/mbedtls
-
 MATTER_LWIP_DIR       = $(LWIP_DIR)
+
+MBEDTLS_DIR_SELECTION = matter
+ifeq ($(MBEDTLS_DIR_SELECTION), matter)
+MBEDTLS_DIR          := $(MATTER_COMMON_DIR)/mbedtls
+else
+MBEDTLS_DIR          := $(SDKROOTDIR)/component/common/network/ssl
+endif
 MATTER_MBEDTLS_DIR    = $(MBEDTLS_DIR)
 
 # Build System Directories
