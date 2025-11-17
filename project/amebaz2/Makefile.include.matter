@@ -20,9 +20,14 @@ MATTER_TOOL_DIR      := $(MATTER_DIR)/tools
 
 # Networking and Security Directories
 LWIP_DIR             := $(MATTER_COMMON_DIR)/lwip
-MBEDTLS_DIR          := $(MATTER_COMMON_DIR)/mbedtls
-
 MATTER_LWIP_DIR       = $(LWIP_DIR)
+
+MBEDTLS_DIR_SELECTION = matter
+ifeq ($(MBEDTLS_DIR_SELECTION), matter)
+MBEDTLS_DIR          := $(MATTER_COMMON_DIR)/mbedtls
+else
+MBEDTLS_DIR          := $(SDKROOTDIR)/component/common/network/ssl
+endif
 MATTER_MBEDTLS_DIR    = $(MBEDTLS_DIR)
 
 # Build System Directories
@@ -84,8 +89,12 @@ CFLAGS += -DCHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1
 CFLAGS += -DINET_CONFIG_ENABLE_IPV4=0
 CFLAGS += -DFD_SETSIZE=10
 CFLAGS += -DLWIP_IPV6_ROUTE_TABLE_SUPPORT=1
-CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
 CFLAGS += -DCHIP_HAVE_CONFIG_H
+
+# Mbedtls options
+# Removal of mbedtls config file, to use the default mbedtls_config.h for all new mbedtls version.
+# Mbedtls 2.28.1 will still use matter_mbedtls_config.h declared in mbedtls/config.h
+#CFLAGS += -DMBEDTLS_CONFIG_FILE=\"matter_mbedtls_config.h\"
 
 CFLAGS += -DCONFIG_BT=1
 CFLAGS += -DCONFIG_MATTER_BLEMGR_ADAPTER=1
