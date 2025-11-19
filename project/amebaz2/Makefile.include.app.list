@@ -50,7 +50,7 @@ SRC_C += $(MATTER_COMMON_DIR)/port/matter_utils.c
 SRC_C += $(MATTER_COMMON_DIR)/port/matter_wifis.c
 
 #matter - app - mbedtls
-SRC_C += $(MATTER_MBEDTLS_DIR)/net_sockets.c
+SRC_C += $(MATTER_COMMON_DIR)/mbedtls/net_sockets.c
 
 #matter - app - protobuf
 SRC_C += $(MATTER_COMMON_DIR)/protobuf/ameba_factory.pb.c
