@@ -2,8 +2,8 @@
 FROM ameba-rtos-matter:common
 
 # Redefine following build arguments to respective repo and tag/branch
-ARG AMEBA_MATTER_REPO=https://github.com/Sandyyeow-realtek/ameba-rtos-matter.git
-ARG TAG_NAME=add-pics
+ARG AMEBA_MATTER_REPO=https://github.com/xshuqun/ameba-rtos-matter.git
+ARG TAG_NAME=main-PR/makefile_makeover
 
 # Define fixed build arguments
 ARG AMBD_REPO=https://github.com/Ameba-AIoT/ameba-rtos-d.git

@@ -2,32 +2,14 @@
 #define CONFIG_SSL_RSA          1
 #endif
 
-#include "rom_ssl_ram_map.h"
-#include "platform_opts.h"
-#define RTL_HW_CRYPTO
-//#define SUPPORT_HW_SW_CRYPTO
-#define MBEDTLS_ECDH_LEGACY_CONTEXT
-#define MBEDTLS_AES_C
-
-#if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1)
-#define MBEDTLS_BIGNUM_USE_S_ROM_API
-#else
-#define MBEDTLS_USE_ROM_API
-#endif
-
-#if defined(CONFIG_EXAMPLE_MBEDTLS_ECDHE) && (CONFIG_EXAMPLE_MBEDTLS_ECDHE == 1)
-#define MBEDTLS_ECDH_C
-#define MBEDTLS_ECP_C
-#define MBEDTLS_ENTROPY_C
-#define MBEDTLS_KEY_EXCHANGE_PSK_ENABLED
-#define MBEDTLS_ENTROPY_HARDWARE_ALT
-#define MBEDTLS_NO_PLATFORM_ENTROPY
-#define MBEDTLS_CTR_DRBG_C
-#endif
-
+#if (MBEDTLS_VERSION_NUMBER == 0x021C0100)
+#define SUPPORT_HW_SW_CRYPTO
 #if defined(CONFIG_PLATFORM_8710C)
-#define SUPPORT_HW_SSL_HMAC_SHA256
-#endif
+#include <rom_ssl_ram_map.h>
+#define RTL_HW_CRYPTO
+//#define SUPPORT_HW_SSL_HMAC_SHA256
+#endif /* defined(CONFIG_PLATFORM_8710C) */
+#endif /* (MBEDTLS_VERSION_NUMBER == 0x021C0100) */
 
 /* RTL_CRYPTO_FRAGMENT should be less than 16000, and should be 16bytes-aligned */
 #if defined (CONFIG_PLATFORM_8195A)
@@ -41,20 +23,11 @@
 #include "platform_stdlib.h"
 #include "mbedtls/config_rom.h"
 #define SUPPORT_HW_SW_CRYPTO
-#elif defined(CONFIG_BAIDU_DUER) && CONFIG_BAIDU_DUER
-#define CONFIG_SSL_RSA          0
-#include "baidu_ca_mbedtls_config.h"
+#elif defined(CONFIG_MATTER) && (CONFIG_MATTER==1)
+#include "matter_mbedtls_config.h"
 #elif defined(CONFIG_SSL_RSA) && CONFIG_SSL_RSA
-#if defined(ENABLE_AMAZON_COMMON)
-#include "platform_stdlib.h"
-#include "mbedtls/config_rsa_amazon.h"
-#elif (defined(CONFIG_EXAMPLE_FFS) && CONFIG_EXAMPLE_FFS)
-#include "platform_stdlib.h"
-#include "mbedtls/config_rsa_amazon.h"
-#else
 #include "platform_stdlib.h"
 #include "mbedtls/config_rsa.h"
-#endif
 #else
 #include "platform_stdlib.h"
 #include "mbedtls/config_all.h"

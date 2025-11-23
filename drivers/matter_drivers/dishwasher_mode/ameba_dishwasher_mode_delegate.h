@@ -73,7 +73,6 @@ CHIP_ERROR AmebaDishwasherModeDelegateInit(EndpointId endpoint);
 void AmebaDishwasherModeDelegateShutdown(void);
 
 } // namespace DishwasherMode
-
 } // namespace Clusters
 } // namespace app
 } // namespace chip

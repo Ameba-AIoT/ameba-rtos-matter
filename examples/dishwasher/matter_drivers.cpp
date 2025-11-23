@@ -16,7 +16,6 @@
 using namespace ::chip::app;
 using namespace chip;
 using namespace chip::app;
-using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OnOff;
 using namespace chip::app::Clusters::OperationalState;
 using namespace chip::app::Clusters::DishwasherMode;
@@ -32,6 +31,11 @@ using chip::Protocols::InteractionModel::Status;
 
 MatterDishwasher dishwasher;
 
+// Set identify cluster and its callback on ep1
+static Identify gIdentify1 = {
+    chip::EndpointId{ 1 }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
+};
+
 CHIP_ERROR matter_driver_dishwasher_init()
 {
     dishwasher.Init(PWM_PIN);
@@ -42,8 +46,8 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status;
-    ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
-    ModeBase::Instance * dishwasherInstance = GetAmebaDishwasherModeInstance();
+    Clusters::ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
+    Clusters::ModeBase::Instance & dishwasherInstance = *GetAmebaDishwasherModeInstance();
     DishwasherAlarmServer & dishwasherAlarmInstance = DishwasherAlarmServer::Instance();
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -77,8 +81,8 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
         err = CHIP_ERROR_INTERNAL;
     }
 
-    modeChangedResponse.status = to_underlying(dishwasherInstance->UpdateCurrentMode(to_underlying(ModeTag::kNormal))); // Set dishwasher mode
-    if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
+    modeChangedResponse.status = to_underlying(dishwasherInstance.UpdateCurrentMode(to_underlying(ModeTag::kNormal))); // Set dishwasher mode
+    if (modeChangedResponse.status != to_underlying(Clusters::ModeBase::StatusCode::kSuccess))
     {
         ChipLogProgress(DeviceLayer, "Failed to set Dishwasher Mode!\n");
         err = CHIP_ERROR_INTERNAL;
@@ -185,6 +189,38 @@ void matter_driver_set_temperature_callback(int32_t id)
     PostDownlinkEvent(&downlink_event);
 }
 
+void matter_driver_on_identify_start(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStart");
+}
+
+void matter_driver_on_identify_stop(Identify *identify)
+{
+    ChipLogProgress(Zcl, "OnIdentifyStop");
+}
+
+void matter_driver_on_trigger_effect(Identify *identify)
+{
+    switch (identify->mCurrentEffectIdentifier)
+    {
+    case Clusters::Identify::EffectIdentifierEnum::kBlink:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kOkay:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
+        break;
+    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
+        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
+        break;
+    default:
+        ChipLogProgress(Zcl, "No identifier effect");
+        return;
+    }
+}
+
 void matter_driver_uplink_update_handler(AppEvent *aEvent)
 {
     chip::app::ConcreteAttributePath path = aEvent->path;
@@ -244,8 +280,8 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     Status status;
     CHIP_ERROR error;
-    ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
-    ModeBase::Instance * dishwasherInstance = GetAmebaDishwasherModeInstance();
+    Clusters::ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
+    Clusters::ModeBase::Instance & dishwasherInstance = *GetAmebaDishwasherModeInstance();
     DishwasherAlarmServer & dishwasherAlarmInstance = DishwasherAlarmServer::Instance();
     
     chip::DeviceLayer::PlatformMgr().LockChipStack();
@@ -292,8 +328,8 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     case AppEvent::kEventType_Downlink_DW_Mode:
         {
             ChipLogProgress(DeviceLayer, "Set Dishwasher Mode 0x%x", event->value._u8);
-            modeChangedResponse.status = to_underlying(dishwasherInstance->UpdateCurrentMode(event->value._u8));
-            if (modeChangedResponse.status != to_underlying(ModeBase::StatusCode::kSuccess))
+            modeChangedResponse.status = to_underlying(dishwasherInstance.UpdateCurrentMode(event->value._u8));
+            if (modeChangedResponse.status != to_underlying(Clusters::ModeBase::StatusCode::kSuccess))
             {
                 ChipLogProgress(DeviceLayer, "Failed to set Dishwasher mode!\n");
             }

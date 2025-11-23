@@ -14,24 +14,6 @@
 #include <platform/CHIPDeviceLayer.h>
 
 /**
- * @brief  Callback function for starting the identify process.
- * @param[in]  identify: Pointer to the Identify structure.
- */
-void matter_driver_on_identify_start(Identify *identify);
-
-/**
- * @brief  Callback function for stopping the identify process.
- * @param[in]  identify: Pointer to the Identify structure.
- */
-void matter_driver_on_identify_stop(Identify *identify);
-
-/**
- * @brief  Callback function for triggering an effect during the identify process.
- * @param[in]  identify: Pointer to the Identify structure.
- */
-void matter_driver_on_trigger_effect(Identify *identify);
-
-/**
  * @brief  Initialize the thermostat driver.
  * @return  CHIP_NO_ERROR set successfully, CHIP_ERROR_INTERNAL otherwise (if necessary).
  */
@@ -50,7 +32,31 @@ CHIP_ERROR matter_driver_thermostat_ui_init(void);
 CHIP_ERROR matter_driver_thermostat_ui_set_startup_value(void);
 
 /**
+ * @brief  Callback function for starting the identify process.
+ * @param[in]  identify: Pointer to the Identify structure.
+ */
+void matter_driver_on_identify_start(Identify *identify);
+
+/**
+ * @brief  Callback function for stopping the identify process.
+ * @param[in]  identify: Pointer to the Identify structure.
+ */
+void matter_driver_on_identify_stop(Identify *identify);
+
+/**
+ * @brief  Callback function for triggering an effect during the identify process.
+ * @param[in]  identify: Pointer to the Identify structure.
+ */
+void matter_driver_on_trigger_effect(Identify *identify);
+
+/**
  * @brief  Update uplink handler when receiving commands from Matter Controller.
  * @param[in]  event: Pointer to the AppEvent structure containing event details.
  */
 void matter_driver_uplink_update_handler(AppEvent *aEvent);
+
+/**
+ * @brief  Update downlink handler when receiving commands from external (e.g., GPIO, PWM).
+ * @param[in]  event: Pointer to the AppEvent structure containing event details.
+ */
+void matter_driver_downlink_update_handler(AppEvent *event);

@@ -90,7 +90,7 @@ void matter_cluster_basic_information_server(ClusterConfig *clusterConfig)
     EventConfig basicinfoLeave(0x00000002);
 
     clusterConfig->clusterId = 0x00000028;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(basicinfoDataModelRevision);
     clusterConfig->attributeConfigs.push_back(basicinfoVendorName);
     clusterConfig->attributeConfigs.push_back(basicinfoVendorId);
@@ -115,8 +115,6 @@ void matter_cluster_basic_information_server(ClusterConfig *clusterConfig)
     clusterConfig->eventConfigs.push_back(basicinfoStartUp);
     clusterConfig->eventConfigs.push_back(basicinfoShutDown);
     clusterConfig->eventConfigs.push_back(basicinfoLeave);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfBasicInformationClusterServerInitCallback);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterBasicInformationClusterServerShutdownCallback);
 }
 
 void matter_cluster_ota_requestor_server(ClusterConfig *clusterConfig)
@@ -252,13 +250,20 @@ void matter_cluster_general_diagnostics_server(ClusterConfig *clusterConfig)
     AttributeConfig gendiagFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
     AttributeConfig gendiagClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
 
+    CommandConfig gendiagTestEventTrigger(0x00000000, COMMAND_MASK_ACCEPTED);
+    CommandConfig gendiagTimeSnapshot(0x00000001, COMMAND_MASK_ACCEPTED);
+    CommandConfig gendiagEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
+
+    CommandConfig gendigTimeSnapshotResponse(0x00000002, COMMAND_MASK_GENERATED);
+    CommandConfig gendigEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
+
     EventConfig gendiagHardwareFaultChange(0x00000000);
     EventConfig gendiagRadioFaultChange(0x00000001);
     EventConfig gendiagNetworkFaultChange(0x00000002);
     EventConfig gendiagBootReasonEvent(0x00000003);
 
     clusterConfig->clusterId = 0x00000033;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(gendiagNetworkInterfaces);
     clusterConfig->attributeConfigs.push_back(gendiagRebootCount);
     clusterConfig->attributeConfigs.push_back(gendiagUpTime);
@@ -270,12 +275,15 @@ void matter_cluster_general_diagnostics_server(ClusterConfig *clusterConfig)
     clusterConfig->attributeConfigs.push_back(gendiagTestEventTriggersEnabled);
     clusterConfig->attributeConfigs.push_back(gendiagFeatureMap);
     clusterConfig->attributeConfigs.push_back(gendiagClusterRevision);
+    clusterConfig->commandConfigs.push_back(gendiagTestEventTrigger);
+    clusterConfig->commandConfigs.push_back(gendiagTimeSnapshot);
+    clusterConfig->commandConfigs.push_back(gendiagEndOfGeneratedCommandList);
+    clusterConfig->commandConfigs.push_back(gendigTimeSnapshotResponse);
+    clusterConfig->commandConfigs.push_back(gendigEndOfGeneratedCommandList);
     clusterConfig->eventConfigs.push_back(gendiagHardwareFaultChange);
     clusterConfig->eventConfigs.push_back(gendiagRadioFaultChange);
     clusterConfig->eventConfigs.push_back(gendiagNetworkFaultChange);
     clusterConfig->eventConfigs.push_back(gendiagBootReasonEvent);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfGeneralDiagnosticsClusterServerInitCallback);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterGeneralDiagnosticsClusterServerShutdownCallback);
 }
 
 void matter_cluster_software_diagnostics_server(ClusterConfig *clusterConfig)
@@ -288,15 +296,13 @@ void matter_cluster_software_diagnostics_server(ClusterConfig *clusterConfig)
     AttributeConfig swdiagClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
 
     clusterConfig->clusterId = 0x00000034;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(swdiagThreadMetrics);
     clusterConfig->attributeConfigs.push_back(swdiagCurrentHeapFree);
     clusterConfig->attributeConfigs.push_back(swdiagCurrentHeapUsed);
     clusterConfig->attributeConfigs.push_back(swdiagCurrentHeapHighWatermark);
     clusterConfig->attributeConfigs.push_back(swdiagFeatureMap);
     clusterConfig->attributeConfigs.push_back(swdiagClusterRevision);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfSoftwareDiagnosticsClusterServerInitCallback);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterSoftwareDiagnosticsClusterServerShutdownCallback);
 }
 
 void matter_cluster_wifi_diagnostics_server(ClusterConfig *clusterConfig)
@@ -314,7 +320,7 @@ void matter_cluster_wifi_diagnostics_server(ClusterConfig *clusterConfig)
     EventConfig wifidiagConnectionStatus(0x00000002);
 
     clusterConfig->clusterId = 0x00000036;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(wifidiagBssid);
     clusterConfig->attributeConfigs.push_back(wifidiagSecurityType);
     clusterConfig->attributeConfigs.push_back(wifidiagWiFiVersion);
@@ -325,8 +331,6 @@ void matter_cluster_wifi_diagnostics_server(ClusterConfig *clusterConfig)
     clusterConfig->eventConfigs.push_back(wifidiagDisconnection);
     clusterConfig->eventConfigs.push_back(wifidiagAssociationFailure);
     clusterConfig->eventConfigs.push_back(wifidiagConnectionStatus);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfWiFiNetworkDiagnosticsClusterServerInitCallback);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterWiFiNetworkDiagnosticsClusterServerShutdownCallback);
 }
 
 void matter_cluster_administrator_commissioning_server(ClusterConfig *clusterConfig)
@@ -338,14 +342,12 @@ void matter_cluster_administrator_commissioning_server(ClusterConfig *clusterCon
     AttributeConfig admincomAdminClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
 
     clusterConfig->clusterId = 0x0000003C;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(admincomWindowStatus);
     clusterConfig->attributeConfigs.push_back(admincomAdminFabricIndex);
     clusterConfig->attributeConfigs.push_back(admincomAdminVendorId);
     clusterConfig->attributeConfigs.push_back(admincomAdminFeatureMap);
     clusterConfig->attributeConfigs.push_back(admincomAdminClusterRevision);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfAdministratorCommissioningClusterServerInitCallback);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterAdministratorCommissioningClusterServerShutdownCallback);
 }
 
 void matter_cluster_operational_credentials_server(ClusterConfig *clusterConfig)
@@ -430,7 +432,7 @@ void matter_cluster_identify_server(ClusterConfig *clusterConfig)
     CommandConfig identifyEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
 
     clusterConfig->clusterId = 0x00000003;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION);
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
     clusterConfig->attributeConfigs.push_back(identifyIdentifyTime);
     clusterConfig->attributeConfigs.push_back(identifyIdentifyType);
     clusterConfig->attributeConfigs.push_back(identifyFeatureMap);
@@ -438,8 +440,6 @@ void matter_cluster_identify_server(ClusterConfig *clusterConfig)
     clusterConfig->commandConfigs.push_back(identifyIdentify);
     clusterConfig->commandConfigs.push_back(identifyTriggerEffect);
     clusterConfig->commandConfigs.push_back(identifyEndOfAcceptedCommandList);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterIdentifyClusterServerAttributeChangedCallback);
 }
 
 void matter_cluster_groups_server(ClusterConfig *clusterConfig)
@@ -482,6 +482,8 @@ void matter_cluster_groups_server(ClusterConfig *clusterConfig)
     clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback);
 }
 
+
+#if defined(ZCL_USING_SCENES_CLUSTER_SERVER)
 void matter_cluster_scenes_server(ClusterConfig *clusterConfig)
 {
     AttributeConfig scenesSceneCount(0x00000000, ZAP_TYPE(INT8U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
@@ -539,7 +541,10 @@ void matter_cluster_scenes_server(ClusterConfig *clusterConfig)
     clusterConfig->commandConfigs.push_back(scenesStoreSceneResponse);
     clusterConfig->commandConfigs.push_back(scenesGetSceneMembershipResponse);
     clusterConfig->commandConfigs.push_back(scenesEndOfGeneratedCommandList);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfScenesManagementClusterServerInitCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterScenesManagementClusterServerShutdownCallback);
 }
+#endif
 
 void matter_cluster_onoff_server(ClusterConfig *clusterConfig)
 {
@@ -708,23 +713,26 @@ void matter_dimmable_light_preset(EndpointConfig *dimmableLightEndpointConfig)
     ClusterConfig descriptorServerCluster;
     ClusterConfig identifyServerCluster;
     ClusterConfig groupsServerCluster;
-    ClusterConfig scenesServerCluster;
     ClusterConfig onOffServerCluster;
     ClusterConfig levelControlServerCluster;
 
     Presets::Clusters::matter_cluster_descriptor_server(&descriptorServerCluster);
     Presets::Clusters::matter_cluster_identify_server(&identifyServerCluster);
     Presets::Clusters::matter_cluster_groups_server(&groupsServerCluster);
-    Presets::Clusters::matter_cluster_scenes_server(&scenesServerCluster);
     Presets::Clusters::matter_cluster_onoff_server(&onOffServerCluster);
     Presets::Clusters::matter_cluster_level_control_server(&levelControlServerCluster);
 
     dimmableLightEndpointConfig->clusterConfigs.push_back(descriptorServerCluster);
     dimmableLightEndpointConfig->clusterConfigs.push_back(identifyServerCluster);
     dimmableLightEndpointConfig->clusterConfigs.push_back(groupsServerCluster);
-    dimmableLightEndpointConfig->clusterConfigs.push_back(scenesServerCluster);
     dimmableLightEndpointConfig->clusterConfigs.push_back(onOffServerCluster);
     dimmableLightEndpointConfig->clusterConfigs.push_back(levelControlServerCluster);
+
+#if defined(ZCL_USING_SCENES_CLUSTER_SERVER)
+    ClusterConfig scenesServerCluster;
+    Presets::Clusters::matter_cluster_scenes_server(&scenesServerCluster);
+    dimmableLightEndpointConfig->clusterConfigs.push_back(scenesServerCluster);
+#endif
 }
 
 void matter_aggregator_preset(EndpointConfig *aggregatorEndpointConfig)
