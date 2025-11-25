@@ -78,7 +78,9 @@ static void example_matter_bridge_task(void *pvParameters)
 
     EndpointConfig bridgedonoffEndpointConfig;
     Presets::Endpoints::matter_dimmable_light_preset(&bridgedonoffEndpointConfig);
-    bridge.addBridgedEndpoint(bridgedonoffEndpointConfig, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes));
+
+    chip::EndpointId firstBridgedDeviceEndpointId;
+    firstBridgedDeviceEndpointId = bridge.addBridgedEndpoint(bridgedonoffEndpointConfig, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes));
 
     if (xTaskCreate(matter_customer_bridge_code, ((const char*)"matter_customer_bridge_code"), 1024, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
     {
@@ -87,7 +89,7 @@ static void example_matter_bridge_task(void *pvParameters)
 
     vTaskDelay(20000);
 
-    bridge.removeBridgedEndpoint(2);
+    bridge.removeBridgedEndpoint(firstBridgedDeviceEndpointId);
 
     vTaskDelete(NULL);
 }

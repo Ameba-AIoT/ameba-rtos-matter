@@ -70,11 +70,11 @@ CFLAGS += -Wno-unused-variable
 CFLAGS += -Wno-unused-label
 CFLAGS += -Wno-unused-parameter
 
-# compiler warnings
+# chip device options
 CFLAGS += -DCHIP_DEVICE_LAYER_TARGET=Ameba
 CFLAGS += -DCHIP_DEVICE_LAYER_NONE=0
 
-# chip device configuration
+# chip system configurations
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=0
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS=0
