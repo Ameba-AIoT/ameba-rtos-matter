@@ -1,30 +1,17 @@
-all: GENERATE_NINJA
+include $(MAKE_INCLUDE_GEN)
 
-# -------------------------------------------------------------------
-# Initial Declaration
-# -------------------------------------------------------------------
-INCLUDES =
-CFLAGS =
-CPPFLAGS =
-SRC_C =
-SRC_CPP =
-
-# -------------------------------------------------------------------
-# Includes
-# -------------------------------------------------------------------
-include $(MATTER_INCLUDE)
-include $(MATTER_INCLUDE_HDR)
+.PHONY: all clean
 
 # -------------------------------------------------------------------
 # Variable Declaration
 # -------------------------------------------------------------------
-DEVICE_TYPE  := bridge_dm
-OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
+DEVICE_TYPE := light
+OUTPUT_DIR  := $(MATTER_EXAMPLE_DIR)/light_dm/build/chip
 
 # -------------------------------------------------------------------
 # Compilation flag
 # -------------------------------------------------------------------
-CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
+GLOBAL_CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
 
 # -------------------------------------------------------------------
 # Build Declaration and Source

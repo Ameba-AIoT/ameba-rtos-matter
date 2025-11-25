@@ -24,7 +24,7 @@ CROSS_COMPILE = $(ARM_GCC_TOOLCHAIN)/arm-none-eabi-
 # Variable Declaration
 # -------------------------------------------------------------------
 DEVICE_TYPE  := light_dm
-OUTPUT_DIR   := $(CHIPDIR)/examples/lighting-app/ameba/build/chip
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/light_dm/build/chip
 CODEGENDIR   := $(OUTPUT_DIR)/codegen
 
 # -------------------------------------------------------------------
@@ -33,11 +33,18 @@ CODEGENDIR   := $(OUTPUT_DIR)/codegen
 include $(MATTER_MAIN_SRC)
 
 # -------------------------------------------------------------------
+# Compilation flag
+# -------------------------------------------------------------------
+CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
+CFLAGS += -DCONFIG_DISABLE_LAST_FIXED_ENDPOINT=1
+
+# -------------------------------------------------------------------
 # Include Path
 # -------------------------------------------------------------------
 INCLUDES += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
 INCLUDES += -I$(OUTPUT_DIR)/gen/include
 INCLUDES += -I$(CODEGENDIR)
+INCLUDES += -I$(CODEGENDIR)/zap-generated
 
 # -------------------------------------------------------------------
 # Source Files (Porting Layer Core)

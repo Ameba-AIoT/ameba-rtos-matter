@@ -95,6 +95,7 @@ GLOBAL_CFLAGS += -Wno-unused-but-set-variable
 GLOBAL_CFLAGS += -Wno-unused-variable
 GLOBAL_CFLAGS += -Wno-unused-label
 GLOBAL_CFLAGS += -Wno-unused-parameter
+GLOBAL_CFLAGS += -Wno-unused-result
 
 # chip device options
 GLOBAL_CFLAGS += -DCHIP_DEVICE_LAYER_TARGET=Ameba
