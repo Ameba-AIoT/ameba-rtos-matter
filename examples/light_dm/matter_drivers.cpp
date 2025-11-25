@@ -1,3 +1,4 @@
+#include <matter_data_model.h>
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <led_driver.h>
@@ -24,9 +25,9 @@ using chip::Protocols::InteractionModel::Status;
 MatterLED led;
 gpio_irq_t gpio_btn;
 
-// Set identify cluster and its callback on ep1
+// Set identify cluster and its callback on FIRST_DYNAMIC_ENDPOINT_ID
 static Identify gIdentify1 = {
-    chip::EndpointId{ 1 }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
+    chip::EndpointId{ FIRST_DYNAMIC_ENDPOINT_ID }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
 };
 
 void matter_driver_button_callback(uint32_t id, gpio_irq_event event)
@@ -64,10 +65,10 @@ CHIP_ERROR matter_driver_led_set_startup_value(void)
     Status getcurrentlevelstatus;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    getonoffstatus = Clusters::OnOff::Attributes::OnOff::Get(1, &LEDOnOffValue);
+    getonoffstatus = Clusters::OnOff::Attributes::OnOff::Get(FIRST_DYNAMIC_ENDPOINT_ID, &LEDOnOffValue);
     VerifyOrExit(getonoffstatus == Status::Success, err = CHIP_ERROR_INTERNAL);
 
-    getcurrentlevelstatus = Clusters::LevelControl::Attributes::CurrentLevel::Get(1, LEDCurrentLevelValue);
+    getcurrentlevelstatus = Clusters::LevelControl::Attributes::CurrentLevel::Get(FIRST_DYNAMIC_ENDPOINT_ID, LEDCurrentLevelValue);
     VerifyOrExit(getcurrentlevelstatus == Status::Success, err = CHIP_ERROR_INTERNAL);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
@@ -157,7 +158,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
         {
             led.Toggle();
             ChipLogProgress(DeviceLayer, "Writing to OnOff cluster");
-            Status status = Clusters::OnOff::Attributes::OnOff::Set(1, led.IsTurnedOn());
+            Status status = Clusters::OnOff::Attributes::OnOff::Set(FIRST_DYNAMIC_ENDPOINT_ID, led.IsTurnedOn());
 
             if (status != Status::Success)
             {
@@ -165,7 +166,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
             }
 
             ChipLogProgress(DeviceLayer, "Writing to LevelControl cluster");
-            status = Clusters::LevelControl::Attributes::CurrentLevel::Set(1, led.GetLevel());
+            status = Clusters::LevelControl::Attributes::CurrentLevel::Set(FIRST_DYNAMIC_ENDPOINT_ID, led.GetLevel());
 
             if (status != Status::Success)
             {

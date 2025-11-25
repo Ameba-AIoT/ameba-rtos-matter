@@ -19,7 +19,7 @@ include $(MATTER_INCLUDE_HDR)
 # Variable Declaration
 # -------------------------------------------------------------------
 DEVICE_TYPE  := light_dm
-OUTPUT_DIR   := $(CHIPDIR)/examples/lighting-app/ameba/build/chip
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/light_dm/build/chip
 
 # -------------------------------------------------------------------
 # Build Declaration and Source
