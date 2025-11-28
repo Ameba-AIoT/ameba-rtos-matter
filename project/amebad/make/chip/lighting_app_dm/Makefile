@@ -1,25 +1,12 @@
-all: GENERATE_NINJA
+include $(MAKE_INCLUDE_GEN)
 
-# -------------------------------------------------------------------
-# Initial Declaration
-# -------------------------------------------------------------------
-INCLUDES =
-CFLAGS =
-CPPFLAGS =
-SRC_C =
-SRC_CPP =
-
-# -------------------------------------------------------------------
-# Includes
-# -------------------------------------------------------------------
-include $(MATTER_INCLUDE)
-include $(MATTER_INCLUDE_HDR)
+.PHONY: all clean
 
 # -------------------------------------------------------------------
 # Variable Declaration
 # -------------------------------------------------------------------
-DEVICE_TYPE  := light_dm
-OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/light_dm/build/chip
+DEVICE_TYPE := light
+OUTPUT_DIR  := $(MATTER_EXAMPLE_DIR)/light_dm/build/chip
 
 # -------------------------------------------------------------------
 # Build Declaration and Source
