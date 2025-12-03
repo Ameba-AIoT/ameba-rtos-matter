@@ -61,6 +61,8 @@ GENERIC_SWITCH_FILE			= $(MATTER_EXAMPLE_DIR)/generic_switch/build/chip/codegen/
 GENERIC_SWITCH_ZAP			= $(MATTER_EXAMPLE_DIR)/generic_switch/generic-switch-app.zap
 LAUNDRY_WASHER_FILE			= $(MATTER_EXAMPLE_DIR)/laundry_washer/build/chip/codegen/cluster-file.txt
 LAUNDRY_WASHER_ZAP			= $(MATTER_EXAMPLE_DIR)/laundry_washer/laundry-washer-app.zap
+LIGHTING_DM_FILE			= $(MATTER_EXAMPLE_DIR)/light_dm/build/chip/codegen/cluster-file.txt
+LIGHTING_DM_ZAP				= $(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.zap
 MICROWAVE_OVEN_FILE			= $(MATTER_EXAMPLE_DIR)/microwave_oven/build/chip/codegen/cluster-file.txt
 MICROWAVE_OVEN_ZAP			= $(MATTER_EXAMPLE_DIR)/microwave_oven/microwave-oven-app.zap
 REFRIGERATOR_FILE			= $(MATTER_EXAMPLE_DIR)/refrigerator/build/chip/codegen/cluster-file.txt
@@ -120,6 +122,9 @@ $(GENERIC_SWITCH_FILE): $(GENERIC_SWITCH_ZAP)
 $(LAUNDRY_WASHER_FILE): $(LAUNDRY_WASHER_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/laundry_washer,$^,$(MATTER_EXAMPLE_DIR)/laundry_washer/laundry-washer-app.matter,$@)
 
+$(LIGHTING_DM_FILE): $(LIGHTING_DM_ZAP)
+	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/light_dm,$^,$(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.matter,$@)
+
 $(MICROWAVE_OVEN_FILE): $(MICROWAVE_OVEN_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/microwave_oven,$^,$(MATTER_EXAMPLE_DIR)/microwave_oven/microwave-oven-app.matter,$@)
 
@@ -135,14 +140,6 @@ $(TEMPERATURE_SENSOR_FILE): $(TEMPERATURE_SENSOR_ZAP)
 $(THERMOSTAT_FILE): $(THERMOSTAT_ZAP)
 	$(call GENERATE_ZAP,$(CHIPDIR)/examples/thermostat/ameba,$^,$(CHIPDIR)/examples/thermostat/thermostat-common/thermostat.matter,$@)
 
-copy_gen_files_bridge_dm:
-	@cp $(MATTER_EXAMPLE_DIR)/bridge_dm/endpoint_config.h $(MATTER_EXAMPLE_DIR)/bridge_dm/build/chip/codegen/zap-generated
-	@cp $(MATTER_EXAMPLE_DIR)/bridge_dm/gen_config.h $(MATTER_EXAMPLE_DIR)/bridge_dm/build/chip/codegen/zap-generated
-
-copy_gen_files_light_dm:
-	@cp $(MATTER_EXAMPLE_DIR)/light_dm/endpoint_config.h $(CHIPDIR)/examples/lighting-app/ameba/build/chip/codegen/zap-generated
-	@cp $(MATTER_EXAMPLE_DIR)/light_dm/gen_config.h $(CHIPDIR)/examples/lighting-app/ameba/build/chip/codegen/zap-generated
-
 #*****************************************************************************#
 #                         MATTER MAKE DEFINES                                 #
 #*****************************************************************************#
@@ -157,7 +154,7 @@ air_purifier: toolchain_matter $(AIR_PURIFIER_FILE)
 	$(MAKE) -f $(MATTER_MAKE_DIR)/air_purifier/lib_chip_air_purifier_main.mk all
 
 .PHONY: bridge_dm
-bridge_dm: toolchain_matter $(BRIDGE_DM_FILE) copy_gen_files_bridge_dm
+bridge_dm: toolchain_matter $(BRIDGE_DM_FILE)
 	$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_core.mk all
 	$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_main.mk all
 
@@ -187,7 +184,7 @@ light: toolchain_matter $(LIGHTING_FILE)
 	$(MAKE) -f $(MATTER_MAKE_DIR)/light/lib_chip_light_main.mk all
 
 .PHONY: light_dm
-light_dm: toolchain_matter $(LIGHTING_FILE) copy_gen_files_light_dm
+light_dm: toolchain_matter $(LIGHTING_DM_FILE)
 	$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_core.mk all
 	$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_main.mk all
 

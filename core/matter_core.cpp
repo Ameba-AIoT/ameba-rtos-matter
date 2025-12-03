@@ -40,6 +40,9 @@
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
 #include <matter_mdns_filter.h>
 #endif
+#if defined(CONFIG_DISABLE_LAST_FIXED_ENDPOINT) && (CONFIG_DISABLE_LAST_FIXED_ENDPOINT == 1)
+#include <matter_data_model.h>
+#endif
 #if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
 #include <app/server/TermsAndConditionsManager.h>
 #endif
@@ -260,6 +263,10 @@ void matter_core_init_server(intptr_t context)
     // We only have network commissioning on endpoint 0.
     // TODO: configure the endpoint
     emberAfEndpointEnableDisable(0xFFFE, false);
+    // Only for Dynamic Endpoint Examples. Disable the last fixed endpoint, which is a placeholder endpoint.
+#if defined(CONFIG_DISABLE_LAST_FIXED_ENDPOINT) && (CONFIG_DISABLE_LAST_FIXED_ENDPOINT == 1)
+    emberAfEndpointEnableDisable(LAST_FIXED_ENDPOINT_ID, false);
+#endif
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap())
     {
