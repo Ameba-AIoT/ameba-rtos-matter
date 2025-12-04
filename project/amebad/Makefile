@@ -126,71 +126,73 @@ $(THERMOSTAT_FILE): $(THERMOSTAT_ZAP)
 #*****************************************************************************#
 #                              MATTER MAKE DEFINES                            #
 #*****************************************************************************#
-all_clusters: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(ALL_CLUSTERS_FILE)
+matter_prereqs: create_lwip_symlink file_replacement build_target_folder copy_ld_img2 check_toolchain build_info.h
+
+all_clusters: matter_prereqs $(ALL_CLUSTERS_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/all_clusters_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/all_clusters_app all
 
-air_purifier: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(AIR_PURIFIER_FILE)
+air_purifier: matter_prereqs $(AIR_PURIFIER_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/air_purifier_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/air_purifier_app all
 
-bridge_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(BRIDGE_FILE)
+bridge_port: matter_prereqs $(BRIDGE_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/bridge_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/bridge_app_port all
 
-bridge_dm: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(BRIDGE_DM_FILE)
+bridge_dm: matter_prereqs $(BRIDGE_DM_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/bridge_app_dm all
 	make -C $(MATTER_MAKE_DIR)/chip_main/bridge_app_port_dm all
 
-dishwasher_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(DISHWASHER_FILE)
+dishwasher_port: matter_prereqs $(DISHWASHER_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/dishwasher_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/dishwasher_app_port all
 
-fan_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(FAN_FILE)
+fan_port: matter_prereqs $(FAN_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/fan_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/fan_app_port all
 
-generic_switch_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(GENERIC_SWITCH_FILE)
+generic_switch_port: matter_prereqs $(GENERIC_SWITCH_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/generic_switch_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/generic_switch_app_port all
 
-laundry_washer_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LAUNDRY_WASHER_FILE)
+laundry_washer_port: matter_prereqs $(LAUNDRY_WASHER_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/laundry_washer_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/laundry_washer_app_port all
 
-light: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHTING_FILE)
+light: matter_prereqs $(LIGHTING_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/lighting_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/lighting_app all
 
-light_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHTING_FILE)
+light_port: matter_prereqs $(LIGHTING_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/lighting_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/lighting_app_port all
 
-light_dm: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHTING_DM_FILE)
+light_dm: matter_prereqs $(LIGHTING_DM_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/lighting_app_dm all
 	make -C $(MATTER_MAKE_DIR)/chip_main/lighting_app_port_dm all
 
-light_switch: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(LIGHT_SWITCH_FILE)
+light_switch: matter_prereqs $(LIGHT_SWITCH_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/light_switch_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/light_switch_app all
 
-microwave_oven_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(MICROWAVE_OVEN_FILE)
+microwave_oven_port: matter_prereqs $(MICROWAVE_OVEN_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/microwave_oven_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/microwave_oven_app_port all
 
-refrigerator_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(REFRIGERATOR_FILE)
+refrigerator_port: matter_prereqs $(REFRIGERATOR_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/refrigerator_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/refrigerator_app_port all
 
-room_air_conditioner_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(ROOM_AIR_CONDITIONER_FILE)
+room_air_conditioner_port: matter_prereqs $(ROOM_AIR_CONDITIONER_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/room_air_conditioner_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/room_air_conditioner_app_port all
 
-temperature_sensor_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(TEMPERATURE_SENSOR_FILE)
+temperature_sensor_port: matter_prereqs $(TEMPERATURE_SENSOR_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/temperature_sensor_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/temperature_sensor_app_port all
 
-thermostat_port: create_lwip_symlink build_target_folder copy_ld_img2 check_toolchain build_info.h $(THERMOSTAT_FILE)
+thermostat_port: matter_prereqs $(THERMOSTAT_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/thermostat_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/thermostat_app_port all
 
@@ -206,3 +208,9 @@ create_lwip_symlink:
 	else \
 		echo "Symbolic link already exists"; \
 	fi
+
+#*****************************************************************************#
+#                              CREATE SYMBOLIC LINK                           #
+#*****************************************************************************#
+file_replacement:
+	@cp $(MATTER_BUILD_DIR)/misc/strproc.h $(MATTER_ROOTDIR)/component/soc/realtek/amebad/swlib/string/strproc.h
