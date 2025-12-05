@@ -51,33 +51,33 @@ This structure and approach simplify the process of building and extending Matte
 The following table provides approximate memory usage for the Realtek Porting Layer example.
 Example: light_port
 
-#### AmebaZ2 (CM) Memory Usage
+#### AmebaZ2 Memory Usage
 Image size (`flash_is.bin`): 1,246 KB
 
 | Memory Region | Size (Bytes) | Size (KB) | Notes |
 |----------------|--------------|-----------|-------|
 | RAM | 111,520 | 108.9 | Internal SRAM usage (static data, stacks, etc.) |
-| Heap | 171,400 | 167.4 | Dynamic allocation area |
-| **Total** | **282,920** | **276.3** | Approximate total memory usage |
+| Heap | 169,832 | 165.9 | Dynamic allocation area |
+| **Total** | **281,352** | **274.6** | Approximate total memory usage |
 
 ---
 
-#### AmebaZ2plus (CM) Memory Usage
+#### AmebaZ2plus Memory Usage
 Image size (`flash_is.bin`): 1,234 KB
 
 | Memory Region | Size (Bytes) | Size (KB) | Notes |
 |----------------|--------------|-----------|-------|
 | RAM | 111,584 | 108.9 | Internal SRAM usage (static data, stacks, etc.) |
-| Heap | 170,568 | 166.6 | Dynamic allocation area |
-| **Total** | **282,152** | **275.5** | Approximate total memory usage |
+| Heap | 169,808 | 165.8 | Dynamic allocation area |
+| **Total** | **281,328** | **274.7** | Approximate total memory usage |
 
 ---
 
-#### AmebaD (DM) Memory Usage
+#### AmebaD Memory Usage
 Image size (`km0_km4_image2.bin`): 1,376 KB
 
 | Memory Region | Size (Bytes) | Size (KB) | Notes |
 |----------------|--------------|-----------|-------|
-| RAM | 170,944 | 167.0 | Internal SRAM usage (static data, stacks, etc.) |
-| Heap | 212,000 | 207.0 | Dynamic allocation area |
-| **Total** | **382,944** | **373.9** | Approximate total memory usage |
+| RAM | 170,784 | 166.8 | Internal SRAM usage (static data, stacks, etc.) |
+| Heap | 214,816 | 209.8 | Dynamic allocation area |
+| **Total** | **385，600** | **376.6** | Approximate total memory usage |
