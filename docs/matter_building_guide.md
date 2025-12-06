@@ -9,9 +9,9 @@ This general guide provides an overview of the Matter integration process and se
 
 This general guide provides an overview of the Matter integration process and serves as a foundational resource for understanding how to build Matter on various ICs supported by Ameba.
 
-- [AmebaZ2 Building Guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/amebaz2_general_build.md) - Step-by-step instructions for building Matter on AmebaZ2.
+- [AmebaZ2 Building Guide](amebaz2_general_build.md) - Step-by-step instructions for building Matter on AmebaZ2.
 
-- [AmebaD Building Guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/amebad_general_build.md) - Step-by-step instructions for building Matter on AmebaD.
+- [AmebaD Building Guide](amebad_general_build.md) - Step-by-step instructions for building Matter on AmebaD.
 
 **Notes**: For AmebaZ2plus, please refer to the AmebaZ2 Building Guide.
 
@@ -53,4 +53,4 @@ There are two different types of Matter applications:
 - Utilizes Realtek's Porting Layer for specific device integrations.
 - Includes: `aircon_port`, `bridge_dm`, `dishwasher_port`, `laundrywasher_port`, `light_port`, `light_dm`, `microwaveoven_port`, `refrigerator_port`, `thermostat_port`.
 
-Learn more about Realtek's Porting Layer Application [here](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/matter_porting_layer_guide.md).
+Learn more about Realtek's Porting Layer Application [here](matter_porting_layer_guide.md).
