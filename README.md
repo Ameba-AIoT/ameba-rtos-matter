@@ -31,35 +31,35 @@ Feel free to explore our curated list of supported ICs below to find the best ma
 > - [ameba-rtos/release/v1.3](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/ameba-rtos/release/v1.3)
 > - [ameba-rtos/release/v1.4](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/ameba-rtos/release/v1.4)
 
-Checkout the [Application Notes](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/AN0204%20Realtek%20Matter%20application%20note.en.pdf) to learn more about Realtek's Matter solution.
+Checkout the [Application Notes](docs/AN0204%20Realtek%20Matter%20application%20note.en.pdf) to learn more about Realtek's Matter solution.
 
 ## Ameba RTOS Matter Repo Integration
 
-Learn how to integrate Realtek's Matter solution with the Ameba RTOS platform. Explore the integration details [here](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/ameba_matter_integration.md)
+Learn how to integrate Realtek's Matter solution with the Ameba RTOS platform. Explore the integration details [here](docs/ameba_matter_integration.md)
 
 ## Important Notice
 
-Please read the [Important Notice](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_important_notice.md) for important updates and announcements.
+Please read the [Important Notice](docs/matter_important_notice.md) for important updates and announcements.
 
 ## Documentation
 
-1. [General Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_general_guide.md) - A comprehensive overview of Matter integration and usage.
+1. [General Guide](docs/matter_general_guide.md) - A comprehensive overview of Matter integration and usage.
 
-2. [Building Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_building_guide.md) - Detailed instructions and guidelines for building Matter-compliant devices using the Ameba Matter solutions.
+2. [Building Guide](docs/matter_building_guide.md) - Detailed instructions and guidelines for building Matter-compliant devices using the Ameba Matter solutions.
 
-3. [Supported Device Types](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/ameba_supported_device_types.md) - Comprehensive list detailing the types of devices compatible with Ameba Matter.
+3. [Supported Device Types](docs/ameba_supported_device_types.md) - Comprehensive list detailing the types of devices compatible with Ameba Matter.
 
-4. [AT Command Guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/matter_device_at_commands.md) - AT commands for Matter.
+4. [AT Command Guide](docs/matter_device_at_commands.md) - AT commands for Matter.
 
-5. [Commissioning and Control](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_commissioning_and_control_guide.md) - Focuses on commissioning procedures and control mechanisms within the Ameba Matter ecosystem.
+5. [Commissioning and Control](docs/matter_commissioning_and_control_guide.md) - Focuses on commissioning procedures and control mechanisms within the Ameba Matter ecosystem.
 
-6. [Matter Certification Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_certification_guide.md) - Guide for Matter Certification.
+6. [Matter Certification Guide](docs/matter_certification_guide.md) - Guide for Matter Certification.
 
-7. [Factory Data Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/tools/factorydata/README.md) - Information about Matter factory data.
+7. [Factory Data Guide](tools/factorydata/README.md) - Information about Matter factory data.
 
-8. [OTA Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/tools/ota/README.md) - Guide for Over-The-Air (OTA) updates in Matter implementations.
+8. [OTA Guide](tools/ota/README.md) - Guide for Over-The-Air (OTA) updates in Matter implementations.
 
-9. [Tools Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_tools_guide.md) - Overview of tools available for Matter development.
+9. [Tools Guide](docs/matter_tools_guide.md) - Overview of tools available for Matter development.
 
 ## Release History
 
@@ -81,6 +81,8 @@ Starting from **Matter v1.4**, we have moved to these new repositories:
 | Matter Version | ameba-rtos-matter version | connectedhomeip version |
 |----------------|---------------------------|-------------------------|
 | Matter v1.4    | (Branch) release/v1.4     | (Branch) v1.4-branch    |
+| Matter v1.4.2  | (Branch) release/v1.4.2   | (Branch) v1.4.2-branch  |
+| Matter v1.5    | (Branch) release/v1.5     | (Branch) v1.5-branch    |
 
 ## Directory Structure Overview
 
