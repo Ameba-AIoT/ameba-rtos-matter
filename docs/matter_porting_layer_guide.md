@@ -32,19 +32,19 @@ This structure and approach simplify the process of building and extending Matte
 
 ### Porting Layer Example Documentations
 
- - [Bridge App](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
- - [Bridge App with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Dishwasher](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/dishwasher/README.md) - Dishwasher device type implementation
- - [Fan](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/fan/README.md) - Fan device type implementation
- - [Generic Switch](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/generic_switch/README.md) - Generic Switch device type implementation
- - [Laundry Washer](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/laundry_washer/README.md) - Dishwasher device type implementation
- - [Dimmable Light](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
- - [Dimmable Light with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Microwave Oven](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/microwave_oven/README.md) - Microwave oven device type implementation
- - [Refrigerator](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/refrigerator/README.md) - Refrigerator device type implementation
- - [Room Air-Conditioner](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/room_air_conditioner/README.md) - Room air-conditioner device type implementation
- - [Temperature Sensor](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/temperature_sensor/README.md) - Temperature Sensor device type implementation
- - [Thermostat](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4.2/examples/thermostat/README.md) - Thermostat device type implementation
+ - [Bridge App](bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
+ - [Bridge App with Dynamic Endpoint](bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Dishwasher](dishwasher/README.md) - Dishwasher device type implementation
+ - [Fan](fan/README.md) - Fan device type implementation
+ - [Generic Switch](generic_switch/README.md) - Generic Switch device type implementation
+ - [Laundry Washer](laundry_washer/README.md) - Dishwasher device type implementation
+ - [Dimmable Light](light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
+ - [Dimmable Light with Dynamic Endpoint](light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Microwave Oven](microwave_oven/README.md) - Microwave oven device type implementation
+ - [Refrigerator](refrigerator/README.md) - Refrigerator device type implementation
+ - [Room Air-Conditioner](room_air_conditioner/README.md) - Room air-conditioner device type implementation
+ - [Temperature Sensor](temperature_sensor/README.md) - Temperature Sensor device type implementation
+ - [Thermostat](thermostat/README.md) - Thermostat device type implementation
 
 ### Porting Layer Example Memory Usage
 
