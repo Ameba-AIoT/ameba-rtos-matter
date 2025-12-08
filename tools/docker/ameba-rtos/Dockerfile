@@ -2,8 +2,8 @@
 FROM ameba-rtos-matter:common
 
 # Redefine following build arguments to respective repo and tag/branch
-ARG AMEBA_MATTER_REPO=https://github.com/mikaelajiwidodo/ameba-rtos-matter.git
-ARG TAG_NAME=ameba-rtos/v1.4/update_sdk_250804
+ARG AMEBA_MATTER_REPO=https://github.com/xshuqun/ameba-rtos-matter.git
+ARG TAG_NAME=v1.5-PR/ble_bug_fix
 
 # Define fixed build arguments
 ARG AMBRTOS_REPO=https://github.com/Ameba-AIoT/ameba-rtos.git
