@@ -20,4 +20,4 @@ Before starting with Matter integration, ensure you have fulfilled the prerequis
 
 ### Getting Repository and Building Matter for Supported ICs
 
-To begin building Matter for specific ICs, refer to the detailed instructions provided in the [Matter Building Guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/matter_building_guide.md). Each supported IC has its own building method documented there.
+To begin building Matter for specific ICs, refer to the detailed instructions provided in the [Matter Building Guide](matter_building_guide.md). Each supported IC has its own building method documented there.
