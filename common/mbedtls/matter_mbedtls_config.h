@@ -36,6 +36,9 @@
 #define SUPPORT_HW_SW_CRYPTO
 #if defined(CONFIG_PLATFORM_8710C)
 #include <rom_ssl_ram_map.h>
+#if defined(CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE) && (CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE == 1)
+#define MBEDTLS_USE_ROM_API
+#endif
 #define RTL_HW_CRYPTO
 //#define SUPPORT_HW_SSL_HMAC_SHA256
 #endif /* defined(CONFIG_PLATFORM_8710C) */

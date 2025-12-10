@@ -656,20 +656,6 @@ const mbedtls_ecp_curve_info *mbedtls_ecp_curve_info_from_name( const char *name
 }
 
 /*
- * Get the type of a curve
- */
-mbedtls_ecp_curve_type mbedtls_ecp_get_type( const mbedtls_ecp_group *grp )
-{
-    if( grp->G.X.p == NULL )
-        return( MBEDTLS_ECP_TYPE_NONE );
-
-    if( grp->G.Y.p == NULL )
-        return( MBEDTLS_ECP_TYPE_MONTGOMERY );
-    else
-        return( MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS );
-}
-
-/*
  * Initialize (the components of) a point
  */
 void mbedtls_ecp_point_init( mbedtls_ecp_point *pt )
@@ -3112,81 +3098,6 @@ int mbedtls_ecp_check_privkey( const mbedtls_ecp_group *grp,
     return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
 }
 
-#if defined(MBEDTLS_ECP_MONTGOMERY_ENABLED)
-MBEDTLS_STATIC_TESTABLE
-int mbedtls_ecp_gen_privkey_mx( size_t high_bit,
-                                mbedtls_mpi *d,
-                                int (*f_rng)(void *, unsigned char *, size_t),
-                                void *p_rng )
-{
-    int ret = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
-    size_t n_random_bytes = high_bit / 8 + 1;
-
-    /* [Curve25519] page 5 */
-    /* Generate a (high_bit+1)-bit random number by generating just enough
-     * random bytes, then shifting out extra bits from the top (necessary
-     * when (high_bit+1) is not a multiple of 8). */
-    MBEDTLS_MPI_CHK( mbedtls_mpi_fill_random( d, n_random_bytes,
-                                              f_rng, p_rng ) );
-    MBEDTLS_MPI_CHK( mbedtls_mpi_shift_r( d, 8 * n_random_bytes - high_bit - 1 ) );
-
-    MBEDTLS_MPI_CHK( mbedtls_mpi_set_bit( d, high_bit, 1 ) );
-
-    /* Make sure the last two bits are unset for Curve448, three bits for
-       Curve25519 */
-    MBEDTLS_MPI_CHK( mbedtls_mpi_set_bit( d, 0, 0 ) );
-    MBEDTLS_MPI_CHK( mbedtls_mpi_set_bit( d, 1, 0 ) );
-    if( high_bit == 254 )
-    {
-        MBEDTLS_MPI_CHK( mbedtls_mpi_set_bit( d, 2, 0 ) );
-    }
-
-cleanup:
-    return( ret );
-}
-#endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */
-
-#if defined(MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED)
-static int mbedtls_ecp_gen_privkey_sw(
-    const mbedtls_mpi *N, mbedtls_mpi *d,
-    int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
-{
-    int ret = mbedtls_mpi_random( d, 1, N, f_rng, p_rng );
-    switch( ret )
-    {
-        case MBEDTLS_ERR_MPI_NOT_ACCEPTABLE:
-            return( MBEDTLS_ERR_ECP_RANDOM_FAILED );
-        default:
-            return( ret );
-    }
-}
-#endif /* MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED */
-
-/*
- * Generate a private key
- */
-int mbedtls_ecp_gen_privkey( const mbedtls_ecp_group *grp,
-                     mbedtls_mpi *d,
-                     int (*f_rng)(void *, unsigned char *, size_t),
-                     void *p_rng )
-{
-    ECP_VALIDATE_RET( grp   != NULL );
-    ECP_VALIDATE_RET( d     != NULL );
-    ECP_VALIDATE_RET( f_rng != NULL );
-
-#if defined(MBEDTLS_ECP_MONTGOMERY_ENABLED)
-    if( mbedtls_ecp_get_type( grp ) == MBEDTLS_ECP_TYPE_MONTGOMERY )
-        return( mbedtls_ecp_gen_privkey_mx( grp->nbits, d, f_rng, p_rng ) );
-#endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */
-
-#if defined(MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED)
-    if( mbedtls_ecp_get_type( grp ) == MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS )
-        return( mbedtls_ecp_gen_privkey_sw( &grp->N, d, f_rng, p_rng ) );
-#endif /* MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED */
-
-    return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
-}
-
 /*
  * Generate a keypair with configurable base point
  */
@@ -3603,5 +3514,94 @@ cleanup:
 #endif /* !MBEDTLS_ECP_ALT */
 
 #endif /* MBEDTLS_USE_ROM_API */
+
+/*
+ * Get the type of a curve
+ */
+mbedtls_ecp_curve_type mbedtls_ecp_get_type( const mbedtls_ecp_group *grp )
+{
+    if( grp->G.X.p == NULL )
+        return( MBEDTLS_ECP_TYPE_NONE );
+
+    if( grp->G.Y.p == NULL )
+        return( MBEDTLS_ECP_TYPE_MONTGOMERY );
+    else
+        return( MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS );
+}
+
+#if defined(MBEDTLS_ECP_MONTGOMERY_ENABLED)
+MBEDTLS_STATIC_TESTABLE
+int mbedtls_ecp_gen_privkey_mx( size_t high_bit,
+                                mbedtls_mpi *d,
+                                int (*f_rng)(void *, unsigned char *, size_t),
+                                void *p_rng )
+{
+    int ret = MBEDTLS_ERR_ECP_BAD_INPUT_DATA;
+    size_t n_random_bytes = high_bit / 8 + 1;
+
+    /* [Curve25519] page 5 */
+    /* Generate a (high_bit+1)-bit random number by generating just enough
+     * random bytes, then shifting out extra bits from the top (necessary
+     * when (high_bit+1) is not a multiple of 8). */
+    MBEDTLS_MPI_CHK( mbedtls_mpi_fill_random( d, n_random_bytes,
+                                              f_rng, p_rng ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_shift_r( d, 8 * n_random_bytes - high_bit - 1 ) );
+
+    MBEDTLS_MPI_CHK( mbedtls_mpi_set_bit( d, high_bit, 1 ) );
+
+    /* Make sure the last two bits are unset for Curve448, three bits for
+       Curve25519 */
+    MBEDTLS_MPI_CHK( mbedtls_mpi_set_bit( d, 0, 0 ) );
+    MBEDTLS_MPI_CHK( mbedtls_mpi_set_bit( d, 1, 0 ) );
+    if( high_bit == 254 )
+    {
+        MBEDTLS_MPI_CHK( mbedtls_mpi_set_bit( d, 2, 0 ) );
+    }
+
+cleanup:
+    return( ret );
+}
+#endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */
+
+#if defined(MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED)
+static int mbedtls_ecp_gen_privkey_sw(
+    const mbedtls_mpi *N, mbedtls_mpi *d,
+    int (*f_rng)(void *, unsigned char *, size_t), void *p_rng )
+{
+    int ret = mbedtls_mpi_random( d, 1, N, f_rng, p_rng );
+    switch( ret )
+    {
+        case MBEDTLS_ERR_MPI_NOT_ACCEPTABLE:
+            return( MBEDTLS_ERR_ECP_RANDOM_FAILED );
+        default:
+            return( ret );
+    }
+}
+#endif /* MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED */
+
+/*
+ * Generate a private key
+ */
+int mbedtls_ecp_gen_privkey( const mbedtls_ecp_group *grp,
+                     mbedtls_mpi *d,
+                     int (*f_rng)(void *, unsigned char *, size_t),
+                     void *p_rng )
+{
+    ECP_VALIDATE_RET( grp   != NULL );
+    ECP_VALIDATE_RET( d     != NULL );
+    ECP_VALIDATE_RET( f_rng != NULL );
+
+#if defined(MBEDTLS_ECP_MONTGOMERY_ENABLED)
+    if( mbedtls_ecp_get_type( grp ) == MBEDTLS_ECP_TYPE_MONTGOMERY )
+        return( mbedtls_ecp_gen_privkey_mx( grp->nbits, d, f_rng, p_rng ) );
+#endif /* MBEDTLS_ECP_MONTGOMERY_ENABLED */
+
+#if defined(MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED)
+    if( mbedtls_ecp_get_type( grp ) == MBEDTLS_ECP_TYPE_SHORT_WEIERSTRASS )
+        return( mbedtls_ecp_gen_privkey_sw( &grp->N, d, f_rng, p_rng ) );
+#endif /* MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED */
+
+    return( MBEDTLS_ERR_ECP_BAD_INPUT_DATA );
+}
 
 #endif /* MBEDTLS_ECP_C */
