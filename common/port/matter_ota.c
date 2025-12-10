@@ -45,14 +45,18 @@ static flash_t matter_ota_flash;
 update_ota_target_hdr targetHeader;
 #endif
 
-bool matter_ota_first_sector_written = false;
-uint32_t matter_ota_flash_sector_base;
-uint32_t matter_ota_new_firmware_addr;
+static bool matter_ota_first_sector_written = false;
+static uint32_t matter_ota_flash_sector_base;
+static uint32_t matter_ota_new_firmware_addr;
 
-uint8_t matter_ota_header[MATTER_OTA_HEADER_SIZE];
-uint8_t matter_ota_header_size = 0; // variable to track size of ota header
-uint8_t matter_ota_buffer[MATTER_OTA_SECTOR_SIZE]; // 4KB buffer to be written to one sector
-uint16_t matter_ota_buffer_size = 0; // variable to track size of buffer
+static uint8_t matter_ota_header[MATTER_OTA_HEADER_SIZE];
+static uint8_t matter_ota_header_size = 0; // variable to track size of ota header
+static uint16_t matter_ota_buffer_size = 0; // variable to track size of buffer
+#if defined(CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE) && (CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE == 1)
+static uint8_t *matter_ota_buffer; // 4KB buffer to be written to one sector
+#else
+static uint8_t matter_ota_buffer[MATTER_OTA_SECTOR_SIZE]; // 4KB buffer to be written to one sector
+#endif
 
 static const char *kOTACompleted = "ota_completed";
 
@@ -68,6 +72,13 @@ uint8_t matter_ota_get_current_header_size(void)
 
 void matter_ota_prepare_partition(void)
 {
+#if defined(CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE) && (CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE == 1)
+    matter_ota_buffer = (uint8_t *)malloc(MATTER_OTA_SECTOR_SIZE);
+    if (matter_ota_buffer == NULL) {
+        printf("matter_ota_buffer malloc failed\n");
+        return;
+    }
+#endif
     memset(matter_ota_buffer, 0, sizeof(matter_ota_buffer));
     memset(matter_ota_header, 0, sizeof(matter_ota_header));
     matter_ota_header_size = 0;
@@ -214,7 +225,11 @@ int8_t matter_ota_flush_last(void)
     {
         return OTA_ERROR;
     }
+#endif
 
+#if defined(CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE) && (CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE == 1)
+    free(matter_ota_buffer);
+    matter_ota_buffer = NULL;
 #endif
 
     return OTA_SUCCESS;
@@ -296,6 +311,12 @@ static void matter_ota_abort_task(void *pvParameters)
     }
 #endif
     matter_ota_first_sector_written = false;
+
+#if defined(CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE) && (CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE == 1)
+    free(matter_ota_buffer);
+    matter_ota_buffer = NULL;
+#endif
+
     vTaskDelete(NULL);
 }
 
