@@ -22,7 +22,7 @@ void *matter_blemgr_callback_data = NULL;
 extern int ble_matter_adapter_peripheral_main(uint8_t enable);
 extern int ble_matter_adapter_start_adv(void);
 extern int ble_matter_adapter_stop_adv(void);
-extern int ble_matter_adapter_config_adv(uint8_t *adv_data, uint8_t adv_data_length);
+extern int ble_matter_adapter_config_adv(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t *padv_data, uint8_t padv_data_length);
 extern uint16_t ble_matter_adapter_get_mtu(uint8_t conn_id);
 extern int ble_matter_adapter_disconnect(uint8_t connect_id);
 extern int ble_matter_adapter_send_indication(uint8_t connect_id, uint8_t *data, uint16_t data_length);
@@ -66,7 +66,7 @@ int matter_blemgr_config_adv(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t
 {
     matter_adv_data_length = adv_data_length;
     memcpy(matter_adv_data, adv_data, adv_data_length);
-    ble_matter_adapter_config_adv(matter_adv_data, matter_adv_data_length);
+    ble_matter_adapter_config_adv(adv_int_min, adv_int_max, matter_adv_data, matter_adv_data_length);
 
     return 0;
 }
