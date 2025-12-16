@@ -16,10 +16,12 @@
  *    limitations under the License.
  */
 
-#include <device_energy_management/ameba_energy_management_common_main.h>
 #include <device_energy_management/ameba_device_energy_management_mode.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <lib/core/CHIPError.h>
+#include <memory>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagementMode;
@@ -85,11 +87,6 @@ CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeTagsByIndex(uint8_t modeIn
     return CHIP_NO_ERROR;
 }
 
-ModeBase::Instance * DeviceEnergyManagementMode::Instance()
-{
-    return gDeviceEnergyManagementModeInstance.get();
-}
-
 void DeviceEnergyManagementMode::Shutdown()
 {
     gDeviceEnergyManagementModeInstance.reset();
@@ -98,15 +95,23 @@ void DeviceEnergyManagementMode::Shutdown()
 
 void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(!gDeviceEnergyManagementModeDelegate && !gDeviceEnergyManagementModeInstance);
     gDeviceEnergyManagementModeDelegate = std::make_unique<DeviceEnergyManagementMode::DeviceEnergyManagementModeDelegate>();
-    gDeviceEnergyManagementModeInstance =
-        std::make_unique<ModeBase::Instance>(gDeviceEnergyManagementModeDelegate.get(), 0x1, DeviceEnergyManagementMode::Id, 0);
-    gDeviceEnergyManagementModeInstance->Init();
+    gDeviceEnergyManagementModeInstance = std::make_unique<ModeBase::Instance>(gDeviceEnergyManagementModeDelegate.get(),
+                                                                               endpointId, DeviceEnergyManagementMode::Id, 0);
+    TEMPORARY_RETURN_IGNORED gDeviceEnergyManagementModeInstance->Init();
 }
 
-void MatterDeviceEnergyManagementModeClusterServerShutdownCallback(chip::EndpointId endpoint)
+void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gDeviceEnergyManagementModeInstance)
+    {
+        gDeviceEnergyManagementModeInstance->Shutdown();
+    }
+    DeviceEnergyManagementMode::Shutdown();
+}
+
+void MatterDeviceEnergyManagementModeClusterServerShutdownCallback(chip::EndpointId endpointId)
 {
     DeviceEnergyManagementMode::Shutdown();
 }

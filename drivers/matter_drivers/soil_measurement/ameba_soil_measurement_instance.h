@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
+#include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {

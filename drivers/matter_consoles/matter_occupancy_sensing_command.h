@@ -18,8 +18,8 @@
 
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
-#include <app/clusters/occupancy-sensor-server/occupancy-hal.h>
-#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
+#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
+#include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
@@ -66,17 +66,15 @@ CHIP_ERROR ManualOccupancySensingCommandHandler(int argc, char ** argv)
 
 CHIP_ERROR ManualOccupancySensingSetOccupancyCommandHandler(int argc, char ** argv)
 {
-    if (argc != 1)
-    {
+    if (argc != 1) {
         return ManualOccupancySensingCommandHelpHandler(argc, argv);
     }
-    Protocols::InteractionModel::Status status;
-    status = chip::app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, (uint8_t) atoi(argv[0]));
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        ChipLogError(DeviceLayer, "ManualOCCSetOccupancyCommandHandler Error!");
+
+    chip::app::Clusters::OccupancySensingCluster * cluster = OccupancySensing::FindClusterOnEndpoint(1);
+    if (cluster == nullptr) {
         return CHIP_ERROR_INTERNAL;
     }
+    cluster->SetOccupancy(atoi(argv[0]));
     return CHIP_NO_ERROR;
 }
 

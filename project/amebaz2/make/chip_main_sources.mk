@@ -1,4 +1,17 @@
 # -------------------------------------------------------------------
+# Build Definition
+# -------------------------------------------------------------------
+CHIP_ENABLE_AMEBA_DLOG = $(shell grep '\#define CONFIG_ENABLE_AMEBA_DLOG ' $(MATTER_COMMON_DIR)/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
+CHIP_ENABLE_AMEBA_TC = $(shell grep '\#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION ' $(MATTER_COMMON_DIR)/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
+CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
+CHIP_ENABLE_SHELL = $(shell grep 'chip_build_libshell' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
+
+# -------------------------------------------------------------------
+# Includes
+# -------------------------------------------------------------------
+include $(MATTER_INCLUDE)
+
+# -------------------------------------------------------------------
 # Toolchain Definition
 # -------------------------------------------------------------------
 AR = $(CROSS_COMPILE)ar
@@ -9,14 +22,6 @@ LD = $(CROSS_COMPILE)gcc
 GDB = $(CROSS_COMPILE)gdb
 OBJCOPY = $(CROSS_COMPILE)objcopy
 OBJDUMP = $(CROSS_COMPILE)objdump
-
-# -------------------------------------------------------------------
-# Build Definition
-# -------------------------------------------------------------------
-CHIP_ENABLE_AMEBA_DLOG = $(shell grep '\#define CONFIG_ENABLE_AMEBA_DLOG ' $(MATTER_COMMON_DIR)/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
-CHIP_ENABLE_AMEBA_TC = $(shell grep '\#define CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION ' $(MATTER_COMMON_DIR)/include/platform_opts_matter.h | tr -s '[:space:]' | cut -d' ' -f3)
-CHIP_ENABLE_OTA_REQUESTOR = $(shell grep 'chip_enable_ota_requestor' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
-CHIP_ENABLE_SHELL = $(shell grep 'chip_build_libshell' $(OUTPUT_DIR)/args.gn | cut -d' ' -f3)
 
 # -------------------------------------------------------------------
 # Compilation flag
@@ -107,6 +112,7 @@ SRC_CPP += $(CHIPDIR)/src/app/util/privilege-storage.cpp
 # connectedhomeip - src - app - persistence
 SRC_CPP += $(CHIPDIR)/src/app/persistence/AttributePersistence.cpp
 SRC_CPP += $(CHIPDIR)/src/app/persistence/AttributePersistenceProviderInstance.cpp
+SRC_CPP += $(CHIPDIR)/src/app/persistence/AttributePersistenceMigration.cpp
 SRC_CPP += $(CHIPDIR)/src/app/persistence/DefaultAttributePersistenceProvider.cpp
 SRC_CPP += $(CHIPDIR)/src/app/persistence/DeferredAttributePersistenceProvider.cpp
 SRC_CPP += $(CHIPDIR)/src/app/persistence/String.cpp

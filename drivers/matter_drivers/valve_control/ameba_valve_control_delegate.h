@@ -21,7 +21,8 @@
 
 #include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
-#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-cluster.h>
+#include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-server.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {

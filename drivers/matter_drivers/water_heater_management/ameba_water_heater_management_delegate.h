@@ -28,7 +28,7 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-class WhmManufacturer;
+class WaterHeaterManufacturer;
 
 enum HeatingOp
 {
@@ -47,7 +47,7 @@ public:
 
     void SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance);
 
-    void SetWhmManufacturer(WhmManufacturer & whmManufacturer);
+    void SetWaterHeaterManufacturer(WaterHeaterManufacturer & WaterHeaterManufacturer);
 
     /*********************************************************************************
      *
@@ -245,10 +245,10 @@ private:
      ***************************************************************************/
 
     // Need the following so can determine which features are supported
-    WaterHeaterManagement::Instance * mpWhmInstance;
+    WaterHeaterManagement::Instance * mpWaterHeaterMgmtInstance;
 
     // Pointer to the manufacturer specific object which understand the hardware
-    WhmManufacturer * mpWhmManufacturer;
+    WaterHeaterManufacturer * mpWaterHeaterManufacturer;
 
     // Target water temperature in 100ths of a C
     int16_t mTargetWaterTemperature;

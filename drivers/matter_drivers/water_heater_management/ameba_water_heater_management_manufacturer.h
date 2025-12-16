@@ -28,23 +28,23 @@ namespace Clusters {
 namespace WaterHeaterManagement {
 
 /**
- * The WhmManufacturer example class
+ * The WaterHeaterManufacturer example class
  *
  * Helps with handling the test triggers.
  */
 
-class WhmManufacturer : public DeviceEnergyManagement::DEMManufacturerDelegate
+class WaterHeaterManufacturer : public DeviceEnergyManagement::DEMManufacturerDelegate
 {
 public:
-    WhmManufacturer(WaterHeaterManagementInstance * whmInstance) { mWhmInstance = whmInstance; }
+    WaterHeaterManufacturer(WaterHeaterManagementInstance * waterHeaterInstance) { mWaterHeaterInstance = waterHeaterInstance; }
 
-    WaterHeaterManagementInstance * GetWhmInstance() { return mWhmInstance; }
+    WaterHeaterManagementInstance * GetWaterHeaterInstance() { return mWaterHeaterInstance; }
 
-    WaterHeaterManagementDelegate * GetWhmDelegate()
+    WaterHeaterManagementDelegate * GetWaterHeaterDelegate()
     {
-        if (mWhmInstance)
+        if (mWaterHeaterInstance)
         {
-            return mWhmInstance->GetDelegate();
+            return mWaterHeaterInstance->GetDelegate();
         }
 
         return nullptr;
@@ -148,19 +148,19 @@ public:
     int64_t GetApproxEnergyDuringSession() override;
 
 private:
-    WaterHeaterManagementInstance * mWhmInstance;
+    WaterHeaterManagementInstance * mWaterHeaterInstance;
 };
 
-/** @brief Helper function to return the singleton WhmManufacturer instance
+/** @brief Helper function to return the singleton WaterHeaterManufacturer instance
  *
- * This is needed by the WhmManufacturer class to support TestEventTriggers
- * which are called outside of any class context. This allows the WhmManufacturer
+ * This is needed by the WaterHeaterManufacturer class to support TestEventTriggers
+ * which are called outside of any class context. This allows the WaterHeaterManufacturer
  * class to return the relevant Delegate instance in which to invoke the test
  * events on.
  *
  * This function is typically found in main.cpp or wherever the singleton is created.
  */
-WhmManufacturer * GetWhmManufacturer();
+WaterHeaterManufacturer * GetWaterHeaterManufacturer();
 
 } // namespace WaterHeaterManagement
 } // namespace Clusters

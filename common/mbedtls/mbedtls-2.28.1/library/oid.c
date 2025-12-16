@@ -767,4 +767,95 @@ int mbedtls_oid_get_numeric_string( char *buf, size_t size,
 
 #endif /* MBEDTLS_OID_C */
 
+#else /* When MBEDTLS_USE_ROM_API is declared */
+#include "mbedtls/oid.h"
+
+#if defined(MBEDTLS_MD_C)
+/*
+ * Macro to automatically add the size of #define'd OIDs
+ */
+#define ADD_LEN(s)      s, MBEDTLS_OID_SIZE(s)
+
+/*
+ * Macro to generate an internal function for oid_XXX_from_asn1() (used by
+ * the other functions)
+ */
+#define FN_OID_TYPED_FROM_ASN1( TYPE_T, NAME, LIST )                    \
+    static const TYPE_T * oid_ ## NAME ## _from_asn1(                   \
+                                      const mbedtls_asn1_buf *oid )     \
+    {                                                                   \
+        const TYPE_T *p = (LIST);                                       \
+        const mbedtls_oid_descriptor_t *cur =                           \
+            (const mbedtls_oid_descriptor_t *) p;                       \
+        if( p == NULL || oid == NULL ) return( NULL );                  \
+        while( cur->asn1 != NULL ) {                                    \
+            if( cur->asn1_len == oid->len &&                            \
+                memcmp( cur->asn1, oid->p, oid->len ) == 0 ) {          \
+                return( p );                                            \
+            }                                                           \
+            p++;                                                        \
+            cur = (const mbedtls_oid_descriptor_t *) p;                 \
+        }                                                               \
+        return( NULL );                                                 \
+    }
+
+/*
+ * Macro to generate a function for retrieving a single attribute from an
+ * mbedtls_oid_descriptor_t wrapper.
+ */
+#define FN_OID_GET_ATTR1(FN_NAME, TYPE_T, TYPE_NAME, ATTR1_TYPE, ATTR1) \
+int FN_NAME( const mbedtls_asn1_buf *oid, ATTR1_TYPE * ATTR1 )                  \
+{                                                                       \
+    const TYPE_T *data = oid_ ## TYPE_NAME ## _from_asn1( oid );        \
+    if( data == NULL ) return( MBEDTLS_ERR_OID_NOT_FOUND );            \
+    *ATTR1 = data->ATTR1;                                               \
+    return( 0 );                                                        \
+}
+
+/*
+ * For HMAC digestAlgorithm
+ */
+typedef struct {
+    mbedtls_oid_descriptor_t    descriptor;
+    mbedtls_md_type_t           md_hmac;
+} oid_md_hmac_t;
+
+static const oid_md_hmac_t oid_md_hmac[] =
+{
+#if defined(MBEDTLS_SHA1_C)
+    {
+        { ADD_LEN( MBEDTLS_OID_HMAC_SHA1 ),      "hmacSHA1",      "HMAC-SHA-1" },
+        MBEDTLS_MD_SHA1,
+    },
+#endif /* MBEDTLS_SHA1_C */
+#if defined(MBEDTLS_SHA256_C)
+    {
+        { ADD_LEN( MBEDTLS_OID_HMAC_SHA224 ),    "hmacSHA224",    "HMAC-SHA-224" },
+        MBEDTLS_MD_SHA224,
+    },
+    {
+        { ADD_LEN( MBEDTLS_OID_HMAC_SHA256 ),    "hmacSHA256",    "HMAC-SHA-256" },
+        MBEDTLS_MD_SHA256,
+    },
+#endif /* MBEDTLS_SHA256_C */
+#if defined(MBEDTLS_SHA512_C)
+    {
+        { ADD_LEN( MBEDTLS_OID_HMAC_SHA384 ),    "hmacSHA384",    "HMAC-SHA-384" },
+        MBEDTLS_MD_SHA384,
+    },
+    {
+        { ADD_LEN( MBEDTLS_OID_HMAC_SHA512 ),    "hmacSHA512",    "HMAC-SHA-512" },
+        MBEDTLS_MD_SHA512,
+    },
+#endif /* MBEDTLS_SHA512_C */
+    {
+        { NULL, 0, NULL, NULL },
+        MBEDTLS_MD_NONE,
+    },
+};
+
+FN_OID_TYPED_FROM_ASN1(oid_md_hmac_t, md_hmac, oid_md_hmac)
+FN_OID_GET_ATTR1(mbedtls_oid_get_md_hmac, oid_md_hmac_t, md_hmac, mbedtls_md_type_t, md_hmac)
+#endif /* MBEDTLS_MD_C */
+
 #endif /* MBEDTLS_USE_ROM_API */

@@ -75,70 +75,74 @@ void AmebaGenericSwitchEventHandler::HandleCommand(intptr_t context)
     delete pair;
 }
 
-void AmebaGenericSwitchEventHandler::OnSwitchLatchedHandler(EndpointId endpoint, uint8_t newPosition)
+void AmebaGenericSwitchEventHandler::OnSwitchLatchedHandler(EndpointId endpointId, uint8_t newPosition)
 {
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The latching switch is moved to a new position:%d", newPosition);
+    ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d", __func__, endpointId, newPosition);
 
-    chip::app::Clusters::SwitchServer::Instance().OnSwitchLatch(endpoint, newPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnSwitchLatch(newPosition);
 }
 
-void AmebaGenericSwitchEventHandler::OnSwitchInitialPressedHandler(EndpointId endpoint, uint8_t newPosition)
+void AmebaGenericSwitchEventHandler::OnSwitchInitialPressedHandler(EndpointId endpointId, uint8_t newPosition)
 {
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The new position when the momentary switch starts to be pressed:%d", newPosition);
+    ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d", __func__, endpointId, newPosition);
 
-    chip::app::Clusters::SwitchServer::Instance().OnInitialPress(endpoint, newPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnInitialPress(newPosition);
 }
 
-void AmebaGenericSwitchEventHandler::OnSwitchLongPressedHandler(EndpointId endpoint, uint8_t newPosition)
+void AmebaGenericSwitchEventHandler::OnSwitchLongPressedHandler(EndpointId endpointId, uint8_t newPosition)
 {
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
-    ChipLogDetail(NotSpecified, "The new position when the momentary switch has been pressed for a long time:%d", newPosition);
+    ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d", __func__, endpointId, newPosition);
 
-    chip::app::Clusters::SwitchServer::Instance().OnLongPress(endpoint, newPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnLongPress(newPosition);
 }
 
-void AmebaGenericSwitchEventHandler::OnSwitchShortReleasedHandler(EndpointId endpoint, uint8_t previousPosition)
+void AmebaGenericSwitchEventHandler::OnSwitchShortReleasedHandler(EndpointId endpointId, uint8_t previousPosition)
 {
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "%s: endpointId=%d, previousPosition=%d", __func__, endpointId, previousPosition);
 
-    chip::app::Clusters::SwitchServer::Instance().OnShortRelease(endpoint, previousPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnShortRelease(previousPosition);
 }
 
-void AmebaGenericSwitchEventHandler::OnSwitchLongReleasedHandler(EndpointId endpoint, uint8_t previousPosition)
+void AmebaGenericSwitchEventHandler::OnSwitchLongReleasedHandler(EndpointId endpointId, uint8_t previousPosition)
 {
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "%s: endpointId=%d, previousPosition=%d", __func__, endpointId, previousPosition);
 
-    chip::app::Clusters::SwitchServer::Instance().OnLongRelease(endpoint, previousPosition);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnLongRelease(previousPosition);
 }
 
-void AmebaGenericSwitchEventHandler::OnSwitchMultiPressOngoingHandler(EndpointId endpoint, uint8_t newPosition, uint8_t count)
+void AmebaGenericSwitchEventHandler::OnSwitchMultiPressOngoingHandler(EndpointId endpointId, uint8_t newPosition, uint8_t count)
 {
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, newPosition);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to set CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "%s: endpointId=%d, newPosition=%d, count=%d", __func__, endpointId, newPosition, count);
 
-    chip::app::Clusters::SwitchServer::Instance().OnMultiPressOngoing(endpoint, newPosition, count);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressOngoing(newPosition, count);
 }
 
-void AmebaGenericSwitchEventHandler::OnSwitchMultiPressCompleteHandler(EndpointId endpoint, uint8_t previousPosition, uint8_t count)
+void AmebaGenericSwitchEventHandler::OnSwitchMultiPressCompleteHandler(EndpointId endpointId, uint8_t previousPosition, uint8_t count)
 {
-    Protocols::InteractionModel::Status status = Switch::Attributes::CurrentPosition::Set(endpoint, 0);
-    VerifyOrReturn(Protocols::InteractionModel::Status::Success == status,
-                   ChipLogError(NotSpecified, "Failed to reset CurrentPosition attribute"));
+    ChipLogDetail(NotSpecified, "%s: endpointId=%d, previousPosition=%d, count=%d", __func__, endpointId, previousPosition, count);
 
-    chip::app::Clusters::SwitchServer::Instance().OnMultiPressComplete(endpoint, previousPosition, count);
+    auto switchCluster = Clusters::Switch::FindClusterOnEndpoint(endpointId);
+    VerifyOrReturn(switchCluster != nullptr);
+
+    RETURN_SAFELY_IGNORED switchCluster->OnMultiPressComplete(previousPosition, count);
 }
 
 void AmebaGenericSwitchEventHandler::TriggerCommand(SwitchEventData data)

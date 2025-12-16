@@ -33,6 +33,13 @@ CODEGENDIR   := $(OUTPUT_DIR)/codegen
 include $(MATTER_MAIN_SRC)
 
 # -------------------------------------------------------------------
+# Compiler Flags
+# -------------------------------------------------------------------
+ifeq ($(CHIP_ENABLE_SHELL), true)
+CFLAGS += -DCONFIG_ENABLE_CHIP_SHELL=1
+endif
+
+# -------------------------------------------------------------------
 # Include Path
 # -------------------------------------------------------------------
 INCLUDES += -I$(CHIPDIR)/examples/light-switch-app/light-switch-common
@@ -46,6 +53,7 @@ INCLUDES += -I$(CODEGENDIR)
 ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
 SRC_CPP += $(CHIPDIR)/examples/platform/ameba/ota/OTAInitializer.cpp
 endif
+SRC_CPP += $(CHIPDIR)/examples/platform/ameba/shell/launch_shell.cpp
 
 # -------------------------------------------------------------------
 # Source Files (Example)

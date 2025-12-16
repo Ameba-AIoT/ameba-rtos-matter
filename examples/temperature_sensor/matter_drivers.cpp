@@ -6,6 +6,8 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
+#include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace ::chip::app;
@@ -65,11 +67,8 @@ CHIP_ERROR matter_driver_temperature_sensor_init(void)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    status = Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Set(ep, minValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
-
-    status = Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(ep, maxValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
+    err = Clusters::TemperatureMeasurement::SetMeasuredValueRange(ep, minValue, maxValue);
+    VerifyOrExit(err == CHIP_NO_ERROR, err == CHIP_ERROR_INTERNAL);
 
     ChipLogProgress(DeviceLayer, "Temperature range: Min = %i, Max = %i", minValue, maxValue);
 
@@ -156,7 +155,7 @@ void matter_driver_downlink_update_handler(AppEvent *aEvent)
         {
             chip::EndpointId ep = tempSensor.GetEp();
             //ChipLogProgress(DeviceLayer, "Set Temperature %i on Endpoint%d", aEvent->value._i16, ep);
-            Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(ep, aEvent->value._i16);
+            Clusters::TemperatureMeasurement::SetMeasuredValue(ep, aEvent->value._i16);
         }
         break;
     default:

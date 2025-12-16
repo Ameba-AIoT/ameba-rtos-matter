@@ -15,9 +15,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 #pragma once
 
-#include <app/clusters/electrical-power-measurement-server/electrical-power-measurement-server.h>
+#include <app/clusters/electrical-power-measurement-server/CodegenIntegration.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
 
@@ -132,7 +133,29 @@ private:
     ElectricalPowerMeasurementDelegate * mDelegate;
 };
 
+/**
+ * @brief  Creates a Delegate and Instance for Electrical Power Measurement cluster
+ *
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
+
+ * @param endpointId The endpoint ID of the Electrical Power Measurement cluster
+ * @param aDelegate The delegate for the Electrical Power Measurement cluster
+ * @param aInstance The instance for the Electrical Power Measurement cluster
+ * @param aFeature The feature for the Electrical Power Measurement cluster
+ * @param aOptionalAttributes The optional attributes for the Electrical Power Measurement cluster
+ * @return CHIP_NO_ERROR if the Electrical Power Measurement cluster is initialized successfully, otherwise an error code
+ */
+CHIP_ERROR ElectricalPowerMeasurementInit(chip::EndpointId endpointId,
+                                          std::unique_ptr<ElectricalPowerMeasurementDelegate> & aDelegate,
+                                          std::unique_ptr<ElectricalPowerMeasurementInstance> & aInstance, Feature aFeature,
+                                          OptionalAttributes aOptionalAttributes);
+
+CHIP_ERROR ElectricalPowerMeasurementShutdown(std::unique_ptr<ElectricalPowerMeasurementInstance> & aInstance,
+                                              std::unique_ptr<ElectricalPowerMeasurementDelegate> & aDelegate);
+
 } // namespace ElectricalPowerMeasurement
 } // namespace Clusters
 } // namespace app
-} // namespace chip
+} // namespace chip chi

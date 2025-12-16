@@ -42,74 +42,74 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentAttributes()
         return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 
-    // Restore ChargingEnabledUntil value
+    // Restore ChargingEnabledUntil value - via Instance (which owns the data)
     DataModel::Nullable<uint32_t> tempChargingEnabledUntil;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ChargingEnabledUntil::Id),
                                      tempChargingEnabledUntil);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ChargingEnabledUntil from NVM");
-        mDelegate->SetChargingEnabledUntil(tempChargingEnabledUntil);
+        TEMPORARY_RETURN_IGNORED SetChargingEnabledUntil(tempChargingEnabledUntil);
     }
     else
     {
-        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted ChargingEnabledUntil value");
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted ChargingEnabledUntil value");
     }
 
-    // Restore DischargingEnabledUntil value
+    // Restore DischargingEnabledUntil value - via Instance (which owns the data)
     DataModel::Nullable<uint32_t> tempDischargingEnabledUntil;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::DischargingEnabledUntil::Id),
                                      tempDischargingEnabledUntil);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded DischargingEnabledUntil from NVM");
-        mDelegate->SetDischargingEnabledUntil(tempDischargingEnabledUntil);
+        TEMPORARY_RETURN_IGNORED SetDischargingEnabledUntil(tempDischargingEnabledUntil);
     }
     else
     {
-        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted DischargingEnabledUntil value");
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted DischargingEnabledUntil value");
     }
 
-    // Restore UserMaximumChargeCurrent value
+    // Restore UserMaximumChargeCurrent value - via Instance (which owns the data)
     int64_t tempUserMaximumChargeCurrent;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::UserMaximumChargeCurrent::Id),
                                      tempUserMaximumChargeCurrent);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded UserMaximumChargeCurrent from NVM");
-        mDelegate->SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent);
+        TEMPORARY_RETURN_IGNORED SetUserMaximumChargeCurrent(tempUserMaximumChargeCurrent);
     }
     else
     {
-        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted UserMaximumChargeCurrent value");
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted UserMaximumChargeCurrent value");
     }
 
-    // Restore RandomizationDelayWindow value
+    // Restore RandomizationDelayWindow value - via Instance (which owns the data)
     uint32_t tempRandomizationDelayWindow;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::RandomizationDelayWindow::Id),
                                      tempRandomizationDelayWindow);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded RandomizationDelayWindow from NVM");
-        mDelegate->SetRandomizationDelayWindow(tempRandomizationDelayWindow);
+        TEMPORARY_RETURN_IGNORED SetRandomizationDelayWindow(tempRandomizationDelayWindow);
     }
     else
     {
-        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted RandomizationDelayWindow value");
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted RandomizationDelayWindow value");
     }
 
-    // Restore ApproximateEVEfficiency value
+    // Restore ApproximateEVEfficiency value - via Instance (which owns the data)
     DataModel::Nullable<uint16_t> tempApproxEVEfficiency;
     err = aProvider->ReadScalarValue(ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ApproximateEVEfficiency::Id),
                                      tempApproxEVEfficiency);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ApproximateEVEfficiency from NVM");
-        mDelegate->SetApproximateEVEfficiency(tempApproxEVEfficiency);
+        TEMPORARY_RETURN_IGNORED SetApproximateEVEfficiency(tempApproxEVEfficiency);
     }
     else
     {
-        ChipLogDetail(AppServer, "EVSE: Unable to restore persisted ApproximateEVEfficiency value");
+        ChipLogError(AppServer, "EVSE: Unable to restore persisted ApproximateEVEfficiency value");
     }
 
     return CHIP_NO_ERROR; // It is ok to have no value loaded here
@@ -133,5 +133,14 @@ CHIP_ERROR EnergyEvseManager::Init()
 
 void EnergyEvseManager::Shutdown()
 {
+    EnergyEvseDelegate * dg = GetDelegate();
+    if (dg)
+    {
+        EvseTargetsDelegate * targetsStore = dg->GetEvseTargetsDelegate();
+        if (targetsStore)
+        {
+            targetsStore->Shutdown();
+        }
+    }
     Instance::Shutdown();
 }

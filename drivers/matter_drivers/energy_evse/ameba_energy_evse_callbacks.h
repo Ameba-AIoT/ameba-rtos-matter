@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <clusters/EnergyEvse/Enums.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -41,6 +43,12 @@ enum class EVSECallbackType : uint8_t
        update to advertise a different charging current to the EV)
      */
     ChargeCurrentChanged,
+    /*
+     * DischargeCurrent has changed (e.g. maxDischargingCurrent so requires an
+       update to EVSE application logic about a new discharging current )
+     */
+    DischargeCurrentChanged,
+
     /*
      * Charging Preferences have changed
      * The daily charging target time, SoC / Added Energy schedules have changed
@@ -83,6 +91,12 @@ struct EVSECbInfo
         {
             int64_t maximumChargeCurrent;
         } ChargingCurrent;
+
+        /* for type = DischargeCurrentChanged */
+        struct
+        {
+            int64_t maximumDischargeCurrent;
+        } DischargingCurrent;
 
         /* for type = EnergyMeterReadingRequested */
         struct

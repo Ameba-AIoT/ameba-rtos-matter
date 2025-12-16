@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <matter_api.h>
 #include <matter_core.h>
 #include <matter_dcts.h>
 #include <matter_data_providers.h>
@@ -125,10 +126,22 @@ constexpr size_t kMaxPendingMdnsPackets = 10u;
 chip::Inet::DropIfTooManyQueuedPacketsFilter sMdnsPacketFilter(kMaxPendingMdnsPackets);
 #endif
 
+static matter_app_device_callback_t sDeviceCallback = NULL;
+static void * sDeviceCallbackContext = NULL;
+
+void matter_reg_app_device_callback(matter_app_device_callback_t callback, void * context)
+{
+    sDeviceCallback = callback;
+    sDeviceCallbackContext = context;
+}
+
 void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t arg)
 {
-    switch (event->Type)
-    {
+    if (sDeviceCallback != NULL) {
+        sDeviceCallback(event->Type, sDeviceCallbackContext);
+    }
+
+    switch (event->Type) {
     case DeviceEventType::kInternetConnectivityChange:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         static bool isOTAInitialized = false; // use this static variable to replace CheckInit()
@@ -261,10 +274,13 @@ void matter_core_init_server(intptr_t context)
     // TODO: configure the endpoint
     emberAfEndpointEnableDisable(0xFFFE, false);
 
-    if (RTW_SUCCESS != wifi_is_connected_to_ap())
-    {
-        // QR code will be used with CHIP Tool
-        PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    if (RTW_SUCCESS != wifi_is_connected_to_ap()) {
+        matter_print_onboarding_codes();
+    } else if (matter_server_is_commissioned() != 0) {
+        // Ensure DNSSD server is started for devices connected via user-specific Wi-Fi / fast connect.
+        // Previously, commissioned devices became unreachable/uncontrollable
+        // because the DNSSD service was not initialized after network connection.
+        chip::app::DnssdServer::Instance().StartServer();
     }
 
 #if CONFIG_ENABLE_CHIP_SHELL

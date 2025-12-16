@@ -69,6 +69,7 @@ CFLAGS += -Wno-unused-but-set-variable
 CFLAGS += -Wno-unused-variable
 CFLAGS += -Wno-unused-label
 CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-unused-result
 
 # compiler warnings
 CFLAGS += -DCHIP_DEVICE_LAYER_TARGET=Ameba
@@ -107,6 +108,12 @@ CFLAGS += -DCONFIG_ENABLE_AMEBA_FACTORY_DATA_ENC=0
 CFLAGS += -DCONFIG_ENABLE_AMEBA_PRNG=1
 CFLAGS += -DCONFIG_ENABLE_AMEBA_SNTP=1
 CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
+CFLAGS += -DCONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE=0
+
+# -------------------------------------------------------------------
+# Matter Commissioning Flow (default: standard)
+# -------------------------------------------------------------------
+GLOBAL_CFLAGS += -DCONFIG_USER_ACTION_REQUIRED=0
 
 # -------------------------------------------------------------------
 # Matter Cluster Flags

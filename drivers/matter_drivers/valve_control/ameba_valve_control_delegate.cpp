@@ -39,7 +39,7 @@ DataModel::Nullable<chip::Percent> AmebaValveControlDelegate::HandleOpenValve(Da
     ChipLogProgress(NotSpecified, "Valve openinig from level: %d to %d", currentLevel, sLevel);
 
     currentLevel = sLevel;
-    Attributes::CurrentState::Set(kValveEndpoint, ValveConfigurationAndControl::ValveStateEnum::kOpen);
+    ValveConfigurationAndControl::UpdateCurrentState(kValveEndpoint, ValveConfigurationAndControl::ValveStateEnum::kOpen);
 
     return DataModel::Nullable<chip::Percent>(currentLevel);
 }

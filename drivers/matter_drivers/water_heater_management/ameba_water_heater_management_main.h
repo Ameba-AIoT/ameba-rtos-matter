@@ -17,16 +17,9 @@
  */
 
 #pragma once
+#include <lib/core/DataModelTypes.h>
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WaterHeaterManagement {
+void WaterHeaterApplicationInit();
+void WaterHeaterApplicationShutdown();
 
-CHIP_ERROR WhmApplicationInit(EndpointId endpointId);
-CHIP_ERROR WhmApplicationShutdown();
-
-} // namespace WaterHeaterManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+chip::EndpointId GetEnergyDeviceEndpointId();

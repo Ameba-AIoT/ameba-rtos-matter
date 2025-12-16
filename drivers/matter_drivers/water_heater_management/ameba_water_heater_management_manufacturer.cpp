@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +26,7 @@
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
 
+
 using namespace chip;
 using namespace chip::app::Clusters::WaterHeaterManagement;
 
@@ -35,12 +37,12 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-CHIP_ERROR WhmManufacturer::Init()
+CHIP_ERROR WaterHeaterManufacturer::Init()
 {
-    WaterHeaterManagementDelegate * dg = GetWhmManufacturer()->GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterManufacturer()->GetWaterHeaterDelegate();
     if (dg == nullptr)
     {
-        ChipLogError(AppServer, "WhmDelegate is not initialized");
+        ChipLogError(AppServer, "WaterHeaterMgmtDelegate is not initialized");
         return CHIP_ERROR_UNINITIALIZED;
     }
 
@@ -50,17 +52,17 @@ CHIP_ERROR WhmManufacturer::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WhmManufacturer::Shutdown()
+CHIP_ERROR WaterHeaterManufacturer::Shutdown()
 {
     return CHIP_NO_ERROR;
 }
 
-BitMask<WaterHeaterHeatSourceBitmap> WhmManufacturer::DetermineHeatingSources()
+BitMask<WaterHeaterHeatSourceBitmap> WaterHeaterManufacturer::DetermineHeatingSources()
 {
-    WaterHeaterManagementDelegate * dg = GetWhmManufacturer()->GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterManufacturer()->GetWaterHeaterDelegate();
     if (dg == nullptr)
     {
-        ChipLogError(AppServer, "WhmDelegate is not initialized");
+        ChipLogError(AppServer, "WaterHeaterMgmtDelegate is not initialized");
         return BitMask<WaterHeaterHeatSourceBitmap>(0);
     }
 
@@ -91,13 +93,13 @@ BitMask<WaterHeaterHeatSourceBitmap> WhmManufacturer::DetermineHeatingSources()
     return waterHeaterDemand;
 }
 
-Status WhmManufacturer::TurnHeatingOn(bool emergencyBoost)
+Status WaterHeaterManufacturer::TurnHeatingOn(bool emergencyBoost)
 {
     Status status = Status::Success;
 
-    ChipLogProgress(AppServer, "WhmManufacturer::TurnHeatingOn");
+    ChipLogProgress(AppServer, "WaterHeaterManufacturer::TurnHeatingOn");
 
-    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterDelegate();
 
     if (emergencyBoost)
     {
@@ -114,53 +116,53 @@ Status WhmManufacturer::TurnHeatingOn(bool emergencyBoost)
     return status;
 }
 
-Status WhmManufacturer::TurnHeatingOff()
+Status WaterHeaterManufacturer::TurnHeatingOff()
 {
     Status status = Status::Success;
 
-    ChipLogProgress(AppServer, "WhmManufacturer::TurnHeatingOff");
+    ChipLogProgress(AppServer, "WaterHeaterManufacturer::TurnHeatingOff");
 
-    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterDelegate();
 
     dg->SetHeatDemand(BitMask<WaterHeaterHeatSourceBitmap>(0));
 
     return status;
 }
 
-Status WhmManufacturer::BoostCommandStarted(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
-                                            Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
-                                            Optional<chip::Percent> targetReheat)
+Status WaterHeaterManufacturer::BoostCommandStarted(uint32_t duration, Optional<bool> oneShot, Optional<bool> emergencyBoost,
+                                                    Optional<int16_t> temporarySetpoint, Optional<chip::Percent> targetPercentage,
+                                                    Optional<chip::Percent> targetReheat)
 {
     return Status::Success;
 }
 
-Status WhmManufacturer::BoostCommandCancelled()
+Status WaterHeaterManufacturer::BoostCommandCancelled()
 {
     return Status::Success;
 }
 
-void WhmManufacturer::BoostCommandFinished() {}
+void WaterHeaterManufacturer::BoostCommandFinished() {}
 
-WaterHeaterManagementDelegate * GetWhmDelegate()
+WaterHeaterManagementDelegate * GetWaterHeaterDelegate()
 {
-    WhmManufacturer * mn = GetWhmManufacturer();
-    VerifyOrDieWithMsg(mn != nullptr, AppServer, "WhmManufacturer is null");
+    WaterHeaterManufacturer * mn = GetWaterHeaterManufacturer();
+    VerifyOrDieWithMsg(mn != nullptr, AppServer, "WaterHeaterManufacturer is null");
 
-    WaterHeaterManagementDelegate * wg = mn->GetWhmDelegate();
-    VerifyOrDieWithMsg(wg != nullptr, AppServer, "WhmDelegate is null");
+    WaterHeaterManagementDelegate * wg = mn->GetWaterHeaterDelegate();
+    VerifyOrDieWithMsg(wg != nullptr, AppServer, "WaterHeaterMgmtDelegate is null");
 
     return wg;
 }
 
 // The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
-int64_t WhmManufacturer::GetApproxEnergyDuringSession()
+int64_t WaterHeaterManufacturer::GetApproxEnergyDuringSession()
 {
     return 300;
 }
 
 void SetTestEventTrigger_BasicInstallationTestEvent()
 {
-    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterDelegate();
 
     // Simulate installation in a 100L tank full of water at 20C, with a target temperature of 60C, in OFF mode
     dg->SetTankVolume(100);
@@ -177,7 +179,7 @@ void SetTestEventTrigger_BasicInstallationTestEventClear() {}
 
 void SetTestEventTrigger_WaterTemperature20CTestEvent()
 {
-    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterDelegate();
 
     // Simulate 100% of the water in the tank being at 20C
     dg->SetWaterTemperature(2000);
@@ -185,7 +187,7 @@ void SetTestEventTrigger_WaterTemperature20CTestEvent()
 
 void SetTestEventTrigger_WaterTemperature61CTestEvent()
 {
-    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterDelegate();
 
     // Simulate 100% of the water in the tank being at 61C
     dg->SetWaterTemperature(6100);
@@ -193,7 +195,7 @@ void SetTestEventTrigger_WaterTemperature61CTestEvent()
 
 void SetTestEventTrigger_WaterTemperature66CTestEvent()
 {
-    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterDelegate();
 
     // Simulate 100% of the water in the tank being at 66C
     dg->SetWaterTemperature(6600);
@@ -201,7 +203,7 @@ void SetTestEventTrigger_WaterTemperature66CTestEvent()
 
 void SetTestEventTrigger_ManualModeTestEvent()
 {
-    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterDelegate();
 
     // Simulate the Water Heater Mode being set to MANUAL
     Status status = dg->SetWaterHeaterMode(WaterHeaterMode::kModeManual);
@@ -213,7 +215,7 @@ void SetTestEventTrigger_ManualModeTestEvent()
 
 void SetTestEventTrigger_OffModeTestEvent()
 {
-    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterDelegate();
 
     // Simulate the Water Heater Mode being set to OFF
     Status status = dg->SetWaterHeaterMode(WaterHeaterMode::kModeOff);
@@ -225,7 +227,7 @@ void SetTestEventTrigger_OffModeTestEvent()
 
 void SetTestEventTrigger_DrawOffHotWaterTestEvent()
 {
-    WaterHeaterManagementDelegate * dg = GetWhmDelegate();
+    WaterHeaterManagementDelegate * dg = GetWaterHeaterDelegate();
 
     // Simulate drawing off 25% of the tank volume of hot water, replaced with water at 20C
     dg->DrawOffHotWater(25, 2000);
@@ -245,39 +247,44 @@ bool HandleWaterHeaterManagementTestEventTrigger(uint64_t eventTrigger)
     switch (trigger)
     {
     case WaterHeaterManagementTrigger::kBasicInstallationTestEvent:
-        ChipLogProgress(Support,
-                        "[Whm::kBasicInstallationTestEvent] => Simulate installation in a 100L tank full of water at 20C, with a "
-                        "target temperature of 60C, in OFF mode");
+        ChipLogProgress(
+            Support,
+            "[WaterHeaterMgmt::kBasicInstallationTestEvent] => Simulate installation in a 100L tank full of water at 20C, with a "
+            "target temperature of 60C, in OFF mode");
         SetTestEventTrigger_BasicInstallationTestEvent();
         break;
     case WaterHeaterManagementTrigger::kBasicInstallationTestEventClear:
-        ChipLogProgress(Support, "[Whm::kBasicInstallationTestEventClear] => End simulation of installation");
+        ChipLogProgress(Support, "[WaterHeaterMgmt::kBasicInstallationTestEventClear] => End simulation of installation");
         SetTestEventTrigger_BasicInstallationTestEventClear();
         break;
     case WaterHeaterManagementTrigger::kWaterTemperature20CTestEvent:
-        ChipLogProgress(Support, "[Whm::kWaterTemperature20CTestEvent] => Simulate 100%% of the water in the tank being at 20C");
+        ChipLogProgress(Support,
+                        "[WaterHeaterMgmt::kWaterTemperature20CTestEvent] => Simulate 100%% of the water in the tank being at 20C");
         SetTestEventTrigger_WaterTemperature20CTestEvent();
         break;
     case WaterHeaterManagementTrigger::kWaterTemperature61CTestEvent:
-        ChipLogProgress(Support, "[Whm::kWaterTemperature61CTestEvent] => Simulate 100%% of the water in the tank being at 61C");
+        ChipLogProgress(Support,
+                        "[WaterHeaterMgmt::kWaterTemperature61CTestEvent] => Simulate 100%% of the water in the tank being at 61C");
         SetTestEventTrigger_WaterTemperature61CTestEvent();
         break;
     case WaterHeaterManagementTrigger::kWaterTemperature66CTestEvent:
-        ChipLogProgress(Support, "[Whm::kWaterTemperature66CTestEvent] => Simulate 100%% of the water in the tank being at 66C");
+        ChipLogProgress(Support,
+                        "[WaterHeaterMgmt::kWaterTemperature66CTestEvent] => Simulate 100%% of the water in the tank being at 66C");
         SetTestEventTrigger_WaterTemperature66CTestEvent();
         break;
     case WaterHeaterManagementTrigger::kManualModeTestEvent:
-        ChipLogProgress(Support, "[Whm::kManualModeTestEvent] => Simulate the Water Heater Mode being set to MANUAL");
+        ChipLogProgress(Support, "[WaterHeaterMgmt::kManualModeTestEvent] => Simulate the Water Heater Mode being set to MANUAL");
         SetTestEventTrigger_ManualModeTestEvent();
         break;
     case WaterHeaterManagementTrigger::kOffModeTestEvent:
-        ChipLogProgress(Support, "[Whm::kOffModeTestEvent] => Simulate the Water Heater Mode being set to OFF");
+        ChipLogProgress(Support, "[WaterHeaterMgmt::kOffModeTestEvent] => Simulate the Water Heater Mode being set to OFF");
         SetTestEventTrigger_OffModeTestEvent();
         break;
     case WaterHeaterManagementTrigger::kDrawOffHotWaterTestEvent:
-        ChipLogProgress(Support,
-                        "[Whm::kDrawOffHotWaterTestEvent] => Simulate drawing off 25%% of the tank volume of hot water, replaced "
-                        "with water at 20C");
+        ChipLogProgress(
+            Support,
+            "[WaterHeaterMgmt::kDrawOffHotWaterTestEvent] => Simulate drawing off 25%% of the tank volume of hot water, replaced "
+            "with water at 20C");
         SetTestEventTrigger_DrawOffHotWaterTestEvent();
         break;
     default:

@@ -20,6 +20,7 @@
 #include <energy_evse/ameba_energy_evse_manufacturer_impl.h>
 #include <energy_evse/ameba_energy_evse_delegate_impl.h>
 
+#include <app/clusters/energy-evse-server/CodegenIntegration.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 
 using namespace chip;
@@ -29,7 +30,8 @@ using namespace chip::app::Clusters::EnergyEvse;
 
 struct EVSETestEventSaveData
 {
-    int64_t mOldMaxHardwareCurrentLimit;
+    int64_t mOldMaxHardwareChargeCurrentLimit;
+    int64_t mOldMaxHardwareDischargeCurrentLimit;
     int64_t mOldCircuitCapacity;
     int64_t mOldUserMaximumChargeCurrent;
     int64_t mOldCableAssemblyLimit;
@@ -52,27 +54,36 @@ EnergyEvseDelegate * GetEvseDelegate()
 
 void SetTestEventTrigger_BasicFunctionality()
 {
-    EnergyEvseDelegate * dg = GetEvseDelegate();
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
+    VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
-    sEVSETestEventSaveData.mOldMaxHardwareCurrentLimit  = dg->HwGetMaxHardwareCurrentLimit();
-    sEVSETestEventSaveData.mOldCircuitCapacity          = dg->GetCircuitCapacity();
-    sEVSETestEventSaveData.mOldUserMaximumChargeCurrent = dg->GetUserMaximumChargeCurrent();
-    sEVSETestEventSaveData.mOldHwStateBasic             = dg->HwGetState();
+    sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit    = dg->HwGetMaxHardwareChargeCurrentLimit();
+    sEVSETestEventSaveData.mOldMaxHardwareDischargeCurrentLimit = dg->HwGetMaxHardwareDischargeCurrentLimit();
+    sEVSETestEventSaveData.mOldCircuitCapacity                  = instance->GetCircuitCapacity();
+    sEVSETestEventSaveData.mOldUserMaximumChargeCurrent         = instance->GetUserMaximumChargeCurrent();
+    sEVSETestEventSaveData.mOldHwStateBasic                     = dg->HwGetState();
 
-    dg->HwSetMaxHardwareCurrentLimit(32000);
-    dg->HwSetCircuitCapacity(32000);
-    dg->SetUserMaximumChargeCurrent(32000);
+    dg->HwSetMaxHardwareChargeCurrentLimit(32000);
+    dg->HwSetMaxHardwareDischargeCurrentLimit(32000);
+    TEMPORARY_RETURN_IGNORED instance->SetCircuitCapacity(32000);
+    TEMPORARY_RETURN_IGNORED instance->SetUserMaximumChargeCurrent(32000);
     dg->HwSetState(StateEnum::kNotPluggedIn);
 }
+
 void SetTestEventTrigger_BasicFunctionalityClear()
 {
-    EnergyEvseDelegate * dg = GetEvseDelegate();
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
+    VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
 
-    dg->HwSetMaxHardwareCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareCurrentLimit);
-    dg->HwSetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
-    dg->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
+    dg->HwSetMaxHardwareChargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit);
+    dg->HwSetMaxHardwareDischargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareDischargeCurrentLimit);
+    TEMPORARY_RETURN_IGNORED instance->SetCircuitCapacity(sEVSETestEventSaveData.mOldCircuitCapacity);
+    TEMPORARY_RETURN_IGNORED instance->SetUserMaximumChargeCurrent(sEVSETestEventSaveData.mOldUserMaximumChargeCurrent);
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStateBasic);
 }
+
 void SetTestEventTrigger_EVPluggedIn()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
@@ -97,20 +108,24 @@ void SetTestEventTrigger_EVChargeDemand()
     sEVSETestEventSaveData.mOldHwStatePluggedInDemand = dg->HwGetState();
     dg->HwSetState(StateEnum::kPluggedInDemand);
 }
+
 void SetTestEventTrigger_EVChargeDemandClear()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
 
     dg->HwSetState(sEVSETestEventSaveData.mOldHwStatePluggedInDemand);
 }
+
 void SetTestEventTrigger_EVTimeOfUseMode()
 {
     // TODO - See #34249
 }
+
 void SetTestEventTrigger_EVTimeOfUseModeClear()
 {
     // TODO - See #34249
 }
+
 void SetTestEventTrigger_EVSEGroundFault()
 {
     EnergyEvseDelegate * dg = GetEvseDelegate();
@@ -137,6 +152,56 @@ void SetTestEventTrigger_EVSEDiagnosticsComplete()
     EnergyEvseDelegate * dg = GetEvseDelegate();
 
     dg->HwDiagnosticsComplete();
+}
+
+void SetTestEventTrigger_EVSESetSoCLow()
+{
+    // Set SoC 20%, 70kWh BatterySize
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
+    VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
+
+    TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(20)));
+    TEMPORARY_RETURN_IGNORED instance->SetBatteryCapacity(DataModel::MakeNullable(static_cast<int64_t>(70000000)));
+}
+
+void SetTestEventTrigger_EVSESetSoCHigh()
+{
+    // Set SoC 95%, 70kWh BatterySize
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
+    VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
+
+    TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(95)));
+    TEMPORARY_RETURN_IGNORED instance->SetBatteryCapacity(DataModel::MakeNullable(static_cast<int64_t>(70000000)));
+}
+
+void SetTestEventTrigger_EVSESetSoCClear()
+{
+    // Set SoC null, BatterySize null
+    EnergyEvseDelegate * dg         = GetEvseDelegate();
+    EnergyEvse::Instance * instance = dg->GetInstance();
+    VerifyOrDieWithMsg(instance != nullptr, AppServer, "EVSE Instance is null");
+
+    TEMPORARY_RETURN_IGNORED instance->SetStateOfCharge(DataModel::NullNullable);
+    TEMPORARY_RETURN_IGNORED instance->SetBatteryCapacity(DataModel::NullNullable);
+}
+
+void SetTestEventTrigger_EVSESetVehicleID()
+{
+    CharSpan vehicleIdSpan = "Test-Vehicle-ID-012345789-ABCDEF"_span;
+
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+    dg->HwSetVehicleID(vehicleIdSpan);
+}
+
+void SetTestEventTrigger_EVSETriggerRFID()
+{
+    EnergyEvseDelegate * dg = GetEvseDelegate();
+
+    uint8_t rfidData[10] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99 };
+    ByteSpan rfidSpan(rfidData);
+    dg->HwSetRFID(rfidSpan);
 }
 
 bool AmebaHandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
@@ -192,6 +257,26 @@ bool AmebaHandleEnergyEvseTestEventTrigger(uint64_t eventTrigger)
     case EnergyEvseTrigger::kEVTimeOfUseModeClear:
         ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EV TimeOfUse Mode clear");
         SetTestEventTrigger_EVTimeOfUseModeClear();
+        break;
+    case EnergyEvseTrigger::kEVSESetSoCLow:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Set SoC Low");
+        SetTestEventTrigger_EVSESetSoCLow();
+        break;
+    case EnergyEvseTrigger::kEVSESetSoCHigh:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Set SoC High");
+        SetTestEventTrigger_EVSESetSoCHigh();
+        break;
+    case EnergyEvseTrigger::kEVSESetSoCClear:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Set SoC Clear");
+        SetTestEventTrigger_EVSESetSoCClear();
+        break;
+    case EnergyEvseTrigger::kEVSESetVehicleID:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Set VehicleID");
+        SetTestEventTrigger_EVSESetVehicleID();
+        break;
+    case EnergyEvseTrigger::kEVSETriggerRFID:
+        ChipLogProgress(Support, "[EnergyEVSE-Test-Event] => EVSE Trigger RFID");
+        SetTestEventTrigger_EVSETriggerRFID();
         break;
     default:
         return false;

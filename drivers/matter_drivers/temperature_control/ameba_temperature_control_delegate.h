@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/util/config.h>
 
 namespace chip {

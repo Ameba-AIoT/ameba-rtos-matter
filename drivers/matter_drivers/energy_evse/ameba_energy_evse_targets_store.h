@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/energy-evse-server/energy-evse-server.h>
+#include <energy_evse/ameba_energy_evse_target_config.h>
+#include <energy_evse/ameba_charging_targets_mem_manager.h>
 #include <credentials/FabricTable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -28,7 +29,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include <energy_evse/ameba_charging_targets_mem_manager.h>
 
 namespace chip {
 namespace app {
@@ -42,6 +42,7 @@ public:
     ~EvseTargetsDelegate();
 
     CHIP_ERROR Init(PersistentStorageDelegate * targetStore);
+    void Shutdown();
 
     /**
      * @brief Delegate should implement a handler for LoadTargets

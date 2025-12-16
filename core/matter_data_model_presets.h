@@ -31,7 +31,6 @@ void matter_cluster_groups_server(ClusterConfig *clusterConfig);
 void matter_cluster_scenes_server(ClusterConfig *clusterConfig);
 void matter_cluster_onoff_server(ClusterConfig *clusterConfig);
 void matter_cluster_level_control_server(ClusterConfig *clusterConfig);
-void matter_cluster_level_control_server(ClusterConfig *clusterConfig);
 
 } // Clusters
 

@@ -44,7 +44,7 @@ void matter_chip_logging_wrapper(MatterLogType logtype, char* content, char* fil
         ChipLogDetail(DeviceLayer, message.c_str());
         break;
     case kError:
-        err = CHIP_ERROR(Range::kPlatform, 0, file, line);
+        err = CHIP_ERROR(Range::kPlatform, 0, file);
         if(instance.GetAmebaErrorFormatterInited() == true) 
         {
             ChipLogError(DeviceLayer, (message + " %" CHIP_ERROR_FORMAT).c_str(), err.Format());

@@ -33,6 +33,14 @@ CODEGENDIR   := $(OUTPUT_DIR)/codegen
 include $(MATTER_MAIN_SRC)
 
 # -------------------------------------------------------------------
+# Compiler Flags
+# -------------------------------------------------------------------
+CFLAGS += -DCONFIG_ENABLE_AMEBA_APP_TASK=1
+ifeq ($(CHIP_ENABLE_SHELL), true)
+CFLAGS += -DCONFIG_ENABLE_CHIP_SHELL=1
+endif
+
+# -------------------------------------------------------------------
 # Include Path
 # -------------------------------------------------------------------
 INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/ameba/main/include
@@ -62,7 +70,6 @@ SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/concentration_measurement/ameba_c
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_device_energy_management_delegate_impl.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_device_energy_management_manager.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_device_energy_management_mode.cpp
-SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_energy_management_common_main.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_device_management_test_event_trigger.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_energy_time_utils.cpp
 # dishwasher alarm cluster
@@ -81,7 +88,6 @@ SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_mai
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_manager.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_manufacturer_impl.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_mode.cpp
-SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_stub.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_targets_store.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_test_event_trigger.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_preference_delegate.cpp
@@ -103,8 +109,6 @@ SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/microwave_oven_mode/ameba_microwa
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/microwave_oven_mode/ameba_microwave_oven_mode_instance.cpp
 # mode select cluster
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/mode_select/ameba_mode_select_manager.cpp
-# occupancy sensing cluster
-SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/occupancy_sensing/ameba_occupancy_sensing_instance.cpp
 # operational state cluster
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_delegate.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_instance.cpp

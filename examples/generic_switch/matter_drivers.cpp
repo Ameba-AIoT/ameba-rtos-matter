@@ -138,29 +138,16 @@ CHIP_ERROR matter_driver_switch_set_startup_value(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EndpointId ep = 1;
     Status status;
-    uint8_t NumberOfPositionsValue, CurrentPositionValue, MultiPressMaxValue;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     ChipLogProgress(DeviceLayer, "Initialize Switch");
 
-    // Read NumberOfPositions
-    status = Clusters::Switch::Attributes::NumberOfPositions::Get(ep, &NumberOfPositionsValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
-
-    // Read CurrentPosition
-    status = Clusters::Switch::Attributes::CurrentPosition::Get(ep, &CurrentPositionValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
-
-    // Read MultiPressMax
-    status = Clusters::Switch::Attributes::MultiPressMax::Get(ep, &MultiPressMaxValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
-
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    swtch.SetNumberOfPosition(NumberOfPositionsValue);
-    swtch.SetCurrentPosition(CurrentPositionValue);
-    swtch.SetMultiPressMax(MultiPressMaxValue);
+    swtch.SetNumberOfPosition(2);
+    swtch.SetCurrentPosition(1);
+    swtch.SetMultiPressMax(2);
 
 exit:
     if (err == CHIP_ERROR_INTERNAL)

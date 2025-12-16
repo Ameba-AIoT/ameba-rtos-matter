@@ -18,7 +18,7 @@
 
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
-#include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
+#include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <soil_measurement/ameba_soil_measurement_instance.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL

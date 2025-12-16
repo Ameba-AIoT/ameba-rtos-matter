@@ -479,7 +479,6 @@ void matter_cluster_groups_server(ClusterConfig *clusterConfig)
     clusterConfig->commandConfigs.push_back(groupsGetGroupMembershipResponse);
     clusterConfig->commandConfigs.push_back(groupsRemoveGroupResponse);
     clusterConfig->commandConfigs.push_back(groupsEndOfGeneratedCommandList);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback);
 }
 
 
@@ -564,16 +563,6 @@ void matter_cluster_onoff_server(ClusterConfig *clusterConfig)
     CommandConfig onoffOnWithTimedOff(0x00000042, COMMAND_MASK_ACCEPTED);
     CommandConfig onoffEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
 
-    CommandConfig onoffMoveToLevel(0x00000000, COMMAND_MASK_GENERATED);
-    CommandConfig onoffMove(0x00000001, COMMAND_MASK_GENERATED);
-    CommandConfig onoffStep(0x00000002, COMMAND_MASK_GENERATED);
-    CommandConfig onoffStop(0x00000003, COMMAND_MASK_GENERATED);
-    CommandConfig onoffMoveToLevelWithOnOff(0x00000004, COMMAND_MASK_GENERATED);
-    CommandConfig onoffMoveWithOnOff(0x00000005, COMMAND_MASK_GENERATED);
-    CommandConfig onoffStepWithOnOff(0x00000006, COMMAND_MASK_GENERATED);
-    CommandConfig onoffStopWithOnOff(0x00000007, COMMAND_MASK_GENERATED);
-    CommandConfig onoffEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
-
     clusterConfig->clusterId = 0x00000006;
     clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
     clusterConfig->attributeConfigs.push_back(onoffOnOff);
@@ -590,14 +579,6 @@ void matter_cluster_onoff_server(ClusterConfig *clusterConfig)
     clusterConfig->commandConfigs.push_back(onoffOnWithRecallGlobalScene);
     clusterConfig->commandConfigs.push_back(onoffOnWithTimedOff);
     clusterConfig->commandConfigs.push_back(onoffEndOfAcceptedCommandList);
-    clusterConfig->commandConfigs.push_back(onoffMoveToLevel);
-    clusterConfig->commandConfigs.push_back(onoffMove);
-    clusterConfig->commandConfigs.push_back(onoffStep);
-    clusterConfig->commandConfigs.push_back(onoffStop);
-    clusterConfig->commandConfigs.push_back(onoffMoveToLevelWithOnOff);
-    clusterConfig->commandConfigs.push_back(onoffStepWithOnOff);
-    clusterConfig->commandConfigs.push_back(onoffStopWithOnOff);
-    clusterConfig->commandConfigs.push_back(onoffEndOfGeneratedCommandList);
     clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback);
     clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterOnOffClusterServerShutdownCallback);
 }

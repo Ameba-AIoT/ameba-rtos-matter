@@ -14,6 +14,14 @@ OUTPUT_DIR   := $(CHIPDIR)/examples/all-clusters-app/ameba/build/chip
 CODEGEN_DIR  := $(OUTPUT_DIR)/codegen
 
 # -------------------------------------------------------------------
+# Compiler Flags
+# -------------------------------------------------------------------
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_APP_TASK=1
+ifeq ($(CHIP_ENABLE_SHELL), true)
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_CHIP_SHELL=1
+endif
+
+# -------------------------------------------------------------------
 # Search Directory
 # -------------------------------------------------------------------
 DIR += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common
@@ -27,6 +35,7 @@ vpath %.c $(DIR) $(shell find $(DIR) -type d)
 # -------------------------------------------------------------------
 # Include Path
 # -------------------------------------------------------------------
+IFLAGS += -I$(MATTER_EXAMPLE_DIR)/chiptest
 IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/all-clusters-common/include
 IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/ameba/main/include
 IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/ameba/build/chip/gen/include
@@ -54,7 +63,6 @@ CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/concentration_measurement/ameba_co
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_device_energy_management_delegate_impl.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_device_energy_management_manager.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_device_energy_management_mode.cpp
-CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_energy_management_common_main.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_device_management_test_event_trigger.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/device_energy_management/ameba_energy_time_utils.cpp
 # dishwasher alarm cluster
@@ -65,7 +73,7 @@ CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/dishwasher_mode/ameba_dishwasher_m
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/dishwasher_mode/ameba_dishwasher_mode_instance.cpp
 # eletrical power measurement cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/electrical_power_measurement/ameba_electrical_power_measurement_delegate.cpp
-# energy evse cluster
+# energy evse cluster - Not Yet
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_charging_targets_mem_manager.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_fake_readings.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_delegate_impl.cpp
@@ -73,7 +81,6 @@ CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_main
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_manager.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_manufacturer_impl.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_mode.cpp
-CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_stub.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_targets_store.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_evse_test_event_trigger.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/energy_evse/ameba_energy_preference_delegate.cpp
@@ -95,8 +102,6 @@ CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/microwave_oven_mode/ameba_microwav
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/microwave_oven_mode/ameba_microwave_oven_mode_instance.cpp
 # mode select cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/mode_select/ameba_mode_select_manager.cpp
-# occupancy sensing cluster
-CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/occupancy_sensing/ameba_occupancy_sensing_instance.cpp
 # operational state cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_delegate.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_instance.cpp
@@ -139,7 +144,6 @@ CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/water_heater_management/ameba_wate
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/water_heater_management/ameba_water_heater_management_instance.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/water_heater_management/ameba_water_heater_management_main.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/water_heater_management/ameba_water_heater_management_manufacturer.cpp
-
 # water heater mode cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/water_heater_mode/ameba_water_heater_mode_delegate.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/water_heater_mode/ameba_water_heater_mode_instance.cpp

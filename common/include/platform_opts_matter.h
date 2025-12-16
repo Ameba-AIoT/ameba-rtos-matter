@@ -80,7 +80,7 @@
  * MATTER KVS2, for key length large than 64 (Fabric1 ~ FabricF)
  * Uses DCT2, set flash address MATTER_KVS_BEGIN_ADDR2
  ****************************************************************/
-#define MATTER_KVS_MODULE_NUM2                  10                      // max number of module
+#define MATTER_KVS_MODULE_NUM2                  11                      // max number of module
 #define MATTER_KVS_VARIABLE_NAME_SIZE2          32                      // max size of the variable name
 #define MATTER_KVS_VARIABLE_VALUE_SIZE2         400+4                   // max size of the variable value, +4 so it can store 400 bytes variable
                                                                         // max value number in moudle = floor(4024 / (32 + 400 + 4)) = 9
@@ -103,17 +103,21 @@
 #undef BT_FTL_PHY_ADDR1
 #undef BT_FTL_BKUP_ADDR
 #undef UART_SETTING_SECTOR
-#undef DCT_BEGIN_ADDR
 #undef MATTER_KVS_BEGIN_ADDR
 #undef MATTER_KVS_BEGIN_ADDR2
 
-#define FAST_RECONNECT_DATA                     (0x400000 - 0x1000)     // 0x3FF000
-#define BT_FTL_PHY_ADDR0                        (0x400000 - 0x2000)     // 0x3FE000
-#define BT_FTL_PHY_ADDR1                        (0x400000 - 0x3000)     // 0x3FD000
-#define BT_FTL_BKUP_ADDR                        (0x400000 - 0x4000)     // 0x3FC000
-#define UART_SETTING_SECTOR                     (0x400000 - 0x5000)     // 0x3FB000
-#define MATTER_KVS_BEGIN_ADDR                   (0x400000 - 0x13000)    // 0x3ED000 ~ 0x3FB000 : 56K
-#define MATTER_KVS_BEGIN_ADDR2                  (0x400000 - 0x1E000)    // 0x3E6000 ~ 0x3ED000 : 24K
+#define FAST_RECONNECT_DATA                     (0x400000 - 0x1000)     // 0x3FF000 (4K)
+#define BT_FTL_PHY_ADDR0                        (0x400000 - 0x2000)     // 0x3FE000 (4K)
+#define BT_FTL_PHY_ADDR1                        (0x400000 - 0x3000)     // 0x3FD000 (4K)
+#define BT_FTL_BKUP_ADDR                        (0x400000 - 0x4000)     // 0x3FC000 (4K)
+#define UART_SETTING_SECTOR                     (0x400000 - 0x5000)     // 0x3FB000 (4K)
+#if (MATTER_KVS_ENABLE_BACKUP == 0)
+#define MATTER_KVS_BEGIN_ADDR                   (0x400000 - 0x13000)    // 0x3ED000 ~ 0x3FB000 (56K)
+#define MATTER_KVS_BEGIN_ADDR2                  (0x400000 - 0x1F000)    // 0x3E1000 ~ 0x3ED000 (48K)
+#elif (MATTER_KVS_ENABLE_BACKUP == 1)
+#define MATTER_KVS_BEGIN_ADDR                   (0x400000 - 0x20000)    // 0x3E0000 ~ 0x3FB000 (108K)
+#define MATTER_KVS_BEGIN_ADDR2                  (0x400000 - 0x37000)    // 0x3C9000 ~ 0x3E0000 (92K)
+#endif /* MATTER_KVS_ENABLE_BACKUP */
 
 #elif defined(CONFIG_PLATFORM_8721D)
 
@@ -155,7 +159,7 @@
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG==1)
 #define CONFIG_ENABLE_AMEBA_LFS                 1
-#define CONFIG_ENABLE_AMEBA_DLOG_TEST           1
+#define CONFIG_ENABLE_AMEBA_DLOG_ATCMD          1
 #else
 #define CONFIG_ENABLE_AMEBA_LFS                 0
 #endif

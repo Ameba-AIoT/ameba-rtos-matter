@@ -53,13 +53,13 @@ public:
 
     void TriggerCommand(SwitchEventData data);
 
-    void OnSwitchLatchedHandler(chip::EndpointId endpoint, uint8_t newPosition);
-    void OnSwitchInitialPressedHandler(chip::EndpointId endpoint, uint8_t newPosition);
-    void OnSwitchLongPressedHandler(chip::EndpointId endpoint, uint8_t newPosition);
-    void OnSwitchShortReleasedHandler(chip::EndpointId endpoint, uint8_t previousPosition);
-    void OnSwitchLongReleasedHandler(chip::EndpointId endpoint, uint8_t previousPosition);
-    void OnSwitchMultiPressOngoingHandler(chip::EndpointId endpoint, uint8_t newPosition, uint8_t count);
-    void OnSwitchMultiPressCompleteHandler(chip::EndpointId endpoint, uint8_t previousPosition, uint8_t count);
+    void OnSwitchLatchedHandler(chip::EndpointId endpointId, uint8_t newPosition);
+    void OnSwitchInitialPressedHandler(chip::EndpointId endpointId, uint8_t newPosition);
+    void OnSwitchLongPressedHandler(chip::EndpointId endpointId, uint8_t newPosition);
+    void OnSwitchShortReleasedHandler(chip::EndpointId endpointId, uint8_t previousPosition);
+    void OnSwitchLongReleasedHandler(chip::EndpointId endpointId, uint8_t previousPosition);
+    void OnSwitchMultiPressOngoingHandler(chip::EndpointId endpointId, uint8_t newPosition, uint8_t count);
+    void OnSwitchMultiPressCompleteHandler(chip::EndpointId endpointId, uint8_t previousPosition, uint8_t count);
 
     // Nested classes for switch events
     class SwitchLatch

@@ -18,6 +18,7 @@
  */
 
 #include <temperature_control/ameba_temperature_control_delegate.h>
+#include <app/clusters/temperature-control-server/CodegenIntegration.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
@@ -81,7 +82,7 @@ CHIP_ERROR TemperatureControl::AmebaTemperatureControlDelegateInit(chip::Endpoin
 
     VerifyOrReturnError(sAmebaTemperatureControlDelegate != nullptr, CHIP_ERROR_INTERNAL);
 
-    TemperatureControl::SetInstance(sAmebaTemperatureControlDelegate);
+    TemperatureControl::SetDelegate(sAmebaTemperatureControlDelegate);
 
     return CHIP_NO_ERROR;
 }

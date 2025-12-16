@@ -73,6 +73,22 @@ extern "C" {
 /* Hook Options */
 #define LWIP_HOOK_FILENAME              "lwip_default_hooks.h"
 
+#if defined(CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE) && (CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE == 1)
+#undef DNS_TABLE_SIZE
+#undef MEMP_NUM_ND6_QUEUE
+#undef LWIP_ND6_NUM_NEIGHBORS
+#undef LWIP_ND6_NUM_PREFIXES
+#undef LWIP_ND6_NUM_ROUTERS
+#undef LWIP_ND6_NUM_DESTINATIONS
+
+#define DNS_TABLE_SIZE                  2
+#define MEMP_NUM_ND6_QUEUE              3
+#define LWIP_ND6_NUM_NEIGHBORS          5
+#define LWIP_ND6_NUM_PREFIXES           5
+#define LWIP_ND6_NUM_ROUTERS            5
+#define LWIP_ND6_NUM_DESTINATIONS       10
+#endif
+
 #ifdef __cplusplus
 }
 #endif

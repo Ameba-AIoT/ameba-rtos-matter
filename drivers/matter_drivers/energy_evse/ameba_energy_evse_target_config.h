@@ -1,8 +1,7 @@
 /*
- *    This module is a confidential and proprietary property of RealTek and
- *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright (c) 2025 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,21 +18,27 @@
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/occupancy-sensor-server/occupancy-sensor-server.h>
+/**
+ * @file EvseTargetsConfig.h
+ *
+ * This file contains constants needed by evse-common code that are not defined in the EVSE cluster.
+ * TODO: Move these defines back into EnergyEvseDelegateImpl.h once the EVSE cluster is converted
+ * to code driven.
+ */
 
+#include <cstdint>
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace OccupancySensing {
+namespace EnergyEvse {
 
-Instance * GetOccupancySensingInstance(void);
-CHIP_ERROR AmebaOccupancySensingInstanceInit(EndpointId endpointId);
-void AmebaOccupancySensingInstanceShutdown(void);
+// Bitmask for all days of the week (union of TargetDayOfWeekBitmap values)
+constexpr uint8_t kAllTargetDaysMask = 0x7f;
+// A sensible minimum limit for mains voltage (100V) to avoid accidental use
+// of 100mV instead of 100000mV
+constexpr int64_t kMinimumMainsVoltage_mV = 100000;
 
-} // namespace LaundryWasherMode
+} // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -20,7 +20,6 @@
 
 #include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
 #include <app/clusters/device-energy-management-server/device-energy-management-server.h>
-#include <app/util/config.h>
 
 namespace chip {
 namespace app {
