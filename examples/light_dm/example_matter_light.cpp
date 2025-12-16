@@ -21,7 +21,7 @@
 #include <task.h>
 #include <basic_types.h>
 #include <platform_stdlib.h>
-#include <rtw_wifi_constants.h>
+#include <wifi_conf.h>
 
 #include <chip_porting.h>
 #include <matter_core.h>
@@ -47,15 +47,10 @@ using namespace ::chip::Platform;
 using namespace ::chip::app::Clusters;
 
 // (taken from chip-devices.xml)
-#define DEVICE_TYPE_ROOT_NODE 0x0016
 #define DEVICE_TYPE_LO_ON_OFF_LIGHT 0x0100
 
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
-
-EmberAfDeviceType rootNodeDeviceTypes[] = {
-    { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },
-};
 
 EmberAfDeviceType dimmableLightDeviceTypes[] = {
     { DEVICE_TYPE_LO_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
@@ -83,13 +78,10 @@ static void example_matter_light_task(void *pvParameters)
         ChipLogProgress(DeviceLayer, "matter_driver_led_init failed!");
     }
 
-    EndpointConfig rootNodeEndpointConfig;
     EndpointConfig dimmableLightEndpointConfig;
-    Presets::Endpoints::matter_root_node_preset(&rootNodeEndpointConfig);
     Presets::Endpoints::matter_dimmable_light_preset(&dimmableLightEndpointConfig);
 
-    // Initial, root node on ep0, dimmable light on ep1
-    node.addEndpoint(rootNodeEndpointConfig, Span<const EmberAfDeviceType>(rootNodeDeviceTypes));
+    // Add the first dynamic endpoint to ep2
     node.addEndpoint(dimmableLightEndpointConfig, Span<const EmberAfDeviceType>(dimmableLightDeviceTypes));
 
     // Enable endpoints
@@ -117,14 +109,14 @@ static void example_matter_light_task(void *pvParameters)
 
     vTaskDelay(20000);
 
-    // Test add another dimmable light on ep2
+    // Test add another dimmable light on ep3
     chip::EndpointId testEndpointId;
     testEndpointId = node.addEndpoint(dimmableLightEndpointConfig, Span<const EmberAfDeviceType>(dimmableLightDeviceTypes));
     node.enableAllEndpoints();
 
     vTaskDelay(20000);
 
-    // Test remove ep2
+    // Test remove ep3
     node.getEndpoint(testEndpointId)->disableEndpoint();
     node.removeEndpoint(testEndpointId);
 

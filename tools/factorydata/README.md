@@ -174,14 +174,14 @@ If you don't want to encrypt the factorydata, don't pass in the key and iv
 
 Flash the binary file using Image_Tool_Linux or Windows Image Tool
 
-    cd /path/to/Image_Tool_Linux
+    cd ameba-rtos/amebaxxx_gcc_project/flash.py
 
-    ./flash.sh <serial port> <path to factorydata bin> <address>
+    python flash.py -p <serial port> -i <path to factorydata bin> <start address> <end address>
 
-Note: Default address to flash `ameba_factory.bin` is 0x083FF000, you may configure it using `MATTER_FACTORY_DATA` macro in `platform_opts.matter.h`. Make sure to check for partition conflicts.
+Note: Default address to flash `ameba_factory.bin` is 0x08400000 (AmebaDplus and AmebaLite), or 0x08644000 (AmebaSmart), you may configure it using `MATTER_FACTORY_DATA` macro in `matter_utils.c`. Make sure to check for partition conflicts.
 An example is shown below
 
-    ./flash.sh /dev/ttyUSB0 ./ameba_factory.bin 0x083FF000
+    python flash.py -p /dev/ttyUSB0 -i ameba_factory.bin 0x08400000 0x08401000
 
 ### Commissioning
 

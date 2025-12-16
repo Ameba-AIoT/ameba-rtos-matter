@@ -2,7 +2,7 @@
 
 This table lists various hardware device types supported. Each device type is categorized based on its functionality, such as environmental sensors, lighting controls, appliances, security and safety devices, and controls/actuators. 
 
-All listed device types are compatible with Matter v1.4.
+All listed device types are compatible with Matter v1.5.
 
 | Category                  | Device Types                  |
 |---------------------------|-------------------------------|

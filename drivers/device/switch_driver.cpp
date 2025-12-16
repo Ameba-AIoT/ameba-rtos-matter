@@ -4,7 +4,8 @@
 
 void MatterSwitch::Init(PinName pin)
 {
-    mPwm_obj = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_obj          = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_obj->pwm_idx = 1;
     pwmout_init(mPwm_obj, pin);
 }
 

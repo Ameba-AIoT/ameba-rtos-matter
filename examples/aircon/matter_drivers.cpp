@@ -1,22 +1,3 @@
-/*
- *    This module is a confidential and proprietary property of RealTek and
- *    possession or use of this module requires written permission of RealTek.
- *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <gpio_api.h>
@@ -96,7 +77,8 @@ CHIP_ERROR matter_driver_fan_init(void)
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL) {
+    if (err == CHIP_ERROR_INTERNAL)
+    {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     return err;
@@ -129,7 +111,8 @@ CHIP_ERROR matter_driver_humidity_sensor_init(void)
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL) {
+    if (err == CHIP_ERROR_INTERNAL)
+    {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     return err;
@@ -162,13 +145,14 @@ CHIP_ERROR matter_driver_temperature_sensor_init(void)
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL) {
+    if (err == CHIP_ERROR_INTERNAL)
+    {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     return err;
 }
 
-int32_t expect_pulse(uint32_t expect_level, uint32_t max_cycle, gpio_t gpio_device)
+int32_t expect_pulse (uint32_t expect_level, uint32_t max_cycle, gpio_t gpio_device)
 {
     uint32_t cycle = 1;
     while (expect_level == gpio_read(&gpio_device)) {
@@ -185,7 +169,8 @@ void matter_driver_take_measurement(void *pvParameters)
     uint16_t humidity = 0;
     int16_t temperature = 0;
 
-    while (1) {
+    while (1)
+    {
         humidity = DHTSensor.readHumidity();
         temperature = DHTSensor.readTemperature();
         //printf("Humidity: %i %%\t Temperature: %i *C \r\n", humidity, temperature);
@@ -216,24 +201,28 @@ CHIP_ERROR matter_driver_room_aircon_init(void)
     DHTSensor.Init(DHT_DATA_PIN);
 
     err = matter_driver_fan_init();
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogProgress(DeviceLayer, "matter_driver_fan_init failed!");
         goto exit;
     }
 
     err = matter_driver_humidity_sensor_init();
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogProgress(DeviceLayer, "matter_driver_humidity_sensor_init failed!");
         goto exit;
     }
 
     err = matter_driver_temperature_sensor_init();
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         ChipLogProgress(DeviceLayer, "matter_driver_temperature_sensor_init failed!");
         goto exit;
     }
 
-    if (xTaskCreate(matter_driver_take_measurement, "matter_driver_take_measurement", 1024, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+    if (xTaskCreate(matter_driver_take_measurement, "matter_driver_take_measurement", 1024, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
+    {
         ChipLogError(DeviceLayer, "failed to create matter_driver_take_measurement");
     }
 
@@ -241,19 +230,20 @@ exit:
     return err;
 }
 
-void matter_driver_on_identify_start(Identify *identify)
+void matter_driver_on_identify_start(Identify * identify)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
 }
 
-void matter_driver_on_identify_stop(Identify *identify)
+void matter_driver_on_identify_stop(Identify * identify)
 {
     ChipLogProgress(Zcl, "OnIdentifyStop");
 }
 
-void matter_driver_on_trigger_effect(Identify *identify)
+void matter_driver_on_trigger_effect(Identify * identify)
 {
-    switch (identify->mCurrentEffectIdentifier) {
+    switch (identify->mCurrentEffectIdentifier)
+    {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
@@ -284,35 +274,45 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (path.mClusterId) {
+    switch (path.mClusterId)
+    {
     case Clusters::FanControl::Id:
-        if (path.mAttributeId == Clusters::FanControl::Attributes::PercentSetting::Id) {
+        if (path.mAttributeId == Clusters::FanControl::Attributes::PercentSetting::Id)
+        {
             fan.setFanSpeedPercent(aEvent->value._u8);
-        } else if (path.mAttributeId == Clusters::FanControl::Attributes::FanMode::Id) {
+        }
+        else if (path.mAttributeId == Clusters::FanControl::Attributes::FanMode::Id)
+        {
             fan.setFanMode(aEvent->value._u8);
         }
         break;
     case Clusters::Identify::Id:
         break;
     case Clusters::RelativeHumidityMeasurement::Id:
-        if (path.mAttributeId == Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Id) {
+        if (path.mAttributeId == Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Id)
+        {
             DHTSensor.setMeasuredHumidity(aEvent->value._u16);
         }
         break;
     case Clusters::TemperatureMeasurement::Id:
-        if (path.mAttributeId == Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Id) {
+        if (path.mAttributeId == Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Id)
+        {
             DHTSensor.setMeasuredTemperature(aEvent->value._i16);
         }
         break;
     case Clusters::Thermostat::Id:
         break;
     case Clusters::OnOff::Id:
-        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id) {
+        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id)
+        {
             fan.setFanMode((aEvent->value._u8 == 1) ? 4 /* kOn */ : 0 /* kOff */);
             ep = aircon.GetEp();
-            if (aEvent->value._u8 == 1) {
+            if (aEvent->value._u8 == 1)
+            {
                 Clusters::FanControl::Attributes::FanMode::Set(ep, Clusters::FanControl::FanModeEnum::kOn);
-            } else {
+            }
+            else
+            {
                 Clusters::FanControl::Attributes::FanMode::Set(ep, Clusters::FanControl::FanModeEnum::kOff);
             }
         }
@@ -329,19 +329,22 @@ void matter_driver_downlink_update_handler(AppEvent *aEvent)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (aEvent->Type) {
-    case AppEvent::kEventType_Downlink_RelativeHumidityMeasurement_SetValue: {
-        chip::EndpointId ep = DHTSensor.GetHumSensorEp();
-        //ChipLogProgress(DeviceLayer, "Set Humidity %i on Endpoint%d", aEvent->value._u16, ep);
-        Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(ep, aEvent->value._u16);
-    }
-    break;
-    case AppEvent::kEventType_Downlink_TemperatureMeasurement_SetValue: {
-        chip::EndpointId ep = DHTSensor.GetTempSensorEp();
-        //ChipLogProgress(DeviceLayer, "Set Temperature %i on Endpoint%d", aEvent->value._i16, ep);
-        Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(ep, aEvent->value._i16);
-    }
-    break;
+    switch (aEvent->Type)
+    {
+    case AppEvent::kEventType_Downlink_RelativeHumidityMeasurement_SetValue:
+        {
+            chip::EndpointId ep = DHTSensor.GetHumSensorEp();
+            //ChipLogProgress(DeviceLayer, "Set Humidity %i on Endpoint%d", aEvent->value._u16, ep);
+            Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(ep, aEvent->value._u16);
+        }
+        break;
+    case AppEvent::kEventType_Downlink_TemperatureMeasurement_SetValue:
+        {
+            chip::EndpointId ep = DHTSensor.GetTempSensorEp();
+            //ChipLogProgress(DeviceLayer, "Set Temperature %i on Endpoint%d", aEvent->value._i16, ep);
+            Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(ep, aEvent->value._i16);
+        }
+        break;
     default:
         break;
     }

@@ -27,11 +27,11 @@ The following diagram is a simplified model of Realtek’s Matter application.
 3. [Getting Repository and Building Matter for Supported ICs](#getting-repository-and-building-matter-for-supported-ics)
 
 ### Requirements
-- Recommended to use Ubuntu 22.04 and above.
+- Recommended to use Ubuntu 24.04 and above.
 
 ### Prerequisites
 Before starting with Matter integration, ensure you have fulfilled the prerequisites as outlined in the [Matter Repository](https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md#prerequisites).
 
 ### Getting Repository and Building Matter for Supported ICs
 
-To begin building Matter for specific ICs, refer to the detailed instructions provided in the [Matter Building Guide](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_building_guide.md). Each supported IC has its own building method documented there.
+To begin building Matter for specific ICs, refer to the detailed instructions provided in the [Matter Building Guide](matter_building_guide.md). Each supported IC has its own building method documented there.

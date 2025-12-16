@@ -26,42 +26,35 @@ if [ ! -d "$amebadir" ]; then
 fi
 
 cd ${chipdir}
-source ${chipdir}/scripts/bootstrap.sh
 source ${chipdir}/scripts/activate.sh
 
 cd ${amebadir}
 
 chmod u+x matter_setup.sh
-.//matter_setup.sh ameba-rtos v1.4 || handle_error "Failed to run matter_setup.sh for ameba-rtos"
+.//matter_setup.sh ameba-rtos v1.5 || handle_error "Failed to run matter_setup.sh for ameba-rtos"
 
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebalite/inc/kr4/platform_autoconf.h ${amebadir}/amebalite_gcc_project/project_kr4/inc/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebalite/inc/km4/platform_autoconf.h ${amebadir}/amebalite_gcc_project/project_km4/inc/
+mkdir ${amebadir}/amebalite_gcc_project/menuconfig/
+mkdir ${amebadir}/amebalite_gcc_project/menuconfig/project_kr4/
+mkdir ${amebadir}/amebalite_gcc_project/menuconfig/project_km4/
+
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebalite/inc/kr4/platform_autoconf.h ${amebadir}/amebalite_gcc_project/menuconfig/project_kr4/
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebalite/inc/km4/platform_autoconf.h ${amebadir}/amebalite_gcc_project/menuconfig/project_km4/
 
 cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebalite/menuconfig/.config     ${amebadir}/amebalite_gcc_project/menuconfig/
 cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebalite/menuconfig/.config_kr4 ${amebadir}/amebalite_gcc_project/menuconfig/
 cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/amebalite/menuconfig/.config_km4 ${amebadir}/amebalite_gcc_project/menuconfig/
 
-echo "Clean SDK"
+echo "Build firmware"
 cd ${amebadir}/amebalite_gcc_project/
-make clean || handle_error "Failed to clean SDK"
 
-echo "Build project_km4"
-cd ${amebadir}/amebalite_gcc_project/project_km4/
+echo "Building all_clusters examples"
+python build.py -D MATTER_EXAMPLE=all_clusters || handle_error "Failed to build all_clusters"
 
-echo "Building all_clusters"
-make -C asdk all_clusters || handle_error "Failed to build all_clusters"
+echo "Build all_clusters examples completed"
+cd build/ && ninja clean_matter_libs clean && cd ../ && rm -rf build/ || handle_error "Failed to clean"
 
-echo "Building firmware image"
-make MATTER_EXAMPLE=chiptest || handle_error "Failed to build project_km4 firmware image"
+echo "Building light_port example"
+python build.py -D MATTER_EXAMPLE=light_port || handle_error "Failed to build light_port"
 
-echo "Build all-clusters-app completed"
-make clean || handle_error "Failed to clean"
-
-echo "Building lighting"
-make -C asdk light_port || handle_error "Failed to build light_port"
-
-echo "Building firmware image"
-make MATTER_EXAMPLE=light || handle_error "Failed to build project_km4 firmware image"
-
-echo "Build light_port completed"
-make clean || handle_error "Failed to clean"
+echo "Build light_port example completed"
+cd build/ && ninja clean_matter_libs clean && cd ../ && rm -rf build/ || handle_error "Failed to clean"

@@ -280,8 +280,8 @@ void Attribute::setValue(uint8_t *buffer)
 
 void Attribute::persistValue(uint8_t *buffer, size_t size)
 {
-    // Only store if value is set to be stored in NVS (represented by ATTRIBUTE_MASK_TOKENIZE flag)
-    if (getAttributeMask() & ATTRIBUTE_MASK_TOKENIZE)
+    // Only store if value is set to be stored in NVS (represented by MATTER_ATTRIBUTE_FLAG_TOKENIZE flag)
+    if (getAttributeMask() & MATTER_ATTRIBUTE_FLAG_TOKENIZE)
     {
         char key[64];
         sprintf(key, "g/a/%x/%x/%x", parentEndpointId, parentClusterId, attributeId); // g/a/endpoint_id/cluster_id/attribute_id
@@ -293,8 +293,8 @@ CHIP_ERROR Attribute::retrieveValue(uint8_t *buffer, size_t size)
 {
     int32_t error = -1;
 
-    // Only retrieved if value is set to be stored in NVS (represented by ATTRIBUTE_MASK_TOKENIZE flag)
-    if (!(getAttributeMask() & ATTRIBUTE_MASK_TOKENIZE))
+    // Only retrieved if value is set to be stored in NVS (represented by MATTER_ATTRIBUTE_FLAG_TOKENIZE flag)
+    if (!(getAttributeMask() & MATTER_ATTRIBUTE_FLAG_TOKENIZE))
     {
         return CHIP_ERROR_INTERNAL;
     }
@@ -847,7 +847,7 @@ void Endpoint::disableEndpoint()
         for (size_t j=0; j<cluster.attributes.size(); j++)
         {
             Attribute attribute = cluster.attributes[j];
-            if (cluster.attributes[j].getAttributeMask() & ATTRIBUTE_MASK_TOKENIZE)
+            if (cluster.attributes[j].getAttributeMask() & MATTER_ATTRIBUTE_FLAG_TOKENIZE)
             {
                 sprintf(key, "g/a/%x/%x/%x", attribute.getParentEndpointId(), attribute.getParentClusterId(), attribute.getAttributeId());
                 deleteKey(key, key);
@@ -960,8 +960,8 @@ void Node::removeEndpoint(chip::EndpointId endpointId)
             }
             else
             {
-                // If the removed endpoint was the first one, set the parentEndpointId to 0xFFFF
-                endpoints[i].setParentEndpointId(0xFFFF);
+                // If the removed endpoint was the first one, set the parentEndpointId to DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID
+                endpoints[i].setParentEndpointId(DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID);
             }
         }
     }

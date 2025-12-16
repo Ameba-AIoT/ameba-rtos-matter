@@ -68,15 +68,17 @@ Navigate to `Endpoint 0`. Under `General` clusters, configure `General Commissio
 
 Save and close the zapfile.
 
-Open `component/application/matter/project/amebaxxx/Makefile.include.matter` and modify `CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS` and `CHIP_AMEBA_TC_MIN_REQUIRED_VERSION` based on requirements, default is set to 1.
+Open `component/application/matter/project/cmake/flags/public_definitions_matter.cmake` and modify `CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS` and `CHIP_AMEBA_TC_MIN_REQUIRED_VERSION` based on requirements, default is set to 1.
 
-```Makefile
+```cmake
 ...
-# ameba terms and condition options
-ifeq ($(CONFIG_MATTER_TC_EN), y)
-GLOBAL_CFLAGS += -DCHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS=1
-GLOBAL_CFLAGS += -DCHIP_AMEBA_TC_MIN_REQUIRED_VERSION=1
-endif
+if(CONFIG_MATTER_TC_EN)
+    ameba_list_append(matter_defintions
+        CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION=1
+        CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS=1
+        CHIP_AMEBA_TC_MIN_REQUIRED_VERSION=1
+    )
+endif()
 ...
 ```
 
@@ -87,11 +89,10 @@ cd ameba-rtos/amebaxxx_gcc_project/
 ```
 
 Menuconfig for Matter ESF:
-- To enable Matter, select `MENUCONFIG FOR KM4 CONFIG` for amebadplus and amebalite, or select `MENUCONFIG FOR CA32 CONFIG` for amebasmart, then select `Matter Config`, and enable `Enable Matter`.
-- To enable Matter ESF, under `Matter Config`, enable `Enable Matter Terms and Condition`
+- To enable Matter ESF, select `CONFIG APPLICATION`, under `Matter Config`, enable `Enable Matter Terms and Condition`
 
 ```bash
-make menuconfig
+python menuconfig.py
 ```
 
 [Build Matter library and Ameba image](matter_building_guide.md)

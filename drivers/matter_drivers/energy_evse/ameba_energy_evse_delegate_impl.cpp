@@ -79,15 +79,15 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableCharging()");
 
-    if (maximumChargeCurrent < kMinimumChargeCurrent)
+    if (maximumChargeCurrent < kMinimumChargeCurrentLimit)
     {
         ChipLogError(AppServer, "Maximum Current outside limits");
         return Status::ConstraintError;
     }
 
-    if (minimumChargeCurrent < kMinimumChargeCurrent)
+    if (minimumChargeCurrent < kMinimumChargeCurrentLimit)
     {
-        ChipLogError(AppServer, "Maximum Current outside limits");
+        ChipLogError(AppServer, "Minimum Current outside limits");
         return Status::ConstraintError;
     }
 
@@ -242,6 +242,10 @@ Status EnergyEvseDelegate::SetTargets(
     VerifyOrReturnError(targets != nullptr, Status::Failure);
 
     CHIP_ERROR err = targets->SetTargets(chargingTargetSchedules);
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        return Status::ResourceExhausted;
+    }
     VerifyOrReturnError(err == CHIP_NO_ERROR, StatusIB(err).mStatus);
 
     /* The Application needs to be told that the Targets have been updated
@@ -342,7 +346,7 @@ Status EnergyEvseDelegate::HwRegisterEvseCallbackHandler(EVSECallbackFunc handle
  */
 Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrentLimit)
     {
         return Status::ConstraintError;
     }
@@ -364,7 +368,7 @@ Status EnergyEvseDelegate::HwSetMaxHardwareCurrentLimit(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrentLimit)
     {
         return Status::ConstraintError;
     }
@@ -389,7 +393,7 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
  */
 Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
 {
-    if (currentmA < kMinimumChargeCurrent)
+    if (currentmA < kMinimumChargeCurrentLimit)
     {
         return Status::ConstraintError;
     }
@@ -934,10 +938,10 @@ Status EnergyEvseDelegate::ComputeMaxChargeCurrentLimit()
 
     oldValue                    = mActualChargingCurrentLimit;
     mActualChargingCurrentLimit = mMaxHardwareCurrentLimit;
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mCircuitCapacity);
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mCableAssemblyCurrentLimit);
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mMaximumChargingCurrentLimitFromCommand);
-    mActualChargingCurrentLimit = min(mActualChargingCurrentLimit, mUserMaximumChargeCurrent);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mCircuitCapacity);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mCableAssemblyCurrentLimit);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mMaximumChargingCurrentLimitFromCommand);
+    mActualChargingCurrentLimit = std::min(mActualChargingCurrentLimit, mUserMaximumChargeCurrent);
 
     /* Set the actual max charging current attribute */
     mMaximumChargeCurrent = mActualChargingCurrentLimit;

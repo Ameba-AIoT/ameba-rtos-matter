@@ -32,6 +32,11 @@ extern "C" {
 #include <wifi_auto_reconnect.h>
 #include <wifi_conf.h>
 
+#define SCAN_RECORD_SECURITY_OFFSET 11
+#define SCAN_RECORD_CHANNEL_OFFSET  13
+#define SCAN_RECORD_SSID_OFFSET     14
+#define MAX_SSID_LEN                32
+
 static const char *TAG = "matter-wifis";
 u32 apNum = 0; // no of total AP scanned
 static u8 matter_wifi_trigger = 0;
@@ -45,23 +50,8 @@ rtw_mode_t wifi_mode = RTW_MODE_NONE;
 #if defined(CONFIG_AUTO_RECONNECT) && CONFIG_AUTO_RECONNECT
 static void *matter_param_indicator;
 struct task_struct matter_wifi_autoreconnect_task;
-struct matter_wifi_autoreconnect_param {
-    rtw_security_t security_type;
-    char *ssid;
-    int ssid_len;
-    char *password;
-    int password_len;
-    int key_id;
-    char *bssid;
-    char is_wps_trigger;
-};
 extern void (*p_wlan_autoreconnect_hdl)(rtw_security_t, char *, int, char *, int, int);
 #endif /* CONFIG_AUTO_RECONNECT */
-
-#if CONFIG_ENABLE_WPS
-extern char wps_profile_ssid[33];
-extern char wps_profile_password[65];
-#endif /* CONFIG_ENABLE_WPS */
 
 struct event_list_elem_t {
     void (*handler)(u8 *buf, s32 len, s32 flags, void *user_data);
@@ -166,7 +156,7 @@ exit:
     return ret;
 }
 
-void matter_scan_networks(void)
+void matter_wifi_scan_networks(void)
 {
     volatile int ret = RTW_SUCCESS;
     apNum = 0; // reset counter at the start of scan
@@ -181,7 +171,7 @@ void matter_scan_networks(void)
     }
 }
 
-void matter_scan_networks_with_ssid(const unsigned char *ssid, size_t length)
+void matter_wifi_scan_networks_with_ssid(const unsigned char *ssid, size_t length)
 {
     volatile int ret = RTW_SUCCESS;
 
@@ -211,7 +201,7 @@ rtw_scan_result_t *matter_get_scan_results(void)
 }
 
 #if defined(CONFIG_AUTO_RECONNECT) && CONFIG_AUTO_RECONNECT
-void matter_reconn_task_hdl(void *param)
+void matter_wifi_reconn_task_hdl(void *param)
 {
     (void) param;
 #if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
@@ -230,7 +220,7 @@ void matter_reconn_timer_hdl(rtos_timer_t timer_hdl)
 
     rtw_reconn.b_waiting = 0;
     /*Creat a task to do wifi reconnect because call WIFI API in WIFI event is not safe*/
-    if (rtos_task_create(NULL, ((const char *)"matter_reconn_task_hdl"), matter_reconn_task_hdl, NULL, 1024, 6) != RTW_SUCCESS) {
+    if (rtos_task_create(NULL, ((const char *)"matter_wifi_reconn_task_hdl"), matter_wifi_reconn_task_hdl, NULL, 1024, 6) != RTW_SUCCESS) {
         RTK_LOGE(TAG, "Create reconn task failed\n");
     } else {
         RTK_LOGI(TAG, "auto reconn %d\n", rtw_reconn.cnt);
@@ -238,7 +228,7 @@ void matter_reconn_timer_hdl(rtos_timer_t timer_hdl)
 }
 #endif /* CONFIG_AUTO_RECONNECT */
 
-void matter_set_autoreconnect(uint8_t mode)
+void matter_wifi_set_autoreconnect(uint8_t mode)
 {
 #if defined(CONFIG_AUTO_RECONNECT) && CONFIG_AUTO_RECONNECT
     size_t ssidLen = 0;
@@ -281,21 +271,18 @@ static int matter_find_ap_from_scan_buf(char *buf, int buflen, char *target_ssid
         u8 len, ssid_len, security_mode;
         char *ssid;
 
-        // len offset = 0
         len = (int) * (buf + plen);
-        // check end
         if (len == 0) {
             break;
         }
-        // ssid offset = 14
-        ssid_len = len - 14;
-        ssid = buf + plen + 14 ;
+        ssid_len = len - SCAN_RECORD_SSID_OFFSET;
+        ssid = buf + plen + SCAN_RECORD_SSID_OFFSET;
+
         if ((ssid_len == strlen(target_ssid)) && (!memcmp(ssid, target_ssid, ssid_len))) {
-            strncpy((char *)pwifi->ssid, target_ssid, 33);
-            // channel offset = 13
-            pwifi->channel = *(buf + plen + 13);
-            // security_mode offset = 11
-            security_mode = (u8) * (buf + plen + 11);
+            strncpy((char *)pwifi->ssid, target_ssid, MAX_SSID_LEN + 1);
+            pwifi->channel = *(buf + plen + SCAN_RECORD_CHANNEL_OFFSET);
+
+            security_mode = (u8) * (buf + plen + SCAN_RECORD_SECURITY_OFFSET);
             if (security_mode == IW_ENCODE_ALG_NONE) {
                 pwifi->security_type = RTW_SECURITY_OPEN;
             } else if (security_mode == IW_ENCODE_ALG_WEP) {
@@ -311,7 +298,7 @@ static int matter_find_ap_from_scan_buf(char *buf, int buflen, char *target_ssid
     return 0;
 }
 
-static int matter_get_ap_security_mode(IN char *ssid, OUT rtw_security_t *security_mode, OUT u8 *channel)
+static int matter_get_ap_security_mode(char *ssid, rtw_security_t *security_mode, u8 *channel)
 {
     volatile int ret = RTW_SUCCESS;
     rtw_scan_param_t scan_param;
@@ -385,7 +372,7 @@ int matter_wifi_connect(
     }
 
     matter_wifi_trigger = 1;
-    matter_set_autoreconnect(1);
+    matter_wifi_set_autoreconnect(1);
 
     strncpy((char *)connect_param.ssid.val, ssid, sizeof(connect_param.ssid.val) - 1);
     connect_param.ssid.len = ssid_len;
@@ -446,7 +433,11 @@ int matter_wifi_set_mode(rtw_mode_t mode)
 
 int matter_wifi_is_connected_to_ap(void)
 {
-    return wifi_is_connected_to_ap();
+    u8 join_status = RTW_JOINSTATUS_UNKNOWN;
+    if ((wifi_get_join_status(&join_status) == RTK_SUCCESS) && (join_status == RTW_JOINSTATUS_SUCCESS))
+        return RTW_SUCCESS;
+    else
+        return RTW_ERROR;
 }
 
 int matter_wifi_is_open_security(void)
@@ -495,15 +486,6 @@ int matter_wifi_is_station_mode(void)
     }
 }
 
-int matter_wifi_get_ap_bssid(unsigned char *bssid)
-{
-    if ((int) RTW_SUCCESS == matter_wifi_is_ready_to_transceive(RTW_STA_INTERFACE)) {
-        memcpy(bssid, ap_bssid.octet, ETH_ALEN);
-        return RTW_SUCCESS;
-    }
-    return RTW_ERROR;
-}
-
 int matter_wifi_get_last_error(void)
 {
     return error_flag;
@@ -518,35 +500,10 @@ int matter_wifi_get_mac_address(char *mac)
     return ret;
 }
 
-int matter_wifi_get_network_mode(rtw_network_mode_t *pmode)
+int matter_wifi_sta_get_network_mode(rtw_network_mode_t *pmode)
 {
     *pmode = wifi_get_network_mode();
     return 0;
-}
-
-int matter_wifi_get_rssi(int *prssi)
-{
-    int ret;
-    rtw_phy_statistics_t phy_statistics;
-    ret = wifi_fetch_phy_statistic(&phy_statistics);
-    if (ret >= 0) {
-        *prssi = phy_statistics.rssi;
-    }
-    return ret;
-}
-
-int matter_wifi_get_security_type(uint8_t wlan_idx, uint32_t *wifi_security)
-{
-    int ret = RTW_SUCCESS;
-
-    rtw_wifi_setting_t setting = {0};
-    if (wifi_get_setting(wlan_idx, &setting) < 0) {
-        ret = RTW_ERROR;
-    } else {
-        *wifi_security = setting.security_type;
-    }
-
-    return ret;
 }
 
 int matter_wifi_get_setting(unsigned char wlan_idx, rtw_wifi_setting_t *psetting)
@@ -555,15 +512,6 @@ int matter_wifi_get_setting(unsigned char wlan_idx, rtw_wifi_setting_t *psetting
 
     ret = wifi_get_setting(wlan_idx, psetting);
 
-    return ret;
-}
-
-int matter_wifi_get_wifi_channel_number(uint8_t wlan_idx, uint8_t *ch)
-{
-    int ret = RTW_SUCCESS;
-    if (wifi_get_channel(wlan_idx, ch) < 0) {
-        ret = RTW_ERROR;
-    }
     return ret;
 }
 
@@ -611,13 +559,13 @@ void matter_wifi_reg_event_handler(matter_wifi_event event_cmds, rtw_event_handl
     }
 }
 
-static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags, void *userdata)
+static void matter_wifi_join_status_event_hdl(u8 *buf, s32 buf_len, s32 flags, void *userdata)
 {
     UNUSED(buf_len);
     UNUSED(userdata);
-
-    enum rtw_join_status_type join_status = (enum rtw_join_status_type)flags;
-    struct rtw_event_join_fail_info_t *fail_info = (struct rtw_event_join_fail_info_t *)buf;
+    u8 join_status = (u8)flags;
+    struct rtw_event_info_joinstatus_joinfail *fail_info = (struct rtw_event_info_joinstatus_joinfail *)buf;
+    struct rtw_event_info_joinstatus_disconn *disconn_info = (struct rtw_event_info_joinstatus_disconn *)buf;
 
     switch (join_status) {
         case RTW_JOINSTATUS_SUCCESS: // Connecting --> Connected Succesfully
@@ -631,18 +579,18 @@ static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags,
         case RTW_JOINSTATUS_FAIL: // Connecting --> Failed to Connect
             RTK_LOGI(TAG, "Join fail, error_flag = ");
             switch (fail_info->fail_reason) {
-                case RTW_CONNECT_SCAN_FAIL:
+                case -RTK_ERR_WIFI_CONN_SCAN_FAIL:
                     error_flag = RTW_NONE_NETWORK;
                     RTK_LOGI(NOTAG, "%d (Can not found target AP)\n", error_flag);
                     break;
-                case RTW_CONNECT_AUTH_FAIL:
-                case RTW_CONNECT_ASSOC_FAIL:
-                case RTW_CONNECT_4WAY_HANDSHAKE_FAIL:
+                case -RTK_ERR_WIFI_CONN_AUTH_FAIL:
+                case -RTK_ERR_WIFI_CONN_ASSOC_FAIL:
+                case -RTK_ERR_WIFI_CONN_4WAY_HANDSHAKE_FAIL:
                     error_flag = RTW_CONNECT_FAIL;
                     RTK_LOGI(NOTAG, "%d (Auth/Assoc/Handshake failed)\n", error_flag);
                     break;
-                case RTW_CONNECT_AUTH_PASSWORD_WRONG:
-                case RTW_CONNECT_4WAY_PASSWORD_WRONG:
+                case -RTK_ERR_WIFI_CONN_AUTH_PASSWORD_WRONG:
+                case -RTK_ERR_WIFI_CONN_4WAY_PASSWORD_WRONG:
                     error_flag = RTW_WRONG_PASSWORD;
                     RTK_LOGI(NOTAG, "%d (Wrong Password)\n", error_flag);
                     break;
@@ -663,19 +611,14 @@ static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags,
     }
 }
 
-void matter_wifi_reg_join_status_handler(void)
-{
-    wifi_reg_event_handler(WIFI_EVENT_JOIN_STATUS, matter_wifi_join_status_event_hdl, NULL);
-}
-
 void matter_wifi_init(void)
 {
     matter_wifi_on(RTW_MODE_STA);
-    matter_wifi_reg_join_status_handler();
 #if CONFIG_AUTO_RECONNECT
     //setup reconnection flag
-    matter_set_autoreconnect(1);
+    matter_wifi_set_autoreconnect(1);
 #endif
+    wifi_reg_event_handler(RTW_EVENT_JOIN_STATUS, matter_wifi_join_status_event_hdl, NULL);
 }
 
 void matter_wifi_wait(void)
@@ -687,6 +630,87 @@ void matter_wifi_wait(void)
     while (!(wifi_is_running(WLAN0_IDX) || wifi_is_running(WLAN1_IDX)));
 
     matter_wifi_init();
+}
+
+/* Support for WiFi Network Diagnostics. */
+
+int matter_wifi_sta_get_ap_bssid(unsigned char *bssid)
+{
+    if ((int) RTW_SUCCESS == matter_wifi_is_ready_to_transceive(RTW_STA_INTERFACE)) {
+        memcpy(bssid, ap_bssid.octet, ETH_ALEN);
+        return RTW_SUCCESS;
+    }
+    return RTW_ERROR;
+}
+
+int matter_wifi_sta_get_security_type(uint32_t *wifi_security)
+{
+    int ret = RTW_SUCCESS;
+
+    rtw_wifi_setting_t setting = {0};
+    if (wifi_get_setting(WLAN0_IDX, &setting) < 0) {
+        ret = RTW_ERROR;
+    } else {
+        *wifi_security = setting.security_type;
+    }
+
+    return ret;
+}
+
+int matter_wifi_sta_get_channel_number(uint8_t *ch)
+{
+    int ret = RTW_SUCCESS;
+    rtw_wifi_setting_t setting = {0};
+    if (wifi_get_setting(WLAN0_IDX, &setting) < 0) {
+        ret = RTW_ERROR;
+    } else {
+        *ch = setting.channel;
+    }
+    return ret;
+}
+
+int matter_wifi_sta_get_rssi(int *prssi)
+{
+    int ret;
+    union rtw_phy_stats phy_stats;
+    ret = wifi_get_phy_stats(STA_WLAN_INDEX, NULL, &phy_stats);
+    if (ret >= 0) {
+        *prssi = phy_stats.sta.rssi;
+    }
+    return ret;
+}
+
+int matter_wifi_sta_get_wifi_version(uint8_t *mode)
+{
+    int ret;
+    ret = wifi_get_wireless_mode(mode);
+    if (ret >= 0) {
+        switch (*mode) {
+        case RTW_80211_B:
+            mode = MATTER_WIFI_VERSION_11B;
+            break;
+        case RTW_80211_G:
+            mode = MATTER_WIFI_VERSION_11G;
+            break;
+        case RTW_80211_A:
+            mode = MATTER_WIFI_VERSION_11A;
+            break;
+        case RTW_80211_N:
+            mode = MATTER_WIFI_VERSION_11N;
+            break;
+        case RTW_80211_AC:
+            mode = MATTER_WIFI_VERSION_11AC;
+            break;
+        case RTW_80211_AX:
+            mode = MATTER_WIFI_VERSION_11AX;
+            break;
+        default:
+            mode = MATTER_WIFI_VERSION_11N;
+            break;
+        }
+    }
+
+    return ret;
 }
 
 #ifdef __cplusplus

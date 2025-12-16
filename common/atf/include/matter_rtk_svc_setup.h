@@ -21,10 +21,10 @@
 #define MATTER_RTK_SVC_SETUP_H
 
 #include <stdint.h>
+#include <rtk_svc_setup.h>
 #include <matter_utils.h> // get matter_key_type
 
 /* SMC function ID for Matter Secure Service */
-#define RTK_SMC_MATTER_SECURE     0x82000002
 typedef enum {
     MATTER_SECURE_SMC_MBEDTLS_INIT = 0,
     MATTER_SECURE_SMC_MBEDTLS_HEAP_STATUS,

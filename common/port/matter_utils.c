@@ -430,6 +430,7 @@ void matter_create_secure_context(void)
     }
 
     rtos_create_secure_context(MATTER_SECURE_CONTEXT_STACK_SIZE);
+    rtos_time_delay_ms(10); // to avoid hardfault when switching to TZ
     secure_mbedtls_platform_set_calloc_free();
 
     matter_secure_context_created = true;

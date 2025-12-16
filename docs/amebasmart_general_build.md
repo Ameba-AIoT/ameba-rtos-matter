@@ -8,16 +8,14 @@
 
 ## Get Ameba SDK & Matter SDK
 
-    Tested on Ubuntu 22.04 or above
+    Tested on Ubuntu 24.04 or above
 
 Create and enter new directory
 
     mkdir dev
     cd dev
 
-If you have already obtained the ameba-rtos SDK from the FAE, you can skip this step, else check out this repository:
-
-    git clone https://github.com/mikaelajiwidodo/ameba-rtos.git -b ameba-rtos-v1.0/matter/release/v1.4
+Get ameba-rtos v1.1 SDK + integrated patch + matter v1.5 patch, please contact our FAE to get the SDKs
 
 To check out Matter repository:
 
@@ -29,6 +27,16 @@ Make sure ameba-rtos and connectedhomeip are on the same directory level
     ├── ameba-rtos
     └── connectedhomeip
 
+## Install Required Python Modules
+
+Navigate to the `ameba-rtos` directory:
+
+    cd ameba-rtos
+
+    chmod u+x ameba.sh
+
+    ./ameba.sh
+
 ## Set Matter Build Environment
 
     > Find more details to setup linux build environment
@@ -36,7 +44,7 @@ Make sure ameba-rtos and connectedhomeip are on the same directory level
 
     cd connectedhomeip
 
-	git switch v1.4-branch
+	git switch v1.5-branch
 
     git submodule sync
 
@@ -46,6 +54,12 @@ Make sure ameba-rtos and connectedhomeip are on the same directory level
 
     source scripts/activate.sh
 
+    cd ../ameba-rtos
+
+    pip install -r tools/requirements.txt
+
+Note that the last two steps are required is to install additional python modules to the connectedhomeip environment
+
 ## Set Ameba Build Environment
 
 Navigate to the `ameba-rtos` directory:
@@ -54,87 +68,53 @@ Navigate to the `ameba-rtos` directory:
 
     chmod u+x matter_setup.sh
 
-    ./matter_setup.sh ameba-rtos
+    ./matter_setup.sh ameba-rtos v1.5
 
 ## Build CHIP library by GN and Final Firmware
 
 In this context, we will demostrate building of all-clusters-app.
 
-### Make Matter Libraries
+### Enable Matter Settings
 
 Navigate to the `amebasmart_gcc_project` directory:
 
     cd ameba-rtos/amebasmart_gcc_project/
 
 Menuconfig for matter:
-- To enable Matter, select `MENUCONFIG FOR CA32 CONFIG`, then select `Matter Config`, and enable `Enable Matter`.
-- Change mbedtls version to matter. Under `MENUCONFIG FOR CA32 CONFIG`, select `SSL Config`, then set the `MBEDTLS Version` to `MBEDTLS_MATTER`
-- If you want to support Matter BLE, under `CONFIG BT`, enable `BT Example Demo`, then select `BLE_Matter_Adapter`, and save the configuration.
-- If you want to support [Matter ESF](matter_commissioning_and_control_guide.md#enable-matter-esf), under `Matter Config`, enable `Enable Matter Terms and Condition`
+- To enable Matter, under `CONFIG APPLICATION`, select `Matter Config`, and enable `Enable Matter`.
+- If you want to support Matter BLE, under `CONFIG BT`, select `Enable BT`. Go back to the main menuconfig, select `CONFIG APPLICATION`, under `Matter Config`, enable `BLE Matter Adapter`.
+- If you want to support [Matter ESF](matter_commissioning_and_control_guide.md#enable-matter-esf), select `CONFIG APPLICATION`, under `Matter Config`, enable `Enable Matter Terms and Condition`
 
+```bash
+python menuconfig.py
 ```
-make menuconfig
-```
 
-Navigate to the `project_ap` directory:
+### Build Matter Libraries and Final Firmware
 
-    cd ameba-rtos/amebasmart_gcc_project/project_ap/
+Within `amebasmart_gcc_project` folder, start building the Matter libraries and the final firmware with the following command:
 
-Start building the Matter libraries with:
-
-    make -C asdk all_clusters
-
-### Make Final Firmware
-
-#### Make all projects in one go
-
-Ensure the same menuconfig settings as described in `Make Matter Libraries`and continue building the final firmware.
-
-    cd ameba-rtos/amebasmart_gcc_project/
-
-Build the final firmware:
-
-    make all MATTER_EXAMPLE=chiptest
-
-#### Make each project seperately
-
-##### Make project_ap
-
-Ensure the same menuconfig settings as described in `Make Matter Libraries` and continue building the `project_ap` images.
-
-    cd ameba-rtos/amebasmart_gcc_project/project_ap/
-
-Build `project_ap`:
-
-    make all MATTER_EXAMPLE=chiptest
-
-##### Make project_hp
-
-Navigate to the `project_hp` directory:
-
-    cd ameba-rtos/amebasmart_gcc_project/project_hp/
-
-Build the `project_hp`:
-
-    make all
-
-##### Make project_lp
-
-Navigate to the `project_lp` directory:
-
-    cd ameba-rtos/amebasmart_gcc_project/project_lp/
-
-Build the `project_lp`:
-
-    make all
+    python build.py -D MATTER_EXAMPLE=all_clusters
 
 ### Clean Ameba Matter libraries and application
 
-    make clean
+Within `amebasmart_gcc_project` folder, clean the whole project with the following command:
 
-## Flash Image
+    cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
 
-The generated image is found in the ameba-rtos sdk `ameba-rtos/amebasmart_gcc_project/project_hp/asdk/image`, both `km4_boot_all.bin` and `km0_km4_ca32_app.bin` will be flashed.
+## Flash Image using Python script
 
-- Find more detail in [ameba-rtos/README.md](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing)
+The generated image is found in the ameba-rtos sdk `ameba-rtos/amebasmart_gcc_project`, both `km4_boot_all.bin` and `km0_km4_ca32_app.bin` will be flashed.
 
+Within `amebasmart_gcc_project` folder, flash the image to the Ameba port (e.g. `/dev/ttyUSB0`).
+
+    python flash.py -p /dev/ttyUSB0
+
+If the app image is too large, please add the --image/-i option
+
+    python flash.py -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08020000 -i km0_km4_ca32_app.bin 0x08020000 0x08400000
+
+## Monitor Ameba Log using Python script
+
+Within `amebasmart_gcc_project` folder, monitor Ameba log through the Ameba port (e.g. `/dev/ttyUSB0`).
+
+    python monitor.py -p /dev/ttyUSB0 -b 1500000

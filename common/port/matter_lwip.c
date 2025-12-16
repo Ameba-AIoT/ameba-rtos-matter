@@ -33,7 +33,7 @@ extern struct netif xnetif[NET_IF_NUM];
 void matter_lwip_dhcp(void)
 {
     netif_set_link_up(&xnetif[0]);
-    matter_set_autoreconnect(0);
+    matter_wifi_set_autoreconnect(0);
 
     LwIP_DHCP(0, DHCP_START);
 }

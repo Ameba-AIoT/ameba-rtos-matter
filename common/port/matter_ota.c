@@ -31,6 +31,8 @@ uint8_t matter_ota_header_size = 0; // variable to track size of ota header
 uint8_t matter_ota_buffer[MATTER_OTA_SECTOR_SIZE]; // 4KB buffer to be written to one sector
 uint16_t matter_ota_buffer_size = 0; // variable to track size of buffer
 
+static const char *kOTACompleted = "ota_completed";
+
 uint8_t matter_ota_get_total_header_size(void)
 {
     return MATTER_OTA_HEADER_SIZE;
@@ -163,8 +165,25 @@ int8_t matter_ota_update_signature(void)
     return OTA_SUCCESS;
 }
 
+uint8_t matter_get_ota_completed_value(void)
+{
+    uint8_t value = 0;
+    getPref_bool_new(kOTACompleted, kOTACompleted, &value);
+    return value;
+}
+
 void matter_ota_platform_reset(void)
 {
+    uint8_t value = 1;
+
+    deleteKey(kOTACompleted, kOTACompleted);
+
+    if (setPref_new(kOTACompleted, kOTACompleted, &value, sizeof(value)) != DCT_SUCCESS)
+    {
+        printf("[%s] set persist storage failed\n", __FUNCTION__);
+        return;
+    }
+
     rtos_time_delay_ms(100);
     sys_reset();
 }

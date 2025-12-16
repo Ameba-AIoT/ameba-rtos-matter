@@ -1,22 +1,3 @@
-/*
- *    This module is a confidential and proprietary property of RealTek and
- *    possession or use of this module requires written permission of RealTek.
- *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <fan_driver.h>
@@ -70,7 +51,8 @@ CHIP_ERROR matter_driver_fan_set_startup_value(void)
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL) {
+    if (err == CHIP_ERROR_INTERNAL)
+    {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
     return err;
@@ -88,7 +70,8 @@ void matter_driver_on_identify_stop(Identify *identify)
 
 void matter_driver_on_trigger_effect(Identify *identify)
 {
-    switch (identify->mCurrentEffectIdentifier) {
+    switch (identify->mCurrentEffectIdentifier)
+    {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
@@ -116,18 +99,23 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId) {
+    switch (path.mClusterId)
+    {
     case Clusters::OnOff::Id:
-        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id) {
+        if (path.mAttributeId == Clusters::OnOff::Attributes::OnOff::Id)
+        {
             fan.setFanMode((aEvent->value._u8 == 1) ? 4 /* kOn */ : 0 /* kOff */);
             chip::DeviceLayer::PlatformMgr().LockChipStack();
             Clusters::FanControl::Attributes::FanMode::Set(1, (aEvent->value._u8 == 1) ? Clusters::FanControl::FanModeEnum::kOn : Clusters::FanControl::FanModeEnum::kOff);
             chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         }
     case Clusters::FanControl::Id:
-        if (path.mAttributeId == Clusters::FanControl::Attributes::PercentSetting::Id) {
+        if (path.mAttributeId == Clusters::FanControl::Attributes::PercentSetting::Id)
+        {
             fan.setFanSpeedPercent(aEvent->value._u8);
-        } else if (path.mAttributeId == Clusters::FanControl::Attributes::FanMode::Id) {
+        }
+        else if (path.mAttributeId == Clusters::FanControl::Attributes::FanMode::Id)
+        {
             fan.setFanMode(aEvent->value._u8);
         }
         break;

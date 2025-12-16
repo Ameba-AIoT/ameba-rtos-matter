@@ -19,7 +19,8 @@
 #include <water_heater/ameba_water_heater_management_instance.h>
 #include <water_heater/ameba_water_heater_management_manufacturer.h>
 #include <water_heater/ameba_water_heater_management_test_event_trigger.h>
-#include <water_heater/ameba_water_heater_mode.h>
+#include <water_heater/ameba_water_heater_mode_delegate.h>
+#include <water_heater/ameba_water_heater_mode_instance.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>

@@ -1,6 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,8 +19,14 @@
 
 #pragma once
 
+#include <stdint.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/TestEventTriggerDelegate.h>
+
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 
 /**
  * @brief User handler for handling the test event trigger
@@ -69,6 +77,16 @@ enum class EnergyEvseTrigger : uint64_t
     kEVSEDiagnosticsComplete = 0x0099000000000020,
     // EV Charge TimeOfUse Mode clear | Simulate clearing the EVSE Mode TimeOfUse tag
     kEVTimeOfUseModeClear = 0x0099000000000021,
+    // EVSE Set SoC Low | Simulate a vehicle reporting 20% State of Charge, 70kWh battery capacity
+    kEVSESetSoCLow = 0x0099000000000030,
+    // EVSE Set SoC High | Simulate a vehicle reporting 95% State of Charge, 70kWh battery capacity
+    kEVSESetSoCHigh = 0x0099000000000031,
+    // EVSE Set SoC Clear | Simulate no vehicle State of Charge information
+    kEVSESetSoCClear = 0x0099000000000032,
+    // EVSE Set VehicleID | Simulate a vehicle ID being sent
+    kEVSESetVehicleID = 0x0099000000000040,
+    // EVSE Trigger RFID | Simulate an RFID tag being activated
+    kEVSETriggerRFID = 0x0099000000000050,
 };
 
 class AmebaEnergyEvseTestEventTriggerHandler : public TestEventTriggerHandler

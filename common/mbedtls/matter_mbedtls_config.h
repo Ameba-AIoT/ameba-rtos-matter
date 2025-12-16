@@ -37,9 +37,7 @@
 #if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_AMEBASMART)
 #include <stdlib.h>
 #include <string.h>
-#include <rand.h>
 
-int strstr(const char *s1, const char *s2);
 #define __weak __attribute__((weak))
 #define u32 uint32_t
 #define MATTER_MBEDTLS_SECURE_HEAP_SIZE		U(8 * 1024)

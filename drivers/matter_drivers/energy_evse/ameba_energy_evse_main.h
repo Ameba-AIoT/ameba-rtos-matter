@@ -18,16 +18,19 @@
 
 #pragma once
 
+#include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
+#include <device_energy_management/ameba_device_energy_management_manager.h>
+#include <electrical_power_measurement/ameba_electrical_power_measurement_delegate.h>
+#include <power_topology/ameba_power_topology_delegate.h>
+
 #include <lib/core/CHIPError.h>
 
-CHIP_ERROR EvseApplicationInit();
-CHIP_ERROR EvseApplicationShutdown();
+CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId);
+CHIP_ERROR EnergyEvseShutdown();
 
-CHIP_ERROR DeviceEnergyManagementInit(chip::EndpointId endpointId);
-CHIP_ERROR DeviceEnergyManagementShutdown();
-
-CHIP_ERROR EnergyMeterInit(chip::EndpointId endpointId);
-CHIP_ERROR EnergyMeterShutdown();
-
-CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId);
-CHIP_ERROR PowerTopologyShutdown();
+CHIP_ERROR EVSEManufacturerInit(chip::EndpointId powerSourceEndpointId,
+                                chip::app::Clusters::ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance & epmInstance,
+                                chip::app::Clusters::PowerTopology::PowerTopologyInstance & ptInstance,
+                                chip::app::Clusters::DeviceEnergyManagementManager & demInstance,
+                                chip::app::Clusters::DeviceEnergyManagement::DeviceEnergyManagementDelegate & demDelegate);
+CHIP_ERROR EVSEManufacturerShutdown();

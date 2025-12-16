@@ -1,26 +1,8 @@
-/*
- *    This module is a confidential and proprietary property of RealTek and
- *    possession or use of this module requires written permission of RealTek.
- *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <washer_driver.h>
-#include <operational_state/ameba_operational_state_delegate_impl.h>
+#include <operational_state/ameba_operational_state_delegate.h>
+#include <operational_state/ameba_operational_state_instance.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
@@ -103,30 +85,33 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId) {
-    case Clusters::LaundryWasherMode::Id: {
-        ChipLogProgress(DeviceLayer, "LaundryWasherMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
-                        path.mAttributeId);
-    }
-    break;
-    case Clusters::OnOff::Id: {
-        ChipLogProgress(DeviceLayer, "OnOff(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-    }
-    break;
-    case Clusters::LaundryWasherControls::Id: {
-        ChipLogProgress(DeviceLayer, "LaundryWasherControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
-                        path.mAttributeId);
-    }
-    break;
-    case Clusters::TemperatureControl::Id: {
-        ChipLogProgress(DeviceLayer, "TemperatureControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
-                        path.mAttributeId);
-    }
-    break;
-    case Clusters::OperationalState::Id: {
-        ChipLogProgress(DeviceLayer, "OperationalState(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-    }
-    break;
+    switch (path.mClusterId)
+    {
+    case Clusters::LaundryWasherMode::Id:
+        {
+            ChipLogProgress(DeviceLayer, "LaundryWasherMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        }
+        break;
+    case Clusters::OnOff::Id:
+        {
+            ChipLogProgress(DeviceLayer, "OnOff(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        }
+        break;
+    case Clusters::LaundryWasherControls::Id:
+        {
+            ChipLogProgress(DeviceLayer, "LaundryWasherControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        }
+        break;
+    case Clusters::TemperatureControl::Id:
+        {
+            ChipLogProgress(DeviceLayer, "TemperatureControl(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        }
+        break;
+    case Clusters::OperationalState::Id:
+        {
+            ChipLogProgress(DeviceLayer, "OperationalState(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
+        }
+        break;
     default:
         break;
     }
@@ -139,29 +124,34 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type) {
-    case AppEvent::kEventType_Downlink_Opstate_State: {
-        ChipLogProgress(DeviceLayer, "Set Operational State 0x%x", event->value._u8);
-        GetOperationalStateInstance()->SetOperationalState(event->value._u8);
-    }
-    break;
-    case AppEvent::kEventType_Downlink_LW_SpinSpeed: {
-        DataModel::Nullable<uint8_t> value;
-        value.SetNonNull(event->value._u8);
-        ChipLogProgress(DeviceLayer, "Set Spin Speed0x%x", event->value._u8);
-        LaundryWasherControlsServer::Instance().SetSpinSpeedCurrent(1, value);
-    }
-    break;
-    case AppEvent::kEventType_Downlink_LW_NumberOfRinses: {
-        ChipLogProgress(DeviceLayer, "Set Number Of Rinses 0x%x", event->value._u8);
-        LaundryWasherControlsServer::Instance().SetNumberOfRinses(1, (NumberOfRinsesEnum) event->value._u8);
-    }
-    break;
-    case AppEvent::kEventType_Downlink_LW_Mode: {
-        ChipLogProgress(DeviceLayer, "Change Mode to 0x%x", event->value._u8);
-        ModeSelect::Attributes::CurrentMode::Set(1, event->value._u8);
-    }
-    break;
+    switch (event->Type)
+    {
+    case AppEvent::kEventType_Downlink_Opstate_State:
+        {
+            ChipLogProgress(DeviceLayer, "Set Operational State 0x%x", event->value._u8);
+            GetAmebaOperationalStateInstance()->SetOperationalState(event->value._u8);
+        }
+        break;
+    case AppEvent::kEventType_Downlink_LW_SpinSpeed:
+        {
+            DataModel::Nullable<uint8_t> value;
+            value.SetNonNull(event->value._u8);
+            ChipLogProgress(DeviceLayer, "Set Spin Speed0x%x", event->value._u8);
+            LaundryWasherControlsServer::Instance().SetSpinSpeedCurrent(1, value);
+        }
+        break;
+    case AppEvent::kEventType_Downlink_LW_NumberOfRinses:
+        {
+            ChipLogProgress(DeviceLayer, "Set Number Of Rinses 0x%x", event->value._u8);
+            LaundryWasherControlsServer::Instance().SetNumberOfRinses(1, (NumberOfRinsesEnum) event->value._u8);
+        }
+        break;
+    case AppEvent::kEventType_Downlink_LW_Mode:
+        {
+            ChipLogProgress(DeviceLayer, "Change Mode to 0x%x", event->value._u8);
+            ModeSelect::Attributes::CurrentMode::Set(1, event->value._u8);
+        }
+        break;
     default:
         break;
     }

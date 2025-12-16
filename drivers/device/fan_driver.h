@@ -13,6 +13,8 @@
 #include <pwmout_api.h>
 
 #include <app/util/attribute-table.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/clusters/fan-control-server/fan-control-server.h>
 
 class MatterFan
 {

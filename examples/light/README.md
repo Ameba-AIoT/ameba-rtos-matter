@@ -51,23 +51,19 @@ You may add clusters and attributes handling in `matter_driver_uplink_update_han
 | LED        | PB_18 |
 | Button     | PA_12 |
 
-#### Build Matter Libraries
+#### Build Matter Libraries and the Final Firmware
 
     cd ameba-rtos/amebadplus_gcc_project
-    make -C project_km4/asdk light_port
-
-#### Build the Final Firmware
-
-    cd ameba-rtos/amebadplus_gcc_project
-    make all MATTER_EXAMPLE=light
+    python build.py -D MATTER_EXAMPLE=light_port
 
 #### Flash the Image
-Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
+Refer to this [guide](../../docs/amebadplus_general_build.md#Flash-Image-using-Python-script) to flash the image with python script.
 
 #### Clean Matter Libraries and Firmware
 
-    cd ameba-rtos/amebadplus_gcc_project/project_km4
-    make clean
+    cd ameba-rtos/amebadplus_gcc_project
+    cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
+
 </details>
 
 <details>
@@ -82,23 +78,19 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/READM
 | LED        | PA_31 |
 | Button     | PA_29 |
 
-#### Build Matter Libraries
+#### Build Matter Libraries and the Final Firmware
 
     cd ameba-rtos/amebalite_gcc_project
-    make -C project_km4/asdk light_port
-
-#### Build the Final Firmware
-
-    cd ameba-rtos/amebalite_gcc_project
-    make all MATTER_EXAMPLE=light
+    python build.py -D MATTER_EXAMPLE=light_port
 
 #### Flash the Image
-Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
+Refer to this [guide](../../docs/amebalite_general_build.md#Flash-Image-using-Python-script) to flash the image with python script.
 
 #### Clean Matter Libraries and Firmware
 
-    cd ameba-rtos/amebalite_gcc_project/project_km4
-    make clean
+    cd ameba-rtos/amebalite_gcc_project
+    cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
+
 </details>
 
 <details>
@@ -113,21 +105,17 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/READM
 | LED        | PA_5  |
 | Button     | PA_10 |
 
-#### Build Matter Libraries
+#### Build Matter Libraries and the Final Firmware
 
     cd ameba-rtos/amebasmart_gcc_project
-    make -C project_ap/asdk light_port
-
-#### Build the Final Firmware
-
-    cd ameba-rtos/amebasmart_gcc_project
-    make all MATTER_EXAMPLE=light
+    python build.py -D MATTER_EXAMPLE=light_port
 
 #### Flash the Image
-Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing) to flash the image with Windows Image Tool
+Refer to this [guide](../../docs/amebasmart_general_build.md#Flash-Image-using-Python-script) to flash the image with python script.
 
 #### Clean Matter Libraries and Firmware
 
-    cd ameba-rtos/amebasmart_gcc_project/project_ap
-    make clean
+    cd ameba-rtos/amebasmart_gcc_project
+    cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
+
 </details>

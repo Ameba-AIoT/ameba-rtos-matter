@@ -73,6 +73,7 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec);
  * @brief  Initialize the system clock timer using SNTP when the Matter application starts running.
  */
 void matter_sntp_init(void);
+
 #endif
 
 #ifdef __cplusplus

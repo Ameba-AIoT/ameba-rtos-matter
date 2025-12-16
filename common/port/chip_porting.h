@@ -46,6 +46,10 @@ extern "C" {
 #define F_BT_LE_USE_STATIC_RANDOM_ADDR      1
 #endif
 
+/** @brief  Redefine Return Codes */
+#define RTW_SUCCESS RTK_SUCCESS
+#define RTW_ERROR   RTK_FAIL
+
 #ifdef __cplusplus
 }
 #endif

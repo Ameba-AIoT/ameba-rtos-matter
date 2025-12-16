@@ -21,7 +21,7 @@
 #include <task.h>
 #include <basic_types.h>
 #include <platform_stdlib.h>
-#include <rtw_wifi_constants.h>
+#include <wifi_conf.h>
 
 #include <chip_porting.h>
 #include <matter_core.h>
@@ -91,7 +91,9 @@ static void example_matter_bridge_task(void *pvParameters)
 
     EndpointConfig bridgedonoffEndpointConfig;
     Presets::Endpoints::matter_dimmable_light_preset(&bridgedonoffEndpointConfig);
-    bridge.addBridgedEndpoint(bridgedonoffEndpointConfig, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes));
+
+    chip::EndpointId firstBridgedDeviceEndpointId;
+    firstBridgedDeviceEndpointId = bridge.addBridgedEndpoint(bridgedonoffEndpointConfig, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes));
 
     if (xTaskCreate(matter_customer_bridge_code, ((const char *)"matter_customer_bridge_code"), 1024, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
         printf("\r%s xTaskCreate(matter_customer_bridge_code) failed", __FUNCTION__);
@@ -99,7 +101,7 @@ static void example_matter_bridge_task(void *pvParameters)
 
     vTaskDelay(20000);
 
-    bridge.removeBridgedEndpoint(2);
+    bridge.removeBridgedEndpoint(firstBridgedDeviceEndpointId);
 
     vTaskDelete(NULL);
 }
