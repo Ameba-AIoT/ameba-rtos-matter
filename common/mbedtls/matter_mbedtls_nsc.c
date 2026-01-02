@@ -110,16 +110,17 @@ static int _random(void *p_rng, unsigned char *output, size_t output_len)
 
 #endif //defined(CONFIG_XXX)
 
+#if defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
 #if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
 IMAGE3_ENTRY_SECTION
-__weak int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void)
+int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void)
 #elif defined(CONFIG_AMEBASMART)
-__weak int secure_mbedtls_platform_set_calloc_free(void)
+int secure_mbedtls_platform_set_calloc_free(void)
 #endif
 {
 #if defined(CONFIG_AMEBASMART)
     return mbedtls_platform_set_calloc_free(_calloc, _free);
-#elif defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#elif (defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE))
     CRYPTO_Init(NULL);
     CRYPTO_SHA_Init(NULL);
     ssl_function_map.ssl_calloc = (void *(*)(unsigned int, unsigned int))_calloc;
@@ -129,6 +130,12 @@ __weak int secure_mbedtls_platform_set_calloc_free(void)
     return 0;
 #endif
 }
+#elif ((defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) && defined(CONFIG_AMEBASMART))
+int secure_mbedtls_platform_set_calloc_free(void)
+{
+    return mbedtls_platform_set_calloc_free(_calloc, _free);
+}
+#endif
 
 /**
  * @brief Clears the Key Pair associated with the specified Matter Key Type.

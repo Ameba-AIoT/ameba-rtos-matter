@@ -1,6 +1,6 @@
 
 ameba_list_append(public_includes
-    ${MATTER_DIR}/api
+    ${MATTER_API_DIR}
     ${MATTER_DIR}/common/atcmd
     ${MATTER_DIR}/common/file_system/kv
     ${MATTER_DIR}/common/lwip/api

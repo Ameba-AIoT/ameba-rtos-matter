@@ -1,5 +1,6 @@
 ameba_list_append(matter_defintions
 
+    CONFIG_AMEBARTOS_V1_1=1
     CONFIG_MATTER=1
 
     # chip device options
@@ -78,7 +79,7 @@ if((MATTER_EXAMPLE STREQUAL "bridge_port") OR (MATTER_EXAMPLE STREQUAL "bridge_d
         CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
     )
 endif()
-if(PORTING_LAYER_DM_EXAMPLE)
+if(PORT_DM_EXAMPLE)
     ameba_list_append(matter_defintions
         CONFIG_DISABLE_LAST_FIXED_ENDPOINT=1
     )

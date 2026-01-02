@@ -1,0 +1,224 @@
+
+/*
+ * < CONFIG BOOT OPTION
+ */
+#undef  CONFIG_XIP_FLASH
+
+/*
+ * < CONFIG Mass Production
+ */
+#undef  CONFIG_MP_INCLUDED
+
+/*
+ * < CONFIG Linux
+ */
+#undef  CONFIG_LINUX_FW_EN
+
+/*
+ * < CONFIG Shell CMD
+ */
+#define CONFIG_SUPPORT_ATCMD 1
+#define CONFIG_ATCMD_IO_LOGUART 1
+#undef  CONFIG_ATCMD_IO_UART
+#undef  CONFIG_LONGER_CMD
+
+/*
+ * < CONFIG VFS
+ */
+#define CONFIG_VFS_LITTLEFS_INCLUDED 1
+#undef  CONFIG_VFS_FATFS_INCLUDED
+
+/*
+ * < CONFIG OTA OPTION
+ */
+#undef  CONFIG_UPGRADE_BOOTLOADER
+#undef  CONFIG_COMPRESS_OTA_IMG
+
+/*
+ * < CONFIG Application Processor
+ */
+#define CONFIG_AP_CORE_CA32 1
+#undef  CONFIG_AP_CORE_KM4
+
+/*
+ * < CONFIG BT
+ */
+#define CONFIG_BT_MENU 1
+#define CONFIG_BT 1
+#define CONFIG_FTL_ENABLED 1
+#undef  CONFIG_BT_BLE_ONLY
+#define CONFIG_BT_DUAL_MODE 1
+#undef  CONFIG_BT_ADVANCED_FEATURE_MENU
+#define CONFIG_BT_EXAMPLE_DEMO_MENU 1
+#define CONFIG_BLE_MATTER_ADAPTER 1
+#undef  CONFIG_BT_PERIPHERAL
+#undef  CONFIG_BT_CENTRAL
+#undef  CONFIG_BT_SCATTERNET
+#undef  CONFIG_BT_WIFIMATE_DEVICE
+#undef  CONFIG_BT_WIFIMATE_CONFIGURATOR
+#undef  CONFIG_BT_MESH_PROVISIONER_MENU
+#undef  CONFIG_BT_MESH_DEVICE_MENU
+#undef  CONFIG_BT_MESH_PROVISIONER_SCATTERNET_MENU
+#undef  CONFIG_BT_MESH_DEVICE_SCATTERNET_MENU
+#undef  CONFIG_BT_ISO_TEST
+#undef  CONFIG_BT_LE_AUDIO_MENU
+#undef  CONFIG_BT_A2DP_MENU
+#undef  CONFIG_BT_HFP_MENU
+#undef  CONFIG_BT_A2DP_HFP_MENU
+#undef  CONFIG_BT_SPP
+#undef  CONFIG_BT_RFC
+#undef  CONFIG_BT_A2DP_SCATTERNET_MENU
+#undef  CONFIG_BT_A2DP_LE_AUDIO_PBP_MENU
+#undef  CONFIG_BT_A2DP_LE_AUDIO_TMAP_MENU
+
+/*
+ * < CONFIG WIFI
+ */
+#define CONFIG_WLAN_MENU 1
+#define CONFIG_AS_INIC_KM4_NP_CA32_AP 1
+#undef  CONFIG_SINGLE_CORE_WIFI_KM4
+#define CONFIG_WLAN 1
+#define CONFIG_AS_INIC_AP 1
+#define CONFIG_LWIP_LAYER 1
+#undef  CONFIG_HIGH_TP_TEST
+#undef  CONFIG_ENABLE_WPS
+#undef  CONFIG_WIFI_CSI_ENABLE
+#undef  CONFIG_WIFI_ANTDIV_ENABLE
+#undef  CONFIG_WIFI_11K_ENABLE
+#undef  CONFIG_WIFI_11V_ENABLE
+#undef  CONFIG_WIFI_11R_ENABLE
+#undef  CONFIG_WIFI_SPEAKER_ENABLE
+
+/*
+ * < CONFIG LWIP
+ */
+#undef  CONFIG_FAST_DHCP
+#undef  CONFIG_LWIP_DEBUG
+
+
+/*
+ * < MENUCONFIG FOR CA32 CONFIG
+ */
+
+/*
+ * < CONFIG CHIP
+ */
+#define CONFIG_AMEBASMART 1
+#define ARM_CORE_CA32 1
+#define CONFIG_FPGA 1
+#define CONFIG_AMEBASMART_A_CUT 1
+
+/*
+ * < CONFIG SMP
+ */
+#define CONFIG_SMP_DUAL_CORE 1
+#undef  CONFIG_SMP_SINGLE_CORE
+#define CONFIG_CORE_NUM (2)
+
+/*
+ * < CONFIG OS
+ */
+#define CONFIG_KERNEL 1
+#define PLATFORM_FREERTOS 1
+#define TASK_SCHEDULER_DISABLED (0)
+
+/*
+ * < CONFIG USB
+ */
+#undef  CONFIG_USB_OTG_EN
+
+/*
+ * < CONFIG FUNCTION TEST
+ */
+#undef  CONFIG_PER_TEST
+
+/*
+ * < LWIP Config
+ */
+#undef  CONFIG_IP_NAT
+
+/*
+ * < SSL Config
+ */
+#define CONFIG_MBED_TLS_ENABLED 1
+#undef  MBEDTLS_V_3_4_1_ENABLE
+#define MBEDTLS_MATTER_ENABLE 1
+#undef  MBEDTLS_V_2_16_9_ENABLE
+#undef  MBEDTLS_MATTER_V_2_28_1_ENABLE
+#define MBEDTLS_MATTER_V_3_6_1_ENABLE 1
+
+/*
+ * < 802154 Config
+ */
+#undef  CONFIG_802154_EN
+
+/*
+ * < Audio Config
+ */
+#undef  CONFIG_AUDIO_FWK
+#undef  CONFIG_MEDIA_PLAYER
+
+/*
+ * Third Party Lib
+ */
+#undef  CONFIG_SPEEX_LIB
+#undef  CONFIG_OPUS_LIB
+
+/*
+ * < IPC Message Queue Config
+ */
+#undef  CONFIG_IMQ_EN
+
+/*
+ * < Matter Config 
+ */
+#define CONFIG_MATTER_EN 1
+#define CONFIG_MATTER 1
+#undef  MATTER_V_1_3_EN
+#undef  MATTER_V_1_4_EN
+#define MATTER_V_1_5_EN 1
+#undef  CONFIG_MATTER_TC_EN
+#define CONFIG_MATTER_SECURE_EN 1
+#define CONFIG_MATTER_SECURE 1
+
+/*
+ * < GUI Config
+ */
+#undef  CONFIG_GUI_EN
+
+/*
+ * Third Party Lib
+ */
+#undef  CONFIG_GUI_LIB_PNG
+#undef  CONFIG_GUI_LIB_JPG
+
+/*
+ * < Range Config
+ */
+#undef  CONFIG_RANGE_ENABLED
+
+/*
+ * < Build Option
+ */
+#define CONFIG_TOOLCHAIN_ASDK 1
+#undef  CONFIG_TOOLCHAIN_ARM_GCC
+#define CONFIG_LINK_ROM_LIB 1
+#undef  CONFIG_LINK_ROM_SYMB
+
+/*
+ * < CONFIG IAR PROJECT
+ */
+#if defined(CONFIG_INIC_IPC_DISABLE) && (CONFIG_INIC_IPC_DISABLE == 1)
+#ifdef CONFIG_WLAN
+#undef CONFIG_WLAN
+#endif
+#ifdef CONFIG_HIGH_TP_TEST
+#undef CONFIG_HIGH_TP_TEST
+#endif
+#ifdef CONFIG_AS_INIC_AP
+#undef CONFIG_AS_INIC_AP
+#endif
+#ifdef CONFIG_LWIP_LAYER
+#undef CONFIG_LWIP_LAYER
+#endif
+#endif

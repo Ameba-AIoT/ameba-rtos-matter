@@ -10,7 +10,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 
-MATTER_MBEDTLSDIR = $(MATTER_DIR)/common/mbedtls
+MATTER_MBEDTLS_DIR = $(MATTER_DIR)/common/mbedtls
 MBEDTLS_DIR       = $(BASEDIR)/component/ssl/mbedtls-3.6.2
 
 ifneq (${MATTER_SECURE_MBEDTLS_MK},1)
@@ -22,7 +22,7 @@ ifeq (${MBEDTLS_DIR},)
   $(error Error: MBEDTLS_DIR not set)
 endif
 
-MBEDTLS_INC = -I${MATTER_MBEDTLSDIR} \
+MBEDTLS_INC = -I${MATTER_MBEDTLS_DIR} \
               -I${MBEDTLS_DIR}/include \
               -I${MBEDTLS_DIR}/include/mbedtls \
               -I${MBEDTLS_DIR}/library \

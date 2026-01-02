@@ -433,11 +433,15 @@ int matter_wifi_set_mode(rtw_mode_t mode)
 
 int matter_wifi_is_connected_to_ap(void)
 {
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+    return wifi_is_connected_to_ap();
+#elif defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
     u8 join_status = RTW_JOINSTATUS_UNKNOWN;
     if ((wifi_get_join_status(&join_status) == RTK_SUCCESS) && (join_status == RTW_JOINSTATUS_SUCCESS))
         return RTW_SUCCESS;
     else
         return RTW_ERROR;
+#endif // (CONFIG_AMEBARTOS_XXX)
 }
 
 int matter_wifi_is_open_security(void)
@@ -559,6 +563,56 @@ void matter_wifi_reg_event_handler(matter_wifi_event event_cmds, rtw_event_handl
     }
 }
 
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags, void *userdata)
+{
+    UNUSED(buf_len);
+    UNUSED(userdata);
+
+    enum rtw_join_status_type join_status = (enum rtw_join_status_type)flags;
+    struct rtw_event_join_fail_info_t *fail_info = (struct rtw_event_join_fail_info_t *)buf;
+
+    switch (join_status) {
+        case RTW_JOINSTATUS_SUCCESS: // Connecting --> Connected Succesfully
+            error_flag = RTW_NO_ERROR;
+            RTK_LOGI(TAG, "Join success!\n");
+            matter_wifi_indication(MATTER_WIFI_EVENT_CONNECT, NULL, 0, flags);
+            break;
+        case RTW_JOINSTATUS_FAIL: // Connecting --> Failed to Connect
+            RTK_LOGI(TAG, "Join fail, error_flag = ");
+            switch (fail_info->fail_reason) {
+                case RTW_CONNECT_SCAN_FAIL:
+                    error_flag = RTW_NONE_NETWORK;
+                    RTK_LOGI(NOTAG, "%d (Can not found target AP)\n", error_flag);
+                    break;
+                case RTW_CONNECT_AUTH_FAIL:
+                case RTW_CONNECT_ASSOC_FAIL:
+                case RTW_CONNECT_4WAY_HANDSHAKE_FAIL:
+                    error_flag = RTW_CONNECT_FAIL;
+                    RTK_LOGI(NOTAG, "%d (Auth/Assoc/Handshake failed)\n", error_flag);
+                    break;
+                case RTW_CONNECT_AUTH_PASSWORD_WRONG:
+                case RTW_CONNECT_4WAY_PASSWORD_WRONG:
+                    error_flag = RTW_WRONG_PASSWORD;
+                    RTK_LOGI(NOTAG, "%d (Wrong Password)\n", error_flag);
+                    break;
+                default:
+                    error_flag = RTW_UNKNOWN;
+                    RTK_LOGI(NOTAG, "%d (Unknown Error)\n", error_flag);
+                    break;
+            }
+            matter_wifi_indication(MATTER_WIFI_EVENT_DISCONNECT, NULL, 0, flags);
+            break;
+        case RTW_JOINSTATUS_DISCONNECT: // Connected --> Disconnected
+            error_flag = RTW_CONNECT_FAIL;
+            RTK_LOGI(TAG, "Disconnected, try to reconnect...\n");
+            matter_wifi_indication(MATTER_WIFI_EVENT_DISCONNECT, NULL, 0, flags);
+            break;
+        default:
+            break;
+    }
+}
+#elif defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
 static void matter_wifi_join_status_event_hdl(u8 *buf, s32 buf_len, s32 flags, void *userdata)
 {
     UNUSED(buf_len);
@@ -610,6 +664,7 @@ static void matter_wifi_join_status_event_hdl(u8 *buf, s32 buf_len, s32 flags, v
             break;
     }
 }
+#endif // (CONFIG_AMEBARTOS_XXX)
 
 void matter_wifi_init(void)
 {
@@ -618,7 +673,11 @@ void matter_wifi_init(void)
     //setup reconnection flag
     matter_wifi_set_autoreconnect(1);
 #endif
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+    wifi_reg_event_handler(WIFI_EVENT_JOIN_STATUS, matter_wifi_join_status_event_hdl, NULL);
+#elif defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
     wifi_reg_event_handler(RTW_EVENT_JOIN_STATUS, matter_wifi_join_status_event_hdl, NULL);
+#endif
 }
 
 void matter_wifi_wait(void)
@@ -660,56 +719,105 @@ int matter_wifi_sta_get_security_type(uint32_t *wifi_security)
 int matter_wifi_sta_get_channel_number(uint8_t *ch)
 {
     int ret = RTW_SUCCESS;
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+    if (wifi_get_channel(WLAN0_IDX, ch) < 0) {
+        ret = RTW_ERROR;
+    }
+#elif defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
     rtw_wifi_setting_t setting = {0};
     if (wifi_get_setting(WLAN0_IDX, &setting) < 0) {
         ret = RTW_ERROR;
     } else {
         *ch = setting.channel;
     }
+#endif // (CONFIG_AMEBARTOS_XXX)
     return ret;
 }
 
 int matter_wifi_sta_get_rssi(int *prssi)
 {
     int ret;
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+    rtw_phy_statistics_t phy_statistics;
+    ret = wifi_fetch_phy_statistic(&phy_statistics);
+    if (ret >= 0) {
+        *prssi = phy_statistics.rssi;
+    }
+#elif defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
     union rtw_phy_stats phy_stats;
     ret = wifi_get_phy_stats(STA_WLAN_INDEX, NULL, &phy_stats);
     if (ret >= 0) {
         *prssi = phy_stats.sta.rssi;
     }
+#endif // (CONFIG_AMEBARTOS_XXX)
     return ret;
 }
 
 int matter_wifi_sta_get_wifi_version(uint8_t *mode)
 {
     int ret;
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+    ret = wifi_get_network_mode();
+    if (ret >= 0) {
+        switch (ret) {
+        case WLAN_MD_11B:
+            *mode = MATTER_WIFI_VERSION_11B;
+            break;
+        case WLAN_MD_11G:
+            *mode = MATTER_WIFI_VERSION_11G;
+            break;
+        case WLAN_MD_11A:
+            *mode = MATTER_WIFI_VERSION_11A;
+            break;
+        case WLAN_MD_11N:
+            *mode = MATTER_WIFI_VERSION_11N;
+            break;
+        case WLAN_MD_11AC:
+            *mode = MATTER_WIFI_VERSION_11AC;
+            break;
+        case WLAN_MD_11AX:
+            *mode = MATTER_WIFI_VERSION_11AX;
+            break;
+        default:
+            *mode = MATTER_WIFI_VERSION_11N;
+            break;
+        }
+        ret = RTW_SUCCESS;
+    } else {
+        *mode = MATTER_WIFI_VERSION_11N;
+        ret = RTW_ERROR;
+
+    }
+#elif defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
     ret = wifi_get_wireless_mode(mode);
     if (ret >= 0) {
         switch (*mode) {
         case RTW_80211_B:
-            mode = MATTER_WIFI_VERSION_11B;
+            *mode = MATTER_WIFI_VERSION_11B;
             break;
         case RTW_80211_G:
-            mode = MATTER_WIFI_VERSION_11G;
+            *mode = MATTER_WIFI_VERSION_11G;
             break;
         case RTW_80211_A:
-            mode = MATTER_WIFI_VERSION_11A;
+            *mode = MATTER_WIFI_VERSION_11A;
             break;
         case RTW_80211_N:
-            mode = MATTER_WIFI_VERSION_11N;
+            *mode = MATTER_WIFI_VERSION_11N;
             break;
         case RTW_80211_AC:
-            mode = MATTER_WIFI_VERSION_11AC;
+            *mode = MATTER_WIFI_VERSION_11AC;
             break;
         case RTW_80211_AX:
-            mode = MATTER_WIFI_VERSION_11AX;
+            *mode = MATTER_WIFI_VERSION_11AX;
             break;
         default:
-            mode = MATTER_WIFI_VERSION_11N;
+            *mode = MATTER_WIFI_VERSION_11N;
             break;
         }
+    } else {
+        *mode = MATTER_WIFI_VERSION_11N;
     }
-
+#endif // (CONFIG_AMEBARTOS_XXX)
     return ret;
 }
 

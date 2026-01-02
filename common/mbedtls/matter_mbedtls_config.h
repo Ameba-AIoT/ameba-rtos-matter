@@ -34,14 +34,19 @@
 
 #include <platform_autoconf.h>
 #include <stdio.h>
+
 #if defined(CONFIG_BUILD_SECURE) && (CONFIG_BUILD_SECURE == 1) && defined(CONFIG_AMEBASMART)
 #include <stdlib.h>
 #include <string.h>
 
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+#include <rand.h>
+int strstr(const char *s1, const char *s2);
+#endif
+
 #define __weak __attribute__((weak))
 #define u32 uint32_t
 #define MATTER_MBEDTLS_SECURE_HEAP_SIZE		U(8 * 1024)
-
 #endif
 
 #define MBEDTLS_VERSION_CONVERT(a,b,c)	(((a) << 16) + ((b) << 8) + (c))

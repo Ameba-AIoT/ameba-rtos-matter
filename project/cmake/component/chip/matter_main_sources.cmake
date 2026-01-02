@@ -21,12 +21,12 @@ ameba_list_append(private_includes
 
     # ${GLOBAL_INTERFACE_INCLUDES} #not needed
 
-    ${MATTER_DIR}/api
-    ${MATTER_DIR}/core
+    ${MATTER_API_DIR}
+    ${MATTER_CORE_DIR}
     ${MATTER_DIR}/common/wifi
-    ${MATTER_DIR}/drivers/device
-    ${MATTER_DIR}/drivers/matter_consoles
-    ${MATTER_DIR}/drivers/matter_drivers
+    ${MATTER_DRIVER_DIR}/device
+    ${MATTER_DRIVER_DIR}/matter_consoles
+    ${MATTER_DRIVER_DIR}/matter_drivers
 
     ${CHIP_DIR}/examples/platform/ameba
     ${CHIP_DIR}/examples/providers
@@ -153,13 +153,22 @@ ameba_list_append(private_sources
     ${CODEGEN_DIR}/zap-generated/IMClusterCommandHandler.cpp
 
     # matter - api
-    ${MATTER_DIR}/api/matter_api.cpp
+    ${MATTER_API_DIR}/matter_api.cpp
 
     # matter - core
-    ${MATTER_DIR}/core/matter_device_utils.cpp
-    ${MATTER_DIR}/core/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
+    ${MATTER_CORE_DIR}/matter_device_utils.cpp
+    ${MATTER_CORE_DIR}/matter_test_event_trigger.cpp # Not using AmebaTestEventTriggerDelegate.cpp
 
 )
+
+# Adding additional private_sources based on configuration
+
+# connectedhomeip - examples - platform - ameba - shell
+if(CHIP_ENABLE_SHELL)
+ameba_list_append(private_sources
+    ${CHIP_DIR}/examples/platform/ameba/shell/launch_shell.cpp
+)
+endif()
 
 # connectedhomeip - src - app - server - T&C
 if(CHIP_ENABLE_TC)
@@ -169,10 +178,11 @@ ameba_list_append(private_sources
 )
 endif()
 
+# matter/connectedhomeip - ota
 if(CHIP_ENABLE_OTA_REQUESTOR)
-if(PORTING_LAYER_EXAMPLE)
+if(PORT_DM_EXAMPLE OR PORT_EXAMPLE)
 ameba_list_append(private_sources
-    ${MATTER_DIR}/core/matter_ota_initializer.cpp
+    ${MATTER_CORE_DIR}/matter_ota_initializer.cpp
 )
 else()
 ameba_list_append(private_sources
@@ -181,8 +191,18 @@ ameba_list_append(private_sources
 endif()
 endif()
 
-if(CHIP_ENABLE_SHELL)
+# matter - core
+# porting layer source files
+if(PORT_DM_EXAMPLE OR PORT_EXAMPLE)
 ameba_list_append(private_sources
-    ${CHIP_DIR}/examples/platform/ameba/shell/launch_shell.cpp
+	${MATTER_CORE_DIR}/matter_core.cpp
+	${MATTER_CORE_DIR}/matter_interaction.cpp
+)
+endif()
+# porting layer data model source files
+if(PORT_DM_EXAMPLE)
+ameba_list_append(private_sources
+	${MATTER_CORE_DIR}/matter_data_model.cpp
+	${MATTER_CORE_DIR}/matter_data_model_presets.cpp
 )
 endif()
