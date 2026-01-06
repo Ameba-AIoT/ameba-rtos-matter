@@ -10,8 +10,14 @@ include $(MATTER_MAIN_SRC)
 # Variable Declaration
 # -------------------------------------------------------------------
 DEVICE_TYPE  := light_dm
-OUTPUT_DIR   := $(CHIPDIR)/examples/lighting-app/ameba/build/chip
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/light_dm/build/chip
 CODEGEN_DIR  := $(OUTPUT_DIR)/codegen
+
+# -------------------------------------------------------------------
+# Compilation flag
+# -------------------------------------------------------------------
+GLOBAL_CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
+GLOBAL_CFLAGS += -DCONFIG_DISABLE_LAST_FIXED_ENDPOINT=1
 
 # -------------------------------------------------------------------
 # Search Directory
@@ -29,10 +35,11 @@ vpath %.c $(DIR) $(shell find $(DIR) -type d)
 # Include Path
 # -------------------------------------------------------------------
 IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
+IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip/gen/include
 IFLAGS += -I$(CHIPDIR)/examples/lighting-app/lighting-common/include
 IFLAGS += -I$(CHIPDIR)/examples/lighting-app/ameba/main/include
-IFLAGS += -I$(CHIPDIR)/examples/lighting-app/ameba/build/chip/gen/include
 IFLAGS += -I$(CODEGEN_DIR)
+IFLAGS += -I$(CODEGEN_DIR)/zap-generated
 
 # -------------------------------------------------------------------
 # Source Files (Porting Layer Core)

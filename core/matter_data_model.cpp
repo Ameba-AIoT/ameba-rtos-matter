@@ -960,8 +960,8 @@ void Node::removeEndpoint(chip::EndpointId endpointId)
             }
             else
             {
-                // If the removed endpoint was the first one, set the parentEndpointId to 0xFFFF
-                endpoints[i].setParentEndpointId(0xFFFF);
+                // If the removed endpoint was the first one, set the parentEndpointId to DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID
+                endpoints[i].setParentEndpointId(DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID);
             }
         }
     }

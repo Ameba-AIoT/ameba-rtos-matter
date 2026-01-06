@@ -9,14 +9,6 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <support/logging/CHIPLogging.h>
 
-EmberAfDeviceType gRootNodeDeviceTypes[] = {
-    { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },
-};
-
-EmberAfDeviceType gAggregatorDeviceTypes[] = {
-    { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT },
-};
-
 void MatterBridge::Init(Node &mNode)
 {
     // start polling task to poll for messages from bridged device
@@ -27,40 +19,15 @@ void MatterBridge::Init(Node &mNode)
         return;
     }
 
+    // No need to init Root Node and Aggregator because it is set as Fixed endpoints starting from Matter v1.5
     node = &mNode;
-    Endpoint *ep0, *ep1;
-
-    ep0 = node->getEndpoint(0);
-    ep1 = node->getEndpoint(1);
-
-    if (ep0 != NULL) {
-        ep0->disableEndpoint();
-        node->removeEndpoint(0);
-    }
-
-    if (ep1 != NULL) {
-        ep1->disableEndpoint();
-        node->removeEndpoint(1);
-    }
-
-    EndpointConfig rootNodeEndpointConfig;
-    EndpointConfig aggregatorEndpointConfig;
-
-    Presets::Endpoints::matter_root_node_preset(&rootNodeEndpointConfig);
-    Presets::Endpoints::matter_aggregator_preset(&aggregatorEndpointConfig);
-
-    // Initialization for Bridge: Root Node on ep0 and Aggregator on ep1
-    node->addEndpoint(rootNodeEndpointConfig, Span<const EmberAfDeviceType>(gRootNodeDeviceTypes));
-    node->addEndpoint(aggregatorEndpointConfig, Span<const EmberAfDeviceType>(gAggregatorDeviceTypes));
-
-    // Enable endpoints
-    node->enableAllEndpoints();
 }
 
-void MatterBridge::addBridgedEndpoint(EndpointConfig bridgedConfig, Span<const EmberAfDeviceType> bridgedDeviceType)
+chip::EndpointId MatterBridge::addBridgedEndpoint(EndpointConfig bridgedConfig, Span<const EmberAfDeviceType> bridgedDeviceType)
 {
-    node->addEndpoint(bridgedConfig, bridgedDeviceType);
+    chip::EndpointId assignedEndpoint = node->addEndpoint(bridgedConfig, bridgedDeviceType);
     node->enableAllEndpoints();
+    return assignedEndpoint;
 }
 
 void MatterBridge::removeBridgedEndpoint(chip::EndpointId endpointID)
