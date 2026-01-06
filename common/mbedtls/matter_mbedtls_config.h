@@ -30,20 +30,6 @@
 #ifndef MATTER_MBEDTLS_CONFIG_H
 #define MATTER_MBEDTLS_CONFIG_H
 
-#include <mbedtls/version.h>
-
-#if (MBEDTLS_VERSION_NUMBER == 0x021C0100)
-#define SUPPORT_HW_SW_CRYPTO
-#if defined(CONFIG_PLATFORM_8710C)
-#include <rom_ssl_ram_map.h>
-#if defined(CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE) && (CONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE == 1)
-#define MBEDTLS_USE_ROM_API
-#endif
-#define RTL_HW_CRYPTO
-//#define SUPPORT_HW_SSL_HMAC_SHA256
-#endif /* defined(CONFIG_PLATFORM_8710C) */
-#endif /* (MBEDTLS_VERSION_NUMBER == 0x021C0100) */
-
 /**
  * \def MBEDTLS_HAVE_ASM
  *
@@ -1268,7 +1254,7 @@
  */
 //#define MBEDTLS_ENTROPY_NV_SEED
 
-/* MBEDTLS_PSA_CRYPTO_KEY_ID_ENCODES_OWNER
+/** MBEDTLS_PSA_CRYPTO_KEY_ID_ENCODES_OWNER
  *
  * Enable key identifiers that encode a key owner identifier.
  *
@@ -1291,7 +1277,7 @@
  *
  * Uncomment this macro to let the buffer allocator print out error messages.
  */
-//#define MBEDTLS_MEMORY_DEBUG
+#define MBEDTLS_MEMORY_DEBUG
 
 /**
  * \def MBEDTLS_MEMORY_BACKTRACE
@@ -3997,7 +3983,7 @@
 //#define MBEDTLS_PLATFORM_STD_FPRINTF      fprintf /**< Default fprintf to use, can be undefined */
 //#define MBEDTLS_PLATFORM_STD_PRINTF        printf /**< Default printf to use, can be undefined */
 /* Note: your snprintf must correctly zero-terminate the buffer! */
-//#define MBEDTLS_PLATFORM_STD_SNPRINTF    snprintf /**< Default snprintf to use, can be undefined */
+#define MBEDTLS_PLATFORM_STD_SNPRINTF    snprintf /**< Default snprintf to use, can be undefined */
 //#define MBEDTLS_PLATFORM_STD_EXIT_SUCCESS       0 /**< Default exit value to use, can be undefined */
 //#define MBEDTLS_PLATFORM_STD_EXIT_FAILURE       1 /**< Default exit value to use, can be undefined */
 //#define MBEDTLS_PLATFORM_STD_NV_SEED_READ   mbedtls_platform_std_nv_seed_read /**< Default nv_seed_read function to use, can be undefined */
