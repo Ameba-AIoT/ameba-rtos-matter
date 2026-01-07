@@ -75,10 +75,15 @@ Only one DEM feature support can be enabled at a time, so make sure only one of 
     cd connectedhomeip
     source scripts/activate.sh
 
+---
+
 <details>
   <summary>Building with AmebaDplus</summary>
 
 ### AmebaDplus (RTL8721Dx)
+
+<details>
+  <summary>Building with ameba-rtos_v1.1 SDK</summary>
 
 #### Build Matter Libraries and the Final Firmware
 
@@ -92,12 +97,43 @@ Refer to this [guide](../../docs/amebadplus_general_build.md#Flash-Image-using-P
 
     cd ameba-rtos/amebadplus_gcc_project
     cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
+
 </details>
+
+<details>
+  <summary>Building with ameba-rtos_v1.0 SDK</summary>
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebadplus_gcc_project
+    make -C project_km4/asdk energy_management_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project
+    make all MATTER_EXAMPLE=energy_management
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0/README.md#flashing) to flash the image with Windows Image Tool.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project
+    make clean
+
+</details>
+
+</details>
+
+---
 
 <details>
   <summary>Building with AmebaLite</summary>
 
 ### AmebaLite (RTL8720EA / RTL8726EA)
+
+<details>
+  <summary>Building with ameba-rtos_v1.1 SDK</summary>
 
 #### Build Matter Libraries and the Final Firmware
 
@@ -111,12 +147,43 @@ Refer to this [guide](../../docs/amebalite_general_build.md#Flash-Image-using-Py
 
     cd ameba-rtos/amebalite_gcc_project
     cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
+
 </details>
+
+<details>
+  <summary>Building with ameba-rtos_v1.0 SDK</summary>
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebalite_gcc_project
+    make -C project_km4/asdk energy_management_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebalite_gcc_project
+    make all MATTER_EXAMPLE=energy_management
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0/README.md#flashing) to flash the image with Windows Image Tool.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebalite_gcc_project
+    make clean
+
+</details>
+
+</details>
+
+---
 
 <details>
   <summary>Building with AmebaSmart</summary>
 
 ### AmebaSmart (RTL8730E)
+
+<details>
+  <summary>Building with ameba-rtos_v1.1 SDK</summary>
 
 #### Build Matter Libraries and the Final Firmware
 
@@ -130,4 +197,32 @@ Refer to this [guide](../../docs/amebasmart_general_build.md#Flash-Image-using-P
 
     cd ameba-rtos/amebasmart_gcc_project
     cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
+
 </details>
+
+<details>
+  <summary>Building with ameba-rtos_v1.0 SDK</summary>
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebasmart_gcc_project
+    make -C project_ap/asdk energy_management_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project
+    make all MATTER_EXAMPLE=energy_management
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0/README.md#flashing) to flash the image with Windows Image Tool.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project
+    make clean
+
+</details>
+
+</details>
+
+---

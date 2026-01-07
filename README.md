@@ -68,9 +68,10 @@ Checkout the [Application Notes](docs/AN0204%20Realtek%20Matter%20application%20
 **Matter v1.5** is associated with the following SDKs:
 - AmebaRTOS SDK: ameba-rtos_v1.1 + integrated patch + matter_v1.5 patch, please contact our FAE to get the SDKs.
 
-| Matter Version |    ameba-rtos version   | ameba-rtos-matter version | connectedhomeip version |
-|----------------|-------------------------|---------------------------|-------------------------|
-| Matter v1.5    | v1.1 + integrated patch | ameba-rtos/release/v1.5   | v1.5-branch             |
+| Matter Version |           ameba-rtos version           | ameba-rtos-matter version | connectedhomeip version |
+|----------------|----------------------------------------|---------------------------|-------------------------|
+| Matter v1.5    | v1.1 + integrated patch + matter patch | ameba-rtos/release/v1.5   | v1.5-branch             |
+|                | v1.0 + integrated patch + matter patch | ameba-rtos/release/v1.5   | v1.5-branch             |
 
 **Matter v1.4 and v1.3** is associated with the following SDKs:
 - AmebaRTOS SDK: [ameba-rtos:release/v1.0+matter](https://github.com/Ameba-AIoT/ameba-rtos/tree/release/v1.0%2Bmatter)

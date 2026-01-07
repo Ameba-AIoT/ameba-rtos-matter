@@ -39,7 +39,7 @@
 #elif defined(CONFIG_EXAMPLE_MATTER_LIGHT) && (CONFIG_EXAMPLE_MATTER_LIGHT == 1)
 #include <light/example_matter_light.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN) && (CONFIG_EXAMPLE_MATTER_MICROWAVE_OVEN == 1)
-#include <microwaveoven/example_matter_microwave_oven.h>
+#include <microwaveoven/example_matter_microwaveoven.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_REFRIGERATOR) && (CONFIG_EXAMPLE_MATTER_REFRIGERATOR == 1)
 #include <refrigerator/example_matter_refrigerator.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_THERMOSTAT) && (CONFIG_EXAMPLE_MATTER_THERMOSTAT == 1)

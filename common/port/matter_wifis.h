@@ -26,6 +26,9 @@ extern "C" {
 
 #include <wifi_conf.h>
 #include <lwip_netconf.h>
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+#include <wifi_ind.h>
+#endif
 
 /******************************************************
  *               WiFi Modes
@@ -99,6 +102,8 @@ typedef enum {
     MATTER_WIFI_EVENT_DHCP6_DONE,
     MATTER_WIFI_EVENT_MAX,
 } matter_wifi_event;
+
+#if defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
 
 /******************************************************
  *         WiFi Modes
@@ -179,6 +184,8 @@ typedef struct rtw_scan_param rtw_scan_param_t;
  *         WiFi is connected to AP
  ******************************************************/
 #define wifi_is_connected_to_ap matter_wifi_is_connected_to_ap
+
+#endif // CONFIG_AMEBARTOS_XXX
 
 /******************************************************
  *               WiFi Interface
