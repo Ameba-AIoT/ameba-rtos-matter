@@ -1,9 +1,30 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include <platform_opts.h>
-#if defined(CONFIG_PLATFORM_8721D)
-#include <atcmd_matter.h>
-#endif
 
 #if defined(CONFIG_EXAMPLE_MATTER) && (CONFIG_EXAMPLE_MATTER == 1)
+
+#if defined(CONFIG_PLATFORM_8721D)
+#include <atcmd_matter.h>
+#endif /* CONFIG_PLATFORM_8721D */
+
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && (CONFIG_EXAMPLE_MATTER_CHIPTEST == 1)
 #include <chiptest/example_matter.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_ROOM_AIR_CONDITIONER) && (CONFIG_EXAMPLE_MATTER_ROOM_AIR_CONDITIONER == 1)
@@ -30,6 +51,24 @@
 #include <thermostat/example_matter_thermostat.h>
 #endif
 
+#if defined(CONFIG_PLATFORM_8710C)
+#include "FreeRTOS.h"
+static void *matter_mbedtls_calloc_func(size_t nelements, size_t elementSize)
+{
+    size_t size;
+    void *ptr = NULL;
+
+    size = nelements * elementSize;
+    ptr = pvPortMalloc(size);
+
+    if (ptr) {
+        memset(ptr, 0, size);
+    }
+
+    return ptr;
+}
+#endif /* CONFIG_PLATFORM_8710C */
+
 /*
  * All of the examples (except CONFIG_EXAMPLE_MATTER_CHIPTEST) are disabled by default for code size consideration
  * The configuration is enabled in platform_opts_matter.h
@@ -38,7 +77,11 @@ void matter_example_entry(void)
 {
 #if defined(CONFIG_PLATFORM_8721D)
     matter_shell_init();
-#endif
+#endif /* CONFIG_PLATFORM_8721D */
+
+#if defined(CONFIG_PLATFORM_8710C)
+    mbedtls_platform_set_calloc_free(matter_mbedtls_calloc_func, vPortFree);
+#endif /* CONFIG_PLATFORM_8710C */
 
 #if defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && (CONFIG_EXAMPLE_MATTER_CHIPTEST == 1)
     example_matter_task();
