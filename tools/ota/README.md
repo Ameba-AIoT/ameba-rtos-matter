@@ -18,72 +18,142 @@ You can check the current image's software version using `chip-tool` commands be
     ./chip-tool basicinformation read software-version 1 0
     ./chip-tool basicinformation read software-version-string 1 0
 
-<details>
-  <summary>For AmebaZ2/AmebaZ2Plus OTA Image</summary>
-
-In `GCC-RELEASE/amebaz2_firmware_xx.json`, update the **serial** value to a higher number than that of current image.
-
-After building the firmware, use the `ota_image_tool.py` to generate the OTA image. This tool will add Matter OTA header to the firmware image.
-
-    python3 ota_image_tool.py create -v <VENDORID> -p <PRODUCTID> -vn <VERSION> -vs <VERSIONSTRING> -da <DIGESTALGO> <path to firmware> <output ota image>
-
-AmebaZ2 example
-
-    python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ../../../../../../project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin/firmware_is.bin ota_image.bin
-
-AmebaZ2Plus example
-
-    python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ../../../../../../project/realtek_amebaz2plus_v0_example/GCC-RELEASE/application_is/Debug/bin/firmware_is.bin ota_image.bin
-
-</details>
+In `amebaxxx_gcc_project/manifest.json` update `"IMG_VER_MAJOR"` or `"IMG_VER_MINOR"` value of `"app"` to a higher number than that of current image.
 
 <details>
-  <summary>For AmebaD OTA Image</summary>
+  <summary>For AmebaDplus OTA Image</summary>
 
 Ensure that the OTA address is set correctly according to the device's flash size in the following files:
 
-- `rtl8721d_bootcfg.c`
-- `rtl8721d_ota.h`
+    component/soc/amebadplus/usrcfg/ameba_flashcfg.c
 
-These files can be found in the base SDK.
+The file can be found in the base SDK.
 
-### Example for a 4MB Flash
+### Example
 
-In `rtl8721d_bootcfg.c`
+In `ameba_flashcfg.c`
 ```c
-u32 OTA_Region[2] = {
-    0x08006000,     /* OTA1 region start address */
-    0x08206000,     /* OTA2 region start address */
+const FlashLayoutInfo_TypeDef Flash_Layout[] = {
+	/* Region_Type, [StartAddr, EndAddr] */
+	{IMG_BOOT,      0x08000000, 0x08013FFF}, //Boot Manifest(4K) + KM4 Bootloader(76K)
+	//Users should modify below according to their own memory
+	{IMG_APP_OTA1,  0x08014000, 0x081FFFFF}, //Certificate(4K) + Manifest(4K) + KM4 Application OTA1 + RDP IMG OTA1
+
+	{IMG_BOOT_OTA2, 0x08200000, 0x08213FFF}, //Boot Manifest(4K) + KM4 Bootloader(76K) OTA
+	{IMG_APP_OTA2,  0x08214000, 0x083DCFFF}, //Certificate(4K) + Manifest(4K) + KM4 Application OTA2 + RDP IMG OTA2
+
+	{FTL,           0x083DD000, 0x083DFFFF}, //FTL for BT(>=12K), The start offset of flash pages which is allocated to FTL physical map.
+	{VFS1,          0x083E0000, 0x083FFFFF}, //VFS region 1 (128K)
+	{VFS2,          0xFFFFFFFF, 0xFFFFFFFF}, //VFS region 2
+	{USER,          0xFFFFFFFF, 0xFFFFFFFF}, //reserve for user
+
+	/* End */
+	{0xFF,          0xFFFFFFFF, 0xFFFFFFFF},
 };
 ```
 
-In `rtl8721d_ota.h`
-```c
-    #define LS_IMG2_OTA1_ADDR   0x08006000      /* KM0 OTA1 start address */
-    #define LS_IMG2_OTA2_ADDR   0x08206000      /* KM0 OTA2 start address */
-```
-
-Once you've set the addresses correctly, ensure that you rebuild both the **LP project** and **HP project**.
-
-### Adding AmebaD OTA Header
-
-Add the AmebaD OTA header to the image using the following command:
-
-    python3 python_custom_ecdsa_D_gcc.py <path to km0_km4_image2.bin> <output image with AmebaD header>
-
-Example:
-
-    python3 python_custom_ecdsa_D_gcc.py ../../../../../../project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/asdk/image/km0_km4_image2.bin ota_firmware.bin
+Once you've set the addresses correctly for `IMG_APP_OTA1` and `IMG_APP_OTA2`, ensure that you rebuild both the firmware correctly.
 
 ### Generating Matter OTA Image
 
 Use the ota_image_tool.py to generate the Matter OTA image, embedding the Matter OTA header:
 
-    python3 ota_image_tool.py create -v <VENDORID> -p <PRODUCTID> -vn <VERSION> -vs <VERSIONSTRING> -da <DIGESTALGO> <path to firmware> <output ota image>
+    python3 ota_image_tool.py create -v <VENDORID> -p <PRODUCTID> -vn <VERSION> -vs <VERSIONSTRING> -da <DIGESTALGO> <path to km0_km4_app.bin> <output ota image>
 
 Example:
 
-    python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ota_firmware.bin ota_image.bin
+    python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ../../../../../amebadplus_gcc_project/km0_km4_app.bin ota_image.bin
+
+</details>
+
+<details>
+  <summary>For AmebaLite OTA Image</summary>
+
+Ensure that the OTA address is set correctly according to the device's flash size in the following files:
+
+    component/soc/amebalite/usrcfg/ameba_flashcfg.c
+
+The file can be found in the base SDK.
+
+### Example
+
+In `ameba_flashcfg.c`
+```c
+FlashLayoutInfo_TypeDef Flash_Layout[] = {
+	/* Region_Type, [StartAddr, EndAddr] */
+	{IMG_BOOT,      0x08000000, 0x08013FFF}, //Boot Manifest(4K) + KM4 Bootloader(76K)
+	//Users should modify below according to their own memory
+	{IMG_APP_OTA1,  0x08014000, 0x081FFFFF}, //Certificate(4K) + Manifest(4K) + KR4 & KM4 Application OTA1 + RDP IMG OTA1
+
+	{IMG_BOOT_OTA2, 0x08200000, 0x08213FFF}, //Boot Manifest(4K) + KM4 Bootloader(76K) OTA
+	{IMG_APP_OTA2,  0x08214000, 0x083DCFFF}, //Certificate(4K) + Manifest(4K) + KR4 & KM4 Application OTA2 + RDP IMG OTA2
+	{FTL,           0x083DD000, 0x083DFFFF}, //FTL for BT(>=12K), The start offset of flash pages which is allocated to FTL physical map.
+	{VFS1,          0x083E0000, 0x083FFFFF}, //VFS region 1 (128K)
+	{IMG_DSP,       0x08400000, 0x086FFFFF}, //Manifest(4K) + DSP IMG, only one DSP region in layout
+	{VFS2,          0xFFFFFFFF, 0xFFFFFFFF}, //VFS region 2
+	{USER,          0xFFFFFFFF, 0xFFFFFFFF}, //reserve for user
+
+	/* End */
+	{0xFF,          0xFFFFFFFF, 0xFFFFFFFF},
+};
+```
+
+Once you've set the addresses correctly for `IMG_APP_OTA1` and `IMG_APP_OTA2`, ensure that you rebuild both the firmware correctly.
+
+### Generating Matter OTA Image
+
+Use the ota_image_tool.py to generate the Matter OTA image, embedding the Matter OTA header:
+
+    python3 ota_image_tool.py create -v <VENDORID> -p <PRODUCTID> -vn <VERSION> -vs <VERSIONSTRING> -da <DIGESTALGO> <path to kr4_km4_app.bin> <output ota image>
+
+Example:
+
+    python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ../../../../../amebalite_gcc_project/kr4_km4_app.bin ota_image.bin
+
+</details>
+
+<details>
+  <summary>For AmebaSmart OTA Image</summary>
+
+Ensure that the OTA address is set correctly according to the device's flash size in the following files:
+
+    component/soc/amebasmart/usrcfg/ameba_flashcfg.c
+
+The file can be found in the base SDK.
+
+### Example
+
+In `ameba_flashcfg.c`
+```c
+FlashLayoutInfo_TypeDef Flash_Layout[] = {
+	/* Region_Type, [StartAddr, EndAddr] */
+	{IMG_BOOT,      0x08000000, 0x0801FFFF}, //Boot Manifest(4K) + KM4 Bootloader(124K)
+	//Users should modify below according to their own memory
+	{IMG_APP_OTA1,  0x08020000, 0x0831FFFF}, //Certificate(4K) + Manifest(4K) + KM0 & KM4 & CA32 Application OTA1 + RDP IMG OTA1
+	// + AP IMG OTA1
+	{IMG_BOOT_OTA2, 0x08320000, 0x0835FFFF}, //Boot Manifest(4K) + KM4 Bootloader(252K) OTA
+	{IMG_APP_OTA2,  0x08360000, 0x0865FFFF}, //Certificate(4K) + Manifest(4K) + KM0 & KM4 & CA32 Application OTA2 + RDP IMG OTA2
+	// + AP IMG OTA2
+	{FTL,           0x08660000, 0x08662FFF}, //FTL for BT(>=12K), The start offset of flash pages which is allocated to FTL physical map.
+	{VFS1,          0x08663000, 0x08682FFF}, //VFS region 1 (128K)
+	{VFS2,          0xFFFFFFFF, 0xFFFFFFFF}, //VFS region 2
+	{USER,          0xFFFFFFFF, 0xFFFFFFFF}, //reserve for user
+	/* End */
+	{0xFF,          0xFFFFFFFF, 0xFFFFFFFF},
+};
+```
+
+Once you've set the addresses correctly for `IMG_APP_OTA1` and `IMG_APP_OTA2`, ensure that you rebuild both the firmware correctly.
+
+### Generating Matter OTA Image
+
+Use the ota_image_tool.py to generate the Matter OTA image, embedding the Matter OTA header:
+
+    python3 ota_image_tool.py create -v <VENDORID> -p <PRODUCTID> -vn <VERSION> -vs <VERSIONSTRING> -da <DIGESTALGO> <path to km0_km4_ca32_app.bin> <output ota image>
+
+Example:
+
+    python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ../../../../../amebasmart_gcc_project/km0_km4_ca32_app.bin ota_image.bin
 
 </details>
 
