@@ -13,7 +13,7 @@ ARG TOOLCHAIN_ASDK_NEW_DIR='/opt/rtk-toolchain/asdk-10.3.1-4354'
 
 # Redefine following build arguments to respective repo and tag/branch
 ARG AMEBA_MATTER_REPO=https://github.com/mikaelajiwidodo/ameba-rtos-matter.git
-ARG TAG_NAME=ameba-rtos/v1.5-PR/tools-ota-update
+ARG TAG_NAME=ameba-rtos/v1.5-PR/docs-update
 
 # Define fixed build arguments
 ARG AMBRTOS_REPO=https://github.com/mikaelajiwidodo/ameba-rtos.git

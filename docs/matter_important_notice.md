@@ -9,6 +9,15 @@ This is because we have added all files required for all supported clusters in c
 
 The only solution is to add Ameba's all-clusters-app.zap.
 
+### Ameba RTOS v1.1 (CMake build)
+
 In `project/cmake/matter.cmake`, the default all-clusters-app.zap in connectedhomeip will be replaced by Ameba's all-clusters-app.zap
 
-cp $(MATTER_DIR)/example/chiptest/all-clusters-app.zap $(ALL_CLUSTERS_ZAP)
+    file(COPY "${MATTER_EXAMPLE_DIR}/chiptest/all-clusters-app.zap"
+         DESTINATION "${CHIP_DIR}/examples/all-clusters-app/all-clusters-common/")
+
+### Ameba RTOS v1.0 (Makefile build)
+
+In `project/makefile/amebaXXX/Makefile`, the default all-clusters-app.zap in connectedhomeip will be replaced by Ameba's all-clusters-app.zap
+
+    cp $(MATTER_EXAMPLE_DIR)/chiptest/all-clusters-app.zap $(ALL_CLUSTERS_ZAP)

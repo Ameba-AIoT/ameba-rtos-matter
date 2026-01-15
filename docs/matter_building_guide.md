@@ -24,14 +24,25 @@ Each device type has its standalone example, and here is how you can build the a
 
 ### Matter Application
 
+#### Ameba RTOS v1.1
+
 The following `cmake` commands correspond to different device types applicable in Realtek's SDK
 
 ```bash
-python build.py -D MATTER_EXAMPLE=all_clusters / MATTER_EXAMPLE=air_purifier / MATTER_EXAMPLE=aircon_port
-                   MATTER_EXAMPLE=bridge_dm / MATTER_EXAMPLE=bridge_port / MATTER_EXAMPLE=dishwasher_port
-                   MATTER_EXAMPLE=fan_port / MATTER_EXAMPLE=laundrywasher_port / MATTER_EXAMPLE=light_dm
-                   MATTER_EXAMPLE=light_port / MATTER_EXAMPLE=microwaveoven_port / MATTER_EXAMPLE=refrigerator_port
-                   MATTER_EXAMPLE=thermostat_port
+python build.py -D MATTER_EXAMPLE=all_clusters / MATTER_EXAMPLE=air_purifier / MATTER_EXAMPLE=aircon_port /
+                   MATTER_EXAMPLE=bridge_dm / MATTER_EXAMPLE=bridge_port / MATTER_EXAMPLE=dishwasher_port /
+                   MATTER_EXAMPLE=energy_management_port / MATTER_EXAMPLE=fan_port / MATTER_EXAMPLE=laundrywasher_port /
+                   MATTER_EXAMPLE=light_dm / MATTER_EXAMPLE=light_port / MATTER_EXAMPLE=microwaveoven_port /
+                   MATTER_EXAMPLE=refrigerator_port / MATTER_EXAMPLE=thermostat_port
+```
+
+#### Ameba RTOS v1.0
+
+The following `Makefile` commands correspond to different device types applicable in Realtek's SDK
+
+```bash
+make -C project_XX/asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / energy_management_port /
+                        fan_port / laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
 ```
 
 ### Matter Application Types
@@ -43,6 +54,6 @@ There are two different types of Matter applications:
 
 #### Realtek's Porting Layer Applications:
 - Utilizes Realtek's Porting Layer for specific device integrations.
-- Includes: `aircon_port`, `bridge_dm`, `dishwasher_port`, `laundrywasher_port`, `light_port`, `light_dm`, `microwaveoven_port`, `refrigerator_port`, `thermostat_port`.
+- Includes: `aircon_port`, `bridge_dm`, `bridge_port`, `dishwasher_port`, `energy_management_port`, `fan_port`, `laundrywasher_port`, `light_port`, `light_dm`, `microwaveoven_port`, `refrigerator_port`, `thermostat_port`.
 
 Learn more about Realtek's Porting Layer Application [here](matter_porting_layer_guide.md).
