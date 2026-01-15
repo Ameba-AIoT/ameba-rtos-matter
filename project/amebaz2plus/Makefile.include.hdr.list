@@ -28,7 +28,7 @@ INCLUDES += -I$(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library
 # Include folder list
 # -------------------------------------------------------------------
 
-INCLUDES += -I$(SDKROOTDIR)/project/realtek_amebaz2_v0_example/inc
+INCLUDES += -I$(SDKROOTDIR)/project/realtek_amebaz2plus_v0_example/inc
 
 INCLUDES += -I$(SDKROOTDIR)/component/common/api
 INCLUDES += -I$(SDKROOTDIR)/component/common/api/at_cmd
