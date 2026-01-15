@@ -29,22 +29,22 @@ The following `make` commands correspond to different device types applicable in
 #### AmebaDplus (RTL8721Dx) Commands:
 
 ```bash
-make -C asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / fan_port
-             laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
+make -C project_km4/asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / fan_port /
+                         laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
 ```
 
 #### AmebaLite (RTL8720EA / RTL8726EA) Commands:
 
 ```bash
-make -C asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / fan_port
-             laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
+make -C project_km4/asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / fan_port /
+                         laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
 ```
 
 #### AmebaSmart (RTL8730E) Commands:
 
 ```bash
-make -C asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / fan_port
-             laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
+make -C project_ap/asdk all_clusters / air_purifier / aircon_port / bridge_dm / bridge_port / dishwasher_port / fan_port /
+                         laundrywasher_port / light_dm / light_port / microwaveoven_port / refrigerator_port / thermostat_port
 ```
 
 ### Matter Application Types
@@ -57,6 +57,6 @@ There are two different types of Matter applications:
 
 #### Realtek's Porting Layer Applications:
 - Utilizes Realtek's Porting Layer for specific device integrations.
-- Includes: `aircon_port`, `bridge_dm`, `dishwasher_port`, `laundrywasher_port`, `light_port`, `light_dm`, `microwaveoven_port`, `refrigerator_port`, `thermostat_port`.
+- Includes: `aircon_port`, `bridge_dm`, `bridge_port`, `dishwasher_port`, `fan_port`, `laundrywasher_port`, `light_port`, `light_dm`, `microwaveoven_port`, `refrigerator_port`, `thermostat_port`.
 
-Learn more about Realtek's Porting Layer Application [here](https://github.com/Ameba-AIoT/ameba-matter/blob/main/docs/matter_porting_layer_guide.md).
+Learn more about Realtek's Porting Layer Application [here](matter_porting_layer_guide.md).
