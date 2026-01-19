@@ -32,13 +32,46 @@ This structure and approach simplify the process of building and extending Matte
 
 ### Porting Layer Example Documentations
 
- - [Room Air-Conditioner](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/aircon/README.md) - Room air-conditioner device type implementation
- - [Bridge App](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
- - [Bridge App with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Fan](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/fan/README.md) - Fan device type implementation
- - [Laundry Washer](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/laundrywasher/README.md) - Dishwasher device type implementation
- - [Dimmable Light](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
- - [Dimmable Light with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Microwave Oven](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/microwaveoven/README.md) - Microwave oven device type implementation
- - [Refrigerator](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/refrigerator/README.md) - Refrigerator device type implementation
- - [Thermostat](https://github.com/Ameba-AIoT/ameba-matter/blob/main/example/thermostat/README.md) - Thermostat device type implementation
+ - [Room Air-Conditioner](../example/aircon/README.md) - Room air-conditioner device type implementation
+ - [Bridge App](../example/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
+ - [Bridge App with Dynamic Endpoint](../example/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Dish Washer](../example/dishwasher/README.md) - Dish Washer device type implementation.
+ - [Fan](../example/fan/README.md) - Fan device type implementation
+ - [Laundry Washer](../example/laundrywasher/README.md) - Dishwasher device type implementation
+ - [Dimmable Light](../example/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
+ - [Dimmable Light with Dynamic Endpoint](../example/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Microwave Oven](../example/microwaveoven/README.md) - Microwave oven device type implementation
+ - [Refrigerator](../example/refrigerator/README.md) - Refrigerator device type implementation
+ - [Thermostat](../example/thermostat/README.md) - Thermostat device type implementation
+
+### Porting Layer Example Memory Usage
+
+The following table provides approximate memory usage for the Realtek Porting Layer example.
+Example: light_port
+
+#### AmebaDplus Memory Usage
+Image size (`km4_boot_all.bin` + `km0_km4_app.bin`): 1,591 KB
+
+| Memory Region  | Size (Bytes) | Size (KB) | Notes                                           |
+|----------------|--------------|-----------|-------------------------------------------------|
+| RAM            | 188,412      | 184.0     | Internal SRAM usage (static data, stacks, etc.) |
+| Heap           | 131,232      | 128.2     | Dynamic allocation area                         |
+| **Total**      | **319,644**  | **312.2** | Approximate total memory usage                  |
+
+#### AmebaLite Memory Usage
+Image size (`km4_boot_all.bin` + `kr4_km4_app.bin`): 1,670 KB
+
+| Memory Region  | Size (Bytes) | Size (KB) | Notes                                           |
+|----------------|--------------|-----------|-------------------------------------------------|
+| RAM            | 203,060      | 198.3     | Internal SRAM usage (static data, stacks, etc.) |
+| Heap           | 137,952      | 134.7     | Dynamic allocation area                         |
+| **Total**      | **341,012**  | **333.0** | Approximate total memory usage                  |
+
+#### AmebaSmart Memory Usage
+Image size (`km4_boot_all.bin` + `km0_km4_ca32_app.bin`): 2,908 KB
+
+| Memory Region  | Size (Bytes) | Size (KB) | Notes                                           |
+|----------------|--------------|-----------|-------------------------------------------------|
+| RAM            | 153,820      | 150.2     | Internal SRAM usage (static data, stacks, etc.) |
+| Heap           | 169,024      | 165.1     | Dynamic allocation area                         |
+| **Total**      | **322,844**  | **315.3** | Approximate total memory usage                  |
