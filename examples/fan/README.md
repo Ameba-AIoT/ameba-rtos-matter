@@ -147,9 +147,6 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
     cd amebaz2_sdk/project/realtek_amebaXX_v0_example/GCC-RELEASE/
     make is_matter
 
-### Flash the Image
-Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.4/tools/Image_Tool_Linux/AmebaZ2/README.md) to flash the image with the Linux Image Tool
-
 ### Clean Matter Libraries
 
     cd amebaz2_sdk/project/realtek_amebaXX_v0_example/GCC-RELEASE/
@@ -183,12 +180,12 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/relea
     cd amebad_sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make all
 
-### Flash the Image
-Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.4/tools/Image_Tool_Linux/AmebaD/README.md) to flash the image with the Linux Image Tool
-
 ### Clean Matter Libraries and Firmware
 
     cd amebad_sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make clean
 
 </details>
+
+### Flash the Image
+Refer to this [guide](../../tools/Image_Tool_Linux/README.md) to flash the image with the Linux Image Tool

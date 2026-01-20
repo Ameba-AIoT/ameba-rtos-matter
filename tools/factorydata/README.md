@@ -174,14 +174,14 @@ If you don't want to encrypt the factorydata, don't pass in the key and iv
 
 Flash the binary file using Image_Tool_Linux
 
-    cd ambd_matter/tools/AmebaD/Image_Tool_Linux
-
     ./flash.sh <serial port> <path to factorydata bin> <address>
 
 Note: Default address to flash `ameba_factory.bin` is 0x083FF000, you may configure it using `MATTER_FACTORY_DATA` macro in `platform_opts.matter.h`. Make sure to check for partition conflicts.
 An example is shown below
 
     ./flash.sh /dev/ttyUSB0 ./ameba_factory.bin 0x083FF000
+
+For more information on the image tool please refer to [README](../Image_Tool_Linux/README.md)
 
 ### Commissioning
 

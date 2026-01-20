@@ -105,4 +105,4 @@ Method 1:
 
 Method 2 (using image tool and flashing script):
 
-- Follow the Image Tool README in ameba-rtos-matter/tools/Image_Tool/AmebaX
+- Follow the Image Tool [README](../tools/Image_Tool_Linux/README.md)
