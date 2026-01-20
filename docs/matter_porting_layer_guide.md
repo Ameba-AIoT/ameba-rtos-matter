@@ -32,19 +32,19 @@ This structure and approach simplify the process of building and extending Matte
 
 ### Porting Layer Example Documentations
 
- - [Bridge App](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
- - [Bridge App with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Dishwasher](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/dishwasher/README.md) - Dishwasher device type implementation
- - [Fan](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/fan/README.md) - Fan device type implementation
- - [Generic Switch](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/generic_switch/README.md) - Generic Switch device type implementation
- - [Laundry Washer](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/laundry_washer/README.md) - Dishwasher device type implementation
- - [Dimmable Light](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
- - [Dimmable Light with Dynamic Endpoint](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Microwave Oven](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/microwave_oven/README.md) - Microwave oven device type implementation
- - [Refrigerator](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/refrigerator/README.md) - Refrigerator device type implementation
- - [Room Air-Conditioner](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/room_air_conditioner/README.md) - Room air-conditioner device type implementation
- - [Temperature Sensor](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/temperature_sensor/README.md) - Temperature Sensor device type implementation
- - [Thermostat](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/release/v1.4/examples/thermostat/README.md) - Thermostat device type implementation
+ - [Bridge App](../examples/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
+ - [Bridge App with Dynamic Endpoint](../examples/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Dishwasher](../examples/dishwasher/README.md) - Dishwasher device type implementation
+ - [Fan](../examples/fan/README.md) - Fan device type implementation
+ - [Generic Switch](../examples/generic_switch/README.md) - Generic Switch device type implementation
+ - [Laundry Washer](../examples/laundry_washer/README.md) - Dishwasher device type implementation
+ - [Dimmable Light](../examples/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
+ - [Dimmable Light with Dynamic Endpoint](../examples/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Microwave Oven](../examples/microwave_oven/README.md) - Microwave oven device type implementation
+ - [Refrigerator](../examples/refrigerator/README.md) - Refrigerator device type implementation
+ - [Room Air-Conditioner](../examples/room_air_conditioner/README.md) - Room air-conditioner device type implementation
+ - [Temperature Sensor](../examples/temperature_sensor/README.md) - Temperature Sensor device type implementation
+ - [Thermostat](../examples/thermostat/README.md) - Thermostat device type implementation
 
 ### Porting Layer Example Memory Usage
 
@@ -78,6 +78,6 @@ Image size (`km0_km4_image2.bin`): 1,376 KB
 
 | Memory Region | Size (Bytes) | Size (KB) | Notes |
 |----------------|--------------|-----------|-------|
-| RAM | 170,944 | 167.0 | Internal SRAM usage (static data, stacks, etc.) |
-| Heap | 212,000 | 207.0 | Dynamic allocation area |
-| **Total** | **382,944** | **373.9** | Approximate total memory usage |
+| RAM | 170,784 | 166.8 | Internal SRAM usage (static data, stacks, etc.) |
+| Heap | 214,816 | 209.8 | Dynamic allocation area |
+| **Total** | **385,600** | **376.6** | Approximate total memory usage |

@@ -157,7 +157,7 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
     make is_matter
 
 ### Flash the Image
-Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.4/tools/Image_Tool_Linux/AmebaZ2/README.md) to flash the image with the Linux Image Tool
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/main/tools/Image_Tool_Linux/AmebaZ2/README.md) to flash the image with the Linux Image Tool
 
 ### Clean Matter Libraries
 
@@ -193,7 +193,7 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/relea
     make all
 
 ### Flash the Image
-Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.4/tools/Image_Tool_Linux/AmebaD/README.md) to flash the image with the Linux Image Tool
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/main/tools/Image_Tool_Linux/AmebaD/README.md) to flash the image with the Linux Image Tool
 
 ### Clean Matter Libraries and Firmware
 
