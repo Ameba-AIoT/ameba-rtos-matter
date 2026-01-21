@@ -1,0 +1,3 @@
+menu "Entry to Matter Config"
+    rsource "project/cmake/Kconfig"
+endmenu

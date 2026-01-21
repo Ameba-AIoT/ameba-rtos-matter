@@ -11,7 +11,13 @@ extern "C" {
 #include <task.h>
 #include <errno.h>
 #include <time.h>
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
 #include <sntp/sntp.h>
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#include <lwip/apps/sntp.h>
+#include <sntp/sntp_api.h>
+#endif
 #include <rtc_api.h>
 #include <timer_api.h>
 
@@ -143,6 +149,8 @@ bool matter_sntp_rtc_is_sync(void)
 
 void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 {
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     unsigned int update_tick = 0, retry = 0;
     time_t update_sec = 0, update_usec = 0;
 
@@ -164,6 +172,20 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
     } else { //if the sntp is not reachable yet, use the last known epoch time if available
         *current_sec = matter_rtc_read();
     }
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    uint32_t sec  = 0;
+    uint32_t usec = 0;
+    SNTP_GET_SYSTEM_TIME(sec, usec);
+    if ((sec != 0) && (usec != 0)) { //if sntp server is reachable, write to the dct and rtc
+        *current_sec  = sec;
+        *current_usec = usec;
+
+        matter_rtc_write(*current_sec);
+        matter_sntp_rtc_sync = TRUE;
+    } else { //if the sntp is not reachable yet, use the last known epoch time if available
+        *current_sec = matter_rtc_read();
+    }
+#endif
 }
 
 void matter_sntp_init(void)

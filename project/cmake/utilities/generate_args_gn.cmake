@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.6)
-
 # Generate args.gn to compile lib_chip_core
 
 file(MAKE_DIRECTORY ${OUTPUT_DIR})

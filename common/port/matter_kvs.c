@@ -115,7 +115,13 @@ void modifyKey(char *tempKey, const char *key, int keyLen)
 s32 initPref(void)
 {
     s32 ret;
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     ret = rt_kv_init();
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    ret = vfs_kv_init();
+#endif
+
     if (ret < 0) {
         ret = MATTER_KVS_ERROR;
     } else {

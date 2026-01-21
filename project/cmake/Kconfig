@@ -3,6 +3,14 @@ menu "Matter Config"
         bool "Enable Matter"
         default n
     if MATTER_EN
+        choice
+            prompt "Ameba RTOS version"
+            default AMEBARTOS_V1_1
+            config AMEBARTOS_V1_1
+                bool "Ameba RTOS v1.1"
+            config AMEBARTOS_V1_2
+                bool "Ameba RTOS v1.2"
+        endchoice
         config MBEDTLS_V_3_6_2_ENABLE
             bool
             default y
@@ -19,7 +27,7 @@ menu "Matter Config"
         config MATTER_SECURE_EN
             bool "Enable Matter Secure"
             default n
-            depends on ((AMEBADPLUS || AMEBALITE) && TRUSTZONE_FOR_KM4) || (AMEBASMART)
+            depends on ((AMEBADPLUS || AMEBALITE) && (TRUSTZONE_FOR_KM4 || TRUSTZONE_EN)) || (AMEBASMART)
         config MATTER_SECURE
             bool
             default y

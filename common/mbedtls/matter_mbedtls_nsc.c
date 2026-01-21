@@ -110,7 +110,8 @@ static int _random(void *p_rng, unsigned char *output, size_t output_len)
 
 #endif //defined(CONFIG_XXX)
 
-#if defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
+#if (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
 #if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void)

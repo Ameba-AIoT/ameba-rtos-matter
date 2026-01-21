@@ -1,0 +1,19 @@
+#!/bin/bash -l
+
+MATTER_EXAMPLE=$1
+PATH_TO_AMEBA_RTOS=$(cat .PATH_TO_AMEBA_RTOS)
+AMEBA_PY="python $PATH_TO_AMEBA_RTOS/ameba.py"
+
+PATH_TO_AMEBA_RTOS_MATTER="$PWD"
+MATTER_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/project/cmake/config/ameba-rtos-v1.2/matter_proj.conf"
+SOC_INFO_JSON="$PATH_TO_AMEBA_RTOS_MATTER/soc_info.json"
+
+if [ ! -e "$SOC_INFO_JSON" ]; then
+  echo "$SOC_INFO_JSON does not exist, please run \`ameba.py soc\` and choose the SoC for your project."
+else
+  echo "Enabling Matter in menuconfig..."
+  $AMEBA_PY menuconfig -f "$MATTER_PROJ_CONFIG"
+  echo "The following configurations has been enabled:"
+  cat "$MATTER_PROJ_CONFIG"
+  echo "If you need to modify the menuconfig, please run \`ameba.py menuconfig\`"
+fi

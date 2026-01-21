@@ -1,0 +1,66 @@
+#!/bin/bash -l
+
+MATTER_EXAMPLE=$1
+PATH_TO_AMEBA_RTOS=$(cat .PATH_TO_AMEBA_RTOS)
+AMEBA_PY="python $PATH_TO_AMEBA_RTOS/ameba.py"
+
+PATH_TO_AMEBA_RTOS_MATTER="$PWD"
+SOC_INFO_JSON="$PATH_TO_AMEBA_RTOS_MATTER/soc_info.json"
+
+matter_examples=(
+  "all_clusters"
+  "air_purifier"
+  "aircon_port"
+  "bridge_dm"
+  "bridge_port"
+  "dishwasher_port"
+  "energy_management_port"
+  "fan_port"
+  "laundrywasher_port"
+  "light"
+  "light_dm"
+  "light_port"
+  "microwaveoven_port"
+  "refrigerator_port"
+  "thermostat_port"
+)
+
+valid_example=false
+
+list_matter_examples() {
+  echo "Available Matter App examples:"
+  for matter_example in "${matter_examples[@]}"; do
+    echo "- $matter_example"
+  done
+}
+
+if [ "$#" -lt 1 ]; then
+  echo "Usage: matter_build_proj <Matter App Example>"
+  list_matter_examples
+  exit 1
+else # check if MATTER_EXAMPLE is valid
+  for matter_example in "${matter_examples[@]}"; do
+    if [[ "$matter_example" == "$MATTER_EXAMPLE" ]]; then
+      valid_example=true
+      break
+    fi
+  done
+  if [[ "$valid_example" == "false" ]]; then
+    echo "Invalid Matter Example"
+    list_matter_examples
+    exit 1
+  fi
+fi
+
+if [ -e "$SOC_INFO_JSON" ]; then
+  PATH_TO_MENUCONFIG_FOLDER="$PATH_TO_AMEBA_RTOS_MATTER/build_$(python3 -c "import json; print(json.load(open('$SOC_INFO_JSON'))['soc']['name'])")/menuconfig"
+else
+  echo "$SOC_INFO_JSON does not exist, please run \`ameba.py soc\` and choose the SoC for your project."
+  exit 1
+fi
+
+if [ -d "$PATH_TO_MENUCONFIG_FOLDER" ]; then
+  $AMEBA_PY build -D EXAMPLE="$PWD" MATTER_EXAMPLE=$MATTER_EXAMPLE
+else
+  echo "$PATH_TO_MENUCONFIG_FOLDER does not exist, please run \`matter_menuconfig_proj\`or \`ameba.py menuconfig\` to set configurations for your project."
+fi

@@ -1,15 +1,20 @@
-set(BASEDIR ${c_BASEDIR})
+if(CONFIG_AMEBARTOS_V1_2)
+set(MATTER_DIR ${EXAMPLEDIR})
+elseif(CONFIG_AMEBARTOS_V1_1)
+set(BASEDIR    ${c_BASEDIR})
+set(MATTER_DIR ${BASEDIR}/component/application/matter)
+endif()
 
-set(DIR         ${BASEDIR}/component/application/matter)
-set(ATCMDDIR    ${BASEDIR}/component/application/matter/common/atcmd)
-set(BTDIR       ${BASEDIR}/component/application/matter/common/bluetooth)
-set(LWIPDIR     ${BASEDIR}/component/application/matter/common/lwip)
-set(MBEDDIR     ${BASEDIR}/component/application/matter/common/mbedtls)
-set(PORTDIR     ${BASEDIR}/component/application/matter/common/port)
-set(PROTOBUFDIR ${BASEDIR}/component/application/matter/common/protobuf)
-set(NANOPBDIR   ${BASEDIR}/component/application/matter/common/protobuf/nanopb)
-set(EXAMPLEDIR  ${BASEDIR}/component/application/matter/examples)
-set(CHIPTESTDIR ${BASEDIR}/component/application/matter/examples/chiptest)
+set(DIR         ${MATTER_DIR})
+set(ATCMDDIR    ${MATTER_DIR}/common/atcmd)
+set(BTDIR       ${MATTER_DIR}/common/bluetooth)
+set(LWIPDIR     ${MATTER_DIR}/common/lwip)
+set(MBEDDIR     ${MATTER_DIR}/common/mbedtls)
+set(PORTDIR     ${MATTER_DIR}/common/port)
+set(PROTOBUFDIR ${MATTER_DIR}/common/protobuf)
+set(NANOPBDIR   ${MATTER_DIR}/common/protobuf/nanopb)
+set(EXAMPLEDIR  ${MATTER_DIR}/examples)
+set(CHIPTESTDIR ${MATTER_DIR}/examples/chiptest)
 
 ##########################################################################################
 ## * This part defines public part of the component
@@ -83,7 +88,7 @@ ameba_list_append(private_sources
 ameba_list_append(private_includes
 
     ${MBEDTLSDIR}/library
-    ${BASEDIR}/component/application/matter/examples
+    ${MATTER_DIR}/examples
 )
 # Component private part, user config end
 #------------------------------#

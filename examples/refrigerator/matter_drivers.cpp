@@ -37,7 +37,12 @@ MatterRefrigerator refrigerator;
 gpio_irq_t gpio_level;
 uint32_t current_level = IRQ_LOW;
 
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
 void matter_driver_gpio_level_irq_handler(uint32_t id, gpio_irq_event event)
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+void matter_driver_gpio_level_irq_handler(uint32_t id, uint32_t event)
+#endif
 {
     uint32_t *level = (uint32_t *) id;
 

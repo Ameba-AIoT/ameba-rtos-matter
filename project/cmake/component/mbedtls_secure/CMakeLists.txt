@@ -1,7 +1,10 @@
-set(BASEDIR ${c_BASEDIR})
-
 set(DIR                ${c_MBEDTLS_DIR})
+if(CONFIG_AMEBARTOS_V1_2)
+set(MATTER_DIR         ${EXAMPLEDIR})
+elseif(CONFIG_AMEBARTOS_V1_1)
+set(BASEDIR            ${c_BASEDIR})
 set(MATTER_DIR         ${BASEDIR}/component/application/matter)
+endif()
 set(MATTER_MBEDTLS_DIR ${MATTER_DIR}/common/mbedtls)
 
 ##########################################################################################
@@ -47,7 +50,6 @@ set(private_compile_options)         #private compile_options
 # mbedtls secure library
 #------------------------------#
 ameba_list_append(private_sources
-    ${DIR}/library/aes.c
     ${DIR}/library/asn1parse.c
     ${DIR}/library/asn1write.c
     ${DIR}/library/base64.c
@@ -93,12 +95,24 @@ endif()
 
 # mbedtls secure hardware
 #------------------------------#
-ameba_list_append(private_sources
-    ${DIR}/hw_alt_legacy/aes_alt.c
-    ${DIR}/hw_alt_legacy/sha256_alt.c
-    ${DIR}/hw_alt_legacy/sha512_alt.c
-    ${DIR}/hw_alt_legacy/ssl_rom_to_ram_map.c
-)
+
+if(CONFIG_AMEBASMART OR CONFIG_AMEBALITE OR CONFIG_AMEBADPLUS)
+    ameba_list_append(private_sources
+        ${DIR}/hw_alt_legacy/aes_alt.c
+        ${DIR}/hw_alt_legacy/sha256_alt.c
+        ${DIR}/hw_alt_legacy/sha512_alt.c
+        ${DIR}/hw_alt_legacy/ssl_rom_to_ram_map.c
+    )
+else()
+    ameba_list_append(private_sources
+        ${DIR}/library/aes.c
+        ${DIR}/library/sha256.c
+        ${DIR}/library/sha512.c
+        ${DIR}/library/psa_crypto_driver_wrappers_no_static.c
+        ${DIR}/library/psa_crypto_ffdh.c
+    )
+endif()
+
 ameba_list_append_if(CONFIG_AMEBASMART private_sources ${DIR}/hw_alt_legacy/ecc_alt.c)
 ameba_list_append_if(CONFIG_AMEBALITE  private_sources ${DIR}/hw_alt_legacy/ecc_alt.c)
 ameba_list_append_if(CONFIG_AMEBASMART private_sources ${DIR}/hw_alt_legacy/rsa_alt.c)

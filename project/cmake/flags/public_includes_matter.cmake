@@ -15,7 +15,7 @@ ameba_list_append(public_includes
 
     ${BASEDIR}/component/at_cmd
 
-    ${FREERTOSDIR}/include/
+    ${FREERTOS_DIR}/include/
 
     #lwip_default_hooks
     ${MATTER_DIR}/common/lwip/lwip_v2.1.2/port/realtek/include/
@@ -23,17 +23,17 @@ ameba_list_append(public_includes
 
 if(CONFIG_AMEBADPLUS)
     ameba_list_append(public_includes
-        ${FREERTOSDIR}/portable/GCC/AmebaDplus_KM4/non_secure
-        ${FREERTOSDIR}/portable/GCC/AmebaDplus_KM4/secure
+        ${FREERTOS_DIR}/portable/GCC/AmebaDplus_KM4/non_secure
+        ${FREERTOS_DIR}/portable/GCC/AmebaDplus_KM4/secure
     )
 elseif(CONFIG_AMEBALITE)
     ameba_list_append(public_includes
-        ${FREERTOSDIR}/portable/GCC/AmebaLite_KM4/non_secure
-        ${FREERTOSDIR}/portable/GCC/AmebaLite_KM4/secure
+        ${FREERTOS_DIR}/portable/GCC/AmebaLite_KM4/non_secure
+        ${FREERTOS_DIR}/portable/GCC/AmebaLite_KM4/secure
     )
 elseif(CONFIG_AMEBASMART)
     ameba_list_append(public_includes
-        ${FREERTOSDIR}/portable/GCC/ARM_CA7
+        ${FREERTOS_DIR}/portable/GCC/ARM_CA7
     )
     if(CONFIG_MATTER_SECURE_EN)
         ameba_list_append(public_includes
