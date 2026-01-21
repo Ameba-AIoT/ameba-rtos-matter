@@ -40,25 +40,22 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
 
 #### Build Matter Libraries
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd sdk/project/realtek_amebaz2_v0_example/GCC-RELEASE/
     make dishwasher_port
     
 #### Build the Final Firmware
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd sdk/project/realtek_amebaz2_v0_example/GCC-RELEASE/
     make is_matter
-    
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambz2_matter/blob/main/tools/AmebaZ2/Image_Tool_Linux/README.md) to flash the image with the Linux Image Tool
 
 #### Clean Matter Libraries
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd sdk/project/realtek_amebaz2_v0_example/GCC-RELEASE/
     make clean_matter_libs
 
 #### Clean Ameba Matter application
 
-    cd ambz2_matter/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+    cd sdk/project/realtek_amebaz2_v0_example/GCC-RELEASE/
     make clean_matter
 
 </details>
@@ -70,22 +67,22 @@ Refer to this [guide](https://github.com/ambiot/ambz2_matter/blob/main/tools/Ame
 
 #### Build Matter Libraries
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make -C asdk dishwasher_port
     
 #### Build the Final Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
+    cd sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_lp
     make all
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make all
-    
-#### Flash the Image
-Refer to this [guide](https://github.com/ambiot/ambd_matter/blob/main/tools/AmebaD/Image_Tool_Linux/README.txt) to flash the image with the Linux Image Tool
 
 #### Clean Matter Libraries and Firmware
 
-    cd ambd_matter/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
+    cd sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
     make clean
 
 </details>
+
+## Flash the Image
+Refer to this [guide](../../tools/Image_Tool_Linux/README.md) to flash the image with the Linux Image Tool
