@@ -94,10 +94,4 @@ Navigate to the `GCC-RELEASE` directory:
 
 The generated image is found in the ambz2_matter sdk `project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin/flash_is.bin`
 
-Method 1:
-
-- Find more detail in [application_note](https://github.com/ambiot/ambz2_matter/blob/main/doc/AN0500%20Realtek%20Ameba-ZII%20application%20note.en.pdf) Chapter4
-
-Method 2 (using image tool and flashing script):
-
-- Follow the Image Tool [README](https://github.com/ambiot/ambz2_matter/blob/main/tools/AmebaZ2/Image_Tool_Linux/README.md)
+Follow the Image Tool [README](../tools/Image_Tool_Linux/README.md)

@@ -101,12 +101,6 @@ Build `project_hp`:
 
 ## Flash Image
 
-The generated image is found in the ambz2_matter sdk `project/realtek_amebaz2_v0_example/GCC-RELEASE/application_is/Debug/bin/flash_is.bin`
+The generated image is found in the ambd_matter sdk `project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp`
 
-Method 1:
-
-- Find more detail in [application_note](https://github.com/ambiot/ambd_matter/blob/main/doc/AN0400%20Ameba-D%20Application%20Note.pdf)
-
-Method 2 (using image tool and flashing script):
-
-- Follow the Image Tool [README](https://github.com/ambiot/ambd_matter/blob/main/tools/AmebaD/Image_Tool_Linux/README.txt)
+Follow the Image Tool [README](../tools/Image_Tool_Linux/README.md)
