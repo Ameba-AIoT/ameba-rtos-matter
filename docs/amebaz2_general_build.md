@@ -96,8 +96,8 @@ The generated image is found in the ameba-rtos-z2 sdk `project/realtek_amebaz2_v
 
 Method 1:
 
-- Find more detail in AN0500 Chapter4
+- Find more detail in AN0500 Chapter 4.
 
 Method 2 (using image tool and flashing script):
 
-- Follow the Image Tool README in ameba-rtos-matter/tools/Image_Tool/AmebaX
+- Follow the Image Tool [README](../tools/Image_Tool_Linux/README.md)

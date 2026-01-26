@@ -32,19 +32,19 @@ This structure and approach simplify the process of building and extending Matte
 
 ### Porting Layer Example Documentations
 
- - [Bridge App](bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
- - [Bridge App with Dynamic Endpoint](bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Dishwasher](dishwasher/README.md) - Dishwasher device type implementation
- - [Fan](fan/README.md) - Fan device type implementation
- - [Generic Switch](generic_switch/README.md) - Generic Switch device type implementation
- - [Laundry Washer](laundry_washer/README.md) - Dishwasher device type implementation
- - [Dimmable Light](light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
- - [Dimmable Light with Dynamic Endpoint](light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
- - [Microwave Oven](microwave_oven/README.md) - Microwave oven device type implementation
- - [Refrigerator](refrigerator/README.md) - Refrigerator device type implementation
- - [Room Air-Conditioner](room_air_conditioner/README.md) - Room air-conditioner device type implementation
- - [Temperature Sensor](temperature_sensor/README.md) - Temperature Sensor device type implementation
- - [Thermostat](thermostat/README.md) - Thermostat device type implementation
+ - [Bridge App](../examples/bridge/README.md) - build a bridge application that facilitates communication between Matter fabric and Non-Matter device.
+ - [Bridge App with Dynamic Endpoint](../examples/bridge_dm/README.md) - this example extends the basic bridge functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Dishwasher](../examples/dishwasher/README.md) - Dishwasher device type implementation
+ - [Fan](../examples/fan/README.md) - Fan device type implementation
+ - [Generic Switch](../examples/generic_switch/README.md) - Generic Switch device type implementation
+ - [Laundry Washer](../examples/laundry_washer/README.md) - Dishwasher device type implementation
+ - [Dimmable Light](../examples/light/README.md) - Dimmable light device type implementation but can be customized to different lighting device.
+ - [Dimmable Light with Dynamic Endpoint](../examples/light_dm/README.md) - this example extends the basic lighting functionality by incorporating dynamic endpoint management, enhancing flexibility in device connectivity
+ - [Microwave Oven](../examples/microwave_oven/README.md) - Microwave oven device type implementation
+ - [Refrigerator](../examples/refrigerator/README.md) - Refrigerator device type implementation
+ - [Room Air-Conditioner](../examples/room_air_conditioner/README.md) - Room air-conditioner device type implementation
+ - [Temperature Sensor](../examples/temperature_sensor/README.md) - Temperature Sensor device type implementation
+ - [Thermostat](../examples/thermostat/README.md) - Thermostat device type implementation
 
 ### Porting Layer Example Memory Usage
 
