@@ -110,6 +110,11 @@ CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=0
 CFLAGS += -DCONFIG_ENABLE_AMEBA_SRAM_OPTIMIZE=0
 
 # -------------------------------------------------------------------
+# Matter Commissioning Flow (default: standard)
+# -------------------------------------------------------------------
+CFLAGS += -DCONFIG_USER_ACTION_REQUIRED=0
+
+# -------------------------------------------------------------------
 # Matter Cluster Flags
 # -------------------------------------------------------------------
 
