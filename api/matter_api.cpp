@@ -1,3 +1,22 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include <platform_stdlib.h>
 #include <app/server/Server.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -15,8 +34,7 @@ using namespace ::chip::DeviceLayer;
 
 extern "C" uint8_t matter_get_total_operational_hour(uint32_t *totalOperationalHours)
 {
-    if (totalOperationalHours == nullptr)
-    {
+    if (totalOperationalHours == nullptr) {
         printf("%s: nullptr\n", __FUNCTION__);
         return -1;
     }
@@ -24,17 +42,13 @@ extern "C" uint8_t matter_get_total_operational_hour(uint32_t *totalOperationalH
     CHIP_ERROR err;
     DiagnosticDataProvider &diagProvider = chip::DeviceLayer::GetDiagnosticDataProviderImpl();
 
-    if (&diagProvider != NULL)
-    {
+    if (&diagProvider != NULL) {
         err = diagProvider.GetTotalOperationalHours(*totalOperationalHours);
-        if (err != CHIP_NO_ERROR)
-        {
+        if (err != CHIP_NO_ERROR) {
             printf("%s: GetTotalOperationalHours Failed err=%d\n", __FUNCTION__, err);
             return -1;
         }
-    }
-    else
-    {
+    } else {
         printf("%s: DiagnosticDataProvider is invalid\n", __FUNCTION__);
         return -1;
     }
@@ -48,7 +62,7 @@ extern "C" uint8_t matter_set_total_operational_hour(uint32_t time)
     return (err == CHIP_NO_ERROR) ? 0 : -1;
 }
 
-bool matter_server_is_commissioned()
+bool matter_server_is_commissioned(void)
 {
     return (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0);
 }
@@ -57,10 +71,8 @@ void matter_get_fabric_indexes(uint16_t *pFabricIndexes, size_t bufSize)
 {
     size_t i = 0;
     for (auto it = chip::Server::GetInstance().GetFabricTable().begin();
-            it != chip::Server::GetInstance().GetFabricTable().end(); ++it)
-    {
-        if (bufSize < i)
-        {
+        it != chip::Server::GetInstance().GetFabricTable().end(); ++it) {
+        if (bufSize < i) {
             // out of buffer space
             ChipLogError(DeviceLayer, "Returning... buffer too small");
             return;
@@ -71,10 +83,28 @@ void matter_get_fabric_indexes(uint16_t *pFabricIndexes, size_t bufSize)
     }
 }
 
+void matter_print_onboarding_codes(void)
+{
+#if CONFIG_NETWORK_LAYER_BLE
+    auto flags = chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE);
+#else
+    auto flags = chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kOnNetwork);
+#endif /* CONFIG_NETWORK_LAYER_BLE */
+
+    chip::PayloadContents payload;
+    CHIP_ERROR err = GetPayloadContents(payload, flags);
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "GetPayloadContents() failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+#if CONFIG_USER_ACTION_REQUIRED
+    payload.commissioningFlow = chip::CommissioningFlow::kUserActionRequired;
+#endif
+    PrintOnboardingCodes(payload);
+}
+
 CHIP_ERROR matter_get_manual_pairing_code(char *buf, size_t bufSize)
 {
-    if (bufSize < chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1)
-    {
+    if (bufSize < chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1) {
         ChipLogError(DeviceLayer, "Buffer too small for onboarding code!");
         return CHIP_ERROR_INTERNAL;
     }
@@ -84,14 +114,12 @@ CHIP_ERROR matter_get_manual_pairing_code(char *buf, size_t bufSize)
     RendezvousInformationFlags rendezvousFlag = chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE);
     PayloadContents payload;
 
-    if (GetPayloadContents(payload, rendezvousFlag) != CHIP_NO_ERROR)
-    {
+    if (GetPayloadContents(payload, rendezvousFlag) != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "Failed to get onboarding payload contents");
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (GetManualPairingCode(manualPairingCode, payload) != CHIP_NO_ERROR)
-    {
+    if (GetManualPairingCode(manualPairingCode, payload) != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "Failed to generate manual pairing code!");
         return CHIP_ERROR_INTERNAL;
     }
@@ -103,8 +131,7 @@ CHIP_ERROR matter_get_manual_pairing_code(char *buf, size_t bufSize)
 
 CHIP_ERROR matter_get_qr_code(char *buf, size_t bufSize)
 {
-    if (bufSize < chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1)
-    {
+    if (bufSize < chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1) {
         ChipLogError(DeviceLayer, "Buffer too small for onboarding code!");
         return CHIP_ERROR_INTERNAL;
     }
@@ -114,14 +141,12 @@ CHIP_ERROR matter_get_qr_code(char *buf, size_t bufSize)
     RendezvousInformationFlags rendezvousFlag = chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE);
     PayloadContents payload;
 
-    if (GetPayloadContents(payload, rendezvousFlag) != CHIP_NO_ERROR)
-    {
+    if (GetPayloadContents(payload, rendezvousFlag) != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "Failed to get onboarding payload contents");
         return CHIP_ERROR_INTERNAL;
     }
 
-    if (GetQRCode(qrCode, payload) != CHIP_NO_ERROR)
-    {
+    if (GetQRCode(qrCode, payload) != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "Failed to generate qr code!");
         return CHIP_ERROR_INTERNAL;
     }
@@ -136,8 +161,7 @@ CHIP_ERROR matter_open_basic_commissioning_window()
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     CommissioningWindowManager *mgr = &(chip::Server::GetInstance().GetCommissioningWindowManager());
 
-    if (mgr != NULL)
-    {
+    if (mgr != NULL) {
         chip::DeviceLayer::PlatformMgr().LockChipStack();
         err = mgr->OpenBasicCommissioningWindow();
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
@@ -151,8 +175,7 @@ CHIP_ERROR matter_get_certificate_declaration(MutableByteSpan &outBuffer)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceAttestationCredentialsProvider *dacProvider = chip::Credentials::GetDeviceAttestationCredentialsProvider();
 
-    if (dacProvider != NULL)
-    {
+    if (dacProvider != NULL) {
         err = dacProvider->GetCertificationDeclaration(outBuffer);
     }
 
@@ -164,8 +187,7 @@ CHIP_ERROR matter_get_dac_cert(MutableByteSpan &outBuffer)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceAttestationCredentialsProvider *dacProvider = chip::Credentials::GetDeviceAttestationCredentialsProvider();
 
-    if (dacProvider != NULL)
-    {
+    if (dacProvider != NULL) {
         err = dacProvider->GetDeviceAttestationCert(outBuffer);
     }
 
@@ -177,8 +199,7 @@ CHIP_ERROR matter_get_pai_cert(MutableByteSpan &outBuffer)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceAttestationCredentialsProvider *dacProvider = chip::Credentials::GetDeviceAttestationCredentialsProvider();
 
-    if (dacProvider != NULL)
-    {
+    if (dacProvider != NULL) {
         err = dacProvider->GetProductAttestationIntermediateCert(outBuffer);
     }
 
@@ -190,8 +211,7 @@ CHIP_ERROR matter_get_firmware_information(MutableByteSpan &outBuffer)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceAttestationCredentialsProvider *dacProvider = chip::Credentials::GetDeviceAttestationCredentialsProvider();
 
-    if (dacProvider != NULL)
-    {
+    if (dacProvider != NULL) {
         err = dacProvider->GetFirmwareInformation(outBuffer);
     }
 
@@ -203,8 +223,7 @@ CHIP_ERROR matter_get_setup_discriminator(uint16_t &discriminator)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     CommissionableDataProvider *cdProvider = chip::DeviceLayer::GetCommissionableDataProvider();
 
-    if (cdProvider != NULL)
-    {
+    if (cdProvider != NULL) {
         err = cdProvider->GetSetupDiscriminator(discriminator);
     }
 
@@ -216,8 +235,7 @@ CHIP_ERROR matter_get_spake2p_iteration_count(uint32_t &iterationCount)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     CommissionableDataProvider *cdProvider = chip::DeviceLayer::GetCommissionableDataProvider();
 
-    if (cdProvider != NULL)
-    {
+    if (cdProvider != NULL) {
         err = cdProvider->GetSpake2pIterationCount(iterationCount);
     }
 
@@ -229,8 +247,7 @@ CHIP_ERROR matter_get_spake2p_salt(MutableByteSpan &saltBuf)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     CommissionableDataProvider *cdProvider = chip::DeviceLayer::GetCommissionableDataProvider();
 
-    if (cdProvider != NULL)
-    {
+    if (cdProvider != NULL) {
         err = cdProvider->GetSpake2pSalt(saltBuf);
     }
 
@@ -242,8 +259,7 @@ CHIP_ERROR matter_get_spake2p_verifier(MutableByteSpan &verifierBuf, size_t &ver
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     CommissionableDataProvider *cdProvider = chip::DeviceLayer::GetCommissionableDataProvider();
 
-    if (cdProvider != NULL)
-    {
+    if (cdProvider != NULL) {
         err = cdProvider->GetSpake2pVerifier(verifierBuf, verifierLen);
     }
 
@@ -255,8 +271,7 @@ CHIP_ERROR matter_get_setup_passcode(uint32_t &passcode)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     CommissionableDataProvider *cdProvider = chip::DeviceLayer::GetCommissionableDataProvider();
 
-    if (cdProvider != NULL)
-    {
+    if (cdProvider != NULL) {
         err = cdProvider->GetSetupPasscode(passcode);
     }
 
@@ -268,8 +283,7 @@ CHIP_ERROR matter_get_vendor_name(char *buf, size_t bufSize)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetVendorName(buf, bufSize);
     }
 
@@ -281,8 +295,7 @@ CHIP_ERROR matter_get_vendor_id(uint16_t &vendorId)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetVendorId(vendorId);
     }
 
@@ -294,8 +307,7 @@ CHIP_ERROR matter_get_product_name(char *buf, size_t bufSize)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetProductName(buf, bufSize);
     }
 
@@ -307,8 +319,7 @@ CHIP_ERROR matter_get_product_id(uint16_t &productId)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetProductId(productId);
     }
 
@@ -320,8 +331,7 @@ CHIP_ERROR matter_get_part_number(char *buf, size_t bufSize)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetPartNumber(buf, bufSize);
     }
 
@@ -333,8 +343,7 @@ CHIP_ERROR matter_get_product_url(char *buf, size_t bufSize)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetProductURL(buf, bufSize);
     }
 
@@ -346,8 +355,7 @@ CHIP_ERROR matter_get_product_label(char *buf, size_t bufSize)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetProductLabel(buf, bufSize);
     }
 
@@ -359,8 +367,7 @@ CHIP_ERROR matter_get_serial_number(char *buf, size_t bufSize)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetSerialNumber(buf, bufSize);
     }
 
@@ -372,8 +379,7 @@ CHIP_ERROR matter_get_manufacturing_date(uint16_t &year, uint8_t &month, uint8_t
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetManufacturingDate(year, month, day);
     }
 
@@ -385,8 +391,7 @@ CHIP_ERROR matter_get_hardware_version(uint16_t &hardwareVersion)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetHardwareVersion(hardwareVersion);
     }
 
@@ -398,8 +403,7 @@ CHIP_ERROR matter_get_hardware_version_string(char *buf, size_t bufSize)
     CHIP_ERROR err = CHIP_ERROR_INTERNAL;
     DeviceInstanceInfoProvider *diiProvider = chip::DeviceLayer::GetDeviceInstanceInfoProvider();
 
-    if (diiProvider != NULL)
-    {
+    if (diiProvider != NULL) {
         err = diiProvider->GetHardwareVersionString(buf, bufSize);
     }
 

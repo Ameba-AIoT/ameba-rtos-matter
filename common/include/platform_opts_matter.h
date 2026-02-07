@@ -1,14 +1,24 @@
-/******************************************************************************
-  *
-  * This module is a confidential and proprietary property of RealTek and
-  * possession or use of this module requires written permission of RealTek.
-  *
-  * Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
-  *
-******************************************************************************/
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
-#ifndef __PLATFORM_OPTS_MATTER_H__
-#define __PLATFORM_OPTS_MATTER_H__
+#ifndef PLATFORM_OPTS_MATTER_H
+#define PLATFORM_OPTS_MATTER_H
 
 // Ameba Matter Device Type Example
 #define CONFIG_EXAMPLE_MATTER                           1
@@ -74,7 +84,7 @@
 #define MATTER_KVS_MODULE_NUM                   13                      // max number of module
 #define MATTER_KVS_VARIABLE_NAME_SIZE           32                      // max size of the variable name
 #define MATTER_KVS_VARIABLE_VALUE_SIZE          64+4                    // max size of the variable value, +4 so it can store 64 bytes variable
-                                                                        // max value number in moudle = floor(4024 / (32 + 64 + 4)) = 40
+// max value number in moudle = floor(4024 / (32 + 64 + 4)) = 40
 
 /****************************************************************
  * MATTER KVS2, for key length large than 64 (Fabric1 ~ FabricF)
@@ -83,7 +93,7 @@
 #define MATTER_KVS_MODULE_NUM2                  10                      // max number of module
 #define MATTER_KVS_VARIABLE_NAME_SIZE2          32                      // max size of the variable name
 #define MATTER_KVS_VARIABLE_VALUE_SIZE2         400+4                   // max size of the variable value, +4 so it can store 400 bytes variable
-                                                                        // max value number in moudle = floor(4024 / (32 + 400 + 4)) = 9
+// max value number in moudle = floor(4024 / (32 + 400 + 4)) = 9
 
 /*****************************************************************
  * Matter Factory Data: last 4KB of external flash
@@ -182,4 +192,4 @@
 #define LFS_NUM_BLOCKS                          (LFS_DEVICE_SIZE / SECTOR_SIZE_FLASH)
 #endif /* CONFIG_ENABLE_AMEBA_LFS */
 
-#endif /* __PLATFORM_OPTS_MATTER_H__ */
+#endif /* PLATFORM_OPTS_MATTER_H */
