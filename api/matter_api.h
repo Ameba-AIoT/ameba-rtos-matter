@@ -19,7 +19,13 @@
 
 #pragma once
 
-using namespace ::chip;
+#include <cstddef>
+#include <cstdint>
+
+#include <lib/core/CHIPError.h>
+#include <lib/support/Span.h>
+
+using namespace chip;
 
 /******************************************************
  *               Utilities and Information
@@ -37,6 +43,11 @@ bool matter_server_is_commissioned(void);
  * @param[in]  bufSize: Size of the buffer.
  */
 void matter_get_fabric_indexes(uint16_t *pFabricIndexes, size_t bufSize);
+
+/**
+ * @brief  Print onboarding codes.
+ */
+void matter_print_onboarding_codes(void);
 
 /**
  * @brief  Get the manual pairing code.

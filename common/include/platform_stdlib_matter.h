@@ -1,11 +1,21 @@
-/******************************************************************************
-  *
-  * This module is a confidential and proprietary property of RealTek and
-  * possession or use of this module requires written permission of RealTek.
-  *
-  * Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
-  *
-******************************************************************************/
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #ifndef PLATFORM_STDLIB_MATTER_H
 #define PLATFORM_STDLIB_MATTER_H
@@ -14,19 +24,19 @@
 #include <assert.h>
 
 extern size_t strnlen(const char *s, size_t count);
-extern void *pvPortMalloc( size_t xWantedSize );
+extern void *pvPortMalloc(size_t xWantedSize);
 
 //def
 #ifndef false
-    #define false   0
+#define false   0
 #endif
 
 #ifndef true
-    #define true    1
+#define true    1
 #endif
 
 #ifndef in_addr_t
-    typedef __uint32_t in_addr_t;
+typedef __uint32_t in_addr_t;
 #endif
 
 #elif defined(CONFIG_PLATFORM_8721D)
@@ -34,61 +44,61 @@ extern void *pvPortMalloc( size_t xWantedSize );
 #include <sys/time.h>
 #include <assert.h>
 
-extern char * _strtok_r( char *s , const char *delim , char **lasts);
-extern int _nanosleep( const struct timespec * rqtp, struct timespec * rmtp );
-extern int _vTaskDelay( const TickType_t xTicksToDelay );
-extern time_t _time( time_t * tloc );
+extern char *_strtok_r(char *s, const char *delim, char **lasts);
+extern int _nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
+extern int _vTaskDelay(const TickType_t xTicksToDelay);
+extern time_t _time(time_t *tloc);
 extern void *pvPortCalloc(size_t xWantedCnt, size_t xWantedSize);
 
 #undef calloc
 #define calloc            pvPortCalloc
 
 #ifndef false
-    #define false   0
+#define false   0
 #endif
 
 #ifndef true
-    #define true    1
+#define true    1
 #endif
 
 #ifndef strtok_r
-    #define strtok_r(s, delim, lasts)	  _strtok_r (s, delim, lasts)
+#define strtok_r(s, delim, lasts)	  _strtok_r (s, delim, lasts)
 #endif
 
 #ifndef usleep
-    #define usleep(x)    _vTaskDelay(x)
+#define usleep(x)    _vTaskDelay(x)
 #endif
 
 #ifndef nanosleep
-    #define nanosleep    _nanosleep
+#define nanosleep    _nanosleep
 #endif
 
 #ifndef in_addr_t
-    typedef __uint32_t in_addr_t;
+typedef __uint32_t in_addr_t;
 #endif
 
 #ifdef strtok
-    #undef strtok
+#undef strtok
 #endif
 
 #ifdef strtol
-    #undef strtol
+#undef strtol
 #endif
 
 #ifdef rand
-    #undef rand
+#undef rand
 #endif
 
 #ifdef srand
-    #undef srand
+#undef srand
 #endif
 
 #ifdef IN
-    #undef IN
+#undef IN
 #endif
 
 #ifdef vsnprintf
-	#undef vsnprintf
+#undef vsnprintf
 #endif
 
 #endif /* CONFIG_PLATFORM_XXXX */

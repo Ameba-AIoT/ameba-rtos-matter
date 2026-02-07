@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <matter_api.h>
 #include <matter_core.h>
 #include <matter_dcts.h>
 #include <matter_data_providers.h>
@@ -249,7 +250,7 @@ void matter_core_init_server(intptr_t context)
 
 #if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
     const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
-                app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
+                            app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
     PersistentStorageDelegate &persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
     chip::app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, termsAndConditions);
 #endif // CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
@@ -261,8 +262,7 @@ void matter_core_init_server(intptr_t context)
     emberAfEndpointEnableDisable(0xFFFE, false);
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap()) {
-        // QR code will be used with CHIP Tool
-        PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+        matter_print_onboarding_codes();
     }
 
 #if CONFIG_ENABLE_CHIP_SHELL
