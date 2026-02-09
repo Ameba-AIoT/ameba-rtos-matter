@@ -30,6 +30,8 @@
 #include <bridge_dm/example_matter_bridge.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_DISHWASHER) && (CONFIG_EXAMPLE_MATTER_DISHWASHER == 1)
 #include <dishwasher/example_matter_dishwasher.h>
+#elif defined(CONFIG_EXAMPLE_MATTER_DOORLOCK) && (CONFIG_EXAMPLE_MATTER_DOORLOCK == 1)
+#include <doorlock/example_matter_doorlock.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT) && (CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT == 1)
 #include <energy_management/example_matter_energy_management.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_FAN) && (CONFIG_EXAMPLE_MATTER_FAN == 1)
@@ -63,6 +65,8 @@ void app_example(void)
     example_matter_bridge();
 #elif defined(CONFIG_EXAMPLE_MATTER_DISHWASHER) && (CONFIG_EXAMPLE_MATTER_DISHWASHER == 1)
     example_matter_dishwasher();
+#elif defined(CONFIG_EXAMPLE_MATTER_DOORLOCK) && (CONFIG_EXAMPLE_MATTER_DOORLOCK == 1)
+    example_matter_doorlock();
 #elif defined(CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT) && (CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT == 1)
     example_matter_energy_management();
 #elif defined(CONFIG_EXAMPLE_MATTER_FAN) && (CONFIG_EXAMPLE_MATTER_FAN == 1)

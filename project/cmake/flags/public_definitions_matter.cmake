@@ -148,6 +148,10 @@ elseif(MATTER_EXAMPLE STREQUAL "dishwasher_port")
     ameba_list_append(matter_defintions
         CONFIG_EXAMPLE_MATTER_DISHWASHER=1
     )
+elseif(MATTER_EXAMPLE STREQUAL "doorlock_port")
+    ameba_list_append(matter_defintions
+        CONFIG_EXAMPLE_MATTER_DOORLOCK=1
+    )
 elseif(MATTER_EXAMPLE STREQUAL "energy_management_port")
     ameba_list_append(matter_defintions
         CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT=1

@@ -102,7 +102,7 @@ Whenever there is a change of state in the actual Bridged Devices, the Bridged s
 ## How to build
 
 ### Configurations
-`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_BRIDGE` are automatically enabled in the Makefiles.
+`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_BRIDGE` are automatically enabled in the Makefiles / CMake.
 
 ### Setup the Build Environment
   

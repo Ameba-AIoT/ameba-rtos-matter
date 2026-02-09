@@ -34,6 +34,8 @@ BRIDGE_DM_FILE         = $(MATTER_EXAMPLE_DIR)/bridge_dm/build/chip/codegen/clus
 BRIDGE_DM_ZAP          = $(MATTER_EXAMPLE_DIR)/bridge_dm/bridge-app.zap
 DISHWASHER_FILE        = $(MATTER_EXAMPLE_DIR)/dishwasher/build/chip/codegen/cluster-file.txt
 DISHWASHER_ZAP         = $(MATTER_EXAMPLE_DIR)/dishwasher/dishwasher-app.zap
+DOORLOCK_FILE          = $(MATTER_EXAMPLE_DIR)/doorlock/build/chip/codegen/cluster-file.txt
+DOORLOCK_ZAP           = $(MATTER_EXAMPLE_DIR)/doorlock/door-lock-app.zap
 FAN_FILE               = $(MATTER_EXAMPLE_DIR)/fan/build/chip/codegen/cluster-file.txt
 FAN_ZAP                = $(MATTER_EXAMPLE_DIR)/fan/fan-app.zap
 LAUNDRYWASHER_FILE     = $(MATTER_EXAMPLE_DIR)/laundrywasher/build/chip/codegen/cluster-file.txt
@@ -87,6 +89,9 @@ $(BRIDGE_FILE): $(BRIDGE_ZAP)
 $(DISHWASHER_FILE): $(DISHWASHER_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/dishwasher,$^,$(MATTER_EXAMPLE_DIR)/dishwasher/dishwasher-app.matter,$@)
 
+$(DOORLOCK_FILE): $(DOORLOCK_ZAP)
+	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/doorlock,$^,$(MATTER_EXAMPLE_DIR)/doorlock/door-lock-app.matter,$@)
+
 $(ENERGY_MANAGEMENT_FILE): $(ENERGY_MANAGEMENT_ZAP)
 	$(call GENERATE_ZAP,$(CHIPDIR)/examples/energy-management-app/ameba,$^,$(CHIPDIR)/examples/energy-management-app/energy-management-common/energy-management-app.matter,$@)
 
@@ -138,6 +143,10 @@ bridge_port: prebuild copy_ld_img2 $(BRIDGE_FILE)
 dishwasher_port: prebuild copy_ld_img2 $(DISHWASHER_FILE)
 	@make -C $(MATTER_BUILD_DIR)/make/chip/dishwasher_app all
 	@make -C $(MATTER_BUILD_DIR)/make/chip_main/dishwasher_app_port all
+
+doorlock_port: prebuild copy_ld_img2 $(DOORLOCK_FILE)
+	@make -C $(MATTER_BUILD_DIR)/make/chip/doorlock_app all
+	@make -C $(MATTER_BUILD_DIR)/make/chip_main/doorlock_app_port all
 
 energy_management_port: prebuild copy_ld_img2 $(ENERGY_MANAGEMENT_FILE)
 	@make -C $(MATTER_BUILD_DIR)/make/chip/energy_management_app all

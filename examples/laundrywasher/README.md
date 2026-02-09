@@ -27,7 +27,7 @@ You may add clusters and attributes handling in `matter_driver_uplink_update_han
 ## How to build
 
 ### Configurations
-`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER` are automatically enabled in the Makefiles.
+`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER` are automatically enabled in the Makefiles / CMake.
 
 ### Setup the Build Environment
   

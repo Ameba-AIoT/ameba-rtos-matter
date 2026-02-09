@@ -11,7 +11,7 @@ After another 20 second delay, the `Dimmable Light` endpoint on Endpoint2 will b
 ## How to build
 
 ### Configurations
-`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_LIGHT` are automatically enabled in the Makefiles.
+`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_LIGHT` are automatically enabled in the Makefiles / CMake.
 
 ### Setup the Build Environment
   

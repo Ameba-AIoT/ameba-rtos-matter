@@ -33,6 +33,7 @@ struct AppEvent
         kEventType_Downlink_DW_Alarm_Reset,
         kEventType_Downlink_Refrigerator_Mode,
         kEventType_Downlink_Refrigerator_Alarm_State,
+        kEventType_Downlink_DoorLock_Lock_State,
 
         /*Relative Humidity Measurement Cluster*/
         kEventType_Downlink_RelativeHumidityMeasurement_SetValue,

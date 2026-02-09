@@ -29,7 +29,7 @@ After obtaining the temperature and humidity measurements, the task will update 
 ## How to build
 
 ### Configurations
-`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_AIRCON` are automatically enabled in the Makefiles.
+`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_AIRCON` are automatically enabled in the Makefiles / CMake.
 
 ### Setup the Build Environment
   

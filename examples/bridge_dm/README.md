@@ -15,7 +15,7 @@ Additionally a new thread will be created for user to input their code to commun
 ## How to build
 
 ### Configurations
-`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_BRIDGE` are automatically enabled in the Makefiles.
+`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_BRIDGE` are automatically enabled in the Makefiles / CMake.
 
 ### Setup the Build Environment
   
