@@ -135,8 +135,21 @@ constexpr size_t kMaxPendingMdnsPackets = 10u;
 chip::Inet::DropIfTooManyQueuedPacketsFilter sMdnsPacketFilter(kMaxPendingMdnsPackets);
 #endif
 
+static matter_app_device_callback_t sDeviceCallback = NULL;
+static void * sDeviceCallbackContext = NULL;
+
+void matter_reg_app_device_callback(matter_app_device_callback_t callback, void * context)
+{
+    sDeviceCallback = callback;
+    sDeviceCallbackContext = context;
+}
+
 void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t arg)
 {
+    if (sDeviceCallback != NULL) {
+        sDeviceCallback(event->Type, sDeviceCallbackContext);
+    }
+
     switch (event->Type) {
     case DeviceEventType::kInternetConnectivityChange:
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
