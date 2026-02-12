@@ -242,6 +242,11 @@ void matter_core_init_server(intptr_t context)
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap()) {
         matter_print_onboarding_codes();
+    } else if (matter_server_is_commissioned() != 0) {
+        // Ensure DNSSD server is started for devices connected via user-specific Wi-Fi / fast connect.
+        // Previously, commissioned devices became unreachable/uncontrollable
+        // because the DNSSD service was not initialized after network connection.
+        chip::app::DnssdServer::Instance().StartServer();
     }
 
 #if CONFIG_ENABLE_CHIP_SHELL
