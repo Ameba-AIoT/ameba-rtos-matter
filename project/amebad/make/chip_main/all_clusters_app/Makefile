@@ -14,6 +14,14 @@ OUTPUT_DIR   := $(CHIPDIR)/examples/all-clusters-app/ameba/build/chip
 CODEGEN_DIR  := $(OUTPUT_DIR)/codegen
 
 # -------------------------------------------------------------------
+# Compiler Flags
+# -------------------------------------------------------------------
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_APP_TASK=1
+ifeq ($(CHIP_ENABLE_SHELL), true)
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_CHIP_SHELL=1
+endif
+
+# -------------------------------------------------------------------
 # Search Directory
 # -------------------------------------------------------------------
 DIR += $(CHIPDIR)/examples/all-clusters-app/all-clusters-common
@@ -27,6 +35,7 @@ vpath %.c $(DIR) $(shell find $(DIR) -type d)
 # -------------------------------------------------------------------
 # Include Path
 # -------------------------------------------------------------------
+IFLAGS += -I$(MATTER_EXAMPLE_DIR)/chiptest
 IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/all-clusters-common/include
 IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/ameba/main/include
 IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/ameba/build/chip/gen/include
