@@ -169,7 +169,7 @@
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG==1)
 #define CONFIG_ENABLE_AMEBA_LFS                 1
-#define CONFIG_ENABLE_AMEBA_DLOG_TEST           1
+#define CONFIG_ENABLE_AMEBA_DLOG_ATCMD          1
 #else
 #define CONFIG_ENABLE_AMEBA_LFS                 0
 #endif
