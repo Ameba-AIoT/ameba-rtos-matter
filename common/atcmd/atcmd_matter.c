@@ -322,24 +322,29 @@ static void atcmd_matter_device_info(void *arg)
 
 usage:
     printf("[ATMI]: Matter Device Information\n");
-    printf("Usage:\n");
-    printf("  ATMI=0   -> Get manual pairing code\n");
-    printf("  ATMI=1   -> Get QR code\n");
-    printf("  ATMI=2   -> Get Certification Declaration\n");
-    printf("  ATMI=3   -> Get DAC cert\n");
-    printf("  ATMI=4   -> Get PAI cert\n");
-    printf("  ATMI=5   -> Get discriminator\n");
-    printf("  ATMI=6   -> Get passcode\n");
-    printf("  ATMI=7   -> Get vendor name\n");
-    printf("  ATMI=8   -> Get vendor ID\n");
-    printf("  ATMI=9   -> Get product name\n");
-    printf("  ATMI=10  -> Get product ID\n");
-    printf("  ATMI=11  -> Get serial number\n");
-    printf("  ATMI=12  -> Get manufacturing date\n");
-    printf("  ATMI=13  -> Get hardware version\n");
-    printf("  ATMI=14  -> Get hardware version string\n");
-    printf("  ATMI=15  -> Get software version\n");
-    printf("  ATMI=16  -> Get software version string\n");
+#if defined(CONFIG_PLATFORM_8721D)
+    printf("Usage: ATMI <options>\n");
+#elif defined(CONFIG_PLATFORM_8710C)
+    printf("Usage: ATMI=<options>\n");
+#endif
+    printf("options:\n");
+    printf(" 0  -> Get manual pairing code\n");
+    printf(" 1  -> Get QR code\n");
+    printf(" 2  -> Get Certification Declaration\n");
+    printf(" 3  -> Get DAC cert\n");
+    printf(" 4  -> Get PAI cert\n");
+    printf(" 5  -> Get discriminator\n");
+    printf(" 6  -> Get passcode\n");
+    printf(" 7  -> Get vendor name\n");
+    printf(" 8  -> Get vendor ID\n");
+    printf(" 9  -> Get product name\n");
+    printf(" 10 -> Get product ID\n");
+    printf(" 11 -> Get serial number\n");
+    printf(" 12 -> Get manufacturing date\n");
+    printf(" 13 -> Get hardware version\n");
+    printf(" 14 -> Get hardware version string\n");
+    printf(" 15 -> Get software version\n");
+    printf(" 16 -> Get software version string\n");
 
 exit:
     if (read_buf != NULL) {
@@ -419,7 +424,7 @@ log_item_t at_matter_items[] = {
 
 const char *matter_help_str[] = {
     "factory reset. (Usage: ATM$)",
-#if defined(CONFIG_ENABLE_OTA_REQUESTOR) && CONFIG_ENABLE_OTA_REQUESTOR
+#if defined(CONFIG_ENABLE_OTA_REQUESTOR) && CONFIG_EXAMPLE_MATTER_CHIPTEST
     "matter ota query image. (Usage: ATM%)",
     "matter ota apply update. (Usage: ATM^)",
 #endif /* CONFIG_ENABLE_OTA_REQUESTOR */
@@ -468,8 +473,10 @@ void matter_shell_init(void)
 CMD_TABLE_DATA_SECTION
 const COMMAND_TABLE matter_atcmd[] = {
     {(const u8 *)"ATM$", 0, atcmd_matter_factory_reset, (const u8 *)"ATM$ : factory reset. (Usage: ATM$)"},
+#if CONFIG_ENABLE_OTA_REQUESTOR && CONFIG_EXAMPLE_MATTER_CHIPTEST
     {(const u8 *)"ATM%", 0, atcmd_matter_ota_query, (const u8 *)"ATM% : matter ota query image. (Usage: ATM%)"},
     {(const u8 *)"ATM^", 0, atcmd_matter_ota_apply, (const u8 *)"ATM^ : matter ota apply update. (Usage: ATM^)"},
+#endif /* CONFIG_ENABLE_OTA_REQUESTOR */
     {(const u8 *)"ATMH", 1, atcmd_matter_help, (const u8 *)"ATMH : matter help. (Usage: ATMH)"},
 #if defined(CONFIG_ENABLE_AMEBA_DEVICE_INFO) && CONFIG_ENABLE_AMEBA_DEVICE_INFO
     {(const u8 *)"ATMI", 1, atcmd_matter_device_info, (const u8 *)"ATMI : matter device info. (Usage: ATMI)"},

@@ -14,6 +14,13 @@ OUTPUT_DIR = $(CHIPDIR)/examples/light-switch-app/ameba/build/chip
 CODEGEN_DIR = $(OUTPUT_DIR)/codegen
 
 # -------------------------------------------------------------------
+# Compiler Flags
+# -------------------------------------------------------------------
+ifeq ($(CHIP_ENABLE_SHELL), true)
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_CHIP_SHELL=1
+endif
+
+# -------------------------------------------------------------------
 # Search Directory
 # -------------------------------------------------------------------
 DIR += $(CODEGEN_DIR)/app

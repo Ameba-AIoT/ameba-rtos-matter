@@ -33,6 +33,14 @@ CODEGENDIR   := $(OUTPUT_DIR)/codegen
 include $(MATTER_MAIN_SRC)
 
 # -------------------------------------------------------------------
+# Compiler Flags
+# -------------------------------------------------------------------
+CFLAGS += -DCHIP_AMEBA_APP_TASK=1
+ifeq ($(CHIP_ENABLE_SHELL), true)
+CFLAGS += -DCONFIG_ENABLE_CHIP_SHELL=1
+endif
+
+# -------------------------------------------------------------------
 # Include Path
 # -------------------------------------------------------------------
 INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/ameba/main/include
