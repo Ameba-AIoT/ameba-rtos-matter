@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <energy_evse/ameba_energy_evse_target_config.h>
@@ -29,7 +29,6 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -41,7 +40,7 @@ public:
     EvseTargetsDelegate();
     ~EvseTargetsDelegate();
 
-    CHIP_ERROR Init(PersistentStorageDelegate * targetStore);
+    CHIP_ERROR Init(PersistentStorageDelegate *targetStore);
     void Shutdown();
 
     /**
@@ -54,7 +53,7 @@ public:
     /**
      *  @brief   This returns a reference to the existing targets
      */
-    const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & GetTargets();
+    const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> &GetTargets();
 
     /**
      * @brief   Copies a ChargingTargetSchedule into our store
@@ -67,7 +66,7 @@ public:
      * matching day then it replaces the days existing targets with the new entry
      */
     CHIP_ERROR SetTargets(
-        const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedulesChanges);
+                    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &chargingTargetSchedulesChanges);
 
     /**
      *  @brief   This deletes all targets and resets the list to empty
@@ -77,20 +76,19 @@ public:
     /**
      * Part of the FabricTable::Delegate interface. Gets called when a fabric is deleted, such as on FabricTable::Delete().
      **/
-    virtual void OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex) override;
+    virtual void OnFabricRemoved(const FabricTable &fabricTable, FabricIndex fabricIndex) override;
 
 private:
     // This is the upper bound in bytes of the TLV storage required to store the chargingTargetSchedulesList
     static uint16_t GetTlvSizeUpperBound();
 
-    CHIP_ERROR SaveTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList);
+    CHIP_ERROR SaveTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> &chargingTargetSchedulesList);
 
     // For debug purposes
-    void PrintTargets(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules);
+    void PrintTargets(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> &chargingTargetSchedules);
 
 protected:
-    enum class TargetEntryTag : uint8_t
-    {
+    enum class TargetEntryTag : uint8_t {
         kTargetEntry           = 1,
         kDayOfWeek             = 2,
         kChargingTargetsList   = 3,
@@ -112,10 +110,10 @@ private:
     DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> mChargingTargetSchedulesList;
 
     // Pointer to the PeristentStorage
-    PersistentStorageDelegate * mpTargetStore = nullptr;
+    PersistentStorageDelegate *mpTargetStore = nullptr;
 
     // Need a key to store the Charging Preference Targets which is a TLV of list of lists
-    static constexpr const char * spEvseTargetsKeyName = "g/ev/targ";
+    static constexpr const char *spEvseTargetsKeyName = "g/ev/targ";
 };
 
 } // namespace EnergyEvse

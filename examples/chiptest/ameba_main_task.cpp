@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <CHIPDeviceManager.h>
 #include <app/clusters/unit-localization-server/unit-localization-server.h>
 
@@ -24,7 +23,7 @@
 #include <matter_command.h>
 
 #include <fan_control/ameba_fan_control_manager.h>
-#include <device_energy_management/ameba_energy_management_common_main.h>
+#include <energy_evse/ameba_energy_evse_main.h>
 #include <valve_control/ameba_valve_control_delegate.h>
 #include <water_heater_management/ameba_water_heater_management_main.h>
 #include <mode_select/ameba_mode_select_manager.h>
@@ -68,19 +67,20 @@ void AppTaskInit(void)
 
     app::Clusters::ModeSelect::setSupportedModesManager(&sAmebaSupportedModesManager);
     WaterHeaterApplicationInit();
+    AllClustersEvseApplicationInit();
 
     Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
-                                                                   Clusters::UnitLocalization::TempUnitEnum::kCelsius };
+                                                                   Clusters::UnitLocalization::TempUnitEnum::kCelsius
+                                                                 };
     DataModel::List<Clusters::UnitLocalization::TempUnitEnum> unitsList(supportedUnits);
     VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetSupportedTemperatureUnits(unitsList) ==
                 CHIP_NO_ERROR);
     VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetTemperatureUnit(
-                    Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
+                                Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
     ret = SmokeCoAlarm::AmebaSmokeCoAlarmTestEventInit(1);
-    if (ret != CHIP_NO_ERROR)
-    {
+    if (ret != CHIP_NO_ERROR) {
         ChipLogProgress(Zcl, "AmebaSmokeCoAlarmTestEventInit Failed");
     }
     static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;

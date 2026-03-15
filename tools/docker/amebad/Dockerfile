@@ -2,8 +2,8 @@
 FROM ameba-rtos-matter:common
 
 # Redefine following build arguments to respective repo and tag/branch
-ARG AMEBA_MATTER_REPO=https://github.com/mikaelajiwidodo/ameba-rtos-matter.git
-ARG TAG_NAME=main-PR/green2-wip
+ARG AMEBA_MATTER_REPO=https://github.com/xshuqun/ameba-rtos-matter.git
+ARG TAG_NAME=main-PR/update_sdk_260315
 
 # Define fixed build arguments
 ARG AMBD_REPO=https://github.com/Ameba-AIoT/ameba-rtos-d.git

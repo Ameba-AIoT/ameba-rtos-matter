@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,48 +16,41 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <temperature_control/ameba_temperature_control_delegate.h>
-#include <app/clusters/temperature-control-server/CodegenIntegration.h>
+#include <app/clusters/temperature-control-server/temperature-control-server.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TemperatureControl;
 using chip::Protocols::InteractionModel::Status;
 
-static AmebaTemperatureControlDelegate * sAmebaTemperatureControlDelegate = nullptr;
+static AmebaTemperatureControlDelegate *sAmebaTemperatureControlDelegate = nullptr;
 
 CharSpan AmebaTemperatureControlDelegate::temperatureLevelOptions[] =
-        { CharSpan("Hot", 3), CharSpan("Warm", 4), CharSpan("Freezing", 8) };
+{ CharSpan("Hot", 3), CharSpan("Warm", 4), CharSpan("Freezing", 8) };
 
 const AmebaTemperatureControlDelegate::EndpointPair AmebaTemperatureControlDelegate::supportedOptionsByEndpoints
-    [MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
-        EndpointPair(1, AmebaTemperatureControlDelegate::temperatureLevelOptions, 3) // Options for Endpoint 1
-    };
+[MATTER_DM_TEMPERATURE_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT] = {
+    EndpointPair(1, AmebaTemperatureControlDelegate::temperatureLevelOptions, 3) // Options for Endpoint 1
+};
 
 uint8_t AmebaTemperatureControlDelegate::Size()
 {
-    for (auto & endpointPair : AmebaTemperatureControlDelegate::supportedOptionsByEndpoints)
-    {
-        if (endpointPair.mEndpointId == mEndpoint)
-        {
+    for (auto &endpointPair : AmebaTemperatureControlDelegate::supportedOptionsByEndpoints) {
+        if (endpointPair.mEndpointId == mEndpoint) {
             return endpointPair.mSize;
         }
     }
     return 0;
 }
 
-CHIP_ERROR AmebaTemperatureControlDelegate::Next(MutableCharSpan & item)
+CHIP_ERROR AmebaTemperatureControlDelegate::Next(MutableCharSpan &item)
 {
-    for (auto & endpointPair : AmebaTemperatureControlDelegate::supportedOptionsByEndpoints)
-    {
-        if (endpointPair.mEndpointId == mEndpoint)
-        {
-            if (endpointPair.mSize > mIndex)
-            {
+    for (auto &endpointPair : AmebaTemperatureControlDelegate::supportedOptionsByEndpoints) {
+        if (endpointPair.mEndpointId == mEndpoint) {
+            if (endpointPair.mSize > mIndex) {
                 CHIP_ERROR err = CopyCharSpanToMutableCharSpan(endpointPair.mTemperatureLevels[mIndex], item);
-                if (err != CHIP_NO_ERROR)
-                {
+                if (err != CHIP_NO_ERROR) {
                     ChipLogError(Zcl, "Error copying char span to mutable char span %s", ErrorStr(err));
                     return err;
                 }
@@ -69,19 +62,13 @@ CHIP_ERROR AmebaTemperatureControlDelegate::Next(MutableCharSpan & item)
     return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
 }
 
-AmebaTemperatureControlDelegate * TemperatureControl::GetAmebaTemperatureControlDelegate(void)
+AmebaTemperatureControlDelegate *TemperatureControl::GetAmebaTemperatureControlDelegate(void)
 {
     return sAmebaTemperatureControlDelegate;
 }
 
 CHIP_ERROR TemperatureControl::AmebaTemperatureControlDelegateInit(chip::EndpointId endpoint)
 {
-    VerifyOrReturnError(sAmebaTemperatureControlDelegate == nullptr, CHIP_ERROR_INTERNAL);
-
-    sAmebaTemperatureControlDelegate = new TemperatureControl::AmebaTemperatureControlDelegate;
-
-    VerifyOrReturnError(sAmebaTemperatureControlDelegate != nullptr, CHIP_ERROR_INTERNAL);
-
     TemperatureControl::SetDelegate(sAmebaTemperatureControlDelegate);
 
     return CHIP_NO_ERROR;
@@ -100,8 +87,7 @@ void emberAfTemperatureControlClusterInitCallback(chip::EndpointId endpoint)
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
     ret = AmebaTemperatureControlDelegateInit(endpoint);
-    if (ret != CHIP_NO_ERROR)
-    {
+    if (ret != CHIP_NO_ERROR) {
         ChipLogProgress(Zcl, "AmebaTemperatureControlDelegateInit Failed");
         return;
     }
@@ -111,4 +97,3 @@ void emberAfTemperatureControlClusterShutdownCallback(chip::EndpointId endpoint)
 {
     AmebaTemperatureControlDelegateShutdown();
 }
-

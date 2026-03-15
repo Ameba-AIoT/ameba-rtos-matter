@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
@@ -37,9 +37,9 @@ namespace EnergyEvse {
 class EVSEManufacturer : public DEMManufacturerDelegate
 {
 public:
-    EVSEManufacturer(EnergyEvseManager * aEvseInstance,
-                     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * aEPMInstance,
-                     PowerTopology::PowerTopologyInstance * aPTInstance, DeviceEnergyManagementManager * aDEMInstance)
+    EVSEManufacturer(EnergyEvseManager *aEvseInstance,
+                     ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance *aEPMInstance,
+                     PowerTopology::PowerTopologyInstance *aPTInstance, DeviceEnergyManagementManager *aDEMInstance)
     {
         mEvseInstance = aEvseInstance;
         mEPMInstance  = aEPMInstance;
@@ -49,41 +49,43 @@ public:
 
     virtual ~EVSEManufacturer() {}
 
-    EnergyEvseManager * GetEvseInstance() { return mEvseInstance; }
-
-    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * GetEPMInstance() { return mEPMInstance; }
-
-    EnergyEvseDelegate * GetEvseDelegate()
+    EnergyEvseManager *GetEvseInstance()
     {
-        if (mEvseInstance)
-        {
+        return mEvseInstance;
+    }
+
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance *GetEPMInstance()
+    {
+        return mEPMInstance;
+    }
+
+    EnergyEvseDelegate *GetEvseDelegate()
+    {
+        if (mEvseInstance) {
             return mEvseInstance->GetDelegate();
         }
         return nullptr;
     }
 
-    ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate * GetEPMDelegate()
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementDelegate *GetEPMDelegate()
     {
-        if (mEPMInstance)
-        {
+        if (mEPMInstance) {
             return mEPMInstance->GetDelegate();
         }
         return nullptr;
     }
 
-    PowerTopology::PowerTopologyDelegate * GetPTDelegate()
+    PowerTopology::PowerTopologyDelegate *GetPTDelegate()
     {
-        if (mPTInstance)
-        {
+        if (mPTInstance) {
             return mPTInstance->GetDelegate();
         }
         return nullptr;
     }
 
-    DeviceEnergyManagementDelegate * GetDEMDelegate()
+    DeviceEnergyManagementDelegate *GetDEMDelegate()
     {
-        if (mDEMInstance)
-        {
+        if (mDEMInstance) {
             return mDEMInstance->GetDelegate();
         }
         return nullptr;
@@ -97,22 +99,22 @@ public:
     // The PowerAdjustEnd event needs to report the approximate energy used by the ESA during the session.
     int64_t GetApproxEnergyDuringSession() override;
     CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
-                                                              AdjustmentCauseEnum cause) override;
+            AdjustmentCauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion() override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTime,
-                                                                  AdjustmentCauseEnum cause) override;
+            AdjustmentCauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementPauseRequest(const uint32_t durationS, AdjustmentCauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion() override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause) override;
     CHIP_ERROR HandleDeviceEnergyManagementCancelRequest() override;
     CHIP_ERROR HandleModifyForecastRequest(
-        const uint32_t forecastID,
-        const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
-        AdjustmentCauseEnum cause) override;
+                    const uint32_t forecastID,
+                    const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> &slotAdjustments,
+                    AdjustmentCauseEnum cause) override;
     CHIP_ERROR RequestConstraintBasedForecast(
-        const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
-        AdjustmentCauseEnum cause) override;
+                    const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> &constraints,
+                    AdjustmentCauseEnum cause) override;
 
     /**
      * @brief   Called at start up to apply hardware settings
@@ -127,16 +129,16 @@ public:
     /**
      * @brief   Main Callback handler from delegate to user code
      */
-    static void ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg);
+    static void ApplicationCallbackHandler(const EVSECbInfo *cb, intptr_t arg);
 
     /**
      * @brief   Helper functions used by ComputeChargingSchedule
      */
-    CHIP_ERROR DetermineRequiredEnergy(EnergyEvseDelegate * dg, int64_t & requiredEnergy_mWh,
-                                       DataModel::Nullable<Percent> & targetSoC,
-                                       DataModel::Nullable<int64_t> & targetAddedEnergy_mWh);
+    CHIP_ERROR DetermineRequiredEnergy(EnergyEvseDelegate *dg, int64_t &requiredEnergy_mWh,
+                                       DataModel::Nullable<Percent> &targetSoC,
+                                       DataModel::Nullable<int64_t> &targetAddedEnergy_mWh);
 
-    CHIP_ERROR ComputeStartTime(EnergyEvseDelegate * dg, DataModel::Nullable<uint32_t> & startTime_epoch_s,
+    CHIP_ERROR ComputeStartTime(EnergyEvseDelegate *dg, DataModel::Nullable<uint32_t> &startTime_epoch_s,
                                 uint32_t targetTime_epoch_s, uint32_t now_epoch_s, int64_t requiredEnergy_mWh);
     /**
      * @brief   Simple example to demonstrate how an EVSE can compute the start time
@@ -220,7 +222,7 @@ public:
     /**
      * @brief   Timer expiry callback to handle fake load
      */
-    static void FakeReadingsTimerExpiry(System::Layer * systemLayer, void * manufacturer);
+    static void FakeReadingsTimerExpiry(System::Layer *systemLayer, void *manufacturer);
 
     /*
      * @brief   Updates the parameters used to generate fake power and energy readings
@@ -230,10 +232,10 @@ public:
     void UpdateEVFakeReadings(const Amperage_mA maximumChargeCurrent);
 
 private:
-    EnergyEvseManager * mEvseInstance;
-    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance * mEPMInstance;
-    PowerTopology::PowerTopologyInstance * mPTInstance;
-    DeviceEnergyManagementManager * mDEMInstance;
+    EnergyEvseManager *mEvseInstance;
+    ElectricalPowerMeasurement::ElectricalPowerMeasurementInstance *mEPMInstance;
+    PowerTopology::PowerTopologyInstance *mPTInstance;
+    DeviceEnergyManagementManager *mDEMInstance;
 
     int64_t mLastChargingEnergyMeter    = 0;
     int64_t mLastDischargingEnergyMeter = 0;
@@ -248,10 +250,9 @@ private:
  *
  * This function is typically found in main.cpp or wherever the singleton is created.
  */
-EVSEManufacturer * GetEvseManufacturer();
+EVSEManufacturer *GetEvseManufacturer();
 
 } // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-#include <power_topology/ameba_power_topology_delegate.h>

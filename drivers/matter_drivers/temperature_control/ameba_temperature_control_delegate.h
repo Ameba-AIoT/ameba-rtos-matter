@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/temperature-control-server/supported-temperature-levels-manager.h>
-#include <app/clusters/temperature-control-server/temperature-control-server.h>
+//#include <app/clusters/temperature-control-server/temperature-control-server.h>
 #include <app/util/config.h>
 
 namespace chip {
@@ -33,13 +32,12 @@ namespace TemperatureControl {
 
 class AmebaTemperatureControlDelegate : public SupportedTemperatureLevelsIteratorDelegate
 {
-    struct EndpointPair
-    {
+    struct EndpointPair {
         EndpointId mEndpointId;
-        CharSpan * mTemperatureLevels;
+        CharSpan *mTemperatureLevels;
         uint8_t mSize;
 
-        EndpointPair(EndpointId aEndpointId, CharSpan * aTemperatureLevels, uint8_t aSize) :
+        EndpointPair(EndpointId aEndpointId, CharSpan *aTemperatureLevels, uint8_t aSize) :
             mEndpointId(aEndpointId), mTemperatureLevels(aTemperatureLevels), mSize(aSize)
         {}
 
@@ -53,12 +51,12 @@ public:
 
     uint8_t Size() override;
 
-    CHIP_ERROR Next(MutableCharSpan & item) override;
+    CHIP_ERROR Next(MutableCharSpan &item) override;
 
     ~AmebaTemperatureControlDelegate() {}
 };
 
-AmebaTemperatureControlDelegate * GetAmebaTemperatureControlDelegate(void);
+AmebaTemperatureControlDelegate *GetAmebaTemperatureControlDelegate(void);
 CHIP_ERROR AmebaTemperatureControlDelegateInit(chip::EndpointId endpoint);
 void AmebaTemperatureControlDelegateShutdown(void);
 
