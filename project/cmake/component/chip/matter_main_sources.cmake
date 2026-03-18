@@ -17,6 +17,47 @@ list(APPEND LIB_CHIP_CORE_INC_PATH
 
 )
 
+if(CONFIG_AMEBARTOS_V1_2)
+list(APPEND LIB_CHIP_CORE_INC_PATH
+    ${BASEDIR}/component/file_system/kv
+    ${BASEDIR}/component/lwip/api
+    ${LWIP_DIR}/port/realtek
+    ${LWIP_DIR}/port/realtek/freertos
+    ${LWIP_DIR}/src/include
+    ${FREERTOS_DIR}/include
+    ${BASEDIR}/component/os/os_wrapper/include
+    ${BASEDIR}/component/os/freertos/heap_trace
+    ${MBEDTLS_DIR}/hw_alt
+    ${MBEDTLS_DIR}/include
+    ${BASEDIR}/component/wifi/api
+    ${BASEDIR}/component/wifi/common
+    ${BASEDIR}/component/wifi/driver/include
+)
+if(CONFIG_AMEBADPLUS)
+list(APPEND LIB_CHIP_CORE_INC_PATH
+    ${BASEDIR}/component/soc/amebadplus/app/monitor/include
+    ${BASEDIR}/component/soc/amebadplus/hal/include
+    ${BASEDIR}/component/soc/amebadplus/hal/src
+    ${BASEDIR}/component/soc/amebadplus/misc
+)
+elseif(CONFIG_AMEBALITE)
+list(APPEND LIB_CHIP_CORE_INC_PATH
+    ${BASEDIR}/component/soc/amebalite/app/monitor/include
+    ${BASEDIR}/component/soc/amebalite/hal/include
+    ${BASEDIR}/component/soc/amebalite/hal/src
+    ${BASEDIR}/component/soc/amebalite/misc
+)
+elseif(CONFIG_AMEBASMART)
+list(APPEND LIB_CHIP_CORE_INC_PATH
+    ${FREERTOS_DIR}/portable/GCC/ARM_CA32
+    ${BASEDIR}/component/soc/amebasmart/app/monitor/include
+    ${BASEDIR}/component/soc/amebasmart/hal/include
+    ${BASEDIR}/component/soc/amebasmart/hal/src
+    ${BASEDIR}/component/soc/amebasmart/misc
+)
+endif()
+endif()
+
 ameba_list_append(private_includes
 
     # ${GLOBAL_INTERFACE_INCLUDES} #not needed

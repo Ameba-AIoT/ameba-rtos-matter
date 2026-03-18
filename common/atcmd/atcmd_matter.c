@@ -123,6 +123,8 @@ void fATmattersecureheap(void *arg)
 
 static u32 fATmatterhelp(u16 argc, u8 *argv[]);
 
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
 CMD_TABLE_DATA_SECTION
 const COMMAND_TABLE matter_atcmd[] = {
     {(const u8 *)"ATM$", 0, fATchipapp,          (const u8 *)"ATM$ : factory reset. (Usage: ATM$)"},
@@ -134,6 +136,29 @@ const COMMAND_TABLE matter_atcmd[] = {
     {(const u8 *)"ATMV", 0, fATmattersecureheap, (const u8 *)"ATMV : Secure Heap Status. (Usage: ATMV)"},
 #endif
 };
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+CMD_TABLE_DATA_SECTION
+const COMMAND_TABLE matter_atcmd[] = {
+    {(const char *)"ATM$", fATchipapp},
+    {(const char *)"ATM%", fATchipapp1},
+    {(const char *)"ATM^", fATchipapp2},
+    {(const char *)"ATMH", fATmatterhelp},
+    {(const char *)"ATMS", fATmattershell},
+#if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
+    {(const char *)"ATMV", fATmattersecureheap},
+#endif
+};
+const char* matter_atcmd_help[] = {
+    {(const char *)"ATM$ : factory reset. (Usage: ATM$)"},
+    {(const char *)"ATM% : matter ota query image. (Usage: ATM%)"},
+    {(const char *)"ATM^ : matter ota apply update. (Usage: ATM^)"},
+    {(const char *)"ATMH : matter help. (Usage: ATMH)"},
+    {(const char *)"ATMS : matter client console. (Usage: ATMS switch / ATMS manual)"},
+#if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
+    {(const char *)"ATMV : Secure Heap Status. (Usage: ATMV)"},
+#endif
+};
+#endif
 
 static u32 fATmatterhelp(u16 argc, u8 *argv[])
 {
@@ -141,10 +166,18 @@ static u32 fATmatterhelp(u16 argc, u8 *argv[])
     printf("\r\nMatter AT Commands List\r\n\r\n");
     for(index = 0 ; index < (sizeof(matter_atcmd) / sizeof(COMMAND_TABLE)); index++)
     {
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
         if( matter_atcmd[index].msg )
         {
             printf("    %s\n",matter_atcmd[index].msg);
         }
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+        if( matter_atcmd_help[index] )
+        {
+            printf("    %s\n",matter_atcmd_help[index]);
+        }
+#endif
     }
     printf("\r\n");
     return 0;

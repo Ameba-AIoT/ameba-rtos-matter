@@ -103,7 +103,8 @@ typedef enum {
     MATTER_WIFI_EVENT_MAX,
 } matter_wifi_event;
 
-#if defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
+#if (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
 
 /******************************************************
  *         WiFi Modes

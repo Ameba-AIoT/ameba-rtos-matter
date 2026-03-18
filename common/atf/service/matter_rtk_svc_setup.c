@@ -23,11 +23,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-// #include <assert.h>
-// #include <string.h>
-
 #include <common/debug.h>
-// #include <common/runtime_svc.h>
 
 #include <stdint.h>
 #include <matter_rtk_svc_setup.h>

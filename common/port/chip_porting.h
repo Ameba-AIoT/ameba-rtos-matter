@@ -46,7 +46,8 @@ extern "C" {
 #define F_BT_LE_USE_STATIC_RANDOM_ADDR      1
 #endif
 
-#if defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
+#if (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
 /** @brief  Redefine Return Codes */
 #define RTW_SUCCESS RTK_SUCCESS
 #define RTW_ERROR   RTK_FAIL

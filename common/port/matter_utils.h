@@ -104,6 +104,46 @@ int32_t ReadFactory(uint8_t *buffer, uint16_t *pfactorydata_len);
  */
 int32_t DecodeFactory(uint8_t *buffer, FactoryData *fdp, uint16_t data_len);
 
+#if CONFIG_ENABLE_AMEBA_OTP
+
+/******************************************************
+ *               OTP Data Functions
+ ******************************************************/
+
+/**
+ * @brief  Read data from OTP.
+ * @param[in]  addr: Address of the OTP.
+ * @param[out]  data: Pointer to the data read from the OTP.
+ * @param[in]  length: Length of the OTP data.
+ * @returns  Total bytes read, -1 if failed.
+ */
+int32_t ReadFromOtp(uint32_t addr, uint8_t *data, uint8_t length);
+
+/**
+ * @brief  Write data to OTP.
+ * @param[in]  addr: Address of the OTP.
+ * @param[in]  data: Pointer to the data to be written to the OTP.
+ * @param[in]  length: Length of the OTP data.
+ * @returns  Total bytes written, -1 if failed.
+ */
+int32_t WriteToOtp(uint32_t addr, uint8_t *data, uint8_t length);
+
+/**
+ * @brief  Read DAC Private Key from the OTP.
+ * @param[out]  dacPrivateKey: Pointer to the DAC Private Key read from the OTP.
+ * @returns  Total bytes read, -1 if failed.
+ */
+int32_t ReadDacPrivateKeyFromOtp(uint8_t *dacPrivateKey);
+
+/**
+ * @brief  Write DAC Private Key to the OTP.
+ * @param[in]  dacPrivateKey: Pointer to the DAC Private Key to be written to the OTP.
+ * @returns  Total bytes written, -1 if failed.
+ */
+int32_t WriteDacPrivateKeyToOtp(uint8_t *dacPrivateKey);
+
+#endif
+
 #if defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
 #include <mbedtls/ecp.h>
 

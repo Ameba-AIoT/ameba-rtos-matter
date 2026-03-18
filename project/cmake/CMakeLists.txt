@@ -1,7 +1,11 @@
 if(CONFIG_MATTER_EN)
+
 ##########################################################################################
 ## * MATTER DEFINITIONS
-set(BASEDIR ${c_BASEDIR})
+set(BASEDIR      ${c_BASEDIR})
+set(FREERTOS_DIR ${c_FREERTOS_DIR})
+set(MBEDTLS_DIR  ${c_MBEDTLS_DIR})
+set(LWIP_DIR     ${c_LWIP_DIR})
 
 #Set everything in matter.cmake
 include(matter.cmake)

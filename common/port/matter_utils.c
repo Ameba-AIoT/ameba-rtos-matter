@@ -25,6 +25,10 @@
 #elif defined(CONFIG_AMEBASMART)
 #define MATTER_FACTORY_DATA (0x08644000 - SPI_FLASH_BASE)
 #endif
+#if CONFIG_ENABLE_AMEBA_OTP
+#define DAC_PRIV_KEY_LENGTH  32
+#define DAC_PRIV_KEY_ADDRESS 0x400
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -409,6 +413,85 @@ encrypt_exit:
 exit:
     return ret;
 }
+
+#if CONFIG_ENABLE_AMEBA_OTP
+
+int32_t ReadFromOtp(uint32_t addr, uint8_t *data, uint8_t length)
+{
+    uint32_t bytes_read = 0;
+
+    for(uint32_t index = 0; index < length; index++)
+    {
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+        if(OTP_Read8(addr + index, data + index) == _FAIL)
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+        if(OTP_Read8(addr + index, data + index) == RTK_FAIL)
+#endif
+        {
+            printf("[%s] OTP_Read8(0x%03x) failed!\n", __func__, addr + index);
+            return -1;
+        }
+        bytes_read += 1;
+    }
+
+    return bytes_read;
+}
+
+int32_t WriteToOtp(uint32_t addr, uint8_t *data, uint8_t length)
+{
+    uint8_t  buffer        = 0;
+    uint32_t bytes_written = 0;
+
+    for(uint32_t index = 0; index < length; index++)
+    {
+        // check OTP value of the address
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+        if(OTP_Read8(addr + index, &buffer) == _SUCCESS)
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+        if(OTP_Read8(addr + index, &buffer) == RTK_SUCCESS)
+#endif
+        {
+            // Two conditions to write on OTP:
+            // 1. OTP has not been written (buffer == 0xff)
+            // 2. The data that is going to be written is not 0xff (*(data + index) != 0xff)
+            if((buffer == 0xff) && (*(data + index) != 0xff))
+            {
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+                if(OTP_Write8(addr + index, *(data + index)) == _FAIL)
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+                if(OTP_Write8(addr + index, *(data + index)) == RTK_FAIL)
+#endif
+                {
+                    printf("[%s] OTP_Write8(0x%03x) failed!\n", __func__, addr + index);
+                    return -1;
+                }
+                bytes_written += 1;
+            }
+        }
+        else
+        {
+            printf("[%s] OTP_Read8(0x%03x) failed!\n", __func__, addr + index);
+            return -1;
+        }
+    }
+
+    return bytes_written;
+}
+
+int32_t WriteDacPrivateKeyToOtp(uint8_t *dacPrivateKey)
+{
+    return WriteToOtp(DAC_PRIV_KEY_ADDRESS, dacPrivateKey, DAC_PRIV_KEY_LENGTH);
+}
+
+int32_t ReadDacPrivateKeyFromOtp(uint8_t *dacPrivateKey)
+{
+    return ReadFromOtp(DAC_PRIV_KEY_ADDRESS, dacPrivateKey, DAC_PRIV_KEY_LENGTH);
+}
+
+#endif
 
 #if defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
 #if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)

@@ -66,7 +66,8 @@ ameba_list_append(private_includes
     ${MBEDTLS_DIR}/include/mbedtls
     ${MBEDTLS_DIR}/library
     ${c_CMPT_SSL_DIR}/mbedtls_ram_map/rom
-    ${c_SOC_PROJECT_DIR}/menuconfig/project_ap
+    # ${c_SOC_PROJECT_DIR}/menuconfig/project_ap
+    ${c_MENUCONFIG_DIR}/project_${c_MCU_PROJECT_NAME}
 )
 #ameba-rtos-matter includes
 ameba_list_append(private_includes
@@ -119,7 +120,7 @@ ameba_list_append(private_sources
 )
 #matter modified memory_buffer_alloc.c to print debugger
 ameba_list_append(private_sources
-    ${c_CMPT_MATTER_DIR}/common/mbedtls/mbedtls-3.6.2/library/memory_buffer_alloc.c
+    ${MATTER_DIR}/common/mbedtls/mbedtls-3.6.2/library/memory_buffer_alloc.c
 )
 #matter_mbedtls source
 ameba_list_append(private_sources

@@ -1,6 +1,5 @@
 ameba_list_append(matter_defintions
 
-    CONFIG_AMEBARTOS_V1_1=1
     CONFIG_MATTER=1
 
     # chip device options
@@ -53,6 +52,9 @@ endif()
 ameba_list_append(matter_defintions
     # matter factory data encryption options
     CONFIG_ENABLE_FACTORY_DATA_ENCRYPTION=0
+
+    # matter OTP
+    CONFIG_ENABLE_AMEBA_OTP=0
 
     # matter kv options
     CONFIG_ENABLE_KV_ENCRYPTION=0

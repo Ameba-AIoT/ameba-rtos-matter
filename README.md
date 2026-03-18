@@ -24,24 +24,20 @@ Please read the [Important Notice](docs/matter_important_notice.md) for importan
 
 Feel free to explore our curated list of supported ICs below to find the best match for your project.
 
-| Platform Name         | Chipset(s)                        |
-|-----------------------|-----------------------------------|
-| AmebaZ2 / AmebaZ2plus | RTL8720CM                         |
-| AmebaD                | RTL8721DM                         |
-| AmebaDplus            | RTL8721Dx                         |
-| AmebaLite             | RTL8720E / RTL8726E / RTL8713E    |
-| AmebaSmart            | RTL8730E                          |
+| Chip      |       Matter Support       | Supported SDK Branch |
+|:--------- |:--------------------------:|:--------------------:|
+| RTL8720C  |![alt text][supported]      | main, release/*      |
+| RTL872xD  |![alt text][supported]      | main, release/*      |
+| RTL8721Dx |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8726E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8720E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8713E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8710E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8730E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8721F  |![alt text][not-supported]  |           -          |
 
-> ⚠️ **Notice**: This `ameba-rtos/release/v1.5` branch supports **AmebaDplus**, **AmebaLite**, and **AmebaSmart**.
->
-> For details, examples, and support targeting **AmebaZ2**, **AmebaZ2plus** and **AmebaD**, please switch to the appropriate release branches:
->
-> - [release/v1.5](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.5)
-> - [release/v1.4.2](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.4.2)
-> - [release/v1.4](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.4)
-> - [release/v1.3](https://github.com/Ameba-AIoT/ameba-rtos-matter/tree/release/v1.3)
-
-Checkout the [Application Notes](docs/AN0204%20Realtek%20Matter%20application%20note.en.pdf) to learn more about Realtek's Matter solution.
+[supported]: https://img.shields.io/badge/supported-brightgreen
+[not-supported]: https://img.shields.io/badge/not%20supported-lightgrey
 
 ## Documentation
 

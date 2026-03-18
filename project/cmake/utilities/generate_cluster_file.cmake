@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.6)
-
 # Generate Cluster File
 
 file(MAKE_DIRECTORY ${CODEGEN_DIR}/zap-generated)
