@@ -20,13 +20,20 @@ Learn how to integrate Realtek's Matter solution with the Ameba RTOS platform. E
 
 Feel free to explore our curated list of supported ICs below to find the best match for your project.
 
-1. AmebaZ2    (RTL8710C)
-2. AmebaD     (RTL8721D)
-3. AmebaDplus (RTL8721Dx)
-4. AmebaLite  (RTL8720EA / RTL8726EA)
-5. AmebaSmart (RTL8730E)
+| Chip      |       Matter Support       | Supported SDK Branch |
+|:--------- |:--------------------------:|:--------------------:|
+| RTL8720C  |![alt text][supported]      | main, release/*      |
+| RTL872xD  |![alt text][supported]      | main, release/*      |
+| RTL8721Dx |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8726E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8720E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8713E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8710E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8730E  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8721F  |![alt text][not-supported]  |           -          |
 
-Checkout the [Application Notes](https://github.com/Ameba-AIoT/ameba-rtos-matter/blob/main/docs/AN0204%20Realtek%20Matter%20application%20note.en.pdf) to learn more about Realtek's Matter solution.
+[supported]: https://img.shields.io/badge/supported-brightgreen
+[not-supported]: https://img.shields.io/badge/not%20supported-lightgrey
 
 ## Documentation
 
