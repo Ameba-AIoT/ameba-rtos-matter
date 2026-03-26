@@ -1,4 +1,4 @@
-# Matter (previously CHIP) on AmebaSmart
+# Matter (previously CHIP) on Ameba RTOS
 
 - [Ameba RTOS v1.2 SDK](#ameba-rtos-v12-sdk)
     - [Get Ameba SDK & Matter SDK](#get-ameba-sdk--matter-sdk)
@@ -71,7 +71,7 @@ Navigate to the `ameba-rtos-matter` directory:
 
     cd ameba-rtos-matter
 
-    ameba.py soc RTL8730E
+    ameba.py soc < RTL8721Dx / RTL8726E / RTL8720E / RTL8713E / RTL8710E / RTL8730E >
 
 ### Build CHIP library by GN and Final Firmware
 
@@ -114,39 +114,73 @@ ameba.py menuconfig
 
 Within `ameba-rtos-matter` folder, start building the Matter libraries and the final firmware with the following command:
 
+<details>
+  <summary>With Matter helper command (Recommended!)</summary>
+
     matter_build_proj all_clusters
 
-If user wishes not to use the Matter helper command, please run the following command:
+</details>
+
+<details>
+  <summary>Without Matter helper command</summary>
 
     ameba.py build -D EXAMPLE="$PWD" MATTER_EXAMPLE=all_clusters
+
+</details>
 
 #### Clean Ameba Matter libraries and application
 
 Within `ameba-rtos-matter` folder, clean the whole project with the following command:
 
+<details>
+  <summary>With Matter helper command (Recommended!)</summary>
+
     matter_clean_proj
 
-If user wishes not to use the Matter helper command, please run the following command:
+</details>
 
-    cd build_RTL8730E/build
+<details>
+  <summary>Without Matter helper command</summary>
 
-    ninja clean_matter_libs
+    cd build_RTL87XXX/build && ninja clean_matter_libs && cd ../../ && ameba.py clean
 
-    cd ../../
-
-    ameba.py clean
+</details>
 
 ### Flash Image using ameba.py command
 
-The generated image is found in the ameba-rtos sdk `ameba-rtos-matter/build_RTL8730E/`, both `km4_boot_all.bin` and `km0_km4_ca32_app.bin` will be flashed.
+The generated images are found in the build folder `build_RTL87XXX` of `ameba-rtos-matter` sdk:
+- bootloader image: `km4_boot_all.bin`
+- application image:
+    - RTL8721Dx: `km0_km4_app.bin`
+    - RTL8726E / RTL8720E / RTL8713E / RTL8710E: `kr4_km4_app.bin`
+    - RTL8730E: `km0_km4_ca32_app.bin`
 
-Within `ameba-rtos-matter` folder, flash the image to the Ameba port (e.g. `/dev/ttyUSB0`).
+Both bootloader and appication images will be flashed. Within `ameba-rtos-matter` folder, flash the image to the Ameba port (e.g. `/dev/ttyUSB0`).
 
     ameba.py flash -p /dev/ttyUSB0
 
-If the app image is too large, please add the --image/-i option
+If the app image is too large, please add the --image/-i option:
+
+<details>
+  <summary>Complete flash command to RTL8721Dx</summary>
+
+    ameba.py flash -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08014000 -i km0_km4_app.bin 0x08014000 0x08300000
+
+</details>
+
+<details>
+  <summary>Complete flash command to RTL8726E / RTL8720E / RTL8713E / RTL8710E</summary>
+
+    ameba.py flash -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08014000 -i kr4_km4_app.bin 0x08014000 0x08300000
+
+</details>
+
+<details>
+  <summary>Complete flash command to RTL8730E</summary>
 
     ameba.py flash -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08040000 -i km0_km4_ca32_app.bin 0x08040000 0x08340000
+
+</details>
 
 ### Monitor Ameba Log using ameba.py command
 
@@ -222,13 +256,19 @@ Navigate to the `ameba-rtos` directory:
 
 ### Build CHIP library by GN and Final Firmware
 
+> [!NOTE]
+> Project directory for each IC is defined as the following:
+> - RTL8721Dx: `ameba-rtos/amebadplus_gcc_project/`
+> - RTL8726E / RTL8720E / RTL8713E / RTL8710E: `ameba-rtos/amebalite_gcc_project/`
+> - RTL8730E: `ameba-rtos/amebasmart_gcc_project/`
+
 In this context, we will demostrate building of all-clusters-app.
 
 #### Enable Matter Settings
 
-Navigate to the `amebasmart_gcc_project` directory:
+Navigate to the corresponding project directory based on the IC used:
 
-    cd ameba-rtos/amebasmart_gcc_project/
+    cd ameba-rtos/amebaxxx_gcc_project/
 
 Menuconfig for matter:
 - To enable Matter, under `CONFIG APPLICATION`, select `Matter Config`, and enable `Enable Matter`.
@@ -241,31 +281,55 @@ python menuconfig.py
 
 #### Build Matter Libraries and Final Firmware
 
-Within `amebasmart_gcc_project` folder, start building the Matter libraries and the final firmware with the following command:
+Within the corresponding project directory, start building the Matter libraries and the final firmware with the following command:
 
     python build.py -D MATTER_EXAMPLE=all_clusters
 
 #### Clean Ameba Matter libraries and application
 
-Within `amebasmart_gcc_project` folder, clean the whole project with the following command:
+Within the corresponding project directory, clean the whole project with the following command:
 
     cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
 
 ### Flash Image using Python script
 
-The generated image is found in the ameba-rtos sdk `ameba-rtos/amebasmart_gcc_project`, both `km4_boot_all.bin` and `km0_km4_ca32_app.bin` will be flashed.
+The generated images are found in the project directory of `ameba-rtos` sdk:
+- bootloader image: `km4_boot_all.bin`
+- application image:
+    - RTL8721Dx: `km0_km4_app.bin`
+    - RTL8726E / RTL8720E / RTL8713E / RTL8710E: `kr4_km4_app.bin`
+    - RTL8730E: `km0_km4_ca32_app.bin`
 
-Within `amebasmart_gcc_project` folder, flash the image to the Ameba port (e.g. `/dev/ttyUSB0`).
+Both bootloader and appication images will be flashed. Within the corresponding project directory, flash the image to the Ameba port (e.g. `/dev/ttyUSB0`).
 
     python flash.py -p /dev/ttyUSB0
 
-If the app image is too large, please add the --image/-i option
+If the app image is too large, please add the --image/-i option:
+
+<details>
+  <summary>Complete flash command to RTL8721Dx</summary>
+
+    python flash.py -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08014000 -i km0_km4_app.bin 0x08014000 0x08300000
+
+</details>
+
+<details>
+  <summary>Complete flash command to RTL8726E / RTL8720E / RTL8713E / RTL8710E</summary>
+
+    python flash.py -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08014000 -i kr4_km4_app.bin 0x08014000 0x08300000
+
+</details>
+
+<details>
+  <summary>Complete flash command to RTL8730E</summary>
 
     python flash.py -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08020000 -i km0_km4_ca32_app.bin 0x08020000 0x08400000
 
+</details>
+
 ### Monitor Ameba Log using Python script
 
-Within `amebasmart_gcc_project` folder, monitor Ameba log through the Ameba port (e.g. `/dev/ttyUSB0`).
+Within the corresponding project directory, monitor Ameba log through the Ameba port (e.g. `/dev/ttyUSB0`).
 
     python monitor.py -p /dev/ttyUSB0 -b 1500000
 
@@ -280,7 +344,7 @@ Create and enter new directory
     mkdir dev
     cd dev
 
-Get ameba-rtos v1.1 SDK + integrated patch + matter v1.5 patch, please contact our FAE to get the SDKs
+Get ameba-rtos v1.0 SDK + integrated patch + matter v1.5 patch, please contact our FAE to get the SDKs
 
 To check out Matter repository:
 
@@ -321,18 +385,30 @@ Navigate to the `ameba-rtos` directory:
 
 ### Build CHIP library by GN and Final Firmware
 
+> [!NOTE]
+> Project directory for each IC is defined as the following:
+> - RTL8721Dx: `ameba-rtos/amebadplus_gcc_project/`
+> - RTL8726E / RTL8720E / RTL8713E / RTL8710E: `ameba-rtos/amebalite_gcc_project/`
+> - RTL8730E: `ameba-rtos/amebasmart_gcc_project/`
+
 In this context, we will demostrate building of all-clusters-app.
 
-#### Make Matter Libraries
+#### Enable Matter Settings
 
-Navigate to the `amebasmart_gcc_project` directory:
+> [!NOTE]
+> Location of `Mattter Config` and `SSL Config` in `menuconfig`:
+> - RTL8721Dx / RTL8726E / RTL8720E / RTL8713E / RTL8710E: located under `MENUCONFIG FOR KM4 CONFIG`
+> - RTL8730E: located under `MENUCONFIG FOR CA32 CONFIG`
 
-    cd ameba-rtos/amebasmart_gcc_project/
+Navigate to the corresponding project directory based on the IC used:
+
+    cd ameba-rtos/amebaxxx_gcc_project/
 
 Menuconfig for matter:
-- To enable Matter, select `MENUCONFIG FOR CA32 CONFIG`, then select `Matter Config`, and enable `Enable Matter`.
+
+- To enable Matter, navigate to `Matter Config`, and enable `Enable Matter`.
     - Under the same config, set the `Matter Version` to `MATTER_V_1_5`
-- Change mbedtls version to matter. Under `MENUCONFIG FOR CA32 CONFIG`, select `SSL Config`, then set the `MBEDTLS Version` to `MBEDTLS_MATTER`
+- Change mbedtls version to matter. Navigate to `SSL Config`, then enable `Matter MBEDTLS Enable`
 - If you want to support Matter BLE, under `CONFIG BT`, enable `BT Example Demo`, then select `BLE_Matter_Adapter`, and save the configuration.
 - If you want to support [Matter ESF](matter_commissioning_and_control_guide.md#enable-matter-esf), under `Matter Config`, enable `Enable Matter Terms and Condition`
 
@@ -340,32 +416,43 @@ Menuconfig for matter:
 make menuconfig
 ```
 
-Navigate to the `amebasmart_gcc_project` directory:
+#### Make Matter Libraries
 
-    cd ameba-rtos/amebasmart_gcc_project/
+Within the corresponding project directory, start building the Matter libraries with:
 
-Start building the Matter libraries with:
+<details>
+  <summary>Matter library build command for RTL8721Dx / RTL8726E / RTL8720E / RTL8713E / RTL8710E</summary>
+
+    make -C project_km4/asdk all_clusters
+
+</details>
+
+<details>
+  <summary>Matter library build command for RTL8730E</summary>
 
     make -C project_ap/asdk all_clusters
 
+</details>
+
 #### Make Final Firmware
 
-Ensure the same menuconfig settings as described in `Make Matter Libraries`and continue building the final firmware.
-
-    cd ameba-rtos/amebasmart_gcc_project/
-
-Build the final firmware:
+Within the corresponding project directory, build the final firmware:
 
     make all MATTER_EXAMPLE=chiptest
 
 #### Clean Ameba Matter libraries and application
 
-    cd ameba-rtos/amebasmart_gcc_project/
+Within the corresponding project directory, clean the whole project with the following command:
 
     make clean
 
 ### Flash Image using Windows Image Tool
 
-The generated image is found in the ameba-rtos sdk `ameba-rtos/amebasmart_gcc_project/`, both `km4_boot_all.bin` and `km0_km4_ca32_app.bin` will be flashed.
+The generated images are found in the project directory of `ameba-rtos` sdk:
+- bootloader image: `km4_boot_all.bin`
+- application image:
+    - RTL8721Dx: `km0_km4_app.bin`
+    - RTL8726E / RTL8720E / RTL8713E / RTL8710E: `kr4_km4_app.bin`
+    - RTL8730E: `km0_km4_ca32_app.bin`
 
-- Find more detail in [ameba-rtos/README.md](https://github.com/Ameba-AIoT/ameba-rtos/blob/master/README.md#flashing)
+Both bootloader and appication images will be flashed. Find more detail in [ameba-rtos/README.md](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0/README.md#flashing)
