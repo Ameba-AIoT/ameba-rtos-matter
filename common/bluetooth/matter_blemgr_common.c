@@ -23,13 +23,10 @@ extern int ble_matter_adapter_peripheral_main(uint8_t enable);
 extern int ble_matter_adapter_start_adv(void);
 extern int ble_matter_adapter_stop_adv(void);
 extern int ble_matter_adapter_config_adv(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t *padv_data, uint8_t padv_data_length);
-extern uint16_t ble_matter_adapter_get_mtu(uint8_t conn_id);
-extern int ble_matter_adapter_disconnect(uint8_t connect_id);
-extern int ble_matter_adapter_send_indication(uint8_t connect_id, uint8_t *data, uint16_t data_length);
-
-#if CONFIG_BLE_MATTER_MULTI_ADV_ON
-extern uint8_t customer_adv_id;
-#endif
+extern uint16_t ble_matter_adapter_get_mtu(uint16_t conn_handle);
+extern int ble_matter_adapter_get_device_name(char *device_name);
+extern int ble_matter_adapter_disconnect(uint16_t conn_handle);
+extern int ble_matter_adapter_send_indication(uint16_t conn_handle, uint8_t *data, uint16_t data_length);
 
 /*============================================================================*
  *                              Functions
@@ -38,7 +35,12 @@ extern uint8_t customer_adv_id;
 int matter_blemgr_init(void)
 {
     ble_matter_adapter_peripheral_main(1);
+    return 0;
+}
 
+int matter_blemgr_deinit(void)
+{
+    ble_matter_adapter_peripheral_main(0);
     return 0;
 }
 
@@ -71,12 +73,12 @@ int matter_blemgr_config_adv(uint16_t adv_int_min, uint16_t adv_int_max, uint8_t
     return 0;
 }
 
-uint16_t matter_blemgr_get_mtu(uint8_t connect_id)
+uint16_t matter_blemgr_get_mtu(uint16_t conn_handle)
 {
     int ret;
     uint16_t mtu_size;
 
-    mtu_size = ble_matter_adapter_get_mtu(connect_id);
+    mtu_size = ble_matter_adapter_get_mtu(conn_handle);
     if (mtu_size != 0xFFFF)
     {
         printf("printing MTU size\n");
@@ -94,27 +96,19 @@ int matter_blemgr_set_device_name(char *device_name, uint8_t device_name_length)
         return 1;
     }
 
-    int ret = rtk_bt_le_gap_set_device_name((const uint8_t *)device_name);
-    if (ret) {
-        printf("[%s]:set device name failed! err: 0x%x", __func__, ret);
-        return -1;
-    }
+    return ble_matter_adapter_set_device_name(device_name);
+}
 
-    printf("[%s] set device name success", __func__);
+int matter_blemgr_disconnect(uint16_t conn_handle)
+{
+    ble_matter_adapter_disconnect(conn_handle);
 
     return 0;
 }
 
-int matter_blemgr_disconnect(uint8_t connect_id)
+int matter_blemgr_send_indication(uint16_t conn_handle, uint8_t *data, uint16_t data_length)
 {
-    ble_matter_adapter_disconnect(connect_id);
-
-    return 0;
-}
-
-int matter_blemgr_send_indication(uint8_t connect_id, uint8_t *data, uint16_t data_length)
-{
-    ble_matter_adapter_send_indication(connect_id, data, data_length);
+    ble_matter_adapter_send_indication(conn_handle, data, data_length);
 
     return 0;
 }

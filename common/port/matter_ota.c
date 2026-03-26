@@ -12,15 +12,25 @@ extern "C" {
 #include <FreeRTOS.h>
 #include <task.h>
 #include <ameba_ota.h>
+#if (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+#include <ota_api.h>
+#endif
 
 #define MATTER_OTA_SECTOR_SIZE 4096
 
 #define MATTER_OTA_HEADER_SIZE 32
 #define MATTER_OTA_FIRMWARE_LENGTH   0x1EC000
 flash_t matter_ota_flash;
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
 ota_context matterCtx = {0};
 update_ota_ctrl_info matterOtaCtrl = {0};
 update_ota_target_hdr matterOtaTargetHdr = {0};
+#elif (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+ota_context_t matterCtx = {0};
+ota_download_ctrl_t matterOtaCtrl = {0};
+ota_hdr_manager_t matterOtaTargetHdr = {0};
+#endif
 
 bool matter_ota_first_sector_written = false;
 uint32_t matter_ota_flash_sector_base;
@@ -54,6 +64,8 @@ void matter_ota_prepare_partition(void)
     memset(&matterOtaCtrl, 0, sizeof(matterOtaCtrl));
     memset(&matterOtaTargetHdr, 0, sizeof(matterOtaTargetHdr));
 
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     matterCtx.otactrl = &matterOtaCtrl;
     matterCtx.otaTargetHdr = &matterOtaTargetHdr;
 
@@ -79,6 +91,33 @@ void matter_ota_prepare_partition(void)
     matter_ota_new_firmware_addr = matter_ota_new_firmware_addr - SPI_FLASH_BASE;
     matterCtx.otactrl->FlashAddr = matter_ota_new_firmware_addr;
     matter_ota_flash_sector_base = matter_ota_new_firmware_addr; // Note that the new fw address must be multiples of 4KB
+#elif (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+    matterCtx.otaCtrl = &matterOtaCtrl;
+    matterCtx.otaHdrManager = &matterOtaTargetHdr;
+
+    matterCtx.otaCtrl->ImgId = OTA_IMGID_APP;
+    matterCtx.otaCtrl->ImageLen = MATTER_OTA_FIRMWARE_LENGTH;
+
+    matterCtx.otaHdrManager->FileImgHdr[OTA_INDEX_1].ImgID = OTA_IMGID_APP;
+    matterCtx.otaHdrManager->FileImgHdr[OTA_INDEX_2].ImgID = OTA_IMGID_APP;
+    matterCtx.otaHdrManager->FileImgHdr[OTA_INDEX_1].ImgLen = MATTER_OTA_FIRMWARE_LENGTH;
+    matterCtx.otaHdrManager->FileImgHdr[OTA_INDEX_2].ImgLen = MATTER_OTA_FIRMWARE_LENGTH;
+    matterCtx.otaHdrManager->FileImgHdr[OTA_INDEX_1].Offset = 0x1000; //Offset of Manifest in firmware
+    matterCtx.otaHdrManager->FileImgHdr[OTA_INDEX_2].Offset = 0x1000; //Offset of Manifest in firmware
+
+    if (ota_get_cur_index(matterCtx.otaCtrl->ImgId) == OTA_INDEX_1) {
+        matterCtx.otaCtrl->index = OTA_INDEX_1;
+        matterCtx.otaCtrl->slotIdx = OTA_INDEX_2;
+        flash_get_layout_info(IMG_APP_OTA2, &matter_ota_new_firmware_addr, NULL);
+    } else {
+        matterCtx.otaCtrl->index = OTA_INDEX_2;
+        matterCtx.otaCtrl->slotIdx = OTA_INDEX_1;
+        flash_get_layout_info(IMG_APP_OTA1, &matter_ota_new_firmware_addr, NULL);
+    }
+    matter_ota_new_firmware_addr = matter_ota_new_firmware_addr - SPI_FLASH_BASE;
+    matterCtx.otaCtrl->FlashAddr = matter_ota_new_firmware_addr;
+    matter_ota_flash_sector_base = matter_ota_new_firmware_addr; // Note that the new fw address must be multiples of 4KB
+#endif
 }
 
 int8_t matter_ota_store_header(uint8_t *data, uint32_t size)
@@ -158,8 +197,14 @@ int8_t matter_ota_flush_last(void)
 
 int8_t matter_ota_update_signature(void)
 {
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     memcpy(&(matterCtx.otaTargetHdr->Manifest[matterCtx.otactrl->index]), matter_ota_header, sizeof(Manifest_TypeDef));
     if (!ota_update_manifest(matterCtx.otaTargetHdr, matterCtx.otactrl->targetIdx, matterCtx.otactrl->index)) {
+#elif (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+    memcpy(&(matterCtx.otaHdrManager->Manifest[matterCtx.otaCtrl->index]), matter_ota_header, sizeof(Manifest_TypeDef));
+    if (!ota_storage_update_manifest(matterCtx.otaHdrManager, matterCtx.otaCtrl->slotIdx, matterCtx.otaCtrl->index)) {
+#endif
         return OTA_ERROR;
     }
     return OTA_SUCCESS;

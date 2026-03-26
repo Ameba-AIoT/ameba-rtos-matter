@@ -18,6 +18,11 @@ menu "Matter Config"
             bool "BLE Matter Adapter"
             default n
             depends on BT_MENU
+            if BLE_MATTER_ADAPTER
+                config BLE_MATTER_MULTI_ADV_ON
+                    bool "Enable BLE Matter Multi Adv"
+                    default n
+            endif
         config MATTER_ENABLE_IPV4
             bool "Enable Matter IPv4"
             default n
