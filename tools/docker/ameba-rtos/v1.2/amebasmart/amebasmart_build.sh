@@ -33,9 +33,6 @@ if [ ! -d "$matterdir" ]; then
   handle_error "Directory ${matterdir} does not exist."
 fi
 
-# temporary github workflow fix.
-cp ${matterdir}/tools/docker/ameba-rtos/v1.2/amebasmart/project_ap_image2/CMakeLists.txt ${amebadir}/component/soc/amebasmart/project/project_ap/make/image2/CMakeLists.txt
-
 cd ${matterdir}
 
 echo $PATH
