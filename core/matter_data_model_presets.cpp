@@ -8,740 +8,1259 @@
 
 using namespace chip::app::Clusters;
 
-namespace Presets {
-namespace Clusters {
-
-// Attribute default values that are non trivial
-EmberAfAttributeMinMaxValue onoffStartUpOnOffMinMaxValue = {(uint16_t)0xFF, (uint16_t)0x0, (uint16_t)0x2};
-EmberAfAttributeMinMaxValue levelcontrolOptionsMinMaxValue = {(uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x3};
-uint8_t generalcommissioningBreadCrumbValue[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-
-void matter_cluster_descriptor_server(ClusterConfig *clusterConfig)
+namespace Presets
 {
-    AttributeConfig descriptorDeviceTypeList(0x00000000, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig descriptorServerList(0x00000001, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig descriptorClientList(0x00000002, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig descriptorPartsList(0x00000003, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig descriptorFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig descriptorClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
+namespace Clusters
+{
 
+/*************************************************************************
+ * Attribute default values that are non trivial
+ *************************************************************************/
+
+EmberAfAttributeMinMaxValue onoffValue                 = { (uint16_t)0xFF, (uint16_t)0x0, (uint16_t)0x2 };   // StartUpOnOff
+EmberAfAttributeMinMaxValue laundrydryercontrolsValue  = { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x3 };    // SelectedDrynessLevel
+EmberAfAttributeMinMaxValue laundrywashercontrolsValue = { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x1F };   // SpinSpeedCurrent
+EmberAfAttributeMinMaxValue windowcoveringValue        = { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0xF };    // Mode
+EmberAfAttributeMinMaxValue pumpconfigandcontrolValue  = { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x3 };    // OperationMode
+EmberAfAttributeMinMaxValue colorcontrolValue          = { (uint16_t)0x1, (uint16_t)0x0, (uint16_t)0xFEFF }; // StartUpColorTemperatureMireds
+EmberAfAttributeMinMaxValue levelcontrolValue[] = {
+    { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x3 },          // Options
+    { (uint16_t)0xFF, (uint16_t)0x1, (uint16_t)0xFE },        // OnLevel
+    { (uint16_t)0x32, (uint16_t)0x1, (uint16_t)0xFE }         // DefaultMoveRate
+};
+EmberAfAttributeMinMaxValue thermostatValue[] = {
+    { (uint16_t)0xA28, (uint16_t) -0x6AB3, (uint16_t)0x7FFF }, // OccupiedCoolingSetpoint
+    { (uint16_t)0x7D0, (uint16_t) -0x6AB3, (uint16_t)0x7FFF }, // OccupiedHeatingSetpoint
+    { (uint16_t)0x2BC, (uint16_t) -0x6AB3, (uint16_t)0x7FFF }, // MinHeatSetpointLimit
+    { (uint16_t)0xBB8, (uint16_t) -0x6AB3, (uint16_t)0x7FFF }, // MaxHeatSetpointLimit
+    { (uint16_t)0x640, (uint16_t) -0x6AB3, (uint16_t)0x7FFF }, // MinCoolSetpointLimit
+    { (uint16_t)0xC80, (uint16_t) -0x6AB3, (uint16_t)0x7FFF }, // MaxCoolSetpointLimit
+    { (uint16_t)0x4, (uint16_t)0x0, (uint16_t)0x5 },          // ControlSequenceOfOperation
+    { (uint16_t)0x1, (uint16_t)0x0, (uint16_t)0x7 }           // SystemMode
+};
+EmberAfAttributeMinMaxValue fancontrolValue[] = {
+    { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x6 },          // FanMode
+    { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x64 },         // PercentSetting
+    { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x64 },         // SpeedSetting
+    { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x7 },          // RockSetting
+    { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x3 },          // WindSetting
+    { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x1 }           // AirflowDirection
+};
+EmberAfAttributeMinMaxValue thermostatUIValue[] = {
+    { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x1 },          // TemperatureDisplayMode
+    { (uint16_t)0x0, (uint16_t)0x0, (uint16_t)0x5 }           // KeypadLockout
+};
+
+const uint8_t defaultActiveLocale[] = { 5, 'e', 'n', '-', 'U', 'S' };
+const uint8_t defaultDescription[] = { 6, 'C', 'o', 'f', 'f', 'e', 'e' };
+const uint8_t defaultAutoCloseTime[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
+/*************************************************************************
+ * Type Macros for Attributes
+ *************************************************************************/
+
+#define ATTR_RO         ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)
+#define ATTR_RW         ATTR_RO | ZAP_ATTRIBUTE_MASK(WRITABLE)
+#define ATTR_NULLABLE   ZAP_ATTRIBUTE_MASK(NULLABLE)
+#define ATTR_TOKENIZE   ZAP_ATTRIBUTE_MASK(TOKENIZE)
+#define ATTR_MIN_MAX    ZAP_ATTRIBUTE_MASK(MIN_MAX)
+
+/*************************************************************************
+ * Cluster Initialization Functions
+ *************************************************************************/
+
+void cluster_server_descriptor(ClusterConfig *clusterConfig)
+{
     clusterConfig->clusterId = 0x0000001D;
     clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(descriptorDeviceTypeList);
-    clusterConfig->attributeConfigs.push_back(descriptorServerList);
-    clusterConfig->attributeConfigs.push_back(descriptorClientList);
-    clusterConfig->attributeConfigs.push_back(descriptorPartsList);
-    clusterConfig->attributeConfigs.push_back(descriptorFeatureMap);
-    clusterConfig->attributeConfigs.push_back(descriptorClusterRevision);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},  // DeviceTypeList
+        {0x00000001, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},  // ServerList
+        {0x00000002, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},  // ClientList
+        {0x00000003, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},  // PartsList
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ATTR_RO},  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),   2, ATTR_RO}   // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
 }
 
-void matter_cluster_acl_server(ClusterConfig *clusterConfig)
+void cluster_server_identify(ClusterConfig *clusterConfig)
 {
-    AttributeConfig aclACL(0x00000000, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig aclExtension(0x00000001, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig aclSubjectsPerAccessControlEntry(0x00000002, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig aclTargetsPerAccessControlEntry(0x00000003, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig aclAccessControlEntriesPerFabric(0x00000004, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig aclFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig aclClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    EventConfig aclAccessControlEntryChanged(0x00000000);
-    EventConfig aclAccessControlExtensionChanged(0x00000001);
-
-    clusterConfig->clusterId = 0x0000001F;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(aclACL);
-    clusterConfig->attributeConfigs.push_back(aclExtension);
-    clusterConfig->attributeConfigs.push_back(aclSubjectsPerAccessControlEntry);
-    clusterConfig->attributeConfigs.push_back(aclTargetsPerAccessControlEntry);
-    clusterConfig->attributeConfigs.push_back(aclAccessControlEntriesPerFabric);
-    clusterConfig->attributeConfigs.push_back(aclFeatureMap);
-    clusterConfig->attributeConfigs.push_back(aclClusterRevision);
-    clusterConfig->eventConfigs.push_back(aclAccessControlEntryChanged);
-    clusterConfig->eventConfigs.push_back(aclAccessControlExtensionChanged);
-}
-
-void matter_cluster_basic_information_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig basicinfoDataModelRevision(0x00000000, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoVendorName(0x00000001, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 33, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoVendorId(0x00000002, ZAP_TYPE(VENDOR_ID), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoProductName(0x00000003, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 33, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoProductId(0x00000004, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoNodeLabel(0x00000005, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 33, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig basicinfoLocation(0x00000006, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 3, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig basicinfoHardwareVersion(0x00000007, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoHardwareVersionString(0x00000008, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 65, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoSoftwareVersion(0x00000009, ZAP_TYPE(INT32U), ZAP_EMPTY_DEFAULT(), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoSoftwareVersionString(0x0000000A, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 65, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoManufacturingDate(0x0000000B, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 17, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoPartNumber(0x0000000C, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 33, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoProductUrl(0x0000000D, ZAP_TYPE(LONG_CHAR_STRING), ZAP_EMPTY_DEFAULT(), 258, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoProductLabel(0x0000000E, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 65, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoSerialNumber(0x0000000F, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 33, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoLocalConfigDisabled(0x00000010, ZAP_TYPE(BOOLEAN), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig basicinfoUniqueId(0x00000012, ZAP_TYPE(CHAR_STRING), ZAP_EMPTY_DEFAULT(), 33, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoCapabilityMinima(0x00000013, ZAP_TYPE(STRUCT), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig basicinfoClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    EventConfig basicinfoStartUp(0x00000000);
-    EventConfig basicinfoShutDown(0x00000001);
-    EventConfig basicinfoLeave(0x00000002);
-
-    clusterConfig->clusterId = 0x00000028;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(basicinfoDataModelRevision);
-    clusterConfig->attributeConfigs.push_back(basicinfoVendorName);
-    clusterConfig->attributeConfigs.push_back(basicinfoVendorId);
-    clusterConfig->attributeConfigs.push_back(basicinfoProductName);
-    clusterConfig->attributeConfigs.push_back(basicinfoProductId);
-    clusterConfig->attributeConfigs.push_back(basicinfoNodeLabel);
-    clusterConfig->attributeConfigs.push_back(basicinfoLocation);
-    clusterConfig->attributeConfigs.push_back(basicinfoHardwareVersion);
-    clusterConfig->attributeConfigs.push_back(basicinfoHardwareVersionString);
-    clusterConfig->attributeConfigs.push_back(basicinfoSoftwareVersion);
-    clusterConfig->attributeConfigs.push_back(basicinfoSoftwareVersionString);
-    clusterConfig->attributeConfigs.push_back(basicinfoManufacturingDate);
-    clusterConfig->attributeConfigs.push_back(basicinfoPartNumber);
-    clusterConfig->attributeConfigs.push_back(basicinfoProductUrl);
-    clusterConfig->attributeConfigs.push_back(basicinfoProductLabel);
-    clusterConfig->attributeConfigs.push_back(basicinfoSerialNumber);
-    clusterConfig->attributeConfigs.push_back(basicinfoLocalConfigDisabled);
-    clusterConfig->attributeConfigs.push_back(basicinfoUniqueId);
-    clusterConfig->attributeConfigs.push_back(basicinfoCapabilityMinima);
-    clusterConfig->attributeConfigs.push_back(basicinfoFeatureMap);
-    clusterConfig->attributeConfigs.push_back(basicinfoClusterRevision);
-    clusterConfig->eventConfigs.push_back(basicinfoStartUp);
-    clusterConfig->eventConfigs.push_back(basicinfoShutDown);
-    clusterConfig->eventConfigs.push_back(basicinfoLeave);
-}
-
-void matter_cluster_ota_requestor_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig otarDefaultOtaProviders(0x00000000, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig otarUpdatePossible(0x00000001, ZAP_TYPE(BOOLEAN), ZAP_SIMPLE_DEFAULT(1), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig otarUpdateState(0x00000002, ZAP_TYPE(ENUM8), ZAP_SIMPLE_DEFAULT(0), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig otarUpdateStateProgress(0x00000003, ZAP_TYPE(INT8U), ZAP_SIMPLE_DEFAULT(0), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig otarFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig otarClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig otarAnnounceOtaProvider(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig otarEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-
-    EventConfig otarStateTransition(0x00000000);
-    EventConfig otarVersionApplied(0x00000001);
-    EventConfig otarDownloadError(0x00000002);
-
-    clusterConfig->clusterId = 0x0000002A;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(otarDefaultOtaProviders);
-    clusterConfig->attributeConfigs.push_back(otarUpdatePossible);
-    clusterConfig->attributeConfigs.push_back(otarUpdateState);
-    clusterConfig->attributeConfigs.push_back(otarUpdateStateProgress);
-    clusterConfig->attributeConfigs.push_back(otarFeatureMap);
-    clusterConfig->attributeConfigs.push_back(otarClusterRevision);
-    clusterConfig->commandConfigs.push_back(otarAnnounceOtaProvider);
-    clusterConfig->commandConfigs.push_back(otarEndOfAcceptedCommandList);
-    clusterConfig->eventConfigs.push_back(otarStateTransition);
-    clusterConfig->eventConfigs.push_back(otarVersionApplied);
-    clusterConfig->eventConfigs.push_back(otarDownloadError);
-}
-
-void matter_cluster_general_commissioning_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig gencomBreadcrumb(0x00000000, ZAP_TYPE(INT64U), uint32_t(0), 8, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig gencomBasicCommissioningInfo(0x00000001, ZAP_TYPE(STRUCT), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gencomRegulatoryConfig(0x00000002, ZAP_TYPE(ENUM8), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gencomLocationCapability(0x00000003, ZAP_TYPE(ENUM8), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gencomSupportsConcurrentConnection(0x00000004, ZAP_TYPE(BOOLEAN), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gencomFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gencomClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig gencomArmFailSafe(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig gencomSetRegulatoryConfig(0x00000002, COMMAND_MASK_ACCEPTED);
-    CommandConfig gencomCommissioningComplete(0x00000004, COMMAND_MASK_ACCEPTED);
-    CommandConfig gencomEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-
-    CommandConfig gencomArmFailSafeResponse(0x00000001, COMMAND_MASK_GENERATED);
-    CommandConfig gencomSetRegulatoryConfigResponse(0x00000003, COMMAND_MASK_GENERATED);
-    CommandConfig gencomCommissioningCompleteResponse(0x00000005, COMMAND_MASK_GENERATED);
-    CommandConfig gencomEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
-
-    clusterConfig->clusterId = 0x00000030;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(gencomBreadcrumb);
-    clusterConfig->attributeConfigs.push_back(gencomBasicCommissioningInfo);
-    clusterConfig->attributeConfigs.push_back(gencomRegulatoryConfig);
-    clusterConfig->attributeConfigs.push_back(gencomLocationCapability);
-    clusterConfig->attributeConfigs.push_back(gencomSupportsConcurrentConnection);
-    clusterConfig->attributeConfigs.push_back(gencomFeatureMap);
-    clusterConfig->attributeConfigs.push_back(gencomClusterRevision);
-    clusterConfig->commandConfigs.push_back(gencomArmFailSafe);
-    clusterConfig->commandConfigs.push_back(gencomSetRegulatoryConfig);
-    clusterConfig->commandConfigs.push_back(gencomCommissioningComplete);
-    clusterConfig->commandConfigs.push_back(gencomEndOfAcceptedCommandList);
-    clusterConfig->commandConfigs.push_back(gencomArmFailSafeResponse);
-    clusterConfig->commandConfigs.push_back(gencomSetRegulatoryConfigResponse);
-    clusterConfig->commandConfigs.push_back(gencomCommissioningCompleteResponse);
-    clusterConfig->commandConfigs.push_back(gencomEndOfGeneratedCommandList);
-}
-
-void matter_cluster_network_commissioning_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig netcomMaxNetworks(0x00000000, ZAP_TYPE(INT8U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig netcomNetworks(0x00000001, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig netcomScanMaxTimeSeconds(0x00000002, ZAP_TYPE(INT8U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig netcomConnectMaxTimeSeconds(0x00000003, ZAP_TYPE(INT8U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig netcomInterfaceEnabled(0x00000004, ZAP_TYPE(BOOLEAN), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig netcomLastNetworkingStatus(0x00000005, ZAP_TYPE(ENUM8), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig netcomLastNetworkId(0x00000006, ZAP_TYPE(OCTET_STRING), ZAP_EMPTY_DEFAULT(), 33, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig netcomLastConnectErrorValue(0x00000007, ZAP_TYPE(INT32S), ZAP_EMPTY_DEFAULT(), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig netcomFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig netcomClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig netcomScanNetworks(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig netcomAddOrUpdateWiFiNetwork(0x00000002, COMMAND_MASK_ACCEPTED);
-    CommandConfig netcomRemoveNetwork(0x00000004, COMMAND_MASK_ACCEPTED);
-    CommandConfig netcomConnectNetwork(0x00000006, COMMAND_MASK_ACCEPTED);
-    CommandConfig netcomReorderNetwork(0x00000008, COMMAND_MASK_ACCEPTED);
-    CommandConfig netcomEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-
-    CommandConfig netcomScanNetworksResponse(0x00000001, COMMAND_MASK_GENERATED);
-    CommandConfig netcomNetworkConfigResponse(0x00000005, COMMAND_MASK_GENERATED);
-    CommandConfig netcomConnectNetworkResponse(0x00000007, COMMAND_MASK_GENERATED);
-    CommandConfig netcomEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
-
-    clusterConfig->clusterId = 0x00000031;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(netcomMaxNetworks);
-    clusterConfig->attributeConfigs.push_back(netcomNetworks);
-    clusterConfig->attributeConfigs.push_back(netcomScanMaxTimeSeconds);
-    clusterConfig->attributeConfigs.push_back(netcomConnectMaxTimeSeconds);
-    clusterConfig->attributeConfigs.push_back(netcomInterfaceEnabled);
-    clusterConfig->attributeConfigs.push_back(netcomLastNetworkingStatus);
-    clusterConfig->attributeConfigs.push_back(netcomLastNetworkId);
-    clusterConfig->attributeConfigs.push_back(netcomLastConnectErrorValue);
-    clusterConfig->attributeConfigs.push_back(netcomFeatureMap);
-    clusterConfig->attributeConfigs.push_back(netcomClusterRevision);
-    clusterConfig->commandConfigs.push_back(netcomScanNetworks);
-    clusterConfig->commandConfigs.push_back(netcomAddOrUpdateWiFiNetwork);
-    clusterConfig->commandConfigs.push_back(netcomRemoveNetwork);
-    clusterConfig->commandConfigs.push_back(netcomConnectNetwork);
-    clusterConfig->commandConfigs.push_back(netcomReorderNetwork);
-    clusterConfig->commandConfigs.push_back(netcomEndOfAcceptedCommandList);
-    clusterConfig->commandConfigs.push_back(netcomScanNetworksResponse);
-    clusterConfig->commandConfigs.push_back(netcomNetworkConfigResponse);
-    clusterConfig->commandConfigs.push_back(netcomConnectNetworkResponse);
-    clusterConfig->commandConfigs.push_back(netcomEndOfGeneratedCommandList);
-}
-
-void matter_cluster_general_diagnostics_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig gendiagNetworkInterfaces(0x00000000, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagRebootCount(0x00000001, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagUpTime(0x00000002, ZAP_TYPE(INT64U), ZAP_EMPTY_DEFAULT(), 8, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagTotalOperationalHours(0x00000003, ZAP_TYPE(INT32U), ZAP_EMPTY_DEFAULT(), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagBootReason(0x00000004, ZAP_TYPE(ENUM8), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagActiveHardwareFaults(0x00000005, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagActiveRadioFaults(0x00000006, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagActiveNetworkFaults(0x00000007, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagTestEventTriggersEnabled(0x00000008, ZAP_TYPE(BOOLEAN), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gendiagClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig gendiagTestEventTrigger(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig gendiagTimeSnapshot(0x00000001, COMMAND_MASK_ACCEPTED);
-    CommandConfig gendiagEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-
-    CommandConfig gendigTimeSnapshotResponse(0x00000002, COMMAND_MASK_GENERATED);
-    CommandConfig gendigEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
-
-    EventConfig gendiagHardwareFaultChange(0x00000000);
-    EventConfig gendiagRadioFaultChange(0x00000001);
-    EventConfig gendiagNetworkFaultChange(0x00000002);
-    EventConfig gendiagBootReasonEvent(0x00000003);
-
-    clusterConfig->clusterId = 0x00000033;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(gendiagNetworkInterfaces);
-    clusterConfig->attributeConfigs.push_back(gendiagRebootCount);
-    clusterConfig->attributeConfigs.push_back(gendiagUpTime);
-    clusterConfig->attributeConfigs.push_back(gendiagTotalOperationalHours);
-    clusterConfig->attributeConfigs.push_back(gendiagBootReason);
-    clusterConfig->attributeConfigs.push_back(gendiagActiveHardwareFaults);
-    clusterConfig->attributeConfigs.push_back(gendiagActiveRadioFaults);
-    clusterConfig->attributeConfigs.push_back(gendiagActiveNetworkFaults);
-    clusterConfig->attributeConfigs.push_back(gendiagTestEventTriggersEnabled);
-    clusterConfig->attributeConfigs.push_back(gendiagFeatureMap);
-    clusterConfig->attributeConfigs.push_back(gendiagClusterRevision);
-    clusterConfig->commandConfigs.push_back(gendiagTestEventTrigger);
-    clusterConfig->commandConfigs.push_back(gendiagTimeSnapshot);
-    clusterConfig->commandConfigs.push_back(gendiagEndOfGeneratedCommandList);
-    clusterConfig->commandConfigs.push_back(gendigTimeSnapshotResponse);
-    clusterConfig->commandConfigs.push_back(gendigEndOfGeneratedCommandList);
-    clusterConfig->eventConfigs.push_back(gendiagHardwareFaultChange);
-    clusterConfig->eventConfigs.push_back(gendiagRadioFaultChange);
-    clusterConfig->eventConfigs.push_back(gendiagNetworkFaultChange);
-    clusterConfig->eventConfigs.push_back(gendiagBootReasonEvent);
-}
-
-void matter_cluster_software_diagnostics_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig swdiagThreadMetrics(0x00000000, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig swdiagCurrentHeapFree(0x00000001, ZAP_TYPE(INT64U), ZAP_EMPTY_DEFAULT(), 8, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig swdiagCurrentHeapUsed(0x00000002, ZAP_TYPE(INT64U), ZAP_EMPTY_DEFAULT(), 8, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig swdiagCurrentHeapHighWatermark(0x00000003, ZAP_TYPE(INT64U), ZAP_EMPTY_DEFAULT(), 8, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig swdiagFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig swdiagClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    clusterConfig->clusterId = 0x00000034;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(swdiagThreadMetrics);
-    clusterConfig->attributeConfigs.push_back(swdiagCurrentHeapFree);
-    clusterConfig->attributeConfigs.push_back(swdiagCurrentHeapUsed);
-    clusterConfig->attributeConfigs.push_back(swdiagCurrentHeapHighWatermark);
-    clusterConfig->attributeConfigs.push_back(swdiagFeatureMap);
-    clusterConfig->attributeConfigs.push_back(swdiagClusterRevision);
-}
-
-void matter_cluster_wifi_diagnostics_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig wifidiagBssid(0x00000000, ZAP_TYPE(OCTET_STRING), ZAP_EMPTY_DEFAULT(), 7, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig wifidiagSecurityType(0x00000001, ZAP_TYPE(ENUM8), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig wifidiagWiFiVersion(0x00000002, ZAP_TYPE(ENUM8), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig wifidiagChannelNumber(0x00000003, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig wifidiagRssi(0x00000004, ZAP_TYPE(INT8S), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig wifidiagFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(3), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig wifidiagClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    EventConfig wifidiagDisconnection(0x00000000);
-    EventConfig wifidiagAssociationFailure(0x00000001);
-    EventConfig wifidiagConnectionStatus(0x00000002);
-
-    clusterConfig->clusterId = 0x00000036;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(wifidiagBssid);
-    clusterConfig->attributeConfigs.push_back(wifidiagSecurityType);
-    clusterConfig->attributeConfigs.push_back(wifidiagWiFiVersion);
-    clusterConfig->attributeConfigs.push_back(wifidiagChannelNumber);
-    clusterConfig->attributeConfigs.push_back(wifidiagRssi);
-    clusterConfig->attributeConfigs.push_back(wifidiagFeatureMap);
-    clusterConfig->attributeConfigs.push_back(wifidiagClusterRevision);
-    clusterConfig->eventConfigs.push_back(wifidiagDisconnection);
-    clusterConfig->eventConfigs.push_back(wifidiagAssociationFailure);
-    clusterConfig->eventConfigs.push_back(wifidiagConnectionStatus);
-}
-
-void matter_cluster_administrator_commissioning_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig admincomWindowStatus(0x00000000, ZAP_TYPE(ENUM8), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig admincomAdminFabricIndex(0x00000001, ZAP_TYPE(FABRIC_IDX), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig admincomAdminVendorId(0x00000002, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig admincomAdminFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig admincomAdminClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    clusterConfig->clusterId = 0x0000003C;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(admincomWindowStatus);
-    clusterConfig->attributeConfigs.push_back(admincomAdminFabricIndex);
-    clusterConfig->attributeConfigs.push_back(admincomAdminVendorId);
-    clusterConfig->attributeConfigs.push_back(admincomAdminFeatureMap);
-    clusterConfig->attributeConfigs.push_back(admincomAdminClusterRevision);
-}
-
-void matter_cluster_operational_credentials_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig opcredsNocs(0x00000000, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig opcredsFabrics(0x00000001, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig opcredsSupportedFabrics(0x00000002, ZAP_TYPE(INT8U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig opcredsCommissionedFabrics(0x00000003, ZAP_TYPE(INT8U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig opcredsTrustedRootCertificates(0x00000004, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig opcredsCurrentFabricIndex(0x00000005, ZAP_TYPE(INT8U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig opcredsFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig opcredsClusterRevision(0x0000FFFD, ZAP_TYPE(INT8U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig opcredsAttestationRequest(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig opcredsCertificateChainRequest(0x00000002, COMMAND_MASK_ACCEPTED);
-    CommandConfig opcredsCSRRequest(0x00000004, COMMAND_MASK_ACCEPTED);
-    CommandConfig opcredsAddNOC(0x00000006, COMMAND_MASK_ACCEPTED);
-    CommandConfig opcredsUpdateNOC(0x00000007, COMMAND_MASK_ACCEPTED);
-    CommandConfig opcredsRemoveFabric(0x0000000A, COMMAND_MASK_ACCEPTED);
-    CommandConfig opcredsAddTrustedRootCertificate(0x0000000B, COMMAND_MASK_ACCEPTED);
-    CommandConfig opcredsEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-
-    CommandConfig opcredsAttestationResponse(0x00000001, COMMAND_MASK_GENERATED);
-    CommandConfig opcredsCertificateChainResponse(0x00000003, COMMAND_MASK_GENERATED);
-    CommandConfig opcredsCSRResponse(0x00000005, COMMAND_MASK_GENERATED);
-    CommandConfig opcredsNOCResponse(0x00000008, COMMAND_MASK_GENERATED);
-    CommandConfig opcredsEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
-
-    clusterConfig->clusterId = 0x0000003E;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(opcredsNocs);
-    clusterConfig->attributeConfigs.push_back(opcredsFabrics);
-    clusterConfig->attributeConfigs.push_back(opcredsSupportedFabrics);
-    clusterConfig->attributeConfigs.push_back(opcredsCommissionedFabrics);
-    clusterConfig->attributeConfigs.push_back(opcredsTrustedRootCertificates);
-    clusterConfig->attributeConfigs.push_back(opcredsCurrentFabricIndex);
-    clusterConfig->attributeConfigs.push_back(opcredsFeatureMap);
-    clusterConfig->attributeConfigs.push_back(opcredsClusterRevision);
-    clusterConfig->commandConfigs.push_back(opcredsAttestationRequest);
-    clusterConfig->commandConfigs.push_back(opcredsCertificateChainRequest);
-    clusterConfig->commandConfigs.push_back(opcredsCSRRequest);
-    clusterConfig->commandConfigs.push_back(opcredsAddNOC);
-    clusterConfig->commandConfigs.push_back(opcredsUpdateNOC);
-    clusterConfig->commandConfigs.push_back(opcredsRemoveFabric);
-    clusterConfig->commandConfigs.push_back(opcredsAddTrustedRootCertificate);
-    clusterConfig->commandConfigs.push_back(opcredsEndOfAcceptedCommandList);
-    clusterConfig->commandConfigs.push_back(opcredsAttestationResponse);
-    clusterConfig->commandConfigs.push_back(opcredsCertificateChainResponse);
-    clusterConfig->commandConfigs.push_back(opcredsCSRResponse);
-    clusterConfig->commandConfigs.push_back(opcredsNOCResponse);
-    clusterConfig->commandConfigs.push_back(opcredsEndOfGeneratedCommandList);
-}
-
-void matter_cluster_group_key_management_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig gkmGroupKeyMap(0x00000000, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig gkmGroupTable(0x00000001, ZAP_TYPE(ARRAY), ZAP_EMPTY_DEFAULT(), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gkmMaxGroupsPerFabric(0x00000002, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gkmMaxGroupKeysPerFabric(0x00000003, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gkmFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig gkmClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(1), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    clusterConfig->clusterId = 0x0000003F;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(gkmGroupKeyMap);
-    clusterConfig->attributeConfigs.push_back(gkmGroupTable);
-    clusterConfig->attributeConfigs.push_back(gkmMaxGroupsPerFabric);
-    clusterConfig->attributeConfigs.push_back(gkmMaxGroupKeysPerFabric);
-    clusterConfig->attributeConfigs.push_back(gkmFeatureMap);
-    clusterConfig->attributeConfigs.push_back(gkmClusterRevision);
-}
-
-void matter_cluster_identify_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig identifyIdentifyTime(0x00000000, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(0x0000), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig identifyIdentifyType(0x00000001, ZAP_TYPE(ENUM8), ZAP_SIMPLE_DEFAULT(0x0), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig identifyFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig identifyClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(4), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig identifyIdentify(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig identifyTriggerEffect(0x00000040, COMMAND_MASK_ACCEPTED);
-    CommandConfig identifyEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-
     clusterConfig->clusterId = 0x00000003;
     clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(identifyIdentifyTime);
-    clusterConfig->attributeConfigs.push_back(identifyIdentifyType);
-    clusterConfig->attributeConfigs.push_back(identifyFeatureMap);
-    clusterConfig->attributeConfigs.push_back(identifyClusterRevision);
-    clusterConfig->commandConfigs.push_back(identifyIdentify);
-    clusterConfig->commandConfigs.push_back(identifyTriggerEffect);
-    clusterConfig->commandConfigs.push_back(identifyEndOfAcceptedCommandList);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(INT16U),  ZAP_EMPTY_DEFAULT(), 2, ATTR_RW},  // IdentifyTime
+        {0x00000001, ZAP_TYPE(ENUM8),   ZAP_EMPTY_DEFAULT(), 1, ATTR_RO},  // IdentifyType
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(), 4, ATTR_RO}, // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),  ZAP_EMPTY_DEFAULT(), 2, ATTR_RO}   // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // Identify
+        {0x00000040, COMMAND_MASK_ACCEPTED},  // TriggerEffect
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
 }
 
-void matter_cluster_groups_server(ClusterConfig *clusterConfig)
+void cluster_server_groups(ClusterConfig *clusterConfig)
 {
-    AttributeConfig groupsNameSupport(0x00000000, ZAP_TYPE(BITMAP8), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig groupsFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig groupsClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(4), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig groupsAddGroup(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig groupsViewGroup(0x00000001, COMMAND_MASK_ACCEPTED);
-    CommandConfig groupsGetGroupMembership(0x00000002, COMMAND_MASK_ACCEPTED);
-    CommandConfig groupsRemoveGroup(0x00000003, COMMAND_MASK_ACCEPTED);
-    CommandConfig groupsRemoveAllGroups(0x00000004, COMMAND_MASK_ACCEPTED);
-    CommandConfig groupsAddGroupIfIdentifying(0x00000005, COMMAND_MASK_ACCEPTED);
-    CommandConfig groupsEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-
-    CommandConfig groupsAddGroupResponse(0x00000000, COMMAND_MASK_GENERATED);
-    CommandConfig groupsViewGroupResponse(0x00000001, COMMAND_MASK_GENERATED);
-    CommandConfig groupsGetGroupMembershipResponse(0x00000002, COMMAND_MASK_GENERATED);
-    CommandConfig groupsRemoveGroupResponse(0x00000003, COMMAND_MASK_GENERATED);
-    CommandConfig groupsEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
-
     clusterConfig->clusterId = 0x00000004;
     clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION);
-    clusterConfig->attributeConfigs.push_back(groupsNameSupport);
-    clusterConfig->attributeConfigs.push_back(groupsFeatureMap);
-    clusterConfig->attributeConfigs.push_back(groupsClusterRevision);
-    clusterConfig->commandConfigs.push_back(groupsAddGroup);
-    clusterConfig->commandConfigs.push_back(groupsViewGroup);
-    clusterConfig->commandConfigs.push_back(groupsGetGroupMembership);
-    clusterConfig->commandConfigs.push_back(groupsRemoveGroup);
-    clusterConfig->commandConfigs.push_back(groupsRemoveAllGroups);
-    clusterConfig->commandConfigs.push_back(groupsAddGroupIfIdentifying);
-    clusterConfig->commandConfigs.push_back(groupsEndOfAcceptedCommandList);
-    clusterConfig->commandConfigs.push_back(groupsAddGroupResponse);
-    clusterConfig->commandConfigs.push_back(groupsViewGroupResponse);
-    clusterConfig->commandConfigs.push_back(groupsGetGroupMembershipResponse);
-    clusterConfig->commandConfigs.push_back(groupsRemoveGroupResponse);
-    clusterConfig->commandConfigs.push_back(groupsEndOfGeneratedCommandList);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(BITMAP8),  ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},  // NameSupport
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ATTR_RO},  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(4), 2, ATTR_RO}   // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // AddGroup
+        {0x00000001, COMMAND_MASK_ACCEPTED},  // ViewGroup
+        {0x00000002, COMMAND_MASK_ACCEPTED},  // GetGroupMembership
+        {0x00000003, COMMAND_MASK_ACCEPTED},  // RemoveGroup
+        {0x00000004, COMMAND_MASK_ACCEPTED},  // RemoveAllGroups
+        {0x00000005, COMMAND_MASK_ACCEPTED},  // AddGroupIfIdentifying
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000000, COMMAND_MASK_GENERATED}, // AddGroupResponse
+        {0x00000001, COMMAND_MASK_GENERATED}, // ViewGroupResponse
+        {0x00000002, COMMAND_MASK_GENERATED}, // GetGroupMembershipResponse
+        {0x00000003, COMMAND_MASK_GENERATED}, // RemoveGroupResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
     clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback);
 }
 
-
-#if defined(ZCL_USING_SCENES_CLUSTER_SERVER)
-void matter_cluster_scenes_server(ClusterConfig *clusterConfig)
+void cluster_server_onoff(ClusterConfig *clusterConfig)
 {
-    AttributeConfig scenesSceneCount(0x00000000, ZAP_TYPE(INT8U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig scenesCurrentScene(0x00000001, ZAP_TYPE(INT8U), ZAP_SIMPLE_DEFAULT(0x00), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig scenesCurrentGroup(0x00000002, ZAP_TYPE(GROUP_ID), ZAP_SIMPLE_DEFAULT(0x0000), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig scenesSceneValid(0x00000003, ZAP_TYPE(BOOLEAN), ZAP_SIMPLE_DEFAULT(0x00), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig scenesNameSupport(0x00000004, ZAP_TYPE(BITMAP8), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig scenesLastConfiguredBy(0x00000005, ZAP_TYPE(NODE_ID), uint32_t(0), 8, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig scenesSceneTableSize(0x00000006, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig scenesRemainingCapacity(0x00000007, ZAP_TYPE(INT8U), ZAP_EMPTY_DEFAULT(), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig scenesFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig scenesClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(5), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig scenesAddScene(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig scenesViewScene(0x00000001, COMMAND_MASK_ACCEPTED);
-    CommandConfig scenesRemoveScene(0x00000002, COMMAND_MASK_ACCEPTED);
-    CommandConfig scenesRemoveAllScenes(0x00000003, COMMAND_MASK_ACCEPTED);
-    CommandConfig scenesStoreScene(0x00000004, COMMAND_MASK_ACCEPTED);
-    CommandConfig scenesRecallScene(0x00000005, COMMAND_MASK_ACCEPTED);
-    CommandConfig scenesGetSceneMembership(0x00000006, COMMAND_MASK_ACCEPTED);
-    CommandConfig scenesEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-    
-    CommandConfig scenesAddSceneResponse(0x00000000, COMMAND_MASK_GENERATED);
-    CommandConfig scenesViewSceneResponse(0x00000001, COMMAND_MASK_GENERATED);
-    CommandConfig scenesRemoveSceneResponse(0x00000002, COMMAND_MASK_GENERATED);
-    CommandConfig scenesRemoveAllScenesResponse(0x00000003, COMMAND_MASK_GENERATED);
-    CommandConfig scenesStoreSceneResponse(0x00000004, COMMAND_MASK_GENERATED);
-    CommandConfig scenesGetSceneMembershipResponse(0x00000006, COMMAND_MASK_GENERATED);
-    CommandConfig scenesEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
-
-    clusterConfig->clusterId = 0x00000005;
-    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
-    clusterConfig->attributeConfigs.push_back(scenesSceneCount);
-    clusterConfig->attributeConfigs.push_back(scenesCurrentScene);
-    clusterConfig->attributeConfigs.push_back(scenesCurrentGroup);
-    clusterConfig->attributeConfigs.push_back(scenesSceneValid);
-    clusterConfig->attributeConfigs.push_back(scenesNameSupport);
-    clusterConfig->attributeConfigs.push_back(scenesLastConfiguredBy);
-    clusterConfig->attributeConfigs.push_back(scenesSceneTableSize);
-    clusterConfig->attributeConfigs.push_back(scenesRemainingCapacity);
-    clusterConfig->attributeConfigs.push_back(scenesFeatureMap);
-    clusterConfig->attributeConfigs.push_back(scenesClusterRevision);
-    clusterConfig->commandConfigs.push_back(scenesAddScene);
-    clusterConfig->commandConfigs.push_back(scenesViewScene);
-    clusterConfig->commandConfigs.push_back(scenesRemoveScene);
-    clusterConfig->commandConfigs.push_back(scenesRemoveAllScenes);
-    clusterConfig->commandConfigs.push_back(scenesStoreScene);
-    clusterConfig->commandConfigs.push_back(scenesRecallScene);
-    clusterConfig->commandConfigs.push_back(scenesGetSceneMembership);
-    clusterConfig->commandConfigs.push_back(scenesEndOfAcceptedCommandList);
-    clusterConfig->commandConfigs.push_back(scenesAddSceneResponse);
-    clusterConfig->commandConfigs.push_back(scenesViewSceneResponse);
-    clusterConfig->commandConfigs.push_back(scenesRemoveSceneResponse);
-    clusterConfig->commandConfigs.push_back(scenesRemoveAllScenesResponse);
-    clusterConfig->commandConfigs.push_back(scenesStoreSceneResponse);
-    clusterConfig->commandConfigs.push_back(scenesGetSceneMembershipResponse);
-    clusterConfig->commandConfigs.push_back(scenesEndOfGeneratedCommandList);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfScenesManagementClusterServerInitCallback);
-    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterScenesManagementClusterServerShutdownCallback);
-}
-#endif
-
-void matter_cluster_onoff_server(ClusterConfig *clusterConfig)
-{
-    AttributeConfig onoffOnOff(0x00000000, ZAP_TYPE(BOOLEAN), ZAP_SIMPLE_DEFAULT(0x00), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(TOKENIZE));
-    AttributeConfig onoffGlobalSceneControl(0x00004000, ZAP_TYPE(BOOLEAN), ZAP_SIMPLE_DEFAULT(0x01), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig onoffOnTime(0x00004001, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(0x0000), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig onoffOffWaitTime(0x00004002, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(0x0000), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig onoffStartUpOnOff(0x00004003, ZAP_TYPE(ENUM8), &onoffStartUpOnOffMinMaxValue, 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig onoffFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig onoffClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(4), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig onoffOff(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig onoffOn(0x00000001, COMMAND_MASK_ACCEPTED);
-    CommandConfig onoffToggle(0x00000002, COMMAND_MASK_ACCEPTED);
-    CommandConfig onoffOffWithEffect(0x00000040, COMMAND_MASK_ACCEPTED);
-    CommandConfig onoffOnWithRecallGlobalScene(0x00000041, COMMAND_MASK_ACCEPTED);
-    CommandConfig onoffOnWithTimedOff(0x00000042, COMMAND_MASK_ACCEPTED);
-    CommandConfig onoffEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-
-    CommandConfig onoffMoveToLevel(0x00000000, COMMAND_MASK_GENERATED);
-    CommandConfig onoffMove(0x00000001, COMMAND_MASK_GENERATED);
-    CommandConfig onoffStep(0x00000002, COMMAND_MASK_GENERATED);
-    CommandConfig onoffStop(0x00000003, COMMAND_MASK_GENERATED);
-    CommandConfig onoffMoveToLevelWithOnOff(0x00000004, COMMAND_MASK_GENERATED);
-    CommandConfig onoffMoveWithOnOff(0x00000005, COMMAND_MASK_GENERATED);
-    CommandConfig onoffStepWithOnOff(0x00000006, COMMAND_MASK_GENERATED);
-    CommandConfig onoffStopWithOnOff(0x00000007, COMMAND_MASK_GENERATED);
-    CommandConfig onoffEndOfGeneratedCommandList(chip::kInvalidCommandId, COMMAND_MASK_GENERATED);
-
     clusterConfig->clusterId = 0x00000006;
     clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
-    clusterConfig->attributeConfigs.push_back(onoffOnOff);
-    clusterConfig->attributeConfigs.push_back(onoffGlobalSceneControl);
-    clusterConfig->attributeConfigs.push_back(onoffOnTime);
-    clusterConfig->attributeConfigs.push_back(onoffOffWaitTime);
-    clusterConfig->attributeConfigs.push_back(onoffStartUpOnOff);
-    clusterConfig->attributeConfigs.push_back(onoffFeatureMap);
-    clusterConfig->attributeConfigs.push_back(onoffClusterRevision);
-    clusterConfig->commandConfigs.push_back(onoffOff);
-    clusterConfig->commandConfigs.push_back(onoffOn);
-    clusterConfig->commandConfigs.push_back(onoffToggle);
-    clusterConfig->commandConfigs.push_back(onoffOffWithEffect);
-    clusterConfig->commandConfigs.push_back(onoffOnWithRecallGlobalScene);
-    clusterConfig->commandConfigs.push_back(onoffOnWithTimedOff);
-    clusterConfig->commandConfigs.push_back(onoffEndOfAcceptedCommandList);
-    clusterConfig->commandConfigs.push_back(onoffMoveToLevel);
-    clusterConfig->commandConfigs.push_back(onoffMove);
-    clusterConfig->commandConfigs.push_back(onoffStep);
-    clusterConfig->commandConfigs.push_back(onoffStop);
-    clusterConfig->commandConfigs.push_back(onoffMoveToLevelWithOnOff);
-    clusterConfig->commandConfigs.push_back(onoffStepWithOnOff);
-    clusterConfig->commandConfigs.push_back(onoffStopWithOnOff);
-    clusterConfig->commandConfigs.push_back(onoffEndOfGeneratedCommandList);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(BOOLEAN),  ZAP_SIMPLE_DEFAULT(0x00),   1, ATTR_RO | ATTR_TOKENIZE},                                 // OnOff
+        {0x00004000, ZAP_TYPE(BOOLEAN),  ZAP_SIMPLE_DEFAULT(0x01),   1, ATTR_RO},                                                 // GlobalSceneControl
+        {0x00004001, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0000), 2, ATTR_RW},                                                 // OnTime
+        {0x00004002, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0000), 2, ATTR_RW},                                                 // OffWaitTime
+        {0x00004003, ZAP_TYPE(ENUM8),    &onoffValue,                1, ATTR_RW | ATTR_TOKENIZE | ATTR_NULLABLE | ATTR_MIN_MAX},  // StartUpOnOff
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1),      4, ATTR_RO},                                                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(6),      2, ATTR_RO}                                                  // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // Off
+        {0x00000001, COMMAND_MASK_ACCEPTED},  // On
+        {0x00000002, COMMAND_MASK_ACCEPTED},  // Toggle
+        {0x00000040, COMMAND_MASK_ACCEPTED},  // OffWithEffect
+        {0x00000041, COMMAND_MASK_ACCEPTED},  // OnWithRecallGlobalScene
+        {0x00000042, COMMAND_MASK_ACCEPTED},  // OnWithTimedOff
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
     clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback);
     clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterOnOffClusterServerShutdownCallback);
 }
 
-void matter_cluster_level_control_server(ClusterConfig *clusterConfig)
+
+void cluster_server_level_control(ClusterConfig *clusterConfig)
 {
-    AttributeConfig levelcontrolCurrentLevel(0x00000000, ZAP_TYPE(INT8U), ZAP_SIMPLE_DEFAULT(0x01), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig levelcontrolRemainingTime(0x00000001, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(0x0000), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig levelcontrolMinLevel(0x00000002, ZAP_TYPE(INT8U), ZAP_SIMPLE_DEFAULT(0x01), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig levelcontrolMaxLevel(0x00000003, ZAP_TYPE(INT8U), ZAP_SIMPLE_DEFAULT(0xFE), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig levelcontrolCurrentFrequency(0x00000004, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(0x0000), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig levelcontrolMinFrequency(0x00000005, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(0x0000), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig levelcontrolMaxFrequency(0x00000006, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(0x0000), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig levelcontrolOptions(0x0000000F, ZAP_TYPE(BITMAP8), &levelcontrolOptionsMinMaxValue, 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig levelcontrolOnOffTransitionTime(0x00000010, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(0x0000), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE));
-    AttributeConfig levelcontrolOnLevel(0x00000011, ZAP_TYPE(INT8U), ZAP_SIMPLE_DEFAULT(0xFF), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig levelcontrolOnTransitionTime(0x00000012, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig levelcontrolOffTransitionTime(0x00000013, ZAP_TYPE(INT16U), ZAP_EMPTY_DEFAULT(), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig levelcontrolDefaultMoveRate(0x00000014, ZAP_TYPE(INT8U), ZAP_SIMPLE_DEFAULT(50), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig levelcontrolStartUpCurrentLevel(0x00004000, ZAP_TYPE(INT8U), ZAP_SIMPLE_DEFAULT(255), 1, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE));
-    AttributeConfig levelcontrolFeatureMap(0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(3), 4, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-    AttributeConfig levelcontrolClusterRevision(0x0000FFFD, ZAP_TYPE(INT16U), ZAP_SIMPLE_DEFAULT(5), 2, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE));
-
-    CommandConfig levelcontrolMoveToLevel(0x00000000, COMMAND_MASK_ACCEPTED);
-    CommandConfig levelcontrolMove(0x00000001, COMMAND_MASK_ACCEPTED);
-    CommandConfig levelcontrolStep(0x00000002, COMMAND_MASK_ACCEPTED);
-    CommandConfig levelcontrolStop(0x00000003, COMMAND_MASK_ACCEPTED);
-    CommandConfig levelcontrolMoveToLevelWithOnOff(0x00000004, COMMAND_MASK_ACCEPTED);
-    CommandConfig levelcontrolMoveWithOnOff(0x00000005, COMMAND_MASK_ACCEPTED);
-    CommandConfig levelcontrolStepWithOnOff(0x00000006, COMMAND_MASK_ACCEPTED);
-    CommandConfig levelcontrolStopWithOnOff(0x00000007, COMMAND_MASK_ACCEPTED);
-    CommandConfig levelcontrolEndOfAcceptedCommandList(chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED);
-
     clusterConfig->clusterId = 0x00000008;
     clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
-    clusterConfig->attributeConfigs.push_back(levelcontrolCurrentLevel);
-    clusterConfig->attributeConfigs.push_back(levelcontrolRemainingTime);
-    clusterConfig->attributeConfigs.push_back(levelcontrolMinLevel);
-    clusterConfig->attributeConfigs.push_back(levelcontrolMaxLevel);
-    clusterConfig->attributeConfigs.push_back(levelcontrolCurrentFrequency);
-    clusterConfig->attributeConfigs.push_back(levelcontrolMinFrequency);
-    clusterConfig->attributeConfigs.push_back(levelcontrolMaxFrequency);
-    clusterConfig->attributeConfigs.push_back(levelcontrolOptions);
-    clusterConfig->attributeConfigs.push_back(levelcontrolOnOffTransitionTime);
-    clusterConfig->attributeConfigs.push_back(levelcontrolOnLevel);
-    clusterConfig->attributeConfigs.push_back(levelcontrolOnTransitionTime);
-    clusterConfig->attributeConfigs.push_back(levelcontrolOffTransitionTime);
-    clusterConfig->attributeConfigs.push_back(levelcontrolDefaultMoveRate);
-    clusterConfig->attributeConfigs.push_back(levelcontrolStartUpCurrentLevel);
-    clusterConfig->attributeConfigs.push_back(levelcontrolFeatureMap);
-    clusterConfig->attributeConfigs.push_back(levelcontrolClusterRevision);
-    clusterConfig->commandConfigs.push_back(levelcontrolMoveToLevel);
-    clusterConfig->commandConfigs.push_back(levelcontrolMove);
-    clusterConfig->commandConfigs.push_back(levelcontrolStep);
-    clusterConfig->commandConfigs.push_back(levelcontrolStop);
-    clusterConfig->commandConfigs.push_back(levelcontrolMoveToLevelWithOnOff);
-    clusterConfig->commandConfigs.push_back(levelcontrolMoveWithOnOff);
-    clusterConfig->commandConfigs.push_back(levelcontrolStepWithOnOff);
-    clusterConfig->commandConfigs.push_back(levelcontrolStopWithOnOff);
-    clusterConfig->commandConfigs.push_back(levelcontrolEndOfAcceptedCommandList);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(0xFE),          1, ATTR_RO | ATTR_TOKENIZE | ATTR_NULLABLE}, // CurrentLevel
+        {0x00000001, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0000),        2, ATTR_RO},                                 // RemainingTime
+        {0x00000002, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(0x01),          1, ATTR_RO},                                 // MinLevel
+        {0x00000003, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(0xFE),          1, ATTR_RO},                                 // MaxLevel
+        {0x0000000F, ZAP_TYPE(BITMAP8),  &levelcontrolValue[0],             1, ATTR_RW | ATTR_MIN_MAX},                  // Options
+        {0x00000010, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0000),        2, ATTR_RW},                                 // OnOffTransitionTime
+        {0x00000011, ZAP_TYPE(INT8U),    &levelcontrolValue[1],             1, ATTR_RW | ATTR_MIN_MAX | ATTR_NULLABLE},  // OnLevel
+        {0x00000012, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),               2, ATTR_RW | ATTR_NULLABLE},                 // OnTransitionTime
+        {0x00000013, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),               2, ATTR_RW | ATTR_NULLABLE},                 // OffTransitionTime
+        {0x00000014, ZAP_TYPE(INT8U),    &levelcontrolValue[2],             1, ATTR_RW | ATTR_MIN_MAX | ATTR_NULLABLE},  // DefaultMoveRate
+        {0x00004000, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(255),           1, ATTR_RW | ATTR_TOKENIZE | ATTR_NULLABLE}, // StartUpCurrentLevel
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(3),             4, ATTR_RO},                                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(6),             2, ATTR_RO}                                  // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        {0x00000000, COMMAND_MASK_ACCEPTED}, // MoveToLevel
+        {0x00000001, COMMAND_MASK_ACCEPTED}, // Move
+        {0x00000002, COMMAND_MASK_ACCEPTED}, // Step
+        {0x00000003, COMMAND_MASK_ACCEPTED}, // Stop
+        {0x00000004, COMMAND_MASK_ACCEPTED}, // MoveToLevelWithOnOff
+        {0x00000005, COMMAND_MASK_ACCEPTED}, // MoveWithOnOff
+        {0x00000006, COMMAND_MASK_ACCEPTED}, // StepWithOnOff
+        {0x00000007, COMMAND_MASK_ACCEPTED}, // StopWithOnOff
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
     clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback);
     clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterLevelControlClusterServerShutdownCallback);
 }
 
+void cluster_server_oven_cavity_operational_state(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000048;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO | ATTR_NULLABLE}, // PhaseList
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO | ATTR_NULLABLE}, // CurrentPhase
+        {0x00000003, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},                 // OperationalStateList
+        {0x00000004, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},                 // OperationalState
+        {0x00000005, ZAP_TYPE(STRUCT),   ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},                 // OperationalError
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ATTR_RO},                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),   2, ATTR_RO}                  // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000002, COMMAND_MASK_ACCEPTED},  // Start
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000004, COMMAND_MASK_GENERATED}, // OperationalCommandResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    static const EventConfig events[] = {
+        {0x00000000},  // OperationalError
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->eventConfigs.assign(std::begin(events), std::end(events));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_oven_mode(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000049;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO}, // SupportedModes
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO}, // CurrentMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ATTR_RO}, // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(2), 2, ATTR_RO}  // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // ChangeToMode
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000001, COMMAND_MASK_GENERATED}, // ChangeToModeResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_laundry_dryer_controls(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000004A;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),         0, ATTR_RO},                                // SupportedDrynessLevels
+        {0x00000001, ZAP_TYPE(ENUM8),    &laundrydryercontrolsValue, 1, ATTR_RW | ATTR_NULLABLE | ATTR_MIN_MAX},  // SelectedDrynessLevel
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0),       4, ATTR_RO},                                // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(1),       2, ATTR_RO}                                 // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterLaundryDryerControlsClusterServerPreAttributeChangedCallback);
+}
+
+void cluster_server_mode_select(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000050;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(CHAR_STRING), defaultDescription,          65, ATTR_RO},                 // Description
+        {0x00000001, ZAP_TYPE(ENUM16),      ZAP_SIMPLE_DEFAULT(0),       2, ATTR_RO | ATTR_NULLABLE}, // StandardNamespace
+        {0x00000002, ZAP_TYPE(ARRAY),       ZAP_EMPTY_DEFAULT(),         0, ATTR_RO},                 // SupportedModes
+        {0x00000003, ZAP_TYPE(INT8U),       ZAP_SIMPLE_DEFAULT(0),       1, ATTR_RO},                 // CurrentMode
+        {0x00000004, ZAP_TYPE(INT8U),       ZAP_SIMPLE_DEFAULT(0),       1, ATTR_RW | ATTR_NULLABLE}, // StartUpMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32),    ZAP_SIMPLE_DEFAULT(0),       4, ATTR_RO},                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),      ZAP_SIMPLE_DEFAULT(2),       2, ATTR_RO}                  // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // ChangeToMode
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfModeSelectClusterServerInitCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterModeSelectClusterServerPreAttributeChangedCallback);
+}
+
+void cluster_server_laundry_washer_mode(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000051;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},  // SupportedModes
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},  // CurrentMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),   4, ATTR_RO},  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(3), 2, ATTR_RO}   // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // ChangeToMode
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000001, COMMAND_MASK_GENERATED}, // ChangeToModeResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterLaundryWasherControlsClusterServerPreAttributeChangedCallback);
+}
+
+void cluster_server_refrigerator_mode(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000052;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},  // SupportedModes
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},  // CurrentMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),   4, ATTR_RO},  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(3), 2, ATTR_RO}   // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // ChangeToMode
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000001, COMMAND_MASK_GENERATED}, // ChangeToModeResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_laundry_washer_controls(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000053;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),         0, ATTR_RO},                                // SpinSpeeds
+        {0x00000001, ZAP_TYPE(INT8U),    &laundrywashercontrolsValue, 1, ATTR_RW | ATTR_NULLABLE | ATTR_MIN_MAX}, // SpinSpeedCurrent
+        {0x00000002, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),         1, ATTR_RW},                                // NumberOfRinses
+        {0x00000003, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),         0, ATTR_RO},                                // SupportedRinses
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(3),       4, ATTR_RO},                                // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(2),       2, ATTR_RO}                                 // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
+void cluster_server_rvc_run_mode(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000054;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},  // SupportedModes
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},  // CurrentMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),   4, ATTR_RO},  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(3), 2, ATTR_RO}   // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // ChangeToMode
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000001, COMMAND_MASK_GENERATED}, // ChangeToModeResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_rvc_clean_mode(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000055;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},  // SupportedModes
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},  // CurrentMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),   4, ATTR_RO},  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(4), 2, ATTR_RO}   // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // ChangeToMode
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000001, COMMAND_MASK_GENERATED}, // ChangeToModeResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_temperature_control(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000056;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(TEMPERATURE), ZAP_EMPTY_DEFAULT(),   2, ATTR_RO}, // TemperatureSetpoint
+        {0x00000001, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(0), 2, ATTR_RO}, // MinTemperature
+        {0x00000002, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(5), 2, ATTR_RO}, // MaxTemperature
+        {0x00000003, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(5), 2, ATTR_RO}, // Step
+        {0x0000FFFC, ZAP_TYPE(BITMAP32),    ZAP_SIMPLE_DEFAULT(5), 4, ATTR_RO}, // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),      ZAP_SIMPLE_DEFAULT(1), 2, ATTR_RO}  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
+void cluster_server_refrigerator_alarm(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000057;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1), 4, ATTR_RO}, // Mask
+        {0x00000002, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ATTR_RO}, // State
+        {0x00000003, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1), 4, ATTR_RO}, // Supported
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ATTR_RO}, // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(1), 2, ATTR_RO}  // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // SetTemperature
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    static const EventConfig events[] = {
+        {0x00000000},  // Notify
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->eventConfigs.assign(std::begin(events), std::end(events));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_dishwasher_mode(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000059;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},    // SupportedModes
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},    // CurrentMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),   4, ATTR_RO},    // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(3), 2, ATTR_RO}     // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // ChangeToMode
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000001, COMMAND_MASK_GENERATED}, // ChangeToModeResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_air_quality(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000005B;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO}, // AirQuality
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),   4, ATTR_RO}, // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(1), 2, ATTR_RO}  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
+void cluster_server_dishwasher_alarm(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000005D;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1),  4, ATTR_RO}, // Mask
+        {0x00000001, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1),  4, ATTR_RO}, // Latch
+        {0x00000002, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0),  4, ATTR_RO}, // State
+        {0x00000003, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(15), 4, ATTR_RO}, // Supported
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1),  4, ATTR_RO}, // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(1),  2, ATTR_RO}  // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // Reset
+        {0x00000001, COMMAND_MASK_ACCEPTED},  // ModifyEnabledAlarms
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    static const EventConfig events[] = {
+        {0x00000000},  // Notify
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->eventConfigs.assign(std::begin(events), std::end(events));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_microwave_oven_mode(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000005E;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),    0, ATTR_RO}, // SupportedModes
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),    1, ATTR_RO}, // CurrentMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),    4, ATTR_RO}, // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(2),  2, ATTR_RO}  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
+void cluster_server_microwave_oven_control(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000005F;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ELAPSED_S), ZAP_EMPTY_DEFAULT(),    4, ATTR_RO}, // CookTime
+        {0x00000001, ZAP_TYPE(ELAPSED_S), ZAP_EMPTY_DEFAULT(),    4, ATTR_RO}, // MaxCookTime
+        {0x00000002, ZAP_TYPE(INT8U),     ZAP_EMPTY_DEFAULT(),    1, ATTR_RO}, // PowerSetting
+        {0x0000FFFC, ZAP_TYPE(BITMAP32),  ZAP_EMPTY_DEFAULT(),    4, ATTR_RO}, // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),    ZAP_SIMPLE_DEFAULT(1),  2, ATTR_RO}  // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // SetCookingParameters
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+static const AttributeConfig kOperationalStateAttributes[] = {
+    {0x00000000, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO | ATTR_NULLABLE}, // PhaseList
+    {0x00000001, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO | ATTR_NULLABLE}, // CurrentPhase
+    {0x00000003, ZAP_TYPE(ARRAY),    ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},                 // OperationalStateList
+    {0x00000004, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},                 // OperationalState
+    {0x00000005, ZAP_TYPE(STRUCT),   ZAP_EMPTY_DEFAULT(),   0, ATTR_RO},                 // OperationalError
+    {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0), 4, ATTR_RO},                 // FeatureMap
+    {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),   2, ATTR_RO}                  // ClusterRevision
+};
+
+void cluster_server_operational_state(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000060;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // Pause
+        {0x00000001, COMMAND_MASK_ACCEPTED},  // Stop
+        {0x00000002, COMMAND_MASK_ACCEPTED},  // Start
+        {0x00000003, COMMAND_MASK_ACCEPTED},  // Resume
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000004, COMMAND_MASK_GENERATED}, // OperationalCommandResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    static const EventConfig events[] = {
+        {0x00000000},  // OperationalError
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(kOperationalStateAttributes), std::end(kOperationalStateAttributes));
+    clusterConfig->eventConfigs.assign(std::begin(events), std::end(events));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_rvc_operational_state(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x000000061;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // Pause
+        {0x00000003, COMMAND_MASK_ACCEPTED},  // Resume
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000004, COMMAND_MASK_GENERATED}, // OperationalCommandResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    static const EventConfig events[] = {
+        {0x00000000},  // OperationalError
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(kOperationalStateAttributes), std::end(kOperationalStateAttributes));
+    clusterConfig->eventConfigs.assign(std::begin(events), std::end(events));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_scenes_management(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000062;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),        1, ATTR_RO},                  // SceneCount
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(0x00),   1, ATTR_RO},                  // CurrentScene
+        {0x00000002, ZAP_TYPE(GROUP_ID), ZAP_SIMPLE_DEFAULT(0x0000), 2, ATTR_RO},                  // CurrentGroup
+        {0x00000003, ZAP_TYPE(BOOLEAN),  ZAP_SIMPLE_DEFAULT(0x00),   1, ATTR_RO},                  // SceneValid
+        {0x00000004, ZAP_TYPE(BITMAP8),  ZAP_EMPTY_DEFAULT(),        1, ATTR_RO},                  // NameSupport
+        {0x00000005, ZAP_TYPE(NODE_ID),  uint32_t(0),                8, ATTR_RO | ATTR_NULLABLE},  // LastConfiguredBy
+        {0x00000006, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),        2, ATTR_RO},                  // SceneTableSize
+        {0x00000007, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),        1, ATTR_RO},                  // RemainingCapacity
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0),      4, ATTR_RO},                  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(5),      2, ATTR_RO}                   // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // AddScene
+        {0x00000001, COMMAND_MASK_ACCEPTED},  // ViewScene
+        {0x00000002, COMMAND_MASK_ACCEPTED},  // RemoveScene
+        {0x00000003, COMMAND_MASK_ACCEPTED},  // RemoveAllScenes
+        {0x00000004, COMMAND_MASK_ACCEPTED},  // StoreScene
+        {0x00000005, COMMAND_MASK_ACCEPTED},  // RecallScene
+        {0x00000006, COMMAND_MASK_ACCEPTED},  // GetSceneMembership
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+
+        // Generated commands
+        {0x00000000, COMMAND_MASK_GENERATED}, // AddSceneResponse
+        {0x00000001, COMMAND_MASK_GENERATED}, // ViewSceneResponse
+        {0x00000002, COMMAND_MASK_GENERATED}, // RemoveSceneResponse
+        {0x00000003, COMMAND_MASK_GENERATED}, // RemoveAllScenesResponse
+        {0x00000004, COMMAND_MASK_GENERATED}, // StoreSceneResponse
+        {0x00000006, COMMAND_MASK_GENERATED}, // GetSceneMembershipResponse
+        {chip::kInvalidCommandId, COMMAND_MASK_GENERATED}
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfScenesManagementClusterServerInitCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterScenesManagementClusterServerShutdownCallback);
+}
+
+void cluster_server_hepa_filter_monitoring(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000071;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(PERCENT),  ZAP_EMPTY_DEFAULT(),    1, ATTR_RO},                   // Condition
+        {0x00000001, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),    1, ATTR_RO},                   // DegradationDirection
+        {0x00000002, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),    1, ATTR_RO},                   // ChangeIndication
+        {0x00000003, ZAP_TYPE(BOOLEAN),  ZAP_EMPTY_DEFAULT(),    1, ATTR_RO},                   // InPlaceIndicator
+        {0x00000004, ZAP_TYPE(EPOCH_S),  ZAP_EMPTY_DEFAULT(),    4, ATTR_RW | ATTR_NULLABLE},   // LastChangedTime
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),    4, ATTR_RO},                   // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(1),  2, ATTR_RO}                    // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // ResetCondition
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_activated_carbon_filter_monitoring(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000072;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(PERCENT),  ZAP_EMPTY_DEFAULT(),    1, ATTR_RO},                   // Condition
+        {0x00000001, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),    1, ATTR_RO},                   // DegradationDirection
+        {0x00000002, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),    1, ATTR_RO},                   // ChangeIndication
+        {0x00000003, ZAP_TYPE(BOOLEAN),  ZAP_EMPTY_DEFAULT(),    1, ATTR_RO},                   // InPlaceIndicator
+        {0x00000004, ZAP_TYPE(EPOCH_S),  ZAP_EMPTY_DEFAULT(),    4, ATTR_RW | ATTR_NULLABLE},   // LastChangedTime
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),    4, ATTR_RO},                   // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(1),  2, ATTR_RO}                    // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // ResetCondition
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_valve_configuration_and_control(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000081;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ELAPSED_S), ZAP_SIMPLE_DEFAULT(0xFFFFFFFF), 4, ATTR_RO | ATTR_NULLABLE},  // OpenDuration
+        {0x00000001, ZAP_TYPE(ELAPSED_S), ZAP_SIMPLE_DEFAULT(20),         4, ATTR_RW | ATTR_NULLABLE},  // DefaultOpenDuration
+        {0x00000002, ZAP_TYPE(EPOCH_US),  defaultAutoCloseTime,           8, ATTR_RO | ATTR_NULLABLE},  // AutoCloseTime
+        {0x00000003, ZAP_TYPE(ELAPSED_S), ZAP_EMPTY_DEFAULT(),            4, ATTR_RO | ATTR_NULLABLE},  // RemainingDuration
+        {0x00000004, ZAP_TYPE(ENUM8),     ZAP_SIMPLE_DEFAULT(0xFF),       1, ATTR_RO | ATTR_NULLABLE},  // CurrentState
+        {0x00000005, ZAP_TYPE(ENUM8),     ZAP_SIMPLE_DEFAULT(0xFF),       1, ATTR_RO | ATTR_NULLABLE},  // TargetState
+        {0x0000FFFC, ZAP_TYPE(BITMAP32),  ZAP_SIMPLE_DEFAULT(0x1),        4, ATTR_RO},                  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),    ZAP_SIMPLE_DEFAULT(1),          2, ATTR_RO}                   // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // Open
+        {0x00000001, COMMAND_MASK_ACCEPTED},  // Close
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+}
+
+void cluster_server_window_covering(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000102;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ENUM8),         ZAP_SIMPLE_DEFAULT(0x08),      1, ATTR_RO},                 // Type
+        {0x00000005, ZAP_TYPE(INT16U),        ZAP_SIMPLE_DEFAULT(0x0000),    2, ATTR_RO},                 // NumberOfActuationsLift
+        {0x00000006, ZAP_TYPE(INT16U),        ZAP_SIMPLE_DEFAULT(0x0000),    2, ATTR_RO},                 // NumberOfActuationsTilt
+        {0x00000007, ZAP_TYPE(BITMAP8),       ZAP_SIMPLE_DEFAULT(0x0F),      1, ATTR_RO},                 // ConfigStatus
+        {0x00000008, ZAP_TYPE(PERCENT),       ZAP_SIMPLE_DEFAULT(50),        1, ATTR_RO | ATTR_NULLABLE}, // CurrentPositionLiftPercentage
+        {0x00000009, ZAP_TYPE(PERCENT),       ZAP_EMPTY_DEFAULT(),           1, ATTR_RO | ATTR_NULLABLE}, // CurrentPositionTiltPercentage
+        {0x0000000A, ZAP_TYPE(BITMAP8),       ZAP_SIMPLE_DEFAULT(0x00),      1, ATTR_RO},                 // OperationalStatus
+        {0x0000000B, ZAP_TYPE(PERCENT100THS), ZAP_SIMPLE_DEFAULT(5000),      2, ATTR_RO | ATTR_NULLABLE}, // TargetPositionLiftPercent100ths
+        {0x0000000C, ZAP_TYPE(PERCENT100THS), ZAP_EMPTY_DEFAULT(),           2, ATTR_RO | ATTR_NULLABLE}, // TargetPositionTiltPercent100ths
+        {0x0000000D, ZAP_TYPE(ENUM8),         ZAP_SIMPLE_DEFAULT(0x00),      1, ATTR_RO},                 // EndProductType
+        {0x0000000E, ZAP_TYPE(PERCENT100THS), ZAP_SIMPLE_DEFAULT(5000),      2, ATTR_RO | ATTR_NULLABLE}, // CurrentPositionLiftPercent100ths
+        {0x0000000F, ZAP_TYPE(PERCENT100THS), ZAP_EMPTY_DEFAULT(),           2, ATTR_RO | ATTR_NULLABLE}, // CurrentPositionTiltPercent100ths
+        {0x00000017, ZAP_TYPE(BITMAP8),       &windowcoveringValue,          1, ATTR_RW | ATTR_MIN_MAX},  // Mode
+        {0x0000001A, ZAP_TYPE(BITMAP16),      ZAP_SIMPLE_DEFAULT(0x00),      2, ATTR_RO},                 // SafetyStatus
+        {0x0000FFFC, ZAP_TYPE(BITMAP32),      ZAP_SIMPLE_DEFAULT(23),        4, ATTR_RO},                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),        ZAP_EMPTY_DEFAULT(),           2, ATTR_RO}                  // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // UpOrOpen
+        {0x00000001, COMMAND_MASK_ACCEPTED},  // DownOrClose
+        {0x00000002, COMMAND_MASK_ACCEPTED},  // StopMotion
+        {0x00000005, COMMAND_MASK_ACCEPTED},  // GoToLiftPercentage
+        {0x00000008, COMMAND_MASK_ACCEPTED},  // GoToTiltPercentage
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterWindowCoveringClusterServerAttributeChangedCallback);
+}
+
+void cluster_server_pump_configuration_and_control(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000200;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | \
+                          ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | \
+                          ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(INT16S),   ZAP_EMPTY_DEFAULT(),           2, ATTR_RO | ATTR_NULLABLE}, // MaxPressure
+        {0x00000001, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),           2, ATTR_RO | ATTR_NULLABLE}, // MaxSpeed
+        {0x00000002, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),           2, ATTR_RO | ATTR_NULLABLE}, // MaxFlow
+        {0x00000003, ZAP_TYPE(INT16S),   ZAP_EMPTY_DEFAULT(),           2, ATTR_RO | ATTR_NULLABLE}, // MinConstPressure
+        {0x00000004, ZAP_TYPE(INT16S),   ZAP_EMPTY_DEFAULT(),           2, ATTR_RO | ATTR_NULLABLE}, // MaxConstPressure
+        {0x00000011, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),           1, ATTR_RO},                 // EffectiveOperationMode
+        {0x00000012, ZAP_TYPE(ENUM8),    ZAP_EMPTY_DEFAULT(),           1, ATTR_RO},                 // EffectiveControlMode
+        {0x00000013, ZAP_TYPE(INT16S),   ZAP_EMPTY_DEFAULT(),           2, ATTR_RO | ATTR_NULLABLE}, // Capacity
+        {0x00000020, ZAP_TYPE(ENUM8),    &pumpconfigandcontrolValue,    1, ATTR_RW | ATTR_MIN_MAX},  // OperationMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(1),         4, ATTR_RO},                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(4),         2, ATTR_RO}                  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfPumpConfigurationAndControlClusterServerInitCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterPumpConfigurationAndControlClusterServerAttributeChangedCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterPumpConfigurationAndControlClusterServerPreAttributeChangedCallback);
+}
+
+void cluster_server_thermostat(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000201;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | \
+                          ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | \
+                          ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION) | \
+                          ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(TEMPERATURE), ZAP_EMPTY_DEFAULT(),        2, ATTR_RO | ATTR_NULLABLE},  // LocalTemperature
+        {0x00000003, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(0x02BC), 2, ATTR_RO},                  // AbsMinHeatSetpointLimit
+        {0x00000004, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(0x0BB8), 2, ATTR_RO},                  // AbsMaxHeatSetpointLimit
+        {0x00000005, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(0x0640), 2, ATTR_RO},                  // AbsMinCoolSetpointLimit
+        {0x00000006, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(0x0C80), 2, ATTR_RO},                  // AbsMaxCoolSetpointLimit
+        {0x00000007, ZAP_TYPE(INT8U),       ZAP_EMPTY_DEFAULT(),        1, ATTR_RO},                  // PICoolingDemand
+        {0x00000008, ZAP_TYPE(INT8U),       ZAP_EMPTY_DEFAULT(),        1, ATTR_RO},                  // PIHeatingDemand
+        {0x00000011, ZAP_TYPE(TEMPERATURE), &thermostatValue[0],        2, ATTR_RW | ATTR_MIN_MAX},   // OccupiedCoolingSetpoint
+        {0x00000012, ZAP_TYPE(TEMPERATURE), &thermostatValue[1],        2, ATTR_RW | ATTR_MIN_MAX},   // OccupiedHeatingSetpoint
+        {0x00000015, ZAP_TYPE(TEMPERATURE), &thermostatValue[2],        2, ATTR_RW | ATTR_MIN_MAX},   // MinHeatSetpointLimit
+        {0x00000016, ZAP_TYPE(TEMPERATURE), &thermostatValue[3],        2, ATTR_RW | ATTR_MIN_MAX},   // MaxHeatSetpointLimit
+        {0x00000017, ZAP_TYPE(TEMPERATURE), &thermostatValue[4],        2, ATTR_RW | ATTR_MIN_MAX},   // MinCoolSetpointLimit
+        {0x00000018, ZAP_TYPE(TEMPERATURE), &thermostatValue[5],        2, ATTR_RW | ATTR_MIN_MAX},   // MaxCoolSetpointLimit
+        {0x0000001B, ZAP_TYPE(ENUM8),       &thermostatValue[6],        1, ATTR_RW | ATTR_MIN_MAX},   // ControlSequenceOfOperation
+        {0x0000001C, ZAP_TYPE(ENUM8),       &thermostatValue[7],        1, ATTR_RW | ATTR_MIN_MAX},   // SystemMode
+        {0x0000FFFC, ZAP_TYPE(BITMAP32),    ZAP_SIMPLE_DEFAULT(3),      4, ATTR_RO},                  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),      ZAP_EMPTY_DEFAULT(),        2, ATTR_RO}                   // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // SetpointRaiseLower
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfThermostatClusterServerInitCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterThermostatClusterServerAttributeChangedCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterThermostatClusterServerShutdownCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterThermostatClusterServerPreAttributeChangedCallback);
+}
+
+void cluster_server_fan_control(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000202;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ENUM8),    &fancontrolValue[0],      1, ATTR_RW | ATTR_MIN_MAX},                 // FanMode
+        {0x00000001, ZAP_TYPE(ENUM8),    ZAP_SIMPLE_DEFAULT(0x02), 1, ATTR_RO},                                // FanModeSequence
+        {0x00000002, ZAP_TYPE(PERCENT),  &fancontrolValue[1],      1, ATTR_RW | ATTR_NULLABLE | ATTR_MIN_MAX}, // PercentSetting
+        {0x00000003, ZAP_TYPE(PERCENT),  ZAP_SIMPLE_DEFAULT(0x00), 1, ATTR_RO},                                // PercentCurrent
+        {0x00000004, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(10),   1, ATTR_RO},                                // SpeedMax
+        {0x00000005, ZAP_TYPE(INT8U),    &fancontrolValue[2],      1, ATTR_RW | ATTR_NULLABLE | ATTR_MIN_MAX}, // SpeedSetting
+        {0x00000006, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(0x00), 1, ATTR_RO},                                // SpeedCurrent
+        {0x00000007, ZAP_TYPE(BITMAP8),  ZAP_SIMPLE_DEFAULT(0x01), 1, ATTR_RO},                                // RockSupport
+        {0x00000008, ZAP_TYPE(BITMAP8),  &fancontrolValue[3],      1, ATTR_RW | ATTR_MIN_MAX},                 // RockSetting
+        {0x00000009, ZAP_TYPE(BITMAP8),  ZAP_SIMPLE_DEFAULT(0x03), 1, ATTR_RO},                                // WindSupport
+        {0x0000000A, ZAP_TYPE(BITMAP8),  &fancontrolValue[4],      1, ATTR_RW | ATTR_MIN_MAX},                 // WindSetting
+        {0x0000000B, ZAP_TYPE(ENUM8),    &fancontrolValue[5],      1, ATTR_RW | ATTR_MIN_MAX},                 // AirflowDirection
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0x3F), 4, ATTR_RO},                                // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(5),    2, ATTR_RO}                                 // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // Step
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterFanControlClusterServerAttributeChangedCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterFanControlClusterServerPreAttributeChangedCallback);
+}
+
+void cluster_server_thermostat_user_interface_configuration(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000204;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(ENUM8),    &thermostatUIValue[0], 1, ATTR_RW | ATTR_MIN_MAX}, // TemperatureDisplayMode
+        {0x00000001, ZAP_TYPE(ENUM8),    &thermostatUIValue[1], 1, ATTR_RW | ATTR_MIN_MAX}, // KeypadLockout
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0),          4, ATTR_RO},       // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(2),          2, ATTR_RO}        // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterThermostatUserInterfaceConfigurationClusterServerPreAttributeChangedCallback);
+}
+
+void cluster_server_color_control(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000300;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(SHUTDOWN_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(0x00),   1, ATTR_RO},                                // CurrentHue
+        {0x00000001, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(0x00),   1, ATTR_RO},                                // CurrentSaturation
+        {0x00000002, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0000), 2, ATTR_RO},                                // RemainingTime
+        {0x00000003, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x616B), 2, ATTR_RO},                                // CurrentX
+        {0x00000004, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x607D), 2, ATTR_RO},                                // CurrentY
+        {0x00000007, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x00FA), 2, ATTR_RO},                                // ColorTemperatureMireds
+        {0x00000008, ZAP_TYPE(ENUM8),    ZAP_SIMPLE_DEFAULT(0x01),   1, ATTR_RO},                                // ColorMode
+        {0x0000000F, ZAP_TYPE(BITMAP8),  ZAP_SIMPLE_DEFAULT(0x00),   1, ATTR_RW},                                // Options
+        {0x00000010, ZAP_TYPE(INT8U),    ZAP_EMPTY_DEFAULT(),        1, ATTR_RO | ATTR_NULLABLE},                // NumberOfPrimaries
+        {0x00004000, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0000), 2, ATTR_RO},                                // EnhancedCurrentHue
+        {0x00004001, ZAP_TYPE(ENUM8),    ZAP_SIMPLE_DEFAULT(0x01),   1, ATTR_RO},                                // EnhancedColorMode
+        {0x00004002, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(0x00),   1, ATTR_RO},                                // ColorLoopActive
+        {0x00004003, ZAP_TYPE(INT8U),    ZAP_SIMPLE_DEFAULT(0x00),   1, ATTR_RO},                                // ColorLoopDirection
+        {0x00004004, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0019), 2, ATTR_RO},                                // ColorLoopTime
+        {0x00004005, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x2300), 2, ATTR_RO},                                // ColorLoopStartEnhancedHue
+        {0x00004006, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0000), 2, ATTR_RO},                                // ColorLoopStoredEnhancedHue
+        {0x0000400A, ZAP_TYPE(BITMAP16), ZAP_SIMPLE_DEFAULT(0x1F),   2, ATTR_RO},                                // ColorCapabilities
+        {0x0000400B, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0001), 2, ATTR_RO},                                // MinMireds
+        {0x0000400C, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0xFEFF), 2, ATTR_RO},                                // MaxMireds
+        {0x0000400D, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(1),      2, ATTR_RO},                                // CoupleColorTemp
+        {0x00004010, ZAP_TYPE(INT16U),   &colorcontrolValue,         2, ATTR_RW | ATTR_NULLABLE | ATTR_MIN_MAX}, // StartUpColorTemperature
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0x1F),   4, ATTR_RO},                                // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(8),      2, ATTR_RO}                                 // ClusterRevision
+    };
+
+    static const CommandConfig commands[] = {
+        // Accepted commands
+        {0x00000000, COMMAND_MASK_ACCEPTED},  // MoveToHue
+        {0x00000001, COMMAND_MASK_ACCEPTED},  // MoveHue
+        {0x00000002, COMMAND_MASK_ACCEPTED},  // StepHue
+        {0x00000003, COMMAND_MASK_ACCEPTED},  // MoveToSaturation
+        {0x00000004, COMMAND_MASK_ACCEPTED},  // MoveSaturation
+        {0x00000005, COMMAND_MASK_ACCEPTED},  // StepSaturation
+        {0x00000006, COMMAND_MASK_ACCEPTED},  // MoveToHueAndSaturation
+        {0x00000007, COMMAND_MASK_ACCEPTED},  // MoveToColor
+        {0x00000008, COMMAND_MASK_ACCEPTED},  // MoveColor
+        {0x00000009, COMMAND_MASK_ACCEPTED},  // StepColor
+        {0x0000000A, COMMAND_MASK_ACCEPTED},  // MoveToColorTemperature
+        {0x00000040, COMMAND_MASK_ACCEPTED},  // EnhancedMoveToHue
+        {0x00000041, COMMAND_MASK_ACCEPTED},  // EnhancedMoveHue
+        {0x00000042, COMMAND_MASK_ACCEPTED},  // EnhancedStepHue
+        {0x00000043, COMMAND_MASK_ACCEPTED},  // EnhancedMoveToHueAndSaturation
+        {0x00000044, COMMAND_MASK_ACCEPTED},  // ColorLoopSet
+        {0x00000047, COMMAND_MASK_ACCEPTED},  // StopMoveStep
+        {0x0000004B, COMMAND_MASK_ACCEPTED},  // MoveColorTemperature
+        {0x0000004C, COMMAND_MASK_ACCEPTED},  // StepColorTemperature
+        {chip::kInvalidCommandId, COMMAND_MASK_ACCEPTED},
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->commandConfigs.assign(std::begin(commands), std::end(commands));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback);
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) MatterColorControlClusterServerShutdownCallback);
+}
+
+void cluster_server_illuminance_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000400;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x0000), 2, ATTR_RO | ATTR_NULLABLE}, // MeasuredValue
+        {0x00000001, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x01),   2, ATTR_RO | ATTR_NULLABLE}, // MinMeasuredValue
+        {0x00000002, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0xFFFE), 2, ATTR_RO | ATTR_NULLABLE}, // MaxMeasuredValue
+        {0x00000003, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),        2, ATTR_RO},                 // Tolerance
+        {0x00000004, ZAP_TYPE(ENUM8),    ZAP_SIMPLE_DEFAULT(0xFF),   1, ATTR_RO | ATTR_NULLABLE}, // LightSensorType
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0),      4, ATTR_RO},                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(3),      2, ATTR_RO}                  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
+void cluster_server_temperature_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000402;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(0x8000), 2, ATTR_RO | ATTR_NULLABLE}, // MeasuredValue
+        {0x00000001, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(0x8000), 2, ATTR_RO | ATTR_NULLABLE}, // MinMeasuredValue
+        {0x00000002, ZAP_TYPE(TEMPERATURE), ZAP_SIMPLE_DEFAULT(0x8000), 2, ATTR_RO | ATTR_NULLABLE}, // MaxMeasuredValue
+        {0x00000003, ZAP_TYPE(INT16U),      ZAP_EMPTY_DEFAULT(),        2, ATTR_RO},                 // Tolerance
+        {0x0000FFFC, ZAP_TYPE(BITMAP32),    ZAP_SIMPLE_DEFAULT(0),      4, ATTR_RO},                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),      ZAP_SIMPLE_DEFAULT(4),      2, ATTR_RO}                  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
+void cluster_server_pressure_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000403;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(INT16S),   ZAP_SIMPLE_DEFAULT(0x0000), 2, ATTR_RO | ATTR_NULLABLE}, // MeasuredValue
+        {0x00000001, ZAP_TYPE(INT16S),   ZAP_EMPTY_DEFAULT(),        2, ATTR_RO | ATTR_NULLABLE}, // MinMeasuredValue
+        {0x00000002, ZAP_TYPE(INT16S),   ZAP_EMPTY_DEFAULT(),        2, ATTR_RO | ATTR_NULLABLE}, // MaxMeasuredValue
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0),      4, ATTR_RO},                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(3),      2, ATTR_RO}                  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
+void cluster_server_flow_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000404;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(5),   2, ATTR_RO | ATTR_NULLABLE}, // MeasuredValue
+        {0x00000001, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0),   2, ATTR_RO | ATTR_NULLABLE}, // MinMeasuredValue
+        {0x00000002, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(100), 2, ATTR_RO | ATTR_NULLABLE}, // MaxMeasuredValue
+        {0x00000003, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0),   2, ATTR_RO},                 // Tolerance
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0),   4, ATTR_RO},                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(3),   2, ATTR_RO}                  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
+void cluster_server_relative_humidity_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000405;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),        2, ATTR_RO | ATTR_NULLABLE}, // MeasuredValue
+        {0x00000001, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0),      2, ATTR_RO | ATTR_NULLABLE}, // MinMeasuredValue
+        {0x00000002, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(0x2710), 2, ATTR_RO | ATTR_NULLABLE}, // MaxMeasuredValue
+        {0x00000003, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),        2, ATTR_RO},                 // Tolerance
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_SIMPLE_DEFAULT(0),      4, ATTR_RO},                 // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_SIMPLE_DEFAULT(3),      2, ATTR_RO}                  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
+void cluster_server_occupancy_sensing(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000406;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(BITMAP8),  ZAP_EMPTY_DEFAULT(),   1, ATTR_RO}, // Occupancy
+        {0x00000001, ZAP_TYPE(ENUM8),    ZAP_SIMPLE_DEFAULT(1), 1, ATTR_RO}, // OccupancySensorType
+        {0x00000002, ZAP_TYPE(BITMAP8),  ZAP_SIMPLE_DEFAULT(2), 1, ATTR_RO}, // OccupancySensorTypeBitmap
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(),   4, ATTR_RO}, // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(),   2, ATTR_RO}  // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+    clusterConfig->functionConfigs.push_back((EmberAfGenericClusterFunction) emberAfOccupancySensingClusterServerInitCallback);
+}
+
+static const AttributeConfig kConcentrationMeasurementAttributes[] = {
+    {0x00000000, ZAP_TYPE(SINGLE),    ZAP_EMPTY_DEFAULT(),   4, ATTR_RO | ATTR_NULLABLE},  // MeasuredValue
+    {0x00000001, ZAP_TYPE(SINGLE),    ZAP_EMPTY_DEFAULT(),   4, ATTR_RO | ATTR_NULLABLE},  // MinMeasuredValue
+    {0x00000002, ZAP_TYPE(SINGLE),    ZAP_EMPTY_DEFAULT(),   4, ATTR_RO | ATTR_NULLABLE},  // MaxMeasuredValue
+    {0x00000003, ZAP_TYPE(SINGLE),    ZAP_EMPTY_DEFAULT(),   4, ATTR_RO | ATTR_NULLABLE},  // PeakMeasuredValue
+    {0x00000004, ZAP_TYPE(ELAPSED_S), ZAP_EMPTY_DEFAULT(),   4, ATTR_RO},                  // PeakMeasuredValueWindow
+    {0x00000005, ZAP_TYPE(SINGLE),    ZAP_EMPTY_DEFAULT(),   4, ATTR_RO | ATTR_NULLABLE},  // AverageMeasuredValue
+    {0x00000006, ZAP_TYPE(ELAPSED_S), ZAP_EMPTY_DEFAULT(),   4, ATTR_RO},                  // AverageMeasuredValueWindow
+    {0x00000007, ZAP_TYPE(SINGLE),    ZAP_EMPTY_DEFAULT(),   4, ATTR_RO},                  // Uncertainty
+    {0x00000008, ZAP_TYPE(ENUM8),     ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},                  // MeasurementUnit
+    {0x00000009, ZAP_TYPE(ENUM8),     ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},                  // MeasurementMedium
+    {0x0000000A, ZAP_TYPE(ENUM8),     ZAP_EMPTY_DEFAULT(),   1, ATTR_RO},                  // LevelValue
+    {0x0000FFFC, ZAP_TYPE(BITMAP32),  ZAP_EMPTY_DEFAULT(),   4, ATTR_RO},                  // FeatureMap
+    {0x0000FFFD, ZAP_TYPE(INT16U),    ZAP_SIMPLE_DEFAULT(3), 2, ATTR_RO}                   // ClusterRevision
+};
+
+void cluster_server_carbon_monoxide_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000040C;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_carbon_dioxide_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000040D;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_nitrogen_dioxide_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000413;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_ozone_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000415;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_pm25_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000042A;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_formaldehyde_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000042B;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_pm1_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000042C;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_pm10_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000042D;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_total_volatile_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000042E;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_radon_concentration_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x0000042F;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+    clusterConfig->attributeConfigs.assign(
+                    std::begin(kConcentrationMeasurementAttributes), std::end(kConcentrationMeasurementAttributes));
+}
+
+void cluster_server_soil_measurement(ClusterConfig *clusterConfig)
+{
+    clusterConfig->clusterId = 0x00000430;
+    clusterConfig->mask = ZAP_CLUSTER_MASK(SERVER);
+
+    static const AttributeConfig attributes[] = {
+        {0x00000000, ZAP_TYPE(STRUCT),   ZAP_EMPTY_DEFAULT(), 0, ATTR_RO},                  // SoilMoistureMeasurementLimits
+        {0x00000001, ZAP_TYPE(PERCENT),  ZAP_EMPTY_DEFAULT(), 1, ATTR_RO | ATTR_NULLABLE},  // SoilMoistureMeasuredValue
+        {0x0000FFFC, ZAP_TYPE(BITMAP32), ZAP_EMPTY_DEFAULT(), 4, ATTR_RO},                  // FeatureMap
+        {0x0000FFFD, ZAP_TYPE(INT16U),   ZAP_EMPTY_DEFAULT(), 2, ATTR_RO}                   // ClusterRevision
+    };
+
+    clusterConfig->attributeConfigs.assign(std::begin(attributes), std::end(attributes));
+}
+
 } // Clusters
 
-namespace Endpoints {
-
-void matter_root_node_preset(EndpointConfig *rootNodeEndpointConfig)
+namespace Endpoints
 {
-    ClusterConfig descriptorServerCluster;
-    ClusterConfig aclServerCluster;
-    ClusterConfig basicInformationServerCluster;
-    ClusterConfig otarServerCluster;
-    ClusterConfig generalCommissioningServerCluster;
-    ClusterConfig networkCommissioningServerCluster;
-    ClusterConfig generalDiagnosticsServerCluster;
-    ClusterConfig softwareDiagnosticsServerCluster;
-    ClusterConfig wifiDiagnosticsServerCluster;
-    ClusterConfig administratorCommissioningServerCluster;
-    ClusterConfig operationalCredentialsServerCluster;
-    ClusterConfig groupKeyManagementServerCluster;
 
-    Presets::Clusters::matter_cluster_descriptor_server(&descriptorServerCluster);
-    Presets::Clusters::matter_cluster_acl_server(&aclServerCluster);
-    Presets::Clusters::matter_cluster_basic_information_server(&basicInformationServerCluster);
-    Presets::Clusters::matter_cluster_ota_requestor_server(&otarServerCluster);
-    Presets::Clusters::matter_cluster_general_commissioning_server(&generalCommissioningServerCluster);
-    Presets::Clusters::matter_cluster_network_commissioning_server(&networkCommissioningServerCluster);
-    Presets::Clusters::matter_cluster_general_diagnostics_server(&generalDiagnosticsServerCluster);
-    Presets::Clusters::matter_cluster_software_diagnostics_server(&softwareDiagnosticsServerCluster);
-    Presets::Clusters::matter_cluster_wifi_diagnostics_server(&wifiDiagnosticsServerCluster);
-    Presets::Clusters::matter_cluster_administrator_commissioning_server(&administratorCommissioningServerCluster);
-    Presets::Clusters::matter_cluster_operational_credentials_server(&operationalCredentialsServerCluster);
-    Presets::Clusters::matter_cluster_group_key_management_server(&groupKeyManagementServerCluster);
-
-    rootNodeEndpointConfig->clusterConfigs.push_back(descriptorServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(aclServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(basicInformationServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(otarServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(generalCommissioningServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(networkCommissioningServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(generalDiagnosticsServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(softwareDiagnosticsServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(wifiDiagnosticsServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(administratorCommissioningServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(operationalCredentialsServerCluster);
-    rootNodeEndpointConfig->clusterConfigs.push_back(groupKeyManagementServerCluster);
+using PresetFunc = void (*)(ClusterConfig *);
+inline void addCluster(EndpointConfig *endpoint, PresetFunc preset)
+{
+    ClusterConfig cluster;
+    preset(&cluster);
+    endpoint->clusterConfigs.push_back(cluster);
 }
 
-void matter_dimmable_light_preset(EndpointConfig *dimmableLightEndpointConfig)
+static void matter_default_light_preset(EndpointConfig *mEndpointConfig)
 {
-    ClusterConfig descriptorServerCluster;
-    ClusterConfig identifyServerCluster;
-    ClusterConfig groupsServerCluster;
-    ClusterConfig onOffServerCluster;
-    ClusterConfig levelControlServerCluster;
-
-    Presets::Clusters::matter_cluster_descriptor_server(&descriptorServerCluster);
-    Presets::Clusters::matter_cluster_identify_server(&identifyServerCluster);
-    Presets::Clusters::matter_cluster_groups_server(&groupsServerCluster);
-    Presets::Clusters::matter_cluster_onoff_server(&onOffServerCluster);
-    Presets::Clusters::matter_cluster_level_control_server(&levelControlServerCluster);
-
-    dimmableLightEndpointConfig->clusterConfigs.push_back(descriptorServerCluster);
-    dimmableLightEndpointConfig->clusterConfigs.push_back(identifyServerCluster);
-    dimmableLightEndpointConfig->clusterConfigs.push_back(groupsServerCluster);
-    dimmableLightEndpointConfig->clusterConfigs.push_back(onOffServerCluster);
-    dimmableLightEndpointConfig->clusterConfigs.push_back(levelControlServerCluster);
-
-#if defined(ZCL_USING_SCENES_CLUSTER_SERVER)
-    ClusterConfig scenesServerCluster;
-    Presets::Clusters::matter_cluster_scenes_server(&scenesServerCluster);
-    dimmableLightEndpointConfig->clusterConfigs.push_back(scenesServerCluster);
-#endif
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_descriptor);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_identify);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_groups);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_onoff);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_level_control);
 }
 
-void matter_aggregator_preset(EndpointConfig *aggregatorEndpointConfig)
+void matter_air_purifier_preset(EndpointConfig *mEndpointConfig)
 {
-    ClusterConfig descriptorServerCluster;
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_identify);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_descriptor);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_hepa_filter_monitoring);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_activated_carbon_filter_monitoring);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_fan_control);
+}
 
-    Presets::Clusters::matter_cluster_descriptor_server(&descriptorServerCluster);
+void matter_room_air_con_preset(EndpointConfig *mEndpointConfig)
+{
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_identify);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_onoff);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_descriptor);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_thermostat);
+}
 
-    aggregatorEndpointConfig->clusterConfigs.push_back(descriptorServerCluster);
+void matter_onoff_light_preset(EndpointConfig *mEndpointConfig)
+{
+    matter_default_light_preset(mEndpointConfig);
+}
+
+void matter_dimmable_light_preset(EndpointConfig *mEndpointConfig)
+{
+    matter_default_light_preset(mEndpointConfig);
+}
+
+void matter_color_temperature_light_preset(EndpointConfig *mEndpointConfig)
+{
+    matter_default_light_preset(mEndpointConfig);
+    addCluster(mEndpointConfig, Presets::Clusters::cluster_server_color_control);
 }
 
 } // Endpoints

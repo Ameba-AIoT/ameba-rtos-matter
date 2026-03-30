@@ -19,7 +19,7 @@
 
 #include <platform_opts.h>
 
-#if defined(CONFIG_EXAMPLE_MATTER_BRIDGE) && CONFIG_EXAMPLE_MATTER_BRIDGE
+#if defined(CONFIG_EXAMPLE_MATTER_DYNAMIC_ENDPOINT) && CONFIG_EXAMPLE_MATTER_DYNAMIC_ENDPOINT
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -34,7 +34,6 @@
 #include <matter_data_model_presets.h>
 #include <matter_drivers.h>
 #include <matter_interaction.h>
-#include <bridge_dm_driver.h>
 
 #include <app/ConcreteAttributePath.h>
 #include <app/reporting/reporting.h>
@@ -50,27 +49,25 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::Platform;
 using namespace ::chip::app::Clusters;
 
-MatterBridge bridge;
-Node &node = Node::getInstance();
-
-EmberAfDeviceType gBridgedOnOffDeviceTypes[] = {
-    { DEVICE_TYPE_ON_OFF_LIGHT, DEVICE_VERSION_DEFAULT },
-    { DEVICE_TYPE_BRIDGED_NODE, DEVICE_VERSION_DEFAULT },
+EmberAfDeviceType airpurifierDeviceTypes[] = {
+    { DEVICE_TYPE_AIR_PURIFIER, DEVICE_VERSION_DEFAULT },
 };
 
-static void example_matter_bridge_task(void *pvParameters)
+EmberAfDeviceType roomairconDeviceTypes[] = {
+    { DEVICE_TYPE_ROOM_AIR_CON, DEVICE_VERSION_DEFAULT },
+};
+
+Node &node = Node::getInstance();
+
+static void example_matter_dynamic_endpoint_task(void *pvParameters)
 {
     while (!(wifi_is_up(RTW_STA_INTERFACE) || wifi_is_up(RTW_AP_INTERFACE))) {
         vTaskDelay(500);
     }
-    ChipLogProgress(DeviceLayer, "Matter Bridge Dynamic Endpoint Example!");
+
+    ChipLogProgress(DeviceLayer, "Matter Dynamic Endpoint Example!");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = matter_driver_bridge_light_init();
-    if (err != CHIP_NO_ERROR) {
-        ChipLogProgress(DeviceLayer, "matter_driver_bridge_light_init failed!");
-    }
 
     err = matter_core_start();
     if (err != CHIP_NO_ERROR) {
@@ -87,23 +84,35 @@ static void example_matter_bridge_task(void *pvParameters)
         ChipLogProgress(DeviceLayer, "matter_interaction_start_uplink failed!");
     }
 
-    vTaskDelay(50);
+    ChipLogProgress(DeviceLayer, "Configuring Device as Air Purifier");
 
-    bridge.Init(node);
+    // Set AirPurifier Device Type and add Endpoint
+    EndpointConfig airPurifierEndpointConfig;
+    Presets::Endpoints::matter_air_purifier_preset(&airPurifierEndpointConfig);
+    chip::EndpointId airPurifierEndpointId =
+                    node.addEndpoint(airPurifierEndpointConfig, Span<const EmberAfDeviceType>(airpurifierDeviceTypes));
 
-    EndpointConfig bridgedonoffEndpointConfig;
-    Presets::Endpoints::matter_onoff_light_preset(&bridgedonoffEndpointConfig);
+    // Enable Endpoint
+    node.enableAllEndpoints();
 
-    chip::EndpointId firstBridgedDeviceEndpointId;
-    firstBridgedDeviceEndpointId = bridge.addBridgedEndpoint(bridgedonoffEndpointConfig, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes));
+    vTaskDelay(2000);
 
-    if (xTaskCreate(matter_customer_bridge_code, ((const char *)"matter_customer_bridge_code"), 1024, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
-        printf("\r%s xTaskCreate(matter_customer_bridge_code) failed", __FUNCTION__);
-    }
+    // Disable and Remove Air Purifier
+    node.getEndpoint(airPurifierEndpointId)->disableEndpoint();
+    node.removeEndpoint(airPurifierEndpointId);
 
-    vTaskDelay(20000);
+    vTaskDelay(5000);
 
-    bridge.removeBridgedEndpoint(firstBridgedDeviceEndpointId);
+    ChipLogProgress(DeviceLayer, "Configuring Device as Room Air Conditioner");
+
+    // Set AirPurifier Room Air Conditioner and add Endpoint
+    EndpointConfig roomAirconEndpointConfig;
+    Presets::Endpoints::matter_room_air_con_preset(&roomAirconEndpointConfig);
+    chip::EndpointId roomAirconEndpointId =
+                    node.addEndpoint(roomAirconEndpointConfig, Span<const EmberAfDeviceType>(roomairconDeviceTypes));
+
+    // Enable Endpoint
+    node.enableAllEndpoints();
 
     vTaskDelete(NULL);
 }
@@ -126,10 +135,12 @@ void operator delete (void *p)
 }
 #endif /* CONFIG_PLATFORM_8721D */
 
-extern "C" void example_matter_bridge(void)
+extern "C" void example_matter_dynamic_endpoint(void)
 {
-    if (xTaskCreate(example_matter_bridge_task, ((const char *)"example_matter_bridge_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
-        ChipLogProgress(DeviceLayer, "%s xTaskCreate(example_matter_bridge_task) failed", __FUNCTION__);
+    if (xTaskCreate(example_matter_dynamic_endpoint_task, ((const char *)"example_matter_dynamic_endpoint_task"), 2048, NULL, tskIDLE_PRIORITY + 1,
+                    NULL) != pdPASS) {
+        ChipLogProgress(DeviceLayer, "Dynamic Endpoint task create failed");
     }
 }
-#endif
+
+#endif /* CONFIG_EXAMPLE_MATTER_DYNAMIC_ENDPOINT */

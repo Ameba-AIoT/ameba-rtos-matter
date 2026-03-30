@@ -1,11 +1,22 @@
-/********************************************************************************
-  *
-  * This module is a confidential and proprietary property of RealTek and
-  * possession or use of this module requires written permission of RealTek.
-  *
-  * Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
-  *
-********************************************************************************/
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #pragma once
 
 #include <af-types.h>
@@ -14,8 +25,25 @@
 #include <vector>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app/util/attribute-metadata.h>
+#include <platform_opts.h>
 
 using namespace ::chip;
+
+// ============================
+// Device Type IDs
+// ============================
+#define DEVICE_TYPE_ROOT_NODE           0x0016
+#define DEVICE_TYPE_BRIDGE              0x000E
+#define DEVICE_TYPE_BRIDGED_NODE        0x0013
+#define DEVICE_TYPE_AIR_PURIFIER        0x002D
+#define DEVICE_TYPE_ROOM_AIR_CON        0x0072
+#define DEVICE_TYPE_ON_OFF_LIGHT        0x0100
+#define DEVICE_TYPE_DIMMABLE_LIGHT      0x0101
+
+// ============================
+// Device Configuration
+// ============================
+#define DEVICE_VERSION_DEFAULT          1
 
 class Node;
 class Endpoint;
@@ -25,34 +53,31 @@ class Command;
 class Event;
 
 // Use variant to represent the different data types supported
-typedef std::variant<uint8_t, uint8_t*, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t, float> AttributeValue;
+typedef std::variant<uint8_t, uint8_t *, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t, float> AttributeValue;
 
 // Configurations
-struct AttributeConfig
-{
+struct AttributeConfig {
     std::uint32_t attributeId;
     std::uint8_t dataType; /* use ZAP_TYPE(type) */
     EmberAfDefaultOrMinMaxAttributeValue value; /* use ZAP_EMPTY(), ZAP_SIMPLE(), etc */
     std::uint16_t size;
     std::uint8_t mask = 0; /* attribute flag */
-    AttributeConfig(uint32_t attributeId, uint8_t dataType, EmberAfDefaultOrMinMaxAttributeValue value, uint16_t size, uint8_t mask) : attributeId(attributeId), dataType(dataType), value(value), size(size), mask(mask) {}
+    AttributeConfig(uint32_t attributeId, uint8_t dataType, EmberAfDefaultOrMinMaxAttributeValue value, uint16_t size, uint8_t mask) : attributeId(attributeId),
+        dataType(dataType), value(value), size(size), mask(mask) {}
 };
 
-struct EventConfig
-{
+struct EventConfig {
     std::uint32_t eventId;
     EventConfig(uint32_t eventId) : eventId(eventId) {}
 };
 
-struct CommandConfig
-{
+struct CommandConfig {
     std::uint32_t commandId;
     std::uint8_t mask = 0; /* command flag */
     CommandConfig(uint32_t commandId, uint8_t mask) : commandId(commandId), mask(mask) {}
 };
 
-struct ClusterConfig
-{
+struct ClusterConfig {
 public:
     std::uint32_t clusterId;
     std::vector<AttributeConfig> attributeConfigs;
@@ -72,7 +97,7 @@ public:
 class Attribute
 {
 public:
-    Attribute(chip::ClusterId clusterId, chip::EndpointId endpointId, AttributeConfig attributeConfig) : 
+    Attribute(chip::ClusterId clusterId, chip::EndpointId endpointId, AttributeConfig attributeConfig) :
         attributeId(attributeConfig.attributeId),
         attributeSize(attributeConfig.size),
         attributeType(attributeConfig.dataType),
@@ -83,116 +108,86 @@ public:
     {
         // Retrieve value from NVS if available, else
         // assign value to be of base type with default value from config
-        switch (getAttributeBaseType())
-        {
+        switch (getAttributeBaseType()) {
         case ZCL_INT8U_ATTRIBUTE_TYPE:
         case ZCL_BOOLEAN_ATTRIBUTE_TYPE:
             uint8_t value_uint8_t;
-            if (retrieveValue(&value_uint8_t, sizeof(uint8_t)) == CHIP_NO_ERROR)
-            {
+            if (retrieveValue(&value_uint8_t, sizeof(uint8_t)) == CHIP_NO_ERROR) {
                 value = value_uint8_t;
-            }
-            else
-            {
+            } else {
                 value = uint8_t(attributeConfig.value.defaultValue);
             }
             break;
         case ZCL_INT16U_ATTRIBUTE_TYPE:
             uint16_t value_uint16_t;
-            if (retrieveValue((uint8_t*) &value_uint16_t, sizeof(uint16_t)) == CHIP_NO_ERROR)
-            {
+            if (retrieveValue((uint8_t *) &value_uint16_t, sizeof(uint16_t)) == CHIP_NO_ERROR) {
                 value = value_uint16_t;
-            }
-            else
-            {
+            } else {
                 value = uint16_t(attributeConfig.value.defaultValue);
             }
             break;
         case ZCL_INT32U_ATTRIBUTE_TYPE:
             uint32_t value_uint32_t;
-            if (retrieveValue((uint8_t*) &value_uint32_t, sizeof(uint32_t)) == CHIP_NO_ERROR)
-            {
+            if (retrieveValue((uint8_t *) &value_uint32_t, sizeof(uint32_t)) == CHIP_NO_ERROR) {
                 value = value_uint32_t;
-            }
-            else
-            {
+            } else {
                 value = uint32_t(attributeConfig.value.defaultValue);
             }
             break;
         case ZCL_INT64U_ATTRIBUTE_TYPE:
             uint64_t value_uint64_t;
-            if (retrieveValue((uint8_t*) &value_uint64_t, sizeof(uint64_t)) == CHIP_NO_ERROR)
-            {
+            if (retrieveValue((uint8_t *) &value_uint64_t, sizeof(uint64_t)) == CHIP_NO_ERROR) {
                 value = value_uint64_t;
-            }
-            else
-            {
+            } else {
                 value = uint64_t(attributeConfig.value.defaultValue);
             }
             break;
         case ZCL_INT8S_ATTRIBUTE_TYPE:
             int8_t value_int8_t;
-            if (retrieveValue((uint8_t*) &value_int8_t, sizeof(int8_t)) == CHIP_NO_ERROR)
-            {
+            if (retrieveValue((uint8_t *) &value_int8_t, sizeof(int8_t)) == CHIP_NO_ERROR) {
                 value = value_int8_t;
-            }
-            else
-            {
+            } else {
                 value = int8_t(attributeConfig.value.defaultValue);
             }
             break;
         case ZCL_INT16S_ATTRIBUTE_TYPE:
             int16_t value_int16_t;
-            if (retrieveValue((uint8_t*) &value_int16_t, sizeof(int16_t)) == CHIP_NO_ERROR)
-            {
+            if (retrieveValue((uint8_t *) &value_int16_t, sizeof(int16_t)) == CHIP_NO_ERROR) {
                 value = value_int16_t;
-            }
-            else
-            {
+            } else {
                 value = int16_t(attributeConfig.value.defaultValue);
             }
             break;
         case ZCL_INT32S_ATTRIBUTE_TYPE:
             int32_t value_int32_t;
-            if (retrieveValue((uint8_t*) &value_int32_t, sizeof(int32_t)) == CHIP_NO_ERROR)
-            {
+            if (retrieveValue((uint8_t *) &value_int32_t, sizeof(int32_t)) == CHIP_NO_ERROR) {
                 value = value_int32_t;
-            }
-            else
-            {
+            } else {
                 value = int32_t(attributeConfig.value.defaultValue);
             }
             break;
         case ZCL_INT64S_ATTRIBUTE_TYPE:
             int64_t value_int64_t;
-            if (retrieveValue((uint8_t*) &value_int64_t, sizeof(int64_t)) == CHIP_NO_ERROR)
-            {
+            if (retrieveValue((uint8_t *) &value_int64_t, sizeof(int64_t)) == CHIP_NO_ERROR) {
                 value = value_int64_t;
-            }
-            else
-            {
+            } else {
                 value = int64_t(attributeConfig.value.defaultValue);
             }
             break;
         case ZCL_SINGLE_ATTRIBUTE_TYPE:
             float value_float;
-            if (retrieveValue((uint8_t*) &value_float, sizeof(float)) == CHIP_NO_ERROR)
-            {
+            if (retrieveValue((uint8_t *) &value_float, sizeof(float)) == CHIP_NO_ERROR) {
                 value = value_float;
-            }
-            else
-            {
+            } else {
                 value = float(attributeConfig.value.defaultValue);
             }
             break;
         case ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
         case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
         case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
-            if (retrieveValue(valueBuffer, attributeSize) != CHIP_NO_ERROR)
-            {
+            if (retrieveValue(valueBuffer, attributeSize) != CHIP_NO_ERROR) {
                 memset(valueBuffer, 0, ATTRIBUTE_LARGEST);
-                if (attributeConfig.value.ptrToDefaultValue != nullptr)
-                {
+                if (attributeConfig.value.ptrToDefaultValue != nullptr) {
                     memcpy(valueBuffer, attributeConfig.value.ptrToDefaultValue, attributeSize);
                 }
             }
@@ -217,13 +212,11 @@ public:
         defaultValue(other.defaultValue),
         value(other.value)
     {
-        switch (getAttributeBaseType())
-        {
+        switch (getAttributeBaseType()) {
         case ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
         case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
         case ZCL_LONG_CHAR_STRING_ATTRIBUTE_TYPE:
-            if (other.valueBuffer != nullptr)
-            {
+            if (other.valueBuffer != nullptr) {
                 memcpy(valueBuffer, other.valueBuffer, other.attributeSize);
             }
             break;
@@ -317,7 +310,7 @@ public:
     chip::EndpointId getParentEndpointId() const;
     Attribute *getAttribute(chip::AttributeId attributeId);
     uint32_t getAttributeCount() const;
-    Event *getEvent(chip::EventId eventId); 
+    Event *getEvent(chip::EventId eventId);
     uint32_t getEventCount() const;
     Command *getAcceptedCommand(chip::CommandId commandId);
     uint32_t getAcceptedCommandCount() const;
@@ -361,34 +354,13 @@ private:
 /** So, the dynamic endpoints first parent endpointId is the Fixed endpointId before the last fixed endpointId */
 #define DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID (LAST_FIXED_ENDPOINT_ID - 1)
 
-/** Example
- *
- * Bridge DM Endpoints
- *
- * |-------------|--------------------------------------|------------------|
- * |  Allocation |   Fixed (Generated by the Zap File)  |     Dynamic      |
- * |-------------|--------------------------------------|------------------|
- * |  EndpointID |     0     |     1      |      2      |     3,4,5,...    |
- * | Device Type | Root Node | Aggregator | Placeholder |  Bridged Device  |
- * |    Status   |  Enabled  |  Enabled   |   Disabled  | Enabled/Disabled |
- * |-------------|--------------------------------------|------------------|
- *
- * 3 Endpoints are generated by the Zap File, so FIXED_ENDPOINT_COUNT is 3 (this macro is generated by the zap file)
- * Last fixed endpoint is Placeholder, so LAST_FIXED_ENDPOINT_ID is 2
- * First dynamic endpoint will be allocated right after the last fixed endpoint, so FIRST_DYNAMIC_ENDPOINT_ID is 3
- * Because the placeholder endpoint is going to be disabled, so ENABLED_FIXED_ENDPOINT_COUNT is 2
- * The last enabled fixed endpoint becomes the parent of the first dynamic endpoint, which is the Aggregator.
- * So, DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID is 1
- *
- */
-
 // Endpoint class
 class Endpoint
 {
 public:
     friend class Node;
 
-    Endpoint(Node* node, chip::EndpointId endpointId, uint16_t endpointCount, Span<const EmberAfDeviceType> deviceTypeList) :
+    Endpoint(Node *node, chip::EndpointId endpointId, uint16_t endpointCount, Span<const EmberAfDeviceType> deviceTypeList) :
         endpointId(endpointId),
         endpointIndex(endpointCount),
         parentEndpointId(DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID),
@@ -408,7 +380,7 @@ private:
     chip::EndpointId endpointId;
     uint16_t endpointIndex;
     chip::EndpointId parentEndpointId;
-    Node* parentNode;
+    Node *parentNode;
     chip::DataVersion *dataVersion = nullptr;
     Span<const EmberAfDeviceType> deviceTypeList;
     EmberAfEndpointType *endpointMetadata;
@@ -417,12 +389,12 @@ private:
 
     // Metadata collectors
     // Store dynamic allocated objects here when endpoint is enabled, then delete it when disabled
-    std::vector<EmberAfCluster*> clusterCollector;
-    std::vector<EmberAfAttributeMetadata*> attributeCollector;
-    std::vector<EmberAfGenericClusterFunction*> functionCollector;
-    std::vector<chip::CommandId*> acceptedCommandCollector;
-    std::vector<chip::CommandId*> generatedCommandCollector;
-    std::vector<chip::EventId*> eventCollector;
+    std::vector<EmberAfCluster *> clusterCollector;
+    std::vector<EmberAfAttributeMetadata *> attributeCollector;
+    std::vector<EmberAfGenericClusterFunction *> functionCollector;
+    std::vector<chip::CommandId *> acceptedCommandCollector;
+    std::vector<chip::CommandId *> generatedCommandCollector;
+    std::vector<chip::EventId *> eventCollector;
 };
 
 // Node class

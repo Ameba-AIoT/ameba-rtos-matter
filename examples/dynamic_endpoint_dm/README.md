@@ -1,13 +1,8 @@
 # Matter Lighting Application Example using Ameba Data Model
 
-This example demonstrates an implementation of the **Matter Lighting Application** with **Ameba Data Model**
+This example demonstrates an implementation of the **Matter Dynamic Endpoint** with **Ameba Data Model**
 
-The Matter Lighting Application can represent several lighting device types:
-
-1. **On/Off Light**
-2. **Dimmable Light**
-3. **Color Temperature Light**
-4. **Extended Color Light**
+The Matter Dynamic Endpoint allows user to set the device type during runtime.
 
 Each device type has its own cluster requirements.
 Please refer to the **Matter Specification** for detailed information on supported attributes and features.
@@ -20,9 +15,7 @@ It allows developers to **add, remove, and configure device endpoints** during r
 In this example, the Ameba Data Model demonstrates **dynamic endpoint management** for lighting devices:
 
 - A **Root Node** endpoint is initialized on **Endpoint 0** to serve as the primary node descriptor.
-- A **Dimmable Light** endpoint is created on **Endpoint 1** during startup.
-- After a short delay (20 seconds), a second **Dimmable Light** endpoint is dynamically added on **Endpoint 2**.
-- After another delay (20 seconds), the **Endpoint 2** light is dynamically removed from the Matter data model.
+- A **Placeholder** endpoint is created on **Endpoint 1** which is for enabling the supported clusters that will be used for the dynamic endpoint creation.
 
 This showcases how the Ameba Data Model can manage device lifecycles in real time—supporting use cases such as **modular lighting systems**, **expandable appliances**, or **multi-instance devices** within a single Matter node.
 
@@ -52,7 +45,6 @@ They handle initialization, addition, activation, and removal of Matter endpoint
 
 | **API / Task** | **Purpose** | **Function / Description** |
 |----------------|-------------|-----------------------------|
-| `matter_dimmable_light_preset()` | Dimmable light setup | Creates and initializes a **Dimmable Light** endpoint at the next available endpoint ID. |
 | `enableAllEndpoints()` | Endpoint activation | Enables all dynamically added endpoints and makes them active within the Matter network. |
 | `addEndpoint()` | Add endpoint | Dynamically adds a new endpoint to the device at runtime. |
 | `getEndpoint()` | Retrieve endpoint | Returns a reference to an existing endpoint for inspection or modification. |
@@ -60,13 +52,7 @@ They handle initialization, addition, activation, and removal of Matter endpoint
 
 ## 📘 ZAP Configuration
 
-- **ZAP File:** `lighting-app.zap`
-  Located under `connectedhomeip/examples/lighting-app/lighting-common/lighting-app.zap`
-- **Device Type IDs:**
-  - On/Off Light – `0x0100`
-  - Dimmable Light – `0x0101`
-  - Color Temperature Light – `0x010C`
-  - Extended Color Light – `0x010D`
+- **ZAP File:** `dynamic-endpoint-app.zap`
 
 > **Note:**
 > Before implementation, review the Matter Specification to ensure compliance with required device types and cluster configurations.
@@ -77,23 +63,14 @@ The example defines **one endpoints**:
 
 | **Endpoint ID** | **Device Name**        | **Description** |
 |-----------------|------------------------|-----------------|
-| **1** | Lighting App | Main functional endpoint for the lighting device |
+| **1** | Temporary Device Type acting as the placeholder | Includes all the supported clusters that will be used for adding dynamic endpoint |
 
 > **Note:**
 > You can modify the configuration according to your device requirements.
 
 ## 🔧 Supported Clusters
 
-The following clusters can be supported by this device type:
-
-| **Cluster Name** | **Function** | **Role**  |
-|------------------|--------------|-----------|
-| **Identify** | Allows the device to be visually or audibly identified during commissioning | Server |
-| **On/Off** | Powers the device on or off | Server |
-| **Groups** | Enables the device to be controlled as part of a group | Server |
-| **Level Control** | Controls the brightness level (dimming) | Server |
-| **Scenes** | Enables storing, recalling, and managing predefined device states or settings to create custom scenes | Server |
-| **Color Control** | Controls light color or color temperature | Server |
+The supported clusters SHALL depends on the device type that is being created during runtime.
 
 > **Note:**
 > You can modify the configuration according to your device requirements.
@@ -153,10 +130,6 @@ They provide the main interfaces for peripheral initialization, event handling, 
 
 | **API / Task** | **Purpose** | **Function / Description** |
 |----------------|-------------|----------------------------|
-| `matter_driver_button_callback()` | Button event callback | Registers a callback function to handle physical button presses to control lighting features |
-| `matter_driver_button_init()` | Button initialization | Configures the physical button input used for local light control |
-| `matter_driver_led_init()` | LED initialization | Initializes the LED hardware and sets its default state |
-| `matter_driver_led_set_startup_value()` | Startup configuration | Sets initial values for the lighting clusters and synchronizes Matter attributes with the device’s hardware state |
 | `matter_driver_on_identify_start()` | Identify start | Notifies that the identify operation has started |
 | `matter_driver_on_identify_stop()` | Identify stop | Notifies that the identify operation has stopped |
 | `matter_driver_on_trigger_effect()` | Identify device | Triggers a visual or functional effect to identify the device |
@@ -169,10 +142,9 @@ They provide the main interfaces for peripheral initialization, event handling, 
 
 | **Component** | **Description** |
 |----------------|-----------------|
-| **ZAP File** | `lighting-app.zap` |
-| **Main Example File** | `example_matter_light.cpp` |
+| **ZAP File** | `dynamic-endpoint-app.zap` |
+| **Main Example File** | `example_matter_dynamic_endpoint_dm.cpp` |
 | **Main Matter Driver File** | `matter_drivers.cpp` |
-| **Main Device Driver File** | `led_driver.cpp` |
 
 ---
 
@@ -185,7 +157,7 @@ They provide the main interfaces for peripheral initialization, event handling, 
 ## How to build
 
 ### Configurations
-Enable `CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_LIGHT` in `platform_opts_matter.h`.
+Enable `CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_DYNAMIC_ENDPOINT` in `platform_opts_matter.h`.
 Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
 
 ### Setup the Build Environment
@@ -206,7 +178,7 @@ Ensure that `CONFIG_EXAMPLE_MATTER_CHIPTEST` is disabled.
 ### Build Matter Libraries
 
     cd amebaz2_sdk/project/realtek_amebaXX_v0_example/GCC-RELEASE/
-    make light_port
+    make dynamic_endpoint_dm
 
 ### Build the Final Firmware
 
@@ -249,7 +221,7 @@ In `rtl8721dhp_intfcfg.c`, set the below configurations
 ### Build Matter Libraries
 
     cd amebad_sdk/project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp
-    make -C asdk light_port
+    make -C asdk dynamic_endpoint_dm
     
 ### Build the Final Firmware
 

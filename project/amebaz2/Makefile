@@ -51,8 +51,6 @@ LIGHT_SWITCH_ZAP			= $(CHIPDIR)/examples/light-switch-app/light-switch-common/li
 THERMOSTAT_FILE				= $(CHIPDIR)/examples/thermostat/ameba/build/chip/codegen/cluster-file.txt
 THERMOSTAT_ZAP				= $(CHIPDIR)/examples/thermostat/thermostat-common/thermostat.zap
 
-BRIDGE_DM_FILE				= $(MATTER_EXAMPLE_DIR)/bridge_dm/build/chip/codegen/cluster-file.txt
-BRIDGE_DM_ZAP				= $(MATTER_EXAMPLE_DIR)/bridge_dm/bridge-app.zap
 DISHWASHER_FILE				= $(MATTER_EXAMPLE_DIR)/dishwasher/build/chip/codegen/cluster-file.txt
 DISHWASHER_ZAP				= $(MATTER_EXAMPLE_DIR)/dishwasher/dishwasher-app.zap
 FAN_FILE					= $(MATTER_EXAMPLE_DIR)/fan/build/chip/codegen/cluster-file.txt
@@ -61,8 +59,6 @@ GENERIC_SWITCH_FILE			= $(MATTER_EXAMPLE_DIR)/generic_switch/build/chip/codegen/
 GENERIC_SWITCH_ZAP			= $(MATTER_EXAMPLE_DIR)/generic_switch/generic-switch-app.zap
 LAUNDRY_WASHER_FILE			= $(MATTER_EXAMPLE_DIR)/laundry_washer/build/chip/codegen/cluster-file.txt
 LAUNDRY_WASHER_ZAP			= $(MATTER_EXAMPLE_DIR)/laundry_washer/laundry-washer-app.zap
-LIGHTING_DM_FILE			= $(MATTER_EXAMPLE_DIR)/light_dm/build/chip/codegen/cluster-file.txt
-LIGHTING_DM_ZAP				= $(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.zap
 MICROWAVE_OVEN_FILE			= $(MATTER_EXAMPLE_DIR)/microwave_oven/build/chip/codegen/cluster-file.txt
 MICROWAVE_OVEN_ZAP			= $(MATTER_EXAMPLE_DIR)/microwave_oven/microwave-oven-app.zap
 REFRIGERATOR_FILE			= $(MATTER_EXAMPLE_DIR)/refrigerator/build/chip/codegen/cluster-file.txt
@@ -71,6 +67,13 @@ ROOM_AIR_CONDITIONER_FILE	= $(MATTER_EXAMPLE_DIR)/room_air_conditioner/build/chi
 ROOM_AIR_CONDITIONER_ZAP	= $(MATTER_EXAMPLE_DIR)/room_air_conditioner/room-air-conditioner-app.zap
 TEMPERATURE_SENSOR_FILE		= $(MATTER_EXAMPLE_DIR)/temperature_sensor/build/chip/codegen/cluster-file.txt
 TEMPERATURE_SENSOR_ZAP		= $(MATTER_EXAMPLE_DIR)/temperature_sensor/temperature-sensor-app.zap
+
+BRIDGE_DM_FILE				= $(MATTER_EXAMPLE_DIR)/bridge_dm/build/chip/codegen/cluster-file.txt
+BRIDGE_DM_ZAP				= $(MATTER_EXAMPLE_DIR)/bridge_dm/bridge-app.zap
+LIGHTING_DM_FILE			= $(MATTER_EXAMPLE_DIR)/light_dm/build/chip/codegen/cluster-file.txt
+LIGHTING_DM_ZAP				= $(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.zap
+DYNAMIC_ENDPOINT_DM_FILE	= $(MATTER_EXAMPLE_DIR)/dynamic_endpoint_dm/build/chip/codegen/cluster-file.txt
+DYNAMIC_ENDPOINT_DM_ZAP		= $(MATTER_EXAMPLE_DIR)/dynamic_endpoint_dm/dynamic-endpoint-app.zap
 
 #*****************************************************************************#
 #                      RULES TO MAKE MATTER DIRS                              #
@@ -107,9 +110,6 @@ $(LIGHTING_FILE): $(LIGHTING_ZAP)
 $(LIGHT_SWITCH_FILE): $(LIGHT_SWITCH_ZAP)
 	$(call GENERATE_ZAP,$(CHIPDIR)/examples/light-switch-app/ameba,$^,$(CHIPDIR)/examples/light-switch-app/light-switch-common/light-switch-app.matter,$@)
 
-$(BRIDGE_DM_FILE): $(BRIDGE_DM_ZAP)
-	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/bridge_dm,$^,$(MATTER_EXAMPLE_DIR)/bridge_dm/bridge-app.matter,$@)
-
 $(DISHWASHER_FILE): $(DISHWASHER_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/dishwasher,$^,$(MATTER_EXAMPLE_DIR)/dishwasher/dishwasher-app.matter,$@)
 
@@ -121,9 +121,6 @@ $(GENERIC_SWITCH_FILE): $(GENERIC_SWITCH_ZAP)
 
 $(LAUNDRY_WASHER_FILE): $(LAUNDRY_WASHER_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/laundry_washer,$^,$(MATTER_EXAMPLE_DIR)/laundry_washer/laundry-washer-app.matter,$@)
-
-$(LIGHTING_DM_FILE): $(LIGHTING_DM_ZAP)
-	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/light_dm,$^,$(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.matter,$@)
 
 $(MICROWAVE_OVEN_FILE): $(MICROWAVE_OVEN_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/microwave_oven,$^,$(MATTER_EXAMPLE_DIR)/microwave_oven/microwave-oven-app.matter,$@)
@@ -140,6 +137,15 @@ $(TEMPERATURE_SENSOR_FILE): $(TEMPERATURE_SENSOR_ZAP)
 $(THERMOSTAT_FILE): $(THERMOSTAT_ZAP)
 	$(call GENERATE_ZAP,$(CHIPDIR)/examples/thermostat/ameba,$^,$(CHIPDIR)/examples/thermostat/thermostat-common/thermostat.matter,$@)
 
+$(BRIDGE_DM_FILE): $(BRIDGE_DM_ZAP)
+	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/bridge_dm,$^,$(MATTER_EXAMPLE_DIR)/bridge_dm/bridge-app.matter,$@)
+
+$(LIGHTING_DM_FILE): $(LIGHTING_DM_ZAP)
+	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/light_dm,$^,$(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.matter,$@)
+
+$(DYNAMIC_ENDPOINT_DM_FILE): $(DYNAMIC_ENDPOINT_DM_ZAP)
+	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/dynamic_endpoint_dm,$^,$(MATTER_EXAMPLE_DIR)/dynamic_endpoint_dm/dynamic-endpoint-app.matter,$@)
+
 #*****************************************************************************#
 #                         MATTER MAKE DEFINES                                 #
 #*****************************************************************************#
@@ -152,11 +158,6 @@ all_clusters: toolchain_matter $(ALL_CLUSTERS_FILE)
 air_purifier: toolchain_matter $(AIR_PURIFIER_FILE)
 	$(MAKE) -f $(MATTER_MAKE_DIR)/air_purifier/lib_chip_air_purifier_core.mk all
 	$(MAKE) -f $(MATTER_MAKE_DIR)/air_purifier/lib_chip_air_purifier_main.mk all
-
-.PHONY: bridge_dm
-bridge_dm: toolchain_matter $(BRIDGE_DM_FILE)
-	$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_core.mk all
-	$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_main.mk all
 
 .PHONY: dishwasher_port
 dishwasher_port: toolchain_matter $(DISHWASHER_FILE)
@@ -182,11 +183,6 @@ laundry_washer_port: toolchain_matter $(LAUNDRY_WASHER_FILE)
 light: toolchain_matter $(LIGHTING_FILE)
 	$(MAKE) -f $(MATTER_MAKE_DIR)/light/lib_chip_light_core.mk all
 	$(MAKE) -f $(MATTER_MAKE_DIR)/light/lib_chip_light_main.mk all
-
-.PHONY: light_dm
-light_dm: toolchain_matter $(LIGHTING_DM_FILE)
-	$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_core.mk all
-	$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_main.mk all
 
 .PHONY: light_port
 light_port: toolchain_matter $(LIGHTING_FILE)
@@ -223,16 +219,29 @@ thermostat_port: toolchain_matter $(THERMOSTAT_FILE)
 	$(MAKE) -f $(MATTER_MAKE_DIR)/thermostat/lib_chip_thermostat_core.mk all
 	$(MAKE) -f $(MATTER_MAKE_DIR)/thermostat/lib_chip_thermostat_main.mk all
 
+.PHONY: bridge_dm
+bridge_dm: toolchain_matter $(BRIDGE_DM_FILE)
+	$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_core.mk all
+	$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_main.mk all
+
+.PHONY: light_dm
+light_dm: toolchain_matter $(LIGHTING_DM_FILE)
+	$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_core.mk all
+	$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_main.mk all
+
+.PHONY: dynamic_endpoint_dm
+dynamic_endpoint_dm: toolchain_matter $(DYNAMIC_ENDPOINT_DM_FILE)
+	$(MAKE) -f $(MATTER_MAKE_DIR)/dynamic_endpoint_dm/lib_chip_dynamic_endpoint_core.mk all
+	$(MAKE) -f $(MATTER_MAKE_DIR)/dynamic_endpoint_dm/lib_chip_dynamic_endpoint_main.mk all
+
 _clean_chip_core:
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/all_clusters/lib_chip.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/air_purifier/lib_chip_air_purifier_core.mk clean
-	@$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/dishwasher/lib_chip_dishwasher_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/fan/lib_chip_fan_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/generic_switch/lib_chip_generic_switch_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/laundry_washer/lib_chip_laundry_washer_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/light/lib_chip_light_core.mk clean
-	@$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/light_port/lib_chip_light_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/light_switch/lib_chip_light_switch_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/microwave_oven/lib_chip_microwave_oven_core.mk clean
@@ -240,17 +249,18 @@ _clean_chip_core:
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/room_air_conditioner/lib_chip_room_air_conditioner_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/temperature_sensor/lib_chip_temperature_sensor_core.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/thermostat/lib_chip_thermostat_core.mk clean
+	@$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_core.mk clean
+	@$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_core.mk clean
+	@$(MAKE) -f $(MATTER_MAKE_DIR)/dynamic_endpoint_dm/lib_chip_dynamic_endpoint_core.mk clean
 
 _clean_chip_main:
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/all_clusters/lib_chip_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/air_purifier/lib_chip_air_purifier_main.mk clean
-	@$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/dishwasher/lib_chip_dishwasher_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/fan/lib_chip_fan_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/generic_switch/lib_chip_generic_switch_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/laundry_washer/lib_chip_laundry_washer_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/light/lib_chip_light_main.mk clean
-	@$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/light_port/lib_chip_light_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/light_switch/lib_chip_light_switch_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/microwave_oven/lib_chip_microwave_oven_main.mk clean
@@ -258,7 +268,9 @@ _clean_chip_main:
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/room_air_conditioner/lib_chip_room_air_conditioner_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/temperature_sensor/lib_chip_temperature_sensor_main.mk clean
 	@$(MAKE) -f $(MATTER_MAKE_DIR)/thermostat/lib_chip_thermostat_main.mk clean
-
+	@$(MAKE) -f $(MATTER_MAKE_DIR)/bridge_dm/lib_chip_bridge_main.mk clean
+	@$(MAKE) -f $(MATTER_MAKE_DIR)/light_dm/lib_chip_light_main.mk clean
+	@$(MAKE) -f $(MATTER_MAKE_DIR)/dynamic_endpoint_dm/lib_chip_dynamic_endpoint_main.mk clean
 
 .PHONY: clean_matter_libs
 clean_matter_libs:
