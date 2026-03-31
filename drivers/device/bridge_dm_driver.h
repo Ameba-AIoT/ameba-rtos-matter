@@ -1,11 +1,22 @@
-/********************************************************************************
-  *
-  * This module is a confidential and proprietary property of RealTek and
-  * possession or use of this module requires written permission of RealTek.
-  *
-  * Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
-  *
-********************************************************************************/
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #pragma once
 
 #include <platform_stdlib.h>
@@ -16,23 +27,13 @@
 
 #include <lib/core/DataModelTypes.h>
 
-// Device Type IDs
-#define DEVICE_TYPE_ROOT_NODE          0x0016
-#define DEVICE_TYPE_BRIDGE             0x000E
-#define DEVICE_TYPE_BRIDGED_NODE       0x0013
-#define DEVICE_TYPE_LO_ON_OFF_LIGHT    0x0100
-
-// Device Version for dynamic endpoints:
-#define DEVICE_VERSION_DEFAULT         1
-
 #define BRIDGE_DEVICE_ADDRESS_LENGTH   20
 
 // The bridge should also be a "provisioner" for the other non-matter network
 class MatterBridge
 {
 public:
-    struct EndpointInfo
-    {
+    struct EndpointInfo {
         uint8_t endpointId; // do we need to store this? can just create a new one on reboot
         char address[BRIDGE_DEVICE_ADDRESS_LENGTH];
     };
@@ -51,8 +52,7 @@ public:
     static const int kDeviceNameSize     = 32;
     static const int kDeviceLocationSize     = 32;
 
-    enum Changed_t
-    {
+    enum Changed_t {
         kChanged_Reachable = 0x01,
         kChanged_State     = 0x02,
         kChanged_Location  = 0x04,
@@ -66,10 +66,22 @@ public:
     void SetReachable(bool aReachable);
     void SetName(const char *szDeviceName);
     void SetLocation(const char *szLocation);
-    inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
-    inline chip::EndpointId GetEndpointId() { return mEndpointId; };
-    inline char *GetName() { return mName; };
-    inline char *GetLocation() { return mLocation; };
+    inline void SetEndpointId(chip::EndpointId id)
+    {
+        mEndpointId = id;
+    };
+    inline chip::EndpointId GetEndpointId()
+    {
+        return mEndpointId;
+    };
+    inline char *GetName()
+    {
+        return mName;
+    };
+    inline char *GetLocation()
+    {
+        return mLocation;
+    };
 
 private:
     virtual void HandleDeviceChange(MatterBridgeDevice *device, MatterBridgeDevice::Changed_t changeMask) = 0;
@@ -84,8 +96,7 @@ protected:
 class MatterBridgedDeviceOnOff : public MatterBridgeDevice
 {
 public:
-    enum Changed_t
-    {
+    enum Changed_t {
         kChanged_OnOff,
     } Changed;
 

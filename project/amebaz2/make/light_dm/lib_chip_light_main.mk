@@ -36,7 +36,7 @@ include $(MATTER_MAIN_SRC)
 # Compilation flag
 # -------------------------------------------------------------------
 CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
-CFLAGS += -DCONFIG_DISABLE_LAST_FIXED_ENDPOINT=1
+CFLAGS += -DCONFIG_ENABLE_AMEBA_DATA_MODEL=1
 
 # -------------------------------------------------------------------
 # Include Path

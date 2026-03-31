@@ -1,4 +1,4 @@
-name: Build Ameba RTOS Matter Docker Image
+name: Build AmebaD Matter Docker Image
 
 on:
   push:
@@ -37,21 +37,12 @@ jobs:
       run: |
         docker buildx build --file tools/docker/Dockerfile --tag ameba-rtos-matter:common --load .
 
-    - name: Build AmebaZ2 Docker image
-      run: |
-        docker buildx build --file tools/docker/amebaz2/Dockerfile --tag ameba-rtos-matter:amebaz2 --load .
-
     - name: Build AmebaD Docker image
       run: |
         docker buildx build --file tools/docker/amebad/Dockerfile --tag ameba-rtos-matter:amebad --load .
 
     - name: Check Docker images
       run: docker images
-
-    - name: Run Docker container for AmebaZ2 and execute scripts
-      run: |
-        chmod +x ./tools/docker/amebaz2/run_docker_build_scripts.sh
-        ./tools/docker/amebaz2/run_docker_build_scripts.sh
 
     - name: Run Docker container for AmebaD and execute scripts
       run: |

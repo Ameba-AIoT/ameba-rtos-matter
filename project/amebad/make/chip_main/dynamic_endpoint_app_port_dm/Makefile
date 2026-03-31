@@ -9,8 +9,8 @@ include $(MATTER_MAIN_SRC)
 # -------------------------------------------------------------------
 # Variable Declaration
 # -------------------------------------------------------------------
-DEVICE_TYPE  := light_dm
-OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/light_dm/build/chip
+DEVICE_TYPE  := dynamic_endpoint_dm
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
 CODEGEN_DIR  := $(OUTPUT_DIR)/codegen
 
 # -------------------------------------------------------------------
@@ -36,8 +36,6 @@ vpath %.c $(DIR) $(shell find $(DIR) -type d)
 # -------------------------------------------------------------------
 IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
 IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip/gen/include
-IFLAGS += -I$(CHIPDIR)/examples/lighting-app/lighting-common/include
-IFLAGS += -I$(CHIPDIR)/examples/lighting-app/ameba/main/include
 IFLAGS += -I$(CODEGEN_DIR)
 IFLAGS += -I$(CODEGEN_DIR)/zap-generated
 
@@ -59,8 +57,7 @@ CPPSRC += $(MATTER_CORE_DIR)/matter_data_model_presets.cpp
 # -------------------------------------------------------------------
 # Source Files (Example)
 # -------------------------------------------------------------------
-CPPSRC += $(MATTER_DRIVER_DIR)/device/led_driver.cpp
-CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_light.cpp
+CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_$(DEVICE_TYPE).cpp
 CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/matter_drivers.cpp
 
 # -------------------------------------------------------------------

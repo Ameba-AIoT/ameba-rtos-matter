@@ -64,10 +64,10 @@ cp ${tooldir}/docker/matter_version_selection.sh ${tooldir}/scripts/matter_versi
 
 chmod u+x matter_setup.sh
 
-# AmebaZ2 build flow
-./matter_setup.sh amebaz2 || handle_error "Failed to run matter_setup.sh for amebaz2"
+# AmebaZ2plus build flow
+./matter_setup.sh amebaz2plus || handle_error "Failed to run matter_setup.sh for amebaz2plus"
 
-cd ${amebadir}/project/realtek_amebaz2_v0_example/GCC-RELEASE/
+cd ${amebadir}/project/realtek_amebaz2plus_v0_example/GCC-RELEASE/
 
 # All-clusters-app
 echo "Building all_clusters"

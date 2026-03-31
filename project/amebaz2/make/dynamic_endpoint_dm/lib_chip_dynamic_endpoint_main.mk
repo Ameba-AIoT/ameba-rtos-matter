@@ -1,63 +1,71 @@
-.PHONY: all clean
+all: lib_main
+
+# -------------------------------------------------------------------
+# Initial Declaration
+# -------------------------------------------------------------------
+INCLUDES =
+CFLAGS =
+CPPFLAGS =
+SRC_C =
+SRC_CPP =
 
 # -------------------------------------------------------------------
 # Includes
 # -------------------------------------------------------------------
-include $(MAKE_INCLUDE_GEN)
-include $(MATTER_MAIN_SRC)
+include $(MATTER_INCLUDE)
+include $(MATTER_INCLUDE_HDR)
+
+# -------------------------------------------------------------------
+# Initialize Compiler
+# -------------------------------------------------------------------
+CROSS_COMPILE = $(ARM_GCC_TOOLCHAIN)/arm-none-eabi-
 
 # -------------------------------------------------------------------
 # Variable Declaration
 # -------------------------------------------------------------------
-DEVICE_TYPE  := bridge_dm
-OUTPUT_DIR = $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
-CODEGEN_DIR = $(OUTPUT_DIR)/codegen
+DEVICE_TYPE  := dynamic_endpoint_dm
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
+CODEGENDIR   := $(OUTPUT_DIR)/codegen
+
+# -------------------------------------------------------------------
+# Build Declaration and Source
+# -------------------------------------------------------------------
+include $(MATTER_MAIN_SRC)
 
 # -------------------------------------------------------------------
 # Compilation flag
 # -------------------------------------------------------------------
-GLOBAL_CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
-GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_DATA_MODEL=1
-
-# -------------------------------------------------------------------
-# Search Directory
-# -------------------------------------------------------------------
-DIR += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
-DIR += $(CODEGEN_DIR)
-
-vpath %.cpp $(DIR) $(shell find $(DIR) -type d)
-vpath %.c $(DIR) $(shell find $(DIR) -type d)
+CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
+CFLAGS += -DCONFIG_ENABLE_AMEBA_DATA_MODEL=1
 
 # -------------------------------------------------------------------
 # Include Path
 # -------------------------------------------------------------------
-IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
-IFLAGS += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip/gen/include
-IFLAGS += -I$(CODEGEN_DIR)
-IFLAGS += -I$(CODEGEN_DIR)/zap-generated
+INCLUDES += -I$(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)
+INCLUDES += -I$(OUTPUT_DIR)/gen/include
+INCLUDES += -I$(CODEGENDIR)
+INCLUDES += -I$(CODEGENDIR)/zap-generated
 
 # -------------------------------------------------------------------
 # Source Files (Porting Layer Core)
 # -------------------------------------------------------------------
-CPPSRC += $(MATTER_CORE_DIR)/matter_core.cpp
-CPPSRC += $(MATTER_CORE_DIR)/matter_interaction.cpp
+SRC_CPP += $(MATTER_CORE_DIR)/matter_core.cpp
+SRC_CPP += $(MATTER_CORE_DIR)/matter_interaction.cpp
 ifeq ($(CHIP_ENABLE_OTA_REQUESTOR), true)
-CPPSRC += $(MATTER_CORE_DIR)/matter_ota_initializer.cpp
+SRC_CPP += $(MATTER_CORE_DIR)/matter_ota_initializer.cpp
 endif
 
 # -------------------------------------------------------------------
 # Source Files (Dynamic Endpoint)
 # -------------------------------------------------------------------
-CPPSRC += $(MATTER_CORE_DIR)/matter_data_model.cpp
-CPPSRC += $(MATTER_CORE_DIR)/matter_data_model_presets.cpp
-
+SRC_CPP += $(MATTER_CORE_DIR)/matter_data_model.cpp
+SRC_CPP += $(MATTER_CORE_DIR)/matter_data_model_presets.cpp
 
 # -------------------------------------------------------------------
 # Source Files (Example)
 # -------------------------------------------------------------------
-CPPSRC += $(MATTER_DRIVER_DIR)/device/bridge_dm_driver.cpp
-CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_bridge.cpp
-CPPSRC += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/matter_drivers.cpp
+SRC_CPP += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_$(DEVICE_TYPE).cpp
+SRC_CPP += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/matter_drivers.cpp
 
 # -------------------------------------------------------------------
 # Build Rules

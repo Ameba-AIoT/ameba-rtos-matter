@@ -33,8 +33,6 @@ ROOM_AIR_CONDITIONER_FILE	= $(MATTER_EXAMPLE_DIR)/room_air_conditioner/build/chi
 ROOM_AIR_CONDITIONER_ZAP	= $(MATTER_EXAMPLE_DIR)/room_air_conditioner/room-air-conditioner-app.zap
 BRIDGE_FILE					= $(MATTER_EXAMPLE_DIR)/bridge/build/chip/codegen/cluster-file.txt
 BRIDGE_ZAP					= $(MATTER_EXAMPLE_DIR)/bridge/bridge-app.zap
-BRIDGE_DM_FILE				= $(MATTER_EXAMPLE_DIR)/bridge_dm/build/chip/codegen/cluster-file.txt
-BRIDGE_DM_ZAP				= $(MATTER_EXAMPLE_DIR)/bridge_dm/bridge-app.zap
 DISHWASHER_FILE				= $(MATTER_EXAMPLE_DIR)/dishwasher/build/chip/codegen/cluster-file.txt
 DISHWASHER_ZAP				= $(MATTER_EXAMPLE_DIR)/dishwasher/dishwasher-app.zap
 FAN_FILE					= $(MATTER_EXAMPLE_DIR)/fan/build/chip/codegen/cluster-file.txt
@@ -43,14 +41,19 @@ GENERIC_SWITCH_FILE			= $(MATTER_EXAMPLE_DIR)/generic_switch/build/chip/codegen/
 GENERIC_SWITCH_ZAP			= $(MATTER_EXAMPLE_DIR)/generic_switch/generic-switch-app.zap
 LAUNDRY_WASHER_FILE			= $(MATTER_EXAMPLE_DIR)/laundry_washer/build/chip/codegen/cluster-file.txt
 LAUNDRY_WASHER_ZAP			= $(MATTER_EXAMPLE_DIR)/laundry_washer/laundry-washer-app.zap
-LIGHTING_DM_FILE			= $(MATTER_EXAMPLE_DIR)/light_dm/build/chip/codegen/cluster-file.txt
-LIGHTING_DM_ZAP				= $(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.zap
 MICROWAVE_OVEN_FILE			= $(MATTER_EXAMPLE_DIR)/microwave_oven/build/chip/codegen/cluster-file.txt
 MICROWAVE_OVEN_ZAP			= $(MATTER_EXAMPLE_DIR)/microwave_oven/microwave-oven-app.zap
 REFRIGERATOR_FILE			= $(MATTER_EXAMPLE_DIR)/refrigerator/build/chip/codegen/cluster-file.txt
 REFRIGERATOR_ZAP			= $(MATTER_EXAMPLE_DIR)/refrigerator/refrigerator-app.zap
 TEMPERATURE_SENSOR_FILE		= $(MATTER_EXAMPLE_DIR)/temperature_sensor/build/chip/codegen/cluster-file.txt
 TEMPERATURE_SENSOR_ZAP		= $(MATTER_EXAMPLE_DIR)/temperature_sensor/temperature-sensor-app.zap
+
+BRIDGE_DM_FILE				= $(MATTER_EXAMPLE_DIR)/bridge_dm/build/chip/codegen/cluster-file.txt
+BRIDGE_DM_ZAP				= $(MATTER_EXAMPLE_DIR)/bridge_dm/bridge-app.zap
+LIGHTING_DM_FILE			= $(MATTER_EXAMPLE_DIR)/light_dm/build/chip/codegen/cluster-file.txt
+LIGHTING_DM_ZAP				= $(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.zap
+DYNAMIC_ENDPOINT_DM_FILE	= $(MATTER_EXAMPLE_DIR)/dynamic_endpoint_dm/build/chip/codegen/cluster-file.txt
+DYNAMIC_ENDPOINT_DM_ZAP		= $(MATTER_EXAMPLE_DIR)/dynamic_endpoint_dm/dynamic-endpoint-app.zap
 
 #*****************************************************************************#
 #                      RULES TO MAKE MATTER DIRS                              #
@@ -90,9 +93,6 @@ $(LIGHT_SWITCH_FILE): $(LIGHT_SWITCH_ZAP)
 $(BRIDGE_FILE): $(BRIDGE_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/bridge,$^,$(MATTER_EXAMPLE_DIR)/bridge/bridge-app.matter,$@)
 
-$(BRIDGE_DM_FILE): $(BRIDGE_DM_ZAP)
-	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/bridge_dm,$^,$(MATTER_EXAMPLE_DIR)/bridge_dm/bridge-app.matter,$@)
-
 $(DISHWASHER_FILE): $(DISHWASHER_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/dishwasher,$^,$(MATTER_EXAMPLE_DIR)/dishwasher/dishwasher-app.matter,$@)
 
@@ -104,9 +104,6 @@ $(GENERIC_SWITCH_FILE): $(GENERIC_SWITCH_ZAP)
 
 $(LAUNDRY_WASHER_FILE): $(LAUNDRY_WASHER_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/laundry_washer,$^,$(MATTER_EXAMPLE_DIR)/laundry_washer/laundry-washer-app.matter,$@)
-
-$(LIGHTING_DM_FILE): $(LIGHTING_DM_ZAP)
-	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/light_dm,$^,$(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.matter,$@)
 
 $(MICROWAVE_OVEN_FILE): $(MICROWAVE_OVEN_ZAP)
 	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/microwave_oven,$^,$(MATTER_EXAMPLE_DIR)/microwave_oven/microwave-oven-app.matter,$@)
@@ -122,6 +119,15 @@ $(TEMPERATURE_SENSOR_FILE): $(TEMPERATURE_SENSOR_ZAP)
 
 $(THERMOSTAT_FILE): $(THERMOSTAT_ZAP)
 	$(call GENERATE_ZAP,$(CHIPDIR)/examples/thermostat/ameba,$^,$(CHIPDIR)/examples/thermostat/thermostat-common/thermostat.matter,$@)
+
+$(BRIDGE_DM_FILE): $(BRIDGE_DM_ZAP)
+	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/bridge_dm,$^,$(MATTER_EXAMPLE_DIR)/bridge_dm/bridge-app.matter,$@)
+
+$(LIGHTING_DM_FILE): $(LIGHTING_DM_ZAP)
+	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/light_dm,$^,$(MATTER_EXAMPLE_DIR)/light_dm/lighting-app.matter,$@)
+
+$(DYNAMIC_ENDPOINT_DM_FILE): $(DYNAMIC_ENDPOINT_DM_ZAP)
+	$(call GENERATE_ZAP,$(MATTER_EXAMPLE_DIR)/dynamic_endpoint_dm,$^,$(MATTER_EXAMPLE_DIR)/dynamic_endpoint_dm/dynamic-endpoint-app.matter,$@)
 
 #*****************************************************************************#
 #                              MATTER MAKE DEFINES                            #
@@ -139,10 +145,6 @@ air_purifier: matter_prereqs $(AIR_PURIFIER_FILE)
 bridge_port: matter_prereqs $(BRIDGE_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/bridge_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/bridge_app_port all
-
-bridge_dm: matter_prereqs $(BRIDGE_DM_FILE)
-	make -C $(MATTER_MAKE_DIR)/chip/bridge_app_dm all
-	make -C $(MATTER_MAKE_DIR)/chip_main/bridge_app_port_dm all
 
 dishwasher_port: matter_prereqs $(DISHWASHER_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/dishwasher_app all
@@ -168,10 +170,6 @@ light_port: matter_prereqs $(LIGHTING_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/lighting_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/lighting_app_port all
 
-light_dm: matter_prereqs $(LIGHTING_DM_FILE)
-	make -C $(MATTER_MAKE_DIR)/chip/lighting_app_dm all
-	make -C $(MATTER_MAKE_DIR)/chip_main/lighting_app_port_dm all
-
 light_switch: matter_prereqs $(LIGHT_SWITCH_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/light_switch_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/light_switch_app all
@@ -195,6 +193,18 @@ temperature_sensor_port: matter_prereqs $(TEMPERATURE_SENSOR_FILE)
 thermostat_port: matter_prereqs $(THERMOSTAT_FILE)
 	make -C $(MATTER_MAKE_DIR)/chip/thermostat_app all
 	make -C $(MATTER_MAKE_DIR)/chip_main/thermostat_app_port all
+
+bridge_dm: matter_prereqs $(BRIDGE_DM_FILE)
+	make -C $(MATTER_MAKE_DIR)/chip/bridge_app_dm all
+	make -C $(MATTER_MAKE_DIR)/chip_main/bridge_app_port_dm all
+
+light_dm: matter_prereqs $(LIGHTING_DM_FILE)
+	make -C $(MATTER_MAKE_DIR)/chip/lighting_app_dm all
+	make -C $(MATTER_MAKE_DIR)/chip_main/lighting_app_port_dm all
+
+dynamic_endpoint_dm: matter_prereqs $(DYNAMIC_ENDPOINT_DM_FILE)
+	make -C $(MATTER_MAKE_DIR)/chip/dynamic_endpoint_app_dm all
+	make -C $(MATTER_MAKE_DIR)/chip_main/dynamic_endpoint_app_port_dm all
 
 #*****************************************************************************#
 #                              CREATE SYMBOLIC LINK                           #

@@ -16,17 +16,17 @@ using chip::Protocols::InteractionModel::Status;
 
 /* emberAfExternalAttributeRead/WriteCallback are required for externally stored attributes */
 Status emberAfExternalAttributeReadCallback(EndpointId endpoint_id, ClusterId cluster_id,
-                                                   const EmberAfAttributeMetadata *matter_attribute, uint8_t *buffer,
-                                                   uint16_t max_read_length)
+        const EmberAfAttributeMetadata *matter_attribute, uint8_t *buffer,
+        uint16_t max_read_length)
 {
     Node  &node = Node::getInstance();
     Endpoint *endpoint = node.getEndpoint(endpoint_id);
     Cluster *cluster = endpoint->getCluster(cluster_id);
     Attribute *attribute = cluster->getAttribute(matter_attribute->attributeId);
 
-    if (attribute->getAttributeSize() > max_read_length)
-    {
-        ChipLogError(DeviceLayer, "[%s] Insufficient space to read Attribute 0x%08x from Cluster 0x%08x in Endpoint 0x%04x", __FUNCTION__, matter_attribute->attributeId, cluster_id, endpoint_id);
+    if (attribute->getAttributeSize() > max_read_length) {
+        ChipLogError(DeviceLayer, "[%s] Insufficient space to read Attribute 0x%08x from Cluster 0x%08x in Endpoint 0x%04x", __FUNCTION__,
+                     matter_attribute->attributeId, cluster_id, endpoint_id);
         return Status::ResourceExhausted;
     }
 
@@ -85,8 +85,7 @@ EmberAfDefaultOrMinMaxAttributeValue Attribute::getAttributeDefaultValue() const
 
 EmberAfAttributeType Attribute::getAttributeBaseType() const
 {
-    switch (attributeType)
-    {
+    switch (attributeType) {
     case ZCL_ACTION_ID_ATTRIBUTE_TYPE:  // Action Id
     case ZCL_FABRIC_IDX_ATTRIBUTE_TYPE: // Fabric Index
     case ZCL_BITMAP8_ATTRIBUTE_TYPE:    // 8-bit bitmap
@@ -161,8 +160,7 @@ EmberAfAttributeType Attribute::getAttributeBaseType() const
 
 void Attribute::getValue(uint8_t *buffer) const
 {
-    switch (getAttributeBaseType())
-    {
+    switch (getAttributeBaseType()) {
     case ZCL_INT8U_ATTRIBUTE_TYPE:
     case ZCL_BOOLEAN_ATTRIBUTE_TYPE:
         memcpy(buffer, &(std::get<uint8_t>(value)), sizeof(uint8_t));
@@ -207,8 +205,7 @@ void Attribute::getValue(uint8_t *buffer) const
 
 void Attribute::setValue(uint8_t *buffer)
 {
-    switch (getAttributeBaseType())
-    {
+    switch (getAttributeBaseType()) {
     case ZCL_INT8U_ATTRIBUTE_TYPE:
     case ZCL_BOOLEAN_ATTRIBUTE_TYPE:
         uint8_t value_uint8_t;
@@ -220,49 +217,49 @@ void Attribute::setValue(uint8_t *buffer)
         uint16_t value_uint16_t;
         memcpy(&value_uint16_t, buffer, sizeof(uint16_t));
         value = value_uint16_t;
-        persistValue((uint8_t*) &value_uint16_t, sizeof(uint16_t));
+        persistValue((uint8_t *) &value_uint16_t, sizeof(uint16_t));
         break;
     case ZCL_INT32U_ATTRIBUTE_TYPE:
         uint32_t value_uint32_t;
         memcpy(&value_uint32_t, buffer, sizeof(uint32_t));
         value = value_uint32_t;
-        persistValue((uint8_t*) &value_uint32_t, sizeof(uint32_t));
+        persistValue((uint8_t *) &value_uint32_t, sizeof(uint32_t));
         break;
     case ZCL_INT64U_ATTRIBUTE_TYPE:
         uint64_t value_uint64_t;
         memcpy(&value_uint64_t, buffer, sizeof(uint64_t));
         value = value_uint64_t;
-        persistValue((uint8_t*) &value_uint64_t, sizeof(uint64_t));
+        persistValue((uint8_t *) &value_uint64_t, sizeof(uint64_t));
         break;
     case ZCL_INT8S_ATTRIBUTE_TYPE:
         int8_t value_int8_t;
         memcpy(&value_int8_t, buffer, sizeof(int8_t));
         value = value_int8_t;
-        persistValue((uint8_t*) &value_int8_t, sizeof(int8_t));
+        persistValue((uint8_t *) &value_int8_t, sizeof(int8_t));
         break;
     case ZCL_INT16S_ATTRIBUTE_TYPE:
         int16_t value_int16_t;
         memcpy(&value_int16_t, buffer, sizeof(int16_t));
         value = value_int16_t;
-        persistValue((uint8_t*) &value_int16_t, sizeof(int16_t));
+        persistValue((uint8_t *) &value_int16_t, sizeof(int16_t));
         break;
     case ZCL_INT32S_ATTRIBUTE_TYPE:
         int32_t value_int32_t;
         memcpy(&value_int32_t, buffer, sizeof(int32_t));
         value = value_int32_t;
-        persistValue((uint8_t*) &value_int32_t, sizeof(int32_t));
+        persistValue((uint8_t *) &value_int32_t, sizeof(int32_t));
         break;
     case ZCL_INT64S_ATTRIBUTE_TYPE:
         int64_t value_int64_t;
         memcpy(&value_int64_t, buffer, sizeof(int64_t));
         value = value_int64_t;
-        persistValue((uint8_t*) &value_int64_t, sizeof(int64_t));
+        persistValue((uint8_t *) &value_int64_t, sizeof(int64_t));
         break;
     case ZCL_SINGLE_ATTRIBUTE_TYPE:
         float value_float;
         memcpy(&value_float, buffer, sizeof(float));
         value = value_float;
-        persistValue((uint8_t*) &value_float, sizeof(float));
+        persistValue((uint8_t *) &value_float, sizeof(float));
         break;
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE:
     case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:
@@ -281,8 +278,7 @@ void Attribute::setValue(uint8_t *buffer)
 void Attribute::persistValue(uint8_t *buffer, size_t size)
 {
     // Only store if value is set to be stored in NVS (represented by MATTER_ATTRIBUTE_FLAG_TOKENIZE flag)
-    if (getAttributeMask() & MATTER_ATTRIBUTE_FLAG_TOKENIZE)
-    {
+    if (getAttributeMask() & MATTER_ATTRIBUTE_FLAG_TOKENIZE) {
         char key[64];
         sprintf(key, "g/a/%x/%x/%x", parentEndpointId, parentClusterId, attributeId); // g/a/endpoint_id/cluster_id/attribute_id
         setPref_new(key, key, buffer, size);
@@ -294,8 +290,7 @@ CHIP_ERROR Attribute::retrieveValue(uint8_t *buffer, size_t size)
     int32_t error = -1;
 
     // Only retrieved if value is set to be stored in NVS (represented by MATTER_ATTRIBUTE_FLAG_TOKENIZE flag)
-    if (!(getAttributeMask() & MATTER_ATTRIBUTE_FLAG_TOKENIZE))
-    {
+    if (!(getAttributeMask() & MATTER_ATTRIBUTE_FLAG_TOKENIZE)) {
         return CHIP_ERROR_INTERNAL;
     }
 
@@ -350,10 +345,8 @@ chip::EndpointId Cluster::getParentEndpointId() const
 
 Attribute *Cluster::getAttribute(chip::AttributeId attributeId)
 {
-    for (auto & att : attributes)
-    {
-        if (att.getAttributeId() == attributeId)
-        {
+    for (auto &att : attributes) {
+        if (att.getAttributeId() == attributeId) {
             return &att;
         }
     }
@@ -363,10 +356,8 @@ Attribute *Cluster::getAttribute(chip::AttributeId attributeId)
 
 Event *Cluster::getEvent(chip::EventId eventId)
 {
-    for (auto & evt : events)
-    {
-        if (evt.getEventId() == eventId)
-        {
+    for (auto &evt : events) {
+        if (evt.getEventId() == eventId) {
             return &evt;
         }
     }
@@ -376,10 +367,8 @@ Event *Cluster::getEvent(chip::EventId eventId)
 
 Command *Cluster::getAcceptedCommand(chip::CommandId commandId)
 {
-    for (auto & cmd : acceptedCommands)
-    {
-        if (cmd.getCommandId() == commandId)
-        {
+    for (auto &cmd : acceptedCommands) {
+        if (cmd.getCommandId() == commandId) {
             return &cmd;
         }
     }
@@ -389,10 +378,8 @@ Command *Cluster::getAcceptedCommand(chip::CommandId commandId)
 
 Command *Cluster::getGeneratedCommand(chip::CommandId commandId)
 {
-    for (auto & cmd : generatedCommands)
-    {
-        if (cmd.getCommandId() == commandId)
-        {
+    for (auto &cmd : generatedCommands) {
+        if (cmd.getCommandId() == commandId) {
             return &cmd;
         }
     }
@@ -409,8 +396,7 @@ void Cluster::addAttribute(AttributeConfig attributeConfig)
 void Cluster::addAttribute(const Attribute &attribute)
 {
     // Check if attribute already exist
-    if (getAttribute(attribute.getAttributeId()) != NULL)
-    {
+    if (getAttribute(attribute.getAttributeId()) != NULL) {
         return;
     }
 
@@ -419,13 +405,11 @@ void Cluster::addAttribute(const Attribute &attribute)
 
 void Cluster::removeAttribute(chip::AttributeId attributeId)
 {
-    auto it = std::find_if(attributes.begin(), attributes.end(), [&](const Attribute & attribute)
-    {
+    auto it = std::find_if(attributes.begin(), attributes.end(), [&](const Attribute & attribute) {
         return attribute.getAttributeId() == attributeId;
     });
 
-    if (it != attributes.end())
-    {
+    if (it != attributes.end()) {
         attributes.erase(it);
     }
 }
@@ -439,8 +423,7 @@ void Cluster::addEvent(EventConfig eventConfig)
 void Cluster::addEvent(const Event &event)
 {
     // Check if event already exist
-    if (getEvent(event.getEventId()) != NULL)
-    {
+    if (getEvent(event.getEventId()) != NULL) {
         return;
     }
 
@@ -449,13 +432,11 @@ void Cluster::addEvent(const Event &event)
 
 void Cluster::removeEvent(chip::EventId eventId)
 {
-    auto it = std::find_if(events.begin(), events.end(), [&](const Event  &event)
-    {
+    auto it = std::find_if(events.begin(), events.end(), [&](const Event  & event) {
         return event.getEventId() == eventId;
     });
 
-    if (it != events.end())
-    {
+    if (it != events.end()) {
         events.erase(it);
     }
 }
@@ -469,13 +450,11 @@ void Cluster::addAcceptedCommand(CommandConfig commandConfig)
 void Cluster::addAcceptedCommand(const Command &command)
 {
     // Check if command already exist
-    if (getAcceptedCommand(command.getCommandId()) != NULL)
-    {
+    if (getAcceptedCommand(command.getCommandId()) != NULL) {
         return;
     }
 
-    if (command.getFlag() & COMMAND_MASK_ACCEPTED)
-    {
+    if (command.getFlag() & COMMAND_MASK_ACCEPTED) {
         acceptedCommands.push_back(command);
     }
 }
@@ -489,39 +468,33 @@ void Cluster::addGeneratedCommand(CommandConfig commandConfig)
 void Cluster::addGeneratedCommand(const Command &command)
 {
     // Check if command already exist
-    if (getGeneratedCommand(command.getCommandId()) != NULL)
-    {
+    if (getGeneratedCommand(command.getCommandId()) != NULL) {
         return;
     }
 
-    if (command.getFlag() & COMMAND_MASK_GENERATED)
-    {
+    if (command.getFlag() & COMMAND_MASK_GENERATED) {
         generatedCommands.push_back(command);
     }
 }
 
 void Cluster::removeAcceptedCommand(chip::CommandId commandId)
 {
-    auto it = std::find_if(acceptedCommands.begin(), acceptedCommands.end(), [commandId](const Command &command)
-    {
+    auto it = std::find_if(acceptedCommands.begin(), acceptedCommands.end(), [commandId](const Command & command) {
         return command.getCommandId() == commandId;
     });
 
-    if (it != acceptedCommands.end())
-    {
+    if (it != acceptedCommands.end()) {
         acceptedCommands.erase(it);
     }
 }
 
 void Cluster::removeGeneratedCommand(chip::CommandId commandId)
 {
-    auto it = std::find_if(generatedCommands.begin(), generatedCommands.end(), [commandId](const Command &command)
-    {
+    auto it = std::find_if(generatedCommands.begin(), generatedCommands.end(), [commandId](const Command & command) {
         return command.getCommandId() == commandId;
     });
 
-    if (it != generatedCommands.end())
-    {
+    if (it != generatedCommands.end()) {
         generatedCommands.erase(it);
     }
 }
@@ -544,10 +517,8 @@ chip::EndpointId Endpoint::getEndpointId() const
 
 Cluster *Endpoint::getCluster(chip::ClusterId clusterId)
 {
-    for (auto & cls : clusters)
-    {
-        if (cls.getClusterId() == clusterId)
-        {
+    for (auto &cls : clusters) {
+        if (cls.getClusterId() == clusterId) {
             return &cls;
         }
     }
@@ -558,30 +529,24 @@ Cluster *Endpoint::getCluster(chip::ClusterId clusterId)
 void Endpoint::addCluster(ClusterConfig &clusterConfig)
 {
     Cluster cluster(endpointId, clusterConfig);
-    for (const AttributeConfig &attributeConfig : clusterConfig.attributeConfigs)
-    {
+    for (const AttributeConfig &attributeConfig : clusterConfig.attributeConfigs) {
         Attribute attribute(cluster.getClusterId(), endpointId, attributeConfig);
         cluster.addAttribute(attribute);
     }
-    for (const EventConfig &eventConfig : clusterConfig.eventConfigs)
-    {
+    for (const EventConfig &eventConfig : clusterConfig.eventConfigs) {
         Event event(cluster.getClusterId(), endpointId, eventConfig);
         cluster.addEvent(event);
     }
-    for (const CommandConfig &commandConfig : clusterConfig.commandConfigs)
-    {
+    for (const CommandConfig &commandConfig : clusterConfig.commandConfigs) {
         Command command(cluster.getClusterId(), endpointId, commandConfig);
-        if (command.getFlag() & COMMAND_MASK_ACCEPTED)
-        {
+        if (command.getFlag() & COMMAND_MASK_ACCEPTED) {
             cluster.addAcceptedCommand(command);
         }
-        if (command.getFlag() & COMMAND_MASK_GENERATED)
-        {
+        if (command.getFlag() & COMMAND_MASK_GENERATED) {
             cluster.addGeneratedCommand(command);
         }
     }
-    for (const EmberAfGenericClusterFunction &functionConfig : clusterConfig.functionConfigs)
-    {
+    for (const EmberAfGenericClusterFunction &functionConfig : clusterConfig.functionConfigs) {
         cluster.addFunction(functionConfig);
     }
     addCluster(cluster);
@@ -590,8 +555,7 @@ void Endpoint::addCluster(ClusterConfig &clusterConfig)
 void Endpoint::addCluster(const Cluster &cluster)
 {
     // Check if cluster already exist
-    if (getCluster(cluster.getClusterId()) != NULL)
-    {
+    if (getCluster(cluster.getClusterId()) != NULL) {
         return;
     }
 
@@ -601,13 +565,11 @@ void Endpoint::addCluster(const Cluster &cluster)
 void Endpoint::removeCluster(chip::ClusterId clusterId)
 {
     // Remove the cluster from the vector
-    auto it = std::find_if(clusters.begin(), clusters.end(), [&](const Cluster &cluster)
-    {
+    auto it = std::find_if(clusters.begin(), clusters.end(), [&](const Cluster & cluster) {
         return cluster.getClusterId() == clusterId;
     });
 
-    if (it != clusters.end())
-    {
+    if (it != clusters.end()) {
         clusters.erase(it);
     }
 }
@@ -624,13 +586,12 @@ void Endpoint::setParentEndpointId(chip::EndpointId newParentEndpointId)
 
 void Endpoint::enableEndpoint()
 {
-    if (enabled)
-    {
+    if (enabled) {
         ChipLogDetail(DeviceLayer, "Endpoint %d already enabled", endpointId);
         return;
     }
 
-    dataVersion = (chip::DataVersion*) calloc(clusters.size(), sizeof(chip::DataVersion));
+    dataVersion = (chip::DataVersion *) calloc(clusters.size(), sizeof(chip::DataVersion));
 
     EmberAfEndpointType *endpointType = nullptr;
     EmberAfCluster *clusterType = nullptr;
@@ -641,26 +602,22 @@ void Endpoint::enableEndpoint()
     chip::EventId *eventType = nullptr;
 
     // Setup cluster type
-    if (clusters.size() > 0)
-    {
-        clusterType = (EmberAfCluster*) calloc(clusters.size(), sizeof(EmberAfCluster));
+    if (clusters.size() > 0) {
+        clusterType = (EmberAfCluster *) calloc(clusters.size(), sizeof(EmberAfCluster));
         clusterCollector.push_back(clusterType);
     }
 
-    for (size_t i=0; i<clusters.size(); i++)
-    {
+    for (size_t i = 0; i < clusters.size(); i++) {
         Cluster cluster = clusters[i];
 
         // Setup attributes
-        if (cluster.attributes.size() > 0)
-        {
-            attributeType = (EmberAfAttributeMetadata*) calloc(cluster.attributes.size(), sizeof(EmberAfAttributeMetadata));
+        if (cluster.attributes.size() > 0) {
+            attributeType = (EmberAfAttributeMetadata *) calloc(cluster.attributes.size(), sizeof(EmberAfAttributeMetadata));
             attributeCollector.push_back(attributeType);
         }
 
-        for (size_t j=0; j<cluster.attributes.size(); j++)
-        {
-            attributeType[j].defaultValue = cluster.attributes[j].getAttributeDefaultValue(); 
+        for (size_t j = 0; j < cluster.attributes.size(); j++) {
+            attributeType[j].defaultValue = cluster.attributes[j].getAttributeDefaultValue();
             attributeType[j].attributeId = cluster.attributes[j].getAttributeId();
             attributeType[j].size = cluster.attributes[j].getAttributeSize();
             attributeType[j].attributeType = cluster.attributes[j].getAttributeType();
@@ -668,54 +625,46 @@ void Endpoint::enableEndpoint()
         }
 
         // Setup cluster functions
-        if (cluster.functions.size() > 0)
-        {
-            functionType = (EmberAfGenericClusterFunction*) calloc(cluster.functions.size(), sizeof(EmberAfGenericClusterFunction));
+        if (cluster.functions.size() > 0) {
+            functionType = (EmberAfGenericClusterFunction *) calloc(cluster.functions.size(), sizeof(EmberAfGenericClusterFunction));
             functionCollector.push_back(functionType);
         }
 
-        for (size_t j=0; j<cluster.functions.size(); j++)
-        {
+        for (size_t j = 0; j < cluster.functions.size(); j++) {
             functionType[j] = cluster.functions[j];
         }
 
         // Setup accepted commands
-        if (cluster.acceptedCommands.size() > 0)
-        {
-            acceptedCommandType = (chip::CommandId*) calloc(cluster.acceptedCommands.size(), sizeof(chip::CommandId));
+        if (cluster.acceptedCommands.size() > 0) {
+            acceptedCommandType = (chip::CommandId *) calloc(cluster.acceptedCommands.size(), sizeof(chip::CommandId));
             acceptedCommandCollector.push_back(acceptedCommandType);
         }
 
-        for (size_t j=0; j<cluster.acceptedCommands.size(); j++)
-        {
+        for (size_t j = 0; j < cluster.acceptedCommands.size(); j++) {
             acceptedCommandType[j] = cluster.acceptedCommands[j].getCommandId();
         }
 
         // Setup generated commands
-        if (cluster.generatedCommands.size() > 0)
-        {
-            generatedCommandType = (chip::CommandId*) calloc(cluster.generatedCommands.size(), sizeof(chip::CommandId));
+        if (cluster.generatedCommands.size() > 0) {
+            generatedCommandType = (chip::CommandId *) calloc(cluster.generatedCommands.size(), sizeof(chip::CommandId));
             generatedCommandCollector.push_back(generatedCommandType);
         }
 
-        for (size_t j=0; j<cluster.generatedCommands.size(); j++)
-        {
+        for (size_t j = 0; j < cluster.generatedCommands.size(); j++) {
             generatedCommandType[j] = cluster.generatedCommands[j].getCommandId();
         }
 
         // Setup events
-        if (cluster.events.size() > 0)
-        {
-            eventType = (chip::EventId*) calloc(cluster.events.size(), sizeof(chip::EventId));
+        if (cluster.events.size() > 0) {
+            eventType = (chip::EventId *) calloc(cluster.events.size(), sizeof(chip::EventId));
             eventCollector.push_back(eventType);
         }
 
-        for (size_t j=0; j<cluster.events.size(); j++)
-        {
+        for (size_t j = 0; j < cluster.events.size(); j++) {
             eventType[j] = cluster.events[j].getEventId();
         }
 
-        clusterType[i].clusterId = cluster.getClusterId();    
+        clusterType[i].clusterId = cluster.getClusterId();
         clusterType[i].attributeCount = cluster.attributes.size();
         clusterType[i].clusterSize = 0;   // default value
         clusterType[i].mask = cluster.getClusterMask();
@@ -728,56 +677,48 @@ void Endpoint::enableEndpoint()
     }
 
     // Setup endpoint type
-    endpointType = (EmberAfEndpointType*) calloc(1, sizeof(EmberAfEndpointType));
+    endpointType = (EmberAfEndpointType *) calloc(1, sizeof(EmberAfEndpointType));
     endpointType->clusterCount = clusters.size();
     endpointType->endpointSize = 0;   // set to 0 as default
     endpointType->cluster = clusterType;
 
     // Register endpoint as dynamic endpoint in matter stack
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    ChipError status = emberAfSetDynamicEndpoint(endpointIndex, endpointId, endpointType, chip::Span<chip::DataVersion>(dataVersion, clusters.size()), deviceTypeList, parentEndpointId);
+    ChipError status = emberAfSetDynamicEndpoint(endpointIndex, endpointId, endpointType, chip::Span<chip::DataVersion>(dataVersion, clusters.size()),
+                       deviceTypeList, parentEndpointId);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if (status == CHIP_NO_ERROR)
-    {
+    if (status == CHIP_NO_ERROR) {
         ChipLogProgress(DeviceLayer, "Set dynamic endpoint %d success", endpointId);
         endpointMetadata = endpointType;
         enabled = true;
         return;
-    }
-    else
-    {
+    } else {
         ChipLogError(DeviceLayer, "Failed to set dynamic endpoint %d with status %d", endpointId, status);
     }
 
     // free allocated memory if error
-    for (EmberAfCluster *cls : clusterCollector)
-    {
+    for (EmberAfCluster *cls : clusterCollector) {
         free(cls);
     }
 
-    for (EmberAfAttributeMetadata *att : attributeCollector)
-    {
+    for (EmberAfAttributeMetadata *att : attributeCollector) {
         free(att);
     }
 
-    for (EmberAfGenericClusterFunction *fun : functionCollector)
-    {
+    for (EmberAfGenericClusterFunction *fun : functionCollector) {
         free(fun);
     }
 
-    for (chip::CommandId *acmd : acceptedCommandCollector)
-    {
+    for (chip::CommandId *acmd : acceptedCommandCollector) {
         free(acmd);
     }
 
-    for (chip::CommandId *gcmd : generatedCommandCollector)
-    {
+    for (chip::CommandId *gcmd : generatedCommandCollector) {
         free(gcmd);
     }
 
-    for (chip::EventId *evt : eventCollector)
-    {
+    for (chip::EventId *evt : eventCollector) {
         free(evt);
     }
 
@@ -791,8 +732,7 @@ void Endpoint::disableEndpoint()
     int endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpointId);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if (endpointIndex == 0xFFFF)
-    {
+    if (endpointIndex == 0xFFFF) {
         ChipLogError(DeviceLayer, "Could not find endpoint index");
         return;
     }
@@ -805,33 +745,27 @@ void Endpoint::disableEndpoint()
     enabled = false;
 
     // free allocated memory
-    for (EmberAfCluster *cls : clusterCollector)
-    {
+    for (EmberAfCluster *cls : clusterCollector) {
         free(cls);
     }
 
-    for (EmberAfAttributeMetadata *att : attributeCollector)
-    {
+    for (EmberAfAttributeMetadata *att : attributeCollector) {
         free(att);
     }
 
-    for (EmberAfGenericClusterFunction *fun : functionCollector)
-    {
+    for (EmberAfGenericClusterFunction *fun : functionCollector) {
         free(fun);
     }
 
-    for (chip::CommandId *acmd : acceptedCommandCollector)
-    {
+    for (chip::CommandId *acmd : acceptedCommandCollector) {
         free(acmd);
     }
 
-    for (chip::CommandId *gcmd : generatedCommandCollector)
-    {
+    for (chip::CommandId *gcmd : generatedCommandCollector) {
         free(gcmd);
     }
 
-    for (chip::EventId *evt : eventCollector)
-    {
+    for (chip::EventId *evt : eventCollector) {
         free(evt);
     }
 
@@ -841,14 +775,11 @@ void Endpoint::disableEndpoint()
     char key[64];
 
     // Clear persistent data on this endpoint
-    for (size_t i=0; i<clusters.size(); i++)
-    {
+    for (size_t i = 0; i < clusters.size(); i++) {
         Cluster cluster = clusters[i];
-        for (size_t j=0; j<cluster.attributes.size(); j++)
-        {
+        for (size_t j = 0; j < cluster.attributes.size(); j++) {
             Attribute attribute = cluster.attributes[j];
-            if (cluster.attributes[j].getAttributeMask() & MATTER_ATTRIBUTE_FLAG_TOKENIZE)
-            {
+            if (cluster.attributes[j].getAttributeMask() & MATTER_ATTRIBUTE_FLAG_TOKENIZE) {
                 sprintf(key, "g/a/%x/%x/%x", attribute.getParentEndpointId(), attribute.getParentClusterId(), attribute.getAttributeId());
                 deleteKey(key, key);
             }
@@ -866,11 +797,9 @@ Node &Node::getInstance()
 
 Endpoint *Node::getEndpoint(chip::EndpointId endpointId)
 {
-    int i=0;
-    for (auto & ep : endpoints)
-    {
-        if (ep.getEndpointId() == endpointId)
-        {
+    int i = 0;
+    for (auto &ep : endpoints) {
+        if (ep.getEndpointId() == endpointId) {
             return &ep;
         }
         i++;
@@ -887,38 +816,30 @@ chip::EndpointId Node::addEndpoint(const EndpointConfig &endpointConfig, Span<co
 {
     Endpoint endpoint(this, nextEndpointId, endpointCount, deviceTypeList);
     // Set parentEndpointId based on the previous endpoint's endpointId
-    if (!endpoints.empty())
-    {
+    if (!endpoints.empty()) {
         endpoint.setParentEndpointId(endpoints.back().getEndpointId());
     }
 
-    for (const ClusterConfig &clusterConfig : endpointConfig.clusterConfigs)
-    {
+    for (const ClusterConfig &clusterConfig : endpointConfig.clusterConfigs) {
         Cluster cluster(endpoint.getEndpointId(), clusterConfig);
-        for (const AttributeConfig &attributeConfig : clusterConfig.attributeConfigs)
-        {
+        for (const AttributeConfig &attributeConfig : clusterConfig.attributeConfigs) {
             Attribute attribute(cluster.getClusterId(), endpoint.getEndpointId(), attributeConfig);
             cluster.addAttribute(attribute);
         }
-        for (const EventConfig &eventConfig : clusterConfig.eventConfigs)
-        {
+        for (const EventConfig &eventConfig : clusterConfig.eventConfigs) {
             Event event(cluster.getClusterId(), endpoint.getEndpointId(), eventConfig);
             cluster.addEvent(event);
         }
-        for (const CommandConfig &commandConfig : clusterConfig.commandConfigs)
-        {
+        for (const CommandConfig &commandConfig : clusterConfig.commandConfigs) {
             Command command(cluster.getClusterId(), endpoint.getEndpointId(), commandConfig);
-            if (command.getFlag() & COMMAND_MASK_ACCEPTED)
-            {
+            if (command.getFlag() & COMMAND_MASK_ACCEPTED) {
                 cluster.addAcceptedCommand(command);
             }
-            if (command.getFlag() & COMMAND_MASK_GENERATED)
-            {
+            if (command.getFlag() & COMMAND_MASK_GENERATED) {
                 cluster.addGeneratedCommand(command);
             }
         }
-        for (const EmberAfGenericClusterFunction  &functionConfig : clusterConfig.functionConfigs)
-        {
+        for (const EmberAfGenericClusterFunction  &functionConfig : clusterConfig.functionConfigs) {
             cluster.addFunction(functionConfig);
         }
         endpoint.addCluster(cluster);
@@ -932,18 +853,15 @@ chip::EndpointId Node::addEndpoint(const EndpointConfig &endpointConfig, Span<co
 
 void Node::removeEndpoint(chip::EndpointId endpointId)
 {
-    auto it = std::find_if(endpoints.begin(), endpoints.end(), [&](const Endpoint &endpoint)
-    {
+    auto it = std::find_if(endpoints.begin(), endpoints.end(), [&](const Endpoint & endpoint) {
         return endpoint.getEndpointId() == endpointId;
     });
 
-    if (it != endpoints.end())
-    {
+    if (it != endpoints.end()) {
         // Get the index of the endpoint in the vector
         int index = std::distance(endpoints.begin(), it);
 
-        if (it->enabled)
-        {
+        if (it->enabled) {
             ChipLogError(DeviceLayer, "Endpoint not yet disabled!");
             return;
         }
@@ -952,14 +870,10 @@ void Node::removeEndpoint(chip::EndpointId endpointId)
         endpoints.erase(it);
 
         // Update the parentEndpointId of subsequent endpoints
-        for (int i = index; i < endpoints.size(); ++i)
-        {
-            if (i > 0)
-            {
+        for (int i = index; i < endpoints.size(); ++i) {
+            if (i > 0) {
                 endpoints[i].setParentEndpointId(endpoints[i - 1].getEndpointId());
-            }
-            else
-            {
+            } else {
                 // If the removed endpoint was the first one, set the parentEndpointId to DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID
                 endpoints[i].setParentEndpointId(DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID);
             }
@@ -970,8 +884,7 @@ void Node::removeEndpoint(chip::EndpointId endpointId)
 
 void Node::enableAllEndpoints()
 {
-    for (Endpoint & endpoint: endpoints)
-    {
+    for (Endpoint &endpoint : endpoints) {
         endpoint.enableEndpoint();
     }
 }
