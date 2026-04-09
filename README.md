@@ -34,7 +34,7 @@ Feel free to explore our curated list of supported ICs below to find the best ma
 | RTL8713E  |![alt text][supported]      | ameba-rtos/release/* |
 | RTL8710E  |![alt text][supported]      | ameba-rtos/release/* |
 | RTL8730E  |![alt text][supported]      | ameba-rtos/release/* |
-| RTL8721F  |![alt text][wip]            | ameba-rtos/release/* |
+| RTL8721F  |![alt text][supported]      | ameba-rtos/release/* |
 
 [supported]: https://img.shields.io/badge/supported-brightgreen
 [not-supported]: https://img.shields.io/badge/not%20supported-lightgrey

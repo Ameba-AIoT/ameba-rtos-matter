@@ -36,6 +36,25 @@ You may add clusters and attributes handling in `matter_driver_uplink_update_han
 ### AmebaDplus (RTL8721Dx)
 
 <details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc RTL8721Dx
+    matter_build_proj thermostat_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
+
+<details>
   <summary>Building with ameba-rtos_v1.1 SDK</summary>
 
 #### Build Matter Libraries and the Final Firmware
@@ -44,7 +63,7 @@ You may add clusters and attributes handling in `matter_driver_uplink_update_han
     python build.py -D MATTER_EXAMPLE=thermostat_port
 
 #### Flash the Image
-Refer to this [guide](../../docs/amebadplus_general_build.md#Flash-Image-using-Python-script) to flash the image with python script.
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
 
 #### Clean Matter Libraries and Firmware
 
@@ -83,7 +102,26 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 <details>
   <summary>Building with AmebaLite</summary>
 
-### AmebaLite (RTL8720EA / RTL8726EA)
+### AmebaLite (RTL8726E / RTL8720E / RTL8713E / RTL8710E)
+
+<details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc < RTL8726E / RTL8720E / RTL8713E / RTL8710E >
+    matter_build_proj thermostat_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
 
 <details>
   <summary>Building with ameba-rtos_v1.1 SDK</summary>
@@ -94,7 +132,7 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
     python build.py -D MATTER_EXAMPLE=thermostat_port
 
 #### Flash the Image
-Refer to this [guide](../../docs/amebalite_general_build.md#Flash-Image-using-Python-script) to flash the image with python script.
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
 
 #### Clean Matter Libraries and Firmware
 
@@ -136,6 +174,25 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 ### AmebaSmart (RTL8730E)
 
 <details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc RTL8730E
+    matter_build_proj thermostat_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
+
+<details>
   <summary>Building with ameba-rtos_v1.1 SDK</summary>
 
 #### Build Matter Libraries and the Final Firmware
@@ -144,7 +201,7 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
     python build.py -D MATTER_EXAMPLE=thermostat_port
 
 #### Flash the Image
-Refer to this [guide](../../docs/amebasmart_general_build.md#Flash-Image-using-Python-script) to flash the image with python script.
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
 
 #### Clean Matter Libraries and Firmware
 
@@ -173,6 +230,34 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 
     cd ameba-rtos/amebasmart_gcc_project
     make clean
+
+</details>
+
+</details>
+
+---
+
+<details>
+  <summary>Building with AmebaGreen2</summary>
+
+### AmebaGreen2 (RTL8721F)
+
+<details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc RTL8721F
+    matter_build_proj thermostat_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
 
 </details>
 

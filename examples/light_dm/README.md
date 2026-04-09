@@ -33,6 +33,25 @@ After another 20 second delay, the `Dimmable Light` endpoint on Endpoint2 will b
 | Button     | PA_12 |
 
 <details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc RTL8721Dx
+    matter_build_proj light_dm
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
+
+<details>
   <summary>Building with ameba-rtos_v1.1 SDK</summary>
 
 #### Build Matter Libraries and the Final Firmware
@@ -41,7 +60,7 @@ After another 20 second delay, the `Dimmable Light` endpoint on Endpoint2 will b
     python build.py -D MATTER_EXAMPLE=light_dm
 
 #### Flash the Image
-Refer to this [guide](../../docs/amebadplus_general_build.md#Flash-Image-using-Python-script) to flash the image with python script.
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
 
 #### Clean Matter Libraries and Firmware
 
@@ -80,7 +99,7 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 <details>
   <summary>Building with AmebaLite</summary>
 
-### AmebaLite (RTL8720EA / RTL8726EA)
+### AmebaLite (RTL8726E / RTL8720E / RTL8713E / RTL8710E)
 
 #### GPIO Pin Configuration
 
@@ -88,6 +107,25 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 | ---------- | ----- |
 | LED        | PA_31 |
 | Button     | PA_29 |
+
+<details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc < RTL8726E / RTL8720E / RTL8713E / RTL8710E >
+    matter_build_proj light_dm
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
 
 <details>
   <summary>Building with ameba-rtos_v1.1 SDK</summary>
@@ -98,7 +136,7 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
     python build.py -D MATTER_EXAMPLE=light_dm
 
 #### Flash the Image
-Refer to this [guide](../../docs/amebalite_general_build.md#Flash-Image-using-Python-script) to flash the image with python script.
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
 
 #### Clean Matter Libraries and Firmware
 
@@ -147,6 +185,25 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 | Button     | PA_10 |
 
 <details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc RTL8730E
+    matter_build_proj light_dm
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
+
+<details>
   <summary>Building with ameba-rtos_v1.1 SDK</summary>
 
 #### Build Matter Libraries and the Final Firmware
@@ -155,7 +212,7 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
     python build.py -D MATTER_EXAMPLE=light_dm
 
 #### Flash the Image
-Refer to this [guide](../../docs/amebasmart_general_build.md#Flash-Image-using-Python-script) to flash the image with python script.
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
 
 #### Clean Matter Libraries and Firmware
 
@@ -184,6 +241,41 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 
     cd ameba-rtos/amebasmart_gcc_project
     make clean
+
+</details>
+
+</details>
+
+---
+
+<details>
+  <summary>Building with AmebaGreen2</summary>
+
+### AmebaGreen2 (RTL8721F)
+
+#### GPIO Pin Configuration
+
+| Peripheral | Pin   |
+| ---------- | ----- |
+| LED        | PA_6  |
+| Button     | PA_26 |
+
+<details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc RTL8721F
+    matter_build_proj light_dm
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
 
 </details>
 

@@ -71,7 +71,7 @@ Navigate to the `ameba-rtos-matter` directory:
 
     cd ameba-rtos-matter
 
-    ameba.py soc < RTL8721Dx / RTL8726E / RTL8720E / RTL8713E / RTL8710E / RTL8730E >
+    ameba.py soc < RTL8721Dx / RTL8726E / RTL8720E / RTL8713E / RTL8710E / RTL8730E / RTL8721F >
 
 ### Build CHIP library by GN and Final Firmware
 
@@ -103,6 +103,8 @@ matter_apply_conf
 
 - If other menuconfig needs to be adjusted, run `ameba.py menuconfig`
 - To enable Matter, under `CONFIG APPLICATION`, select `Matter Config`, and enable `Enable Matter`.
+- To support Matter, LwIP configurations need to be updated. Navigate to `CONFIG LWIP`, enable `LWIP IPv6`, and set `Len of pbuf pool` to `1500`
+- For RTL8721F, OS configuration needs to be updated. Navigate to `CONFIG OS`, change `Kernel Selecte` from `FREERTOS_ROM` to `FREERTOS`
 - If you want to support Matter BLE, under `CONFIG BT`, select `Enable BT`. Go back to the main menuconfig, select `CONFIG APPLICATION`, under `Matter Config`, enable `BLE Matter Adapter`.
 - If you want to support [Matter ESF](matter_commissioning_and_control_guide.md#enable-matter-esf), select `CONFIG APPLICATION`, under `Matter Config`, enable `Enable Matter Terms and Condition`
 
@@ -149,11 +151,14 @@ Within `ameba-rtos-matter` folder, clean the whole project with the following co
 ### Flash Image using ameba.py command
 
 The generated images are found in the build folder `build_RTL87XXX` of `ameba-rtos-matter` sdk:
-- bootloader image: `km4_boot_all.bin`
+- bootloader image:
+    - RTL8721Dx / RTL8726E / RTL8720E / RTL8713E / RTL8710E / RTL8730E: `km4_boot_all.bin`
+    - RTL8721F: `amebagreen2_boot.bin`
 - application image:
     - RTL8721Dx: `km0_km4_app.bin`
     - RTL8726E / RTL8720E / RTL8713E / RTL8710E: `kr4_km4_app.bin`
     - RTL8730E: `km0_km4_ca32_app.bin`
+    - RTL8721F: `amebagreen2_app.bin`
 
 Both bootloader and appication images will be flashed. Within `ameba-rtos-matter` folder, flash the image to the Ameba port (e.g. `/dev/ttyUSB0`).
 
@@ -179,6 +184,13 @@ If the app image is too large, please add the --image/-i option:
   <summary>Complete flash command to RTL8730E</summary>
 
     ameba.py flash -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08040000 -i km0_km4_ca32_app.bin 0x08040000 0x08340000
+
+</details>
+
+<details>
+  <summary>Complete flash command to RTL8721F</summary>
+
+    ameba.py flash -p /dev/ttyUSB0 -i amebagreen2_boot.bin 0x08000000 0x08040000 -i amebagreen2_app.bin 0x08040000 0x08240000
 
 </details>
 
@@ -272,6 +284,7 @@ Navigate to the corresponding project directory based on the IC used:
 
 Menuconfig for matter:
 - To enable Matter, under `CONFIG APPLICATION`, select `Matter Config`, and enable `Enable Matter`.
+- To support Matter, LwIP configurations need to be updated. Navigate to `CONFIG LWIP`, enable `LWIP IPv6`, and set `Len of pbuf pool` to `1500`
 - If you want to support Matter BLE, under `CONFIG BT`, select `Enable BT`. Go back to the main menuconfig, select `CONFIG APPLICATION`, under `Matter Config`, enable `BLE Matter Adapter`.
 - If you want to support [Matter ESF](matter_commissioning_and_control_guide.md#enable-matter-esf), select `CONFIG APPLICATION`, under `Matter Config`, enable `Enable Matter Terms and Condition`
 

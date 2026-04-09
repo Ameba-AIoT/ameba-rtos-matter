@@ -9,11 +9,7 @@ This general guide provides an overview of the Matter integration process and se
 
 This general guide provides an overview of the Matter integration process and serves as a foundational resource for understanding how to build Matter on various ICs supported by Ameba.
 
-- [AmebaDplus Building Guide](amebadplus_general_build.md) - Step-by-step instructions for building Matter on AmebaDplus.
-
-- [AmebaLite Building Guide](amebalite_general_build.md) - Step-by-step instructions for building Matter on AmebaLite.
-
-- [AmebaSmart Building Guide](amebasmart_general_build.md) - Step-by-step instructions for building Matter on AmebaSmart.
+- [AmebaRTOS SDK Building Guide](ameba-rtos_general_build.md) - Step-by-step instructions for building Matter on AmebaRTOS SDK.
 
 ## Building Different Applications
 

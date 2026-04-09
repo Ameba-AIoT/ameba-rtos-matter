@@ -7,64 +7,79 @@
 // normal LED
 void MatterLED::Init(PinName pin)
 {
-    mPwm_obj                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_obj->pwm_idx               = 1;
+    mPwm_obj               = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+#if defined(CONFIG_AMEBAGREEN2)
+    mPwm_obj->pwmtimer_idx = 4;
+#endif
+    mPwm_obj->pwm_idx      = 0;
     pwmout_init(mPwm_obj, pin);
-    mRgb                            = false;
-    mState                          = false;
-    mBrightness                     = 254;
-    mHue                            = 0;
-    mSaturation                     = 0;
+    mRgb                   = false;
+    mState                 = false;
+    mBrightness            = 254;
+    mHue                   = 0;
+    mSaturation            = 0;
 }
 
 // RGB LED
 void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin)
 {
-    mPwm_red                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_green                      = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_blue                       = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_red                 = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_green               = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_blue                = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
 
-    mPwm_red->pwm_idx               = 1;
-    mPwm_green->pwm_idx             = 2;
-    mPwm_blue->pwm_idx              = 3;
+#if defined(CONFIG_AMEBAGREEN2)
+    mPwm_red->pwmtimer_idx   = 4;
+    mPwm_green->pwmtimer_idx = 4;
+    mPwm_blue->pwmtimer_idx  = 4;
+#endif
+    mPwm_red->pwm_idx        = 0;
+    mPwm_green->pwm_idx      = 1;
+    mPwm_blue->pwm_idx       = 2;
     pwmout_init(mPwm_red, redpin);
     pwmout_init(mPwm_green, bluepin);
     pwmout_init(mPwm_blue, greenpin);
 
-    mRgb                            = true;
-    mRgbw                           = false;
-    mState                          = false;
-    mBrightness                     = 254;
-    mHue                            = 0;
-    mSaturation                     = 0;
+    mRgb                     = true;
+    mRgbw                    = false;
+    mState                   = false;
+    mBrightness              = 254;
+    mHue                     = 0;
+    mSaturation              = 0;
 }
 
 // RGBCW LED
 void MatterLED::Init(PinName redpin, PinName greenpin, PinName bluepin, PinName cwhitepin, PinName wwhitepin)
 {
-    mPwm_red                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_green                      = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_blue                       = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_cwhite                     = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_wwhite                     = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_red                  = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_green                = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_blue                 = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_cwhite               = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+    mPwm_wwhite               = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
 
-    mPwm_red->pwm_idx               = 1;
-    mPwm_green->pwm_idx             = 2;
-    mPwm_blue->pwm_idx              = 3;
-    mPwm_cwhite->pwm_idx            = 4;
-    mPwm_wwhite->pwm_idx            = 5;
+#if defined(CONFIG_AMEBAGREEN2)
+    mPwm_red->pwmtimer_idx    = 4;
+    mPwm_green->pwmtimer_idx  = 4;
+    mPwm_blue->pwmtimer_idx   = 4;
+    mPwm_cwhite->pwmtimer_idx = 4;
+    mPwm_wwhite->pwmtimer_idx = 4;
+#endif
+    mPwm_red->pwm_idx         = 0;
+    mPwm_green->pwm_idx       = 1;
+    mPwm_blue->pwm_idx        = 2;
+    mPwm_cwhite->pwm_idx      = 3;
+    mPwm_wwhite->pwm_idx      = 4;
     pwmout_init(mPwm_red, redpin);
     pwmout_init(mPwm_green, bluepin);
     pwmout_init(mPwm_blue, greenpin);
     pwmout_init(mPwm_cwhite, cwhitepin);
     pwmout_init(mPwm_wwhite, wwhitepin);
 
-    mRgb                            = true;
-    mRgbw                           = true;
-    mState                          = false;
-    mBrightness                     = 254;
-    mHue                            = 0;
-    mSaturation                     = 0;
+    mRgb                      = true;
+    mRgbw                     = true;
+    mState                    = false;
+    mBrightness               = 254;
+    mHue                      = 0;
+    mSaturation               = 0;
 }
 
 void MatterLED::deInit(void)

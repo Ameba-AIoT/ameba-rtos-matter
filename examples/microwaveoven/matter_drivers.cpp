@@ -27,12 +27,14 @@ using List              = chip::app::DataModel::List<T>;
 using ModeTagStructType = chip::app::Clusters::detail::Structs::ModeTagStruct::Type;
 using Status            = Protocols::InteractionModel::Status;
 
-#if defined (CONFIG_AMEBASMART)
-#define PWM_PIN       PA_5
-#elif defined (CONFIG_AMEBALITE)
-#define PWM_PIN       PA_31
-#elif defined (CONFIG_AMEBADPLUS)
-#define PWM_PIN       PB_18
+#if defined(CONFIG_AMEBADPLUS)
+#define PWM_PIN PB_18
+#elif defined(CONFIG_AMEBALITE)
+#define PWM_PIN PA_31
+#elif defined(CONFIG_AMEBASMART)
+#define PWM_PIN PA_5
+#elif defined(CONFIG_AMEBAGREEN2)
+#define PWM_PIN PA_6
 #endif
 
 MatterMicrowaveOven MicrowaveOven;

@@ -22,8 +22,11 @@ EndpointId MatterRoomAirCon::GetEp(void)
 /* Fan Cluster */
 void MatterRoomAirCon::FanControl::Init(PinName pin)
 {
-    mPwm_obj          = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_obj->pwm_idx = 1;
+    mPwm_obj               = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+#if defined(CONFIG_AMEBAGREEN2)
+    mPwm_obj->pwmtimer_idx = 4;
+#endif
+    mPwm_obj->pwm_idx      = 0;
     pwmout_init(mPwm_obj, pin);
 
     mMode = 0;
@@ -97,8 +100,11 @@ uint8_t MatterRoomAirCon::FanControl::mapModeToPercent(uint8_t mode)
 /* Thermostat Cluster */
 void MatterRoomAirCon::Thermostat::Init(PinName pin)
 {
-    mPwm_obj          = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_obj->pwm_idx = 1;
+    mPwm_obj               = (pwmout_t*) pvPortMalloc(sizeof(pwmout_t));
+#if defined(CONFIG_AMEBAGREEN2)
+    mPwm_obj->pwmtimer_idx = 4;
+#endif
+    mPwm_obj->pwm_idx      = 0;
     pwmout_init(mPwm_obj, pin);
 }
 

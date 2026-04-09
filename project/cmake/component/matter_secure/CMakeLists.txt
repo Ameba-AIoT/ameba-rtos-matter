@@ -60,7 +60,7 @@ ameba_list_append(private_sources
 
 # To check freertos secure heap status, optional, only applicable for dplus and lite
 #------------------------------#
-if(CONFIG_AMEBADPLUS OR CONFIG_AMEBALITE)
+if(CONFIG_AMEBADPLUS OR CONFIG_AMEBALITE OR CONFIG_AMEBAGREEN2)
     ameba_list_append(private_sources
         ${MATTER_DIR}/common/os/freertos_secure_additions.c
     )

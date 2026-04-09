@@ -53,6 +53,10 @@ elseif(CONFIG_AMEBASMART)
             ${MATTER_DIR}/common/atf/include
         )
     endif()
+elseif(CONFIG_AMEBAGREEN2)
+    ameba_list_append(public_includes
+        ${FREERTOS_DIR}/portable/GCC/AmebaGreen2_KM4
+    )
 endif()
 
 if(CONFIG_BT_MATTER_ADAPTER)

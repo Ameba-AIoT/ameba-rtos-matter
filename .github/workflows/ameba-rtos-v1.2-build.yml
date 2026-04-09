@@ -50,5 +50,10 @@ jobs:
         chmod +x ./tools/docker/ameba-rtos/v1.2/amebasmart/run_docker_build_scripts.sh
         ./tools/docker/ameba-rtos/v1.2/amebasmart/run_docker_build_scripts.sh
 
+    - name: Run Docker container for amebagreen2 and execute scripts
+      run: |
+        chmod +x ./tools/docker/ameba-rtos/v1.2/amebagreen2/run_docker_build_scripts.sh
+        ./tools/docker/ameba-rtos/v1.2/amebagreen2/run_docker_build_scripts.sh
+
     - name: Clean up Docker
       run: docker system prune -af

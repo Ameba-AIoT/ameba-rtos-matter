@@ -22,15 +22,18 @@ using namespace chip::app::Clusters::RefrigeratorAlarm;
 using namespace chip::app::Clusters::RefrigeratorAndTemperatureControlledCabinetMode;
 using chip::Protocols::InteractionModel::Status;
 
-#if defined (CONFIG_AMEBASMART)
-#define GPIO_LED_PIN       PA_5
-#define GPIO_IRQ_LEVEL_PIN PA_10
-#elif defined (CONFIG_AMEBALITE)
-#define GPIO_LED_PIN       PA_31
-#define GPIO_IRQ_LEVEL_PIN PA_29
-#elif defined (CONFIG_AMEBADPLUS)
+#if defined(CONFIG_AMEBADPLUS)
 #define GPIO_LED_PIN       PB_18
 #define GPIO_IRQ_LEVEL_PIN PA_12
+#elif defined(CONFIG_AMEBALITE)
+#define GPIO_LED_PIN       PA_31
+#define GPIO_IRQ_LEVEL_PIN PA_29
+#elif defined(CONFIG_AMEBASMART)
+#define GPIO_LED_PIN       PA_5
+#define GPIO_IRQ_LEVEL_PIN PA_10
+#elif defined(CONFIG_AMEBAGREEN2)
+#define GPIO_LED_PIN       PA_6
+#define GPIO_IRQ_LEVEL_PIN PA_26
 #endif
 
 MatterRefrigerator refrigerator;

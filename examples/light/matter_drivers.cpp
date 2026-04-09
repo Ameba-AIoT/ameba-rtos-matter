@@ -12,15 +12,18 @@
 using namespace ::chip::app;
 using chip::Protocols::InteractionModel::Status;
 
-#if defined (CONFIG_AMEBASMART)
-#define PWM_LED      PA_5
-#define GPIO_IRQ_PIN PA_10
-#elif defined (CONFIG_AMEBALITE)
-#define PWM_LED      PA_31
-#define GPIO_IRQ_PIN PA_29
-#elif defined (CONFIG_AMEBADPLUS)
+#if defined(CONFIG_AMEBADPLUS)
 #define PWM_LED      PB_18
 #define GPIO_IRQ_PIN PA_12
+#elif defined(CONFIG_AMEBALITE)
+#define PWM_LED      PA_31
+#define GPIO_IRQ_PIN PA_29
+#elif defined(CONFIG_AMEBASMART)
+#define PWM_LED      PA_5
+#define GPIO_IRQ_PIN PA_10
+#elif defined(CONFIG_AMEBAGREEN2)
+#define PWM_LED      PA_6
+#define GPIO_IRQ_PIN PA_26
 #endif
 
 MatterLED led;
