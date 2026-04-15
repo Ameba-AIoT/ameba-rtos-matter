@@ -37,6 +37,10 @@ menu "Matter Config"
             bool
             default y
             depends on MATTER_SECURE_EN
+        config COMPILE_MBEDTLS_FROM_MATTER_SECURE
+            bool "Compile MbedTLS from Matter Secure (NOT NEEDED FOR LATEST V1.1 AND V1.2)"
+            default n
+            depends on MATTER_SECURE_EN
         config TZ_S_SIZE
             int
             default 136 if AMEBADPLUS

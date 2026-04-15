@@ -145,6 +145,6 @@ ameba_target_add(atf_mbedtls_secure
 )
 
 add_custom_target(
-	lib_atf_mbedtls_secure.a
+	matter_atf_secure
 	DEPENDS ${c_SDK_LIB_APPLICATION_DIR}/lib_atf_mbedtls_secure.a
 )

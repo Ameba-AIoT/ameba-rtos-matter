@@ -20,16 +20,21 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include "ameba.h"
-#include "FreeRTOS.h"
-#include "secure_heap.h"
+#include <ameba.h>
+#include <FreeRTOS.h>
+#include <secure_heap.h>
 
 IMAGE3_ENTRY_SECTION
 void NS_ENTRY vMatterPrintSecureHeapStatus(void)
 {
-	DiagPrintf("secureconfigTOTAL_SRAM_HEAP_SIZE = %d\n", secureconfigTOTAL_SRAM_HEAP_SIZE);
-	DiagPrintf("xPortGetMinimumEverFreeHeapSize  = %d\n", xPortGetMinimumEverFreeHeapSize());
-	DiagPrintf("xPortGetFreeHeapSize             = %d\n", xPortGetFreeHeapSize());
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+	DiagPrintf("Image 3 heap size               = %d\n", secureconfigTOTAL_SRAM_HEAP_SIZE);
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+	DiagPrintf("Image 3 heap size               = %d\n", __image3_heap_size__);
+#endif
+	DiagPrintf("xPortGetMinimumEverFreeHeapSize = %d\n", xPortGetMinimumEverFreeHeapSize());
+	DiagPrintf("xPortGetFreeHeapSize            = %d\n", xPortGetFreeHeapSize());
 }
 
 #if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) && defined(CONFIG_AMEBALITE)

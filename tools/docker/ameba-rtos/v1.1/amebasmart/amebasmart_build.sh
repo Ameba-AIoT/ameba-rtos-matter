@@ -33,22 +33,11 @@ cd ${amebadir}
 chmod u+x matter_setup.sh
 .//matter_setup.sh ameba-rtos v1.5 || handle_error "Failed to run matter_setup.sh for ameba-rtos"
 
-mkdir ${amebadir}/amebasmart_gcc_project/menuconfig/
-mkdir ${amebadir}/amebasmart_gcc_project/menuconfig/project_lp/
-mkdir ${amebadir}/amebasmart_gcc_project/menuconfig/project_hp/
-mkdir ${amebadir}/amebasmart_gcc_project/menuconfig/project_ap/
-
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebasmart/inc/lp/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/menuconfig/project_lp/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebasmart/inc/hp/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/menuconfig/project_hp/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebasmart/inc/ap/platform_autoconf.h ${amebadir}/amebasmart_gcc_project/menuconfig/project_ap/
-
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebasmart/menuconfig/.config      ${amebadir}/amebasmart_gcc_project/menuconfig/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebasmart/menuconfig/.config_km0  ${amebadir}/amebasmart_gcc_project/menuconfig/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebasmart/menuconfig/.config_km4  ${amebadir}/amebasmart_gcc_project/menuconfig/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebasmart/menuconfig/.config_ca32 ${amebadir}/amebasmart_gcc_project/menuconfig/
-
 echo "Build firmware"
 cd ${amebadir}/amebasmart_gcc_project/
+
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/config/amebasmart_matter_proj.conf ${amebadir}/amebasmart_gcc_project/matter_proj.conf
+python menuconfig.py -f matter_proj.conf
 
 echo "Building all_clusters examples"
 python build.py -D MATTER_EXAMPLE=all_clusters || handle_error "Failed to build all_clusters"

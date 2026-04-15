@@ -33,19 +33,11 @@ cd ${amebadir}
 chmod u+x matter_setup.sh
 .//matter_setup.sh ameba-rtos v1.5 || handle_error "Failed to run matter_setup.sh for ameba-rtos"
 
-mkdir ${amebadir}/amebalite_gcc_project/menuconfig/
-mkdir ${amebadir}/amebalite_gcc_project/menuconfig/project_kr4/
-mkdir ${amebadir}/amebalite_gcc_project/menuconfig/project_km4/
-
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebalite/inc/kr4/platform_autoconf.h ${amebadir}/amebalite_gcc_project/menuconfig/project_kr4/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebalite/inc/km4/platform_autoconf.h ${amebadir}/amebalite_gcc_project/menuconfig/project_km4/
-
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebalite/menuconfig/.config     ${amebadir}/amebalite_gcc_project/menuconfig/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebalite/menuconfig/.config_kr4 ${amebadir}/amebalite_gcc_project/menuconfig/
-cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/amebalite/menuconfig/.config_km4 ${amebadir}/amebalite_gcc_project/menuconfig/
-
 echo "Build firmware"
 cd ${amebadir}/amebalite_gcc_project/
+
+cp ${amebadir}/component/application/matter/tools/docker/ameba-rtos/v1.1/config/amebadplus_lite_matter_proj.conf ${amebadir}/amebalite_gcc_project/matter_proj.conf
+python menuconfig.py -f matter_proj.conf
 
 echo "Building all_clusters examples"
 python build.py -D MATTER_EXAMPLE=all_clusters || handle_error "Failed to build all_clusters"
