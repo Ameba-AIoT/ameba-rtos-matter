@@ -689,6 +689,7 @@ int matter_secure_deserialize(uint8_t *pub_buf, size_t pub_size)
     int result = 0;
 
     // Initialize the DAC keypair structure
+    matter_secure_clear_keypair(MATTER_DACKEY_KEY_TYPE);
     mbedtls_ecp_keypair_init(&DacKey);
 
     keyInitialized = 1;

@@ -230,7 +230,7 @@ add_custom_target(
 
 # Other Matter component subdirectories
 ameba_add_subdirectory(component/application)
-if(CONFIG_AMEBASMART)
+if(CONFIG_AMEBASMART AND CONFIG_MATTER_SECURE_EN)
 	ameba_add_subdirectory(component/atf_mbedtls_secure)
 endif()
 

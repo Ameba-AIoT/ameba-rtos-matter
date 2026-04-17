@@ -45,6 +45,8 @@ echo "Building firmware"
 
 $AMEBA_PY soc RTL8726E
 
+cp ${matterdir}/tools/docker/ameba-rtos/v1.2/config/matter_proj.conf ${matterdir}/project/cmake/config/ameba-rtos-v1.2/matter_proj.conf
+
 matter_apply_conf
 
 echo "Building all_clusters example"

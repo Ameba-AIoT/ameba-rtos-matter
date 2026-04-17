@@ -63,4 +63,8 @@ INCLUDES += -I${MATTER_DIR}/common/port \
 # LIBRAND_SRCS = ${MATTER_DIR}/common/atf/libc/rand.c
 # $(eval $(call MAKE_LIB,rand))
 BL32_LIBS += ${MATTER_DIR}/common/atf/libc/librand.a
+ifeq (${CONFIG_AMEBARTOS_V1_2},y)
+LDLIBS    += ${PROJECT_DIR}/lib/application/lib_atf_mbedtls_secure.a
+else
 LDLIBS    += ${PROJECT_DIR}/asdk/lib/application/lib_atf_mbedtls_secure.a
+endif

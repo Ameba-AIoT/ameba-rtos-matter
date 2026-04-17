@@ -18,15 +18,15 @@ You can check the current image's software version using `chip-tool` commands be
     ./chip-tool basicinformation read software-version 1 0
     ./chip-tool basicinformation read software-version-string 1 0
 
-For `ameba-rtos_v1.1`, in `amebaxxx_gcc_project/manifest.json5` update `img_ver_major` or `img_ver_minor` value of `image2` to a higher number than that of current image. Meanwhile for `ameba-rtos_v1.0`, in `amebaxxx_gcc_project/manifest.json` update `"IMG_VER_MAJOR"` or `"IMG_VER_MINOR"` value of `"app"` to a higher number than that of current image.
+For `ameba-rtos-v1.2`, in `component/soc/amebaxx/project/manifest.json5` update `img_ver_major` or `img_ver_minor` value of `image2` to a higher number than that of current image. As for `ameba-rtos-v1.1`, in `amebaxxx_gcc_project/manifest.json5` update `img_ver_major` or `img_ver_minor` value of `image2` to a higher number than that of current image. Meanwhile for `ameba-rtos-v1.0`, in `amebaxxx_gcc_project/manifest.json` update `"IMG_VER_MAJOR"` or `"IMG_VER_MINOR"` value of `"app"` to a higher number than that of current image.
 
 <details>
   <summary>For AmebaDplus OTA Image</summary>
 
 Ensure that the OTA address is set correctly according to the device's flash size in the following files:
 
-    component/soc/usrcfg/amebadplus/ameba_flashcfg.c (ameba-rtos_v1.1)
-    component/soc/amebadplus/usrcfg/ameba_flashcfg.c (ameba-rtos_v1.0)
+    component/soc/usrcfg/amebadplus/ameba_flashcfg.c (ameba-rtos-v1.2 or v1.1)
+    component/soc/amebadplus/usrcfg/ameba_flashcfg.c (ameba-rtos-v1.0)
 
 The file can be found in the base SDK.
 
@@ -72,8 +72,8 @@ Example:
 
 Ensure that the OTA address is set correctly according to the device's flash size in the following files:
 
-    component/soc/usrcfg/amebalite/ameba_flashcfg.c (ameba-rtos_v1.1)
-    component/soc/amebalite/usrcfg/ameba_flashcfg.c (ameba-rtos_v1.0)
+    component/soc/usrcfg/amebalite/ameba_flashcfg.c (ameba-rtos-v1.2 or v1.1)
+    component/soc/amebalite/usrcfg/ameba_flashcfg.c (ameba-rtos-v1.0)
 
 The file can be found in the base SDK.
 
@@ -119,8 +119,8 @@ Example:
 
 Ensure that the OTA address is set correctly according to the device's flash size in the following files:
 
-    component/soc/usrcfg/amebasmart/ameba_flashcfg.c (ameba-rtos_v1.1)
-    component/soc/amebasmart/usrcfg/ameba_flashcfg.c (ameba-rtos_v1.0)
+    component/soc/usrcfg/amebasmart/ameba_flashcfg.c (ameba-rtos-v1.2 or v1.1)
+    component/soc/amebasmart/usrcfg/ameba_flashcfg.c (ameba-rtos-v1.0)
 
 The file can be found in the base SDK.
 
@@ -130,15 +130,15 @@ In `ameba_flashcfg.c`
 ```c
 FlashLayoutInfo_TypeDef Flash_Layout[] = {
 	/* Region_Type, [StartAddr, EndAddr] */
-	{IMG_BOOT,      0x08000000, 0x0801FFFF}, //Boot Manifest(4K) + KM4 Bootloader(124K)
+	{IMG_BOOT,      0x08000000, 0x0803FFFF}, //Boot Manifest(4K) + KM4 Bootloader(252K)
 	//Users should modify below according to their own memory
-	{IMG_APP_OTA1,  0x08020000, 0x0831FFFF}, //Certificate(4K) + Manifest(4K) + KM0 & KM4 & CA32 Application OTA1 + RDP IMG OTA1
+	{IMG_APP_OTA1,  0x08040000, 0x0833FFFF}, //Certificate(4K) + Manifest(4K) + KM0 & KM4 & CA32 Application OTA1 + RDP IMG OTA1
 	// + AP IMG OTA1
-	{IMG_BOOT_OTA2, 0x08320000, 0x0835FFFF}, //Boot Manifest(4K) + KM4 Bootloader(252K) OTA
-	{IMG_APP_OTA2,  0x08360000, 0x0865FFFF}, //Certificate(4K) + Manifest(4K) + KM0 & KM4 & CA32 Application OTA2 + RDP IMG OTA2
+	{IMG_BOOT_OTA2, 0x08340000, 0x0837FFFF}, //Boot Manifest(4K) + KM4 Bootloader(252K) OTA
+	{IMG_APP_OTA2,  0x08380000, 0x0867FFFF}, //Certificate(4K) + Manifest(4K) + KM0 & KM4 & CA32 Application OTA2 + RDP IMG OTA2
 	// + AP IMG OTA2
-	{FTL,           0x08660000, 0x08662FFF}, //FTL for BT(>=12K), The start offset of flash pages which is allocated to FTL physical map.
-	{VFS1,          0x08663000, 0x08682FFF}, //VFS region 1 (128K)
+	{FTL,           0x08680000, 0x08682FFF}, //FTL for BT(>=12K), The start offset of flash pages which is allocated to FTL physical map.
+	{VFS1,          0x08683000, 0x086A2FFF}, //VFS region 1 (128K)
 	{VFS2,          0xFFFFFFFF, 0xFFFFFFFF}, //VFS region 2
 	{USER,          0xFFFFFFFF, 0xFFFFFFFF}, //reserve for user
 	/* End */
