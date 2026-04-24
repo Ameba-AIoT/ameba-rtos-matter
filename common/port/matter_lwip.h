@@ -91,6 +91,12 @@ uint8_t *matter_LwIP_GetIPv6_global(uint8_t idx);
 #endif // LWIP_IPV6
 #endif // LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 
+/**
+  * @brief  Create a thread for sta to get ipv4(dhcp) and ipv6 address
+  */
+
+void matter_LwIP_IP_Address_Request(void);
+
 #ifdef __cplusplus
 }
 #endif

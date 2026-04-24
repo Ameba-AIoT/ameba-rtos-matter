@@ -20,10 +20,11 @@ STATIC_LIB = lib_main.a
 CORE_TARGETS: $(CPPOBJS) $(COBJS) $(STATIC_LIB)
 
 $(CPPOBJS): %.o: %.cpp
-	$(CC) -ffunction-sections $(CPPFLAGS) $(MODULE_IFLAGS) -c $< -o $@
+	$(ECHO) "  CPP      $<"
+	$(Q)$(CC) -ffunction-sections $(CPPFLAGS) $(MODULE_IFLAGS) -c $< -o $@
 	@foldername=$$(basename $$(dirname $<)); \
-	mkdir -p $${foldername}; \
-	cp $@ $${foldername}/$(notdir $@)
+	$(MKDIR) -p $${foldername}; \
+	$(COPY) $@ $${foldername}/$(notdir $@)
 
 $(STATIC_LIB):$(OBJS)
 	$(AR) rvs $@ *.o */*.o

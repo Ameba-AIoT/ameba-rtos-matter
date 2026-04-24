@@ -30,10 +30,6 @@
 #define DAC_PRIV_KEY_ADDRESS 0x400
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <chip_porting.h>
 #include <flash_api.h>
 #include <ameba_factory.pb.h>
@@ -698,7 +694,3 @@ void matter_check_secure_heap_status(void)
 #endif
 }
 #endif /* configENABLE_TRUSTZONE */
-
-#ifdef __cplusplus
-}
-#endif
