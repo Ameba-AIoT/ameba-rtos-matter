@@ -1,5 +1,5 @@
 # Use the latest Ubuntu LTS version for stability
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Install common dependencies
 # Replaces the default Ubuntu repository URL with a new mirror
@@ -10,7 +10,11 @@ RUN set -x && \
     find /etc/apt/ -name '*.list' -exec sed -i 's|http://security.ubuntu.com/ubuntu|http://mirrors.aliyun.com/ubuntu|g' {} + && \
     for i in 1 2 3; do apt-get update && break || sleep 5; done && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    software-properties-common && \
+    software-properties-common \
+    curl \
+    ca-certificates \
+    gnupg && \
+    add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     git \
@@ -26,8 +30,8 @@ RUN set -x && \
     libgirepository1.0-dev \
     libcairo2-dev \
     libreadline-dev \
-    libssl-dev \
-    && apt-get clean && \
+    libssl-dev && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Set python3.10 as the default Python version
@@ -47,9 +51,11 @@ RUN mkdir -p ${AMEBA_DIR} \
     && cd ${AMEBA_DIR} \
     && git clone --depth 1 --branch ${CHIP_REF} --single-branch ${CHIP_REPO} connectedhomeip \
     && cd connectedhomeip \
+    && cp scripts/setup/zap.json latest_zap.json \
     && git fetch --depth=1 origin ${CHIP_SHA} \
     && git checkout ${CHIP_SHA} \
-    && git submodule update --init --recursive --depth 1
+    && git submodule update --init --recursive --depth 1 \
+    && cp latest_zap.json scripts/setup/zap.json
 
 # Set the working directory for the rest of the Dockerfile to work
 WORKDIR ${AMEBA_DIR}
