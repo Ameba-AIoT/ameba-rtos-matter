@@ -20,10 +20,6 @@
 #include <platform_stdlib.h>
 #include <platform_autoconf.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stddef.h>
 #include <string.h>
 #include <chip_porting.h>
@@ -111,6 +107,35 @@ uint8_t *matter_LwIP_GetIPv6_global(uint8_t idx)
 }
 #endif // LWIP_IPV6
 
-#ifdef __cplusplus
-}
+static void matter_LwIP_IP_Address_Request_thread(void *pvParameters)
+{
+    (void) pvParameters;
+
+    uint8_t dhcp_ret = -1;
+    struct netif *pnetif = NULL;
+    pnetif = &xnetif[0];
+
+    if (!netif_is_up(pnetif)) {
+        netifapi_netif_set_up(pnetif);
+    }
+
+#if LWIP_IPV4
+    while (dhcp_ret != DHCP_ADDRESS_ASSIGNED) {
+        dhcp_ret = LwIP_DHCP(0, DHCP_START);
+    }
 #endif
+#if LWIP_IPV6
+    LwIP_AUTOIP_IPv6(pnetif);
+    matter_lwip_dhcp6();
+#endif
+
+    vTaskDelete(NULL);
+}
+
+// Create another thread so it does not block the task that triggered this event
+void matter_LwIP_IP_Address_Request(void)
+{
+    if (xTaskCreate(matter_LwIP_IP_Address_Request_thread, ((const char *)"matter_LwIP_IP_Address_Request_thread"), 512, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+        printf("\n\r%s xTaskCreate(matter_LwIP_IP_Address_Request_thread) failed", __FUNCTION__);
+    }
+}

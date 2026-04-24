@@ -17,12 +17,12 @@
  *    limitations under the License.
  */
 
-#include "platform_autoconf.h"
+#include <platform_autoconf.h>
 #if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
-#include "cmsis.h"
-#include "platform_stdlib.h"
-#include "FreeRTOS.h"
-#include "ameba_crypto_api.h"
+#include <cmsis.h>
+#include <platform_stdlib.h>
+#include <FreeRTOS.h>
+#include <ameba_crypto_api.h>
 #ifndef printf
 #define printf DiagPrintf
 #endif
@@ -30,21 +30,21 @@
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE
 #else
-#include "mbedtls/config.h"
+#include <mbedtls/config.h>
 #endif
-#include "mbedtls/platform.h"
-#include "mbedtls/ssl.h"
-#include "mbedtls/pk.h"
-#include "mbedtls/version.h"
-#include "mbedtls/sha256.h"
+#include <mbedtls/platform.h>
+#include <mbedtls/ssl.h>
+#include <mbedtls/pk.h>
+#include <mbedtls/version.h>
+#include <mbedtls/sha256.h>
 #if (MBEDTLS_VERSION_NUMBER > 0x03000000)
 #include <mbedtls/compat-2.x.h>
 #endif
 
 #if defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
-#include "matter_utils.h"
+#include <matter_utils.h>
 #include <mbedtls/x509_csr.h>
-#include "mbedtls/aes.h"
+#include <mbedtls/aes.h>
 
 __weak const uint8_t kSecureDacPrivateKey[] = {
     0xfe, 0x94, 0x39, 0xea, 0x18, 0xfb, 0x1e, 0x7e, 0xbc, 0xa2, 0x98, 0xf8, 0x87, 0x3a, 0x3c, 0xd5,
@@ -661,6 +661,7 @@ int matter_secure_deserialize(uint8_t *pub_buf, size_t pub_size)
     int result = 0;
 
     // Initialize the DAC keypair structure
+    matter_secure_clear_keypair(MATTER_DACKEY_KEY_TYPE);
     mbedtls_ecp_keypair_init(&DacKey);
 
     keyInitialized = 1;

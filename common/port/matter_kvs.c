@@ -17,17 +17,13 @@
  *    limitations under the License.
  */
 
-#include "platform_stdlib.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <platform_stdlib.h>
 
 #include <stddef.h>
 #include <string.h>
 #include <stdbool.h>
-#include "kv.h"
-#include "matter_kv.h"
+#include <kv.h>
+#include <matter_kv.h>
 
 #include <chip_porting.h>
 
@@ -382,7 +378,3 @@ s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize
     free(tempKey);
     return ret;
 }
-
-#ifdef __cplusplus
-}
-#endif
