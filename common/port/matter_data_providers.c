@@ -22,17 +22,13 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdbool.h>
-#include "kv.h"
-#include "matter_kv.h"
+#include <kv.h>
+#include <matter_kv.h>
 
 #include <chip_porting.h>
 
 #include <matter_data_providers.h>
 #include <matter_kvs.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /******************************************************
  *           Key Value Declarations
@@ -356,9 +352,5 @@ void test_example_set_calendar_type(void)
     {
         printf("Set calendar type failed\n");
     }
-}
-#endif
-
-#ifdef __cplusplus
 }
 #endif

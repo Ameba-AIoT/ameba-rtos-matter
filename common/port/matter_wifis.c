@@ -21,10 +21,6 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stddef.h>
 #include <string.h>
 #include <chip_porting.h>
@@ -577,7 +573,11 @@ static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags,
         case RTW_JOINSTATUS_SUCCESS: // Connecting --> Connected Succesfully
             error_flag = RTW_NO_ERROR;
             RTK_LOGI(TAG, "Join success!\n");
+#if CONFIG_ENABLE_AMEBA_SNTP
+            matter_sntp_init();
+#endif
             matter_wifi_indication(MATTER_WIFI_EVENT_CONNECT, NULL, 0, flags);
+            matter_LwIP_IP_Address_Request();
             break;
         case RTW_JOINSTATUS_FAIL: // Connecting --> Failed to Connect
             RTK_LOGI(TAG, "Join fail, error_flag = ");
@@ -630,6 +630,7 @@ static void matter_wifi_join_status_event_hdl(u8 *buf, s32 buf_len, s32 flags, v
             matter_sntp_init();
 #endif
             matter_wifi_indication(MATTER_WIFI_EVENT_CONNECT, NULL, 0, flags);
+            matter_LwIP_IP_Address_Request();
             break;
         case RTW_JOINSTATUS_FAIL: // Connecting --> Failed to Connect
             RTK_LOGI(TAG, "Join fail, error_flag = ");
@@ -668,7 +669,6 @@ static void matter_wifi_join_status_event_hdl(u8 *buf, s32 buf_len, s32 flags, v
 #elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
 static void matter_wifi_join_status_event_hdl(u8 *buf)
 {
-	int dhcp_ret = 0;
     struct rtw_event_join_status_info *evt_info = (struct rtw_event_join_status_info *)buf;
     u8 join_status = evt_info->status;
     u8 flags = join_status;
@@ -683,10 +683,7 @@ static void matter_wifi_join_status_event_hdl(u8 *buf)
             matter_sntp_init();
 #endif
             matter_wifi_indication(MATTER_WIFI_EVENT_CONNECT, NULL, 0, flags);
-            dhcp_ret = LwIP_IP_Address_Request(NETIF_WLAN_STA_INDEX);
-            if (dhcp_ret == DHCP_ADDRESS_ASSIGNED) {
-                matter_lwip_dhcp6();
-            }
+            matter_LwIP_IP_Address_Request();
             break;
         case RTW_JOINSTATUS_FAIL: // Connecting --> Failed to Connect
             RTK_LOGI(TAG, "Join fail, error_flag = ");
@@ -900,7 +897,3 @@ int matter_wifi_sta_get_wifi_version(uint8_t *mode)
 #endif // (CONFIG_AMEBARTOS_XXX)
     return ret;
 }
-
-#ifdef __cplusplus
-}
-#endif
