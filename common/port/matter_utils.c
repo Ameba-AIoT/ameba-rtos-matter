@@ -25,10 +25,6 @@
 #define MATTER_FACTORY_DATA (0x08644000 - SPI_FLASH_BASE)
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <chip_porting.h>
 #include <flash_api.h>
 #include <ameba_factory.pb.h>
@@ -614,7 +610,3 @@ void matter_check_secure_heap_status(void)
 }
 
 #endif /* configENABLE_TRUSTZONE */
-
-#ifdef __cplusplus
-}
-#endif

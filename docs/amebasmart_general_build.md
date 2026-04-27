@@ -31,16 +31,25 @@ Make sure ameba-rtos and connectedhomeip are on the same directory level
 
 ## Set Matter Build Environment
 
+> [!NOTE]
+> Starting from March 2026, `connectedhomeip/scripts/setup/zap.json` needs to be updated to the latest version.
+>
+> This is for fixing Matter Bootstrap process.
+
     > Find more details to setup linux build environment
     > https://github.com/project-chip/connectedhomeip/blob/master/docs/guides/BUILDING.md
 
     cd connectedhomeip
+
+    cp scripts/setup/zap.json latest_zap.json #Create copy of the latest zap.json
 
 	git checkout 70d9a61475d31686f0fde8e7b56f352a0f59b299 #release/v1.3
 
     git submodule sync
 
     git submodule update --init --recursive
+
+    cp latest_zap.json scripts/setup/zap.json #Update zap.json to latest version
 
     source scripts/bootstrap.sh
 

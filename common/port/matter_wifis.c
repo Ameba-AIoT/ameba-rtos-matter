@@ -21,10 +21,6 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stddef.h>
 #include <string.h>
 #include <chip_porting.h>
@@ -626,6 +622,7 @@ static void matter_wifi_join_status_event_hdl(char *buf, int buf_len, int flags,
             error_flag = RTW_NO_ERROR;
             RTK_LOGI(TAG, "Join success!\n");
             matter_wifi_indication(MATTER_WIFI_EVENT_CONNECT, NULL, 0, flags);
+            matter_LwIP_IP_Address_Request();
             break;
         case RTW_JOINSTATUS_FAIL: // Connecting --> Failed to Connect
             RTK_LOGI(TAG, "Join fail, error_flag = ");
@@ -687,7 +684,3 @@ void matter_wifi_wait(void)
 
     matter_wifi_init();
 }
-
-#ifdef __cplusplus
-}
-#endif
