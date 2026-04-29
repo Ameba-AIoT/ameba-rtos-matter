@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,18 +16,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <energy_evse/ameba_energy_evse_callbacks.h>
 #include <energy_evse/ameba_energy_evse_targets_store.h>
-#include <app/clusters/energy-evse-server/energy-evse-server.h>
+#include <energy_evse/ameba_energy_evse_target_config.h>
 #include <app/clusters/energy-evse-server/CodegenIntegration.h>
 #include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
 
 #include <app/util/config.h>
 #include <cstring>
-
 using chip::Protocols::InteractionModel::Status;
 
 namespace chip {
@@ -35,8 +34,7 @@ namespace Clusters {
 namespace EnergyEvse {
 
 /* Local state machine Events to allow simpler handling of state transitions */
-enum EVSEStateMachineEvent
-{
+enum EVSEStateMachineEvent {
     EVPluggedInEvent,        /* EV has been plugged in */
     EVNotDetectedEvent,      /* EV has been unplugged or detected as not connected */
     EVNoDemandEvent,         /* EV has stopped asking for demand */
@@ -66,7 +64,7 @@ public:
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StartSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StartSession(Instance *instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
      * @brief Stop the current session: recalculates duration and energy values.
@@ -75,14 +73,14 @@ public:
      * @param chargingMeterValue    - The current value of the energy meter (charging) in mWh
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void StopSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
+    void StopSession(Instance *instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
      * @brief Recalculate session duration from start time to now.
      *
      * @param instance - The cluster Instance to update attributes on
      */
-    void RecalculateSessionDuration(Instance * instance);
+    void RecalculateSessionDuration(Instance *instance);
 
     /**
      * @brief Update the session's charged energy delta.
@@ -90,7 +88,7 @@ public:
      * @param instance           - The cluster Instance to update attributes on
      * @param chargingMeterValue - The current value of the energy meter (charging) in mWh
      */
-    void UpdateEnergyCharged(Instance * instance, int64_t chargingMeterValue);
+    void UpdateEnergyCharged(Instance *instance, int64_t chargingMeterValue);
 
     /**
      * @brief Update the session's discharged energy delta.
@@ -98,7 +96,7 @@ public:
      * @param instance              - The cluster Instance to update attributes on
      * @param dischargingMeterValue - The current value of the energy meter (discharging) in mWh
      */
-    void UpdateEnergyDischarged(Instance * instance, int64_t dischargingMeterValue);
+    void UpdateEnergyDischarged(Instance *instance, int64_t dischargingMeterValue);
 
 private:
     uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet
@@ -113,10 +111,19 @@ private:
 class EnergyEvseDelegate : public EnergyEvse::Delegate
 {
 public:
-    EnergyEvseDelegate(EvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate() { mEvseTargetsDelegate = &aDelegate; }
-    ~EnergyEvseDelegate() { CancelActiveTimers(); }
+    EnergyEvseDelegate(EvseTargetsDelegate &aDelegate) : EnergyEvse::Delegate()
+    {
+        mEvseTargetsDelegate = &aDelegate;
+    }
+    ~EnergyEvseDelegate()
+    {
+        CancelActiveTimers();
+    }
 
-    EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
+    EvseTargetsDelegate *GetEvseTargetsDelegate()
+    {
+        return mEvseTargetsDelegate;
+    }
 
     /**
      * @brief   Called when EVSE cluster receives Disable command
@@ -130,8 +137,8 @@ public:
      * @param minimumChargeCurrent (in mA)
      * @param maximumChargeCurrent (in mA)
      */
-    Status EnableCharging(const DataModel::Nullable<uint32_t> & chargingEnabledUntil, const int64_t & minimumChargeCurrent,
-                          const int64_t & maximumChargeCurrent) override;
+    Status EnableCharging(const DataModel::Nullable<uint32_t> &chargingEnabledUntil, const int64_t &minimumChargeCurrent,
+                          const int64_t &maximumChargeCurrent) override;
 
     /**
      * @brief   Called when EVSE cluster receives EnableDischarging command
@@ -139,8 +146,8 @@ public:
      * @param dischargingEnabledUntil
      * @param maximumChargeCurrent (in mA)
      */
-    Status EnableDischarging(const DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
-                             const int64_t & maximumDischargeCurrent) override;
+    Status EnableDischarging(const DataModel::Nullable<uint32_t> &dischargingEnabledUntil,
+                             const int64_t &maximumDischargeCurrent) override;
 
     /**
      * @brief    Called when EVSE cluster receives StartDiagnostics command
@@ -151,7 +158,7 @@ public:
      * @brief    Called when EVSE cluster receives the SetTargets command
      */
     Status SetTargets(
-        const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules) override;
+                    const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &chargingTargetSchedules) override;
 
     /**
      * @brief Delegate should implement a handler for LoadTargets
@@ -167,7 +174,7 @@ public:
      * NOTE: LoadTargets MUST be called GetTargets is called.
      */
     Protocols::InteractionModel::Status
-    GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules) override;
+    GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> &chargingTargetSchedules) override;
 
     /**
      * @brief    Called when EVSE cluster receives ClearTargets command
@@ -176,7 +183,7 @@ public:
 
     /* Helper functions for managing targets*/
     Status
-    ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & chargingTargetSchedules);
+    ValidateTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> &chargingTargetSchedules);
 
     /**
      * @brief    Called by EVSE Hardware to register a single callback handler
@@ -216,20 +223,35 @@ public:
     // -----------------------------------------------------------------
     // Internal API to allow an EVSE to change its internal state etc
     Status HwSetMaxHardwareChargeCurrentLimit(int64_t currentmA);
-    int64_t HwGetMaxHardwareChargeCurrentLimit() { return mMaxHardwareChargeCurrentLimit; }
+    int64_t HwGetMaxHardwareChargeCurrentLimit()
+    {
+        return mMaxHardwareChargeCurrentLimit;
+    }
     Status HwSetMaxHardwareDischargeCurrentLimit(int64_t currentmA);
-    int64_t HwGetMaxHardwareDischargeCurrentLimit() { return mMaxHardwareDischargeCurrentLimit; }
+    int64_t HwGetMaxHardwareDischargeCurrentLimit()
+    {
+        return mMaxHardwareDischargeCurrentLimit;
+    }
     Status HwSetNominalMainsVoltage(int64_t voltage_mV);
-    int64_t HwGetNominalMainsVoltage() { return mNominalMainsVoltage; }
+    int64_t HwGetNominalMainsVoltage()
+    {
+        return mNominalMainsVoltage;
+    }
     Status HwSetCircuitCapacity(int64_t currentmA);
     Status HwSetCableAssemblyLimit(int64_t currentmA);
-    int64_t HwGetCableAssemblyLimit() { return mCableAssemblyCurrentLimit; }
+    int64_t HwGetCableAssemblyLimit()
+    {
+        return mCableAssemblyCurrentLimit;
+    }
     Status HwSetState(StateEnum state);
-    StateEnum HwGetState() { return mHwState; };
+    StateEnum HwGetState()
+    {
+        return mHwState;
+    };
     Status HwSetFault(FaultStateEnum fault);
     Status HwSetRFID(ByteSpan uid);
-    Status HwSetVehicleID(const CharSpan & vehID);
-    CHIP_ERROR HwGetVehicleID(DataModel::Nullable<MutableCharSpan> & outValue);
+    Status HwSetVehicleID(const CharSpan &vehID);
+    CHIP_ERROR HwGetVehicleID(DataModel::Nullable<MutableCharSpan> &outValue);
     Status HwDiagnosticsComplete();
     Status SendEVConnectedEvent();
     Status SendEVNotDetectedEvent();
@@ -265,8 +287,14 @@ public:
 
     // ------------------------------------------------------------------
     // Instance management for codegen integration
-    void SetInstance(Instance * aInstance) { mInstance = aInstance; }
-    Instance * GetInstance() { return mInstance; }
+    void SetInstance(Instance *aInstance)
+    {
+        mInstance = aInstance;
+    }
+    Instance *GetInstance()
+    {
+        return mInstance;
+    }
 
     // ------------------------------------------------------------------
     // Local getters for internal delegate use - delegates to cluster instance
@@ -324,7 +352,7 @@ private:
     Status NotifyApplicationDischargeCurrentLimitChange(int64_t maximumDischargeCurrent);
     Status NotifyApplicationStateChange();
     Status NotifyApplicationChargingPreferencesChange();
-    Status GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t & aMeterValue);
+    Status GetEVSEEnergyMeterValue(ChargingDischargingType meterType, int64_t &aMeterValue);
 
     /* Local State machine handling */
     Status CheckFaultOrDiagnostic();
@@ -351,10 +379,10 @@ private:
      * @params pointer to SystemLayer
      * @params pointer to EnergyEvseDelegate
      */
-    static void EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate);
+    static void EvseCheckTimerExpiry(System::Layer *systemLayer, void *delegate);
 
     /* Instance pointer for accessing cluster */
-    Instance * mInstance = nullptr;
+    Instance *mInstance = nullptr;
 
     /* Session Object - delegate owns session state management */
     EvseSession mSession = EvseSession();
@@ -367,11 +395,10 @@ private:
     char mVehicleIDBuf[kMaxVehicleIDBufSize];
 
     /* Targets Delegate */
-    EvseTargetsDelegate * mEvseTargetsDelegate = nullptr;
+    EvseTargetsDelegate *mEvseTargetsDelegate = nullptr;
 };
 
 } // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-

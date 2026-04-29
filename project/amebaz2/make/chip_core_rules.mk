@@ -17,6 +17,7 @@ GENERATE_NINJA:
 	if [ $(CHIP_ENABLE_IPV4) -eq 0 ]; then echo chip_inet_config_enable_ipv4 = "false" >> $(OUTPUT_DIR)/args.gn; else echo chip_inet_config_enable_ipv4 = "true" >> $(OUTPUT_DIR)/args.gn; fi && \
 	if [ $(CHIP_ENABLE_AMEBA_TC) -eq 0 ]; then echo chip_terms_and_conditions_required = "false" >> $(OUTPUT_DIR)/args.gn; else echo chip_terms_and_conditions_required = "true" >> $(OUTPUT_DIR)/args.gn; fi && \
 	if [ "$(DEVICE_TYPE)" = "all_clusters" ] || [ "$(DEVICE_TYPE)" = "light_switch" ]; then echo chip_build_libshell = "true" >> $(OUTPUT_DIR)/args.gn; else echo chip_build_libshell = "false" >> $(OUTPUT_DIR)/args.gn; fi && \
+	echo chip_config_enable_groupcast = "true" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_support_enable_storage_api_audit = "false" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_use_transitional_commissionable_data_provider = "true" >> $(OUTPUT_DIR)/args.gn && \
 	echo chip_persist_subscriptions = "true" >> $(OUTPUT_DIR)/args.gn && \

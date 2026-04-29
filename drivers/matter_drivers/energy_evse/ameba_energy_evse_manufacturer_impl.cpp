@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,15 +16,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
+#include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
 #include <energy_evse/ameba_energy_evse_manufacturer_impl.h>
 #include <energy_evse/ameba_energy_evse_delegate_impl.h>
 #include <energy_evse/ameba_energy_evse_manager.h>
-#include <energy_evse/ameba_fake_readings.h>
-#include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
-#include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
 #include <device_energy_management/ameba_energy_time_utils.h>
 
+#include <energy_evse/ameba_fake_readings.h>
 #include <app/clusters/device-energy-management-server/DeviceEnergyManagementTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
@@ -53,9 +53,8 @@ CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
     /* Manufacturers should modify this to do any custom initialisation */
 
     /* Register callbacks */
-    EnergyEvseDelegate * dg = GetEvseManufacturer()->GetEvseDelegate();
-    if (dg == nullptr)
-    {
+    EnergyEvseDelegate *dg = GetEvseManufacturer()->GetEvseDelegate();
+    if (dg == nullptr) {
         ChipLogError(AppServer, "EVSE Delegate is not initialized");
         return CHIP_ERROR_UNINITIALIZED;
     }
@@ -66,7 +65,7 @@ CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
 
     ReturnErrorOnFailure(InitializePowerSourceCluster(powerSourceEndpointId));
 
-    DeviceEnergyManagementDelegate * dem = GetEvseManufacturer()->GetDEMDelegate();
+    DeviceEnergyManagementDelegate *dem = GetEvseManufacturer()->GetDEMDelegate();
     VerifyOrReturnLogError(dem != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
@@ -127,66 +126,54 @@ CHIP_ERROR EVSEManufacturer::Shutdown()
 }
 
 CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOfWeekMap, uint16_t minutesPastMidnightNow_m,
-                          uint16_t & targetTimeMinutesPastMidnight_m, DataModel::Nullable<Percent> & targetSoC,
-                          DataModel::Nullable<int64_t> & targetAddedEnergy_mWh, bool bAllowTargetsInPast)
+                          uint16_t &targetTimeMinutesPastMidnight_m, DataModel::Nullable<Percent> &targetSoC,
+                          DataModel::Nullable<int64_t> &targetAddedEnergy_mWh, bool bAllowTargetsInPast)
 {
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type entry;
 
     uint16_t minTimeToTarget_m = 24 * 60; // 24 hours
     bool bFound                = false;
 
-    EVSEManufacturer * mn = GetEvseManufacturer();
+    EVSEManufacturer *mn = GetEvseManufacturer();
     VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    EnergyEvseDelegate * dg = mn->GetEvseDelegate();
+    EnergyEvseDelegate *dg = mn->GetEvseDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    const DataModel::List<const EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules =
-        dg->GetEvseTargetsDelegate()->GetTargets();
-    for (auto & chargingTargetScheduleEntry : chargingTargetSchedules)
-    {
-        if (chargingTargetScheduleEntry.dayOfWeekForSequence.HasAny(dayOfWeekMap))
-        {
+    const DataModel::List<const EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> &chargingTargetSchedules =
+                    dg->GetEvseTargetsDelegate()->GetTargets();
+    for (auto &chargingTargetScheduleEntry : chargingTargetSchedules) {
+        if (chargingTargetScheduleEntry.dayOfWeekForSequence.HasAny(dayOfWeekMap)) {
             // We've found today's schedule - iterate through the targets on this day
-            for (auto & chargingTarget : chargingTargetScheduleEntry.chargingTargets)
-            {
-                if ((chargingTarget.targetTimeMinutesPastMidnight < minutesPastMidnightNow_m) && (bAllowTargetsInPast == false))
-                {
+            for (auto &chargingTarget : chargingTargetScheduleEntry.chargingTargets) {
+                if ((chargingTarget.targetTimeMinutesPastMidnight < minutesPastMidnightNow_m) && (bAllowTargetsInPast == false)) {
                     // This target is in the past so move to the next if there is one
                     continue;
                 }
 
-                if (chargingTarget.targetTimeMinutesPastMidnight < minTimeToTarget_m)
-                {
+                if (chargingTarget.targetTimeMinutesPastMidnight < minTimeToTarget_m) {
                     // This is the earliest target found in the day's targets so far
                     bFound            = true;
                     minTimeToTarget_m = chargingTarget.targetTimeMinutesPastMidnight;
 
                     targetTimeMinutesPastMidnight_m = chargingTarget.targetTimeMinutesPastMidnight;
 
-                    if (chargingTarget.targetSoC.HasValue())
-                    {
+                    if (chargingTarget.targetSoC.HasValue()) {
                         targetSoC.SetNonNull(chargingTarget.targetSoC.Value());
-                    }
-                    else
-                    {
+                    } else {
                         targetSoC.SetNull();
                     }
 
-                    if (chargingTarget.addedEnergy.HasValue())
-                    {
+                    if (chargingTarget.addedEnergy.HasValue()) {
                         targetAddedEnergy_mWh.SetNonNull(chargingTarget.addedEnergy.Value());
-                    }
-                    else
-                    {
+                    } else {
                         targetAddedEnergy_mWh.SetNull();
                     }
                 }
             }
         }
 
-        if (bFound)
-        {
+        if (bFound) {
             // Skip the rest of the search
             break;
         }
@@ -202,25 +189,22 @@ CHIP_ERROR FindNextTarget(const BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOf
  *  Output: requiredEnergy_mWh - how much energy is needed to charge
  *          Note this could be 0 if the vehicleSoC > targetSoC
  */
-CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, int64_t & requiredEnergy_mWh,
-                                                     DataModel::Nullable<Percent> & targetSoC,
-                                                     DataModel::Nullable<int64_t> & targetAddedEnergy_mWh)
+CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate *dg, int64_t &requiredEnergy_mWh,
+        DataModel::Nullable<Percent> &targetSoC,
+        DataModel::Nullable<int64_t> &targetAddedEnergy_mWh)
 {
     DataModel::Nullable<Percent> vehicleSoC;
     DataModel::Nullable<int64_t> batteryCapacity_mWh;
 
-    if (!targetSoC.IsNull())
-    {
-        if (GetEvseInstance()->HasFeature(Feature::kSoCReporting))
-        {
+    if (!targetSoC.IsNull()) {
+        if (GetEvseInstance()->HasFeature(Feature::kSoCReporting)) {
             // We support SoCReporting, but it doesn't mean the Vehicle supports it
             vehicleSoC          = dg->GetStateOfCharge();
             batteryCapacity_mWh = dg->GetBatteryCapacity();
-            if (!vehicleSoC.IsNull() && !batteryCapacity_mWh.IsNull())
-            {
+            if (!vehicleSoC.IsNull() && !batteryCapacity_mWh.IsNull()) {
                 // If the current SoC is already >= targetSoC - we don't need to charge, set to 0.
                 requiredEnergy_mWh = std::max<int64_t>(
-                    0, static_cast<int64_t>((targetSoC.Value() - vehicleSoC.Value()) * batteryCapacity_mWh.Value() / 100));
+                                                     0, static_cast<int64_t>((targetSoC.Value() - vehicleSoC.Value()) * batteryCapacity_mWh.Value() / 100));
                 ChipLogProgress(AppServer, "EVSE: Vehicle reports current SoC: %d    ----- target SoC: %d", vehicleSoC.Value(),
                                 targetSoC.Value());
                 // Since we are charging using SoC then always null out the NextAddedEnergy target
@@ -232,12 +216,9 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
             }
             // ELSE we don't have VehicleSoC and Battery Capacity so we have to
             // fallback to AddedEnergy charging below
-        }
-        else
-        {
+        } else {
             // Cluster does not support SoC Reporting so target SoC is only allowed to be 100%
-            if (targetSoC.Value() != 100)
-            {
+            if (targetSoC.Value() != 100) {
                 ChipLogError(AppServer, "EVSE WARNING: TargetSoC is not 100%% and we don't know the EV SoC!");
             }
 
@@ -252,8 +233,7 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
 
     // Unable to charge using TargetSoC - Fallback to using AddedEnergy method
     // Check we have a AddedEnergy target
-    if (targetAddedEnergy_mWh.IsNull())
-    {
+    if (targetAddedEnergy_mWh.IsNull()) {
         ChipLogError(AppServer,
                      "EVSE ERROR: Cannot use TargetSoC (maybe missing VehicleSoC/BatteryCapacity?) or AddedEnergy has not been "
                      "provided - assume large battery!");
@@ -276,15 +256,14 @@ CHIP_ERROR EVSEManufacturer::DetermineRequiredEnergy(EnergyEvseDelegate * dg, in
  *
  *  Simple optimizer - assume a flat tariff throughout the day
  */
-CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel::Nullable<uint32_t> & startTime_epoch_s,
-                                              uint32_t targetTime_epoch_s, uint32_t now_epoch_s, int64_t requiredEnergy_mWh)
+CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate *dg, DataModel::Nullable<uint32_t> &startTime_epoch_s,
+        uint32_t targetTime_epoch_s, uint32_t now_epoch_s, int64_t requiredEnergy_mWh)
 {
 
     uint32_t chargingDuration_s;
     uint32_t tempStartTime_epoch_s;
 
-    if (requiredEnergy_mWh == 0)
-    {
+    if (requiredEnergy_mWh == 0) {
         // If we don't need to charge, then ensure we do not set a NextStartTime
         // (spec says this should be NULL if we don't plan to schedule a charge)
         startTime_epoch_s.SetNull();
@@ -295,8 +274,7 @@ CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel
     // GetMaximumChargeCurrent returns mA, but to help avoid overflow
     // We use V (not mV) and compute power to the nearest Watt
     uint32_t power_W = static_cast<uint32_t>((dg->HwGetNominalMainsVoltage() * dg->GetMaximumChargeCurrent()) / 1000000);
-    if (power_W == 0)
-    {
+    if (power_W == 0) {
         ChipLogError(AppServer, "EVSE Error: MaxCurrent = 0Amp - Can't schedule charging");
         startTime_epoch_s.SetNull();
         return CHIP_ERROR_INTERNAL;
@@ -305,7 +283,7 @@ CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel
     // Time to charge(seconds) = (3600 * Energy(mWh) / Power(W)) / 1000
     // to avoid using floats we multiply by 36 and then divide by 10 (instead of x3600 and dividing by 1000)
     chargingDuration_s =
-        static_cast<uint32_t>((static_cast<uint64_t>(requiredEnergy_mWh) * 36) / (static_cast<uint64_t>(power_W) * 10));
+                    static_cast<uint32_t>((static_cast<uint64_t>(requiredEnergy_mWh) * 36) / (static_cast<uint64_t>(power_W) * 10));
 
     // Add in 15 minutes leeway to account for slow starting vehicles
     // that need to condition the battery or if it is cold etc
@@ -315,14 +293,11 @@ CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel
     // However for now we'll start charging as late as possible
     tempStartTime_epoch_s = targetTime_epoch_s - chargingDuration_s;
 
-    if (tempStartTime_epoch_s < now_epoch_s)
-    {
+    if (tempStartTime_epoch_s < now_epoch_s) {
         // we need to turn on the EVSE now - it won't have enough time to reach the target
         startTime_epoch_s.SetNonNull(now_epoch_s);
         // TODO call function to turn on the EV
-    }
-    else
-    {
+    } else {
         // we turn off the EVSE for now
         startTime_epoch_s.SetNonNull(tempStartTime_epoch_s);
         // TODO have a periodic timer which checks if we should turn on the charger now
@@ -337,13 +312,13 @@ CHIP_ERROR EVSEManufacturer::ComputeStartTime(EnergyEvseDelegate * dg, DataModel
 CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
 {
     CHIP_ERROR err;
-    EVSEManufacturer * mn = GetEvseManufacturer();
+    EVSEManufacturer *mn = GetEvseManufacturer();
     VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    EnergyEvseDelegate * dg = mn->GetEvseDelegate();
+    EnergyEvseDelegate *dg = mn->GetEvseDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    Instance * instance = dg->GetInstance();
+    Instance *instance = dg->GetInstance();
     VerifyOrReturnError(instance != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     BitMask<EnergyEvse::TargetDayOfWeekBitmap> dayOfWeekMap = 0;
@@ -374,43 +349,35 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
      * so we know the charging current - i.e. can get the max power, and therefore can calculate
      * the charging duration and hence start time
      */
-    if (dg->IsEvsePluggedIn() && dg->GetSupplyState() == SupplyStateEnum::kChargingEnabled)
-    {
+    if (dg->IsEvsePluggedIn() && dg->GetSupplyState() == SupplyStateEnum::kChargingEnabled) {
         uint8_t searchDay = 0;
-        while (searchDay < 2)
-        {
+        while (searchDay < 2) {
             err = FindNextTarget(dayOfWeekMap, minutesPastMidnightNow_m, targetTimeMinutesPastMidnight_m, targetSoC,
                                  targetAddedEnergy_mWh, (searchDay != 0));
-            if (err == CHIP_ERROR_NOT_FOUND)
-            {
+            if (err == CHIP_ERROR_NOT_FOUND) {
                 // We didn't find one for today, try tomorrow
                 searchDay++;
                 dayOfWeekMap = BitMask<EnergyEvse::TargetDayOfWeekBitmap>((dayOfWeekMap.Raw() << 1) & kAllTargetDaysMask);
 
-                if (!dayOfWeekMap.HasAny())
-                {
+                if (!dayOfWeekMap.HasAny()) {
                     // Must be Saturday and shifted off, so set it to Sunday
                     dayOfWeekMap = BitMask<EnergyEvse::TargetDayOfWeekBitmap>(TargetDayOfWeekBitmap::kSunday);
                 }
-            }
-            else
-            {
+            } else {
                 break; // We found a target or we error'd out for some other reason
             }
         }
 
-        if (err == CHIP_NO_ERROR)
-        {
+        if (err == CHIP_NO_ERROR) {
             /* Set the target Time in epoch_s format*/
             tempTargetTime_epoch_s =
-                ((now_epoch_s / 60) + targetTimeMinutesPastMidnight_m + (searchDay * 1440) - minutesPastMidnightNow_m) * 60;
+                            ((now_epoch_s / 60) + targetTimeMinutesPastMidnight_m + (searchDay * 1440) - minutesPastMidnightNow_m) * 60;
             targetTime_epoch_s.SetNonNull(tempTargetTime_epoch_s);
 
             /* Determine requiredEnergy based on if we support SoC Reporting or fallback to AddedEnergy target */
-            if (DetermineRequiredEnergy(dg, requiredEnergy_mWh, targetSoC, targetAddedEnergy_mWh) == CHIP_NO_ERROR)
-            {
+            if (DetermineRequiredEnergy(dg, requiredEnergy_mWh, targetSoC, targetAddedEnergy_mWh) == CHIP_NO_ERROR) {
                 TEMPORARY_RETURN_IGNORED ComputeStartTime(dg, startTime_epoch_s, tempTargetTime_epoch_s, now_epoch_s,
-                                                          requiredEnergy_mWh);
+                        requiredEnergy_mWh);
             }
         }
     }
@@ -429,10 +396,10 @@ CHIP_ERROR EVSEManufacturer::ComputeChargingSchedule()
  */
 CHIP_ERROR EVSEManufacturer::InitializePowerMeasurementCluster()
 {
-    EVSEManufacturer * mn = GetEvseManufacturer();
+    EVSEManufacturer *mn = GetEvseManufacturer();
     VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    ElectricalPowerMeasurementDelegate * dg = mn->GetEPMDelegate();
+    ElectricalPowerMeasurementDelegate *dg = mn->GetEPMDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     ReturnErrorOnFailure(dg->SetPowerMode(PowerModeEnum::kAc));
@@ -451,10 +418,13 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpo
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
     status = PowerSource::Attributes::FeatureMap::Set(endpointId, static_cast<uint32_t>(PowerSource::Feature::kWired));
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+
+#if 0
     status = PowerSource::Attributes::WiredNominalVoltage::Set(endpointId, 230'000); // 230V in mv
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
     status = PowerSource::Attributes::WiredMaximumCurrent::Set(endpointId, 32'000); // 32A in mA
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
+#endif
 
     status = PowerSource::Attributes::WiredCurrentType::Set(endpointId, PowerSource::WiredCurrentTypeEnum::kAc);
     VerifyOrReturnError(status == Protocols::InteractionModel::Status::Success, CHIP_ERROR_INTERNAL);
@@ -478,12 +448,12 @@ CHIP_ERROR EVSEManufacturer::InitializePowerSourceCluster(chip::EndpointId endpo
  * @param[in]  aActiveCurrent_mA - ActiveCurrent measured in milli-amps
  */
 CHIP_ERROR EVSEManufacturer::SendPowerReading(EndpointId aEndpointId, int64_t aActivePower_mW, int64_t aVoltage_mV,
-                                              int64_t aActiveCurrent_mA)
+        int64_t aActiveCurrent_mA)
 {
-    EVSEManufacturer * mn = GetEvseManufacturer();
+    EVSEManufacturer *mn = GetEvseManufacturer();
     VerifyOrReturnError(mn != nullptr, CHIP_ERROR_UNINITIALIZED);
 
-    ElectricalPowerMeasurementDelegate * dg = mn->GetEPMDelegate();
+    ElectricalPowerMeasurementDelegate *dg = mn->GetEPMDelegate();
     VerifyOrReturnError(dg != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     TEMPORARY_RETURN_IGNORED dg->SetActivePower(MakeNullable(aActivePower_mW));
@@ -504,9 +474,9 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement::Structs;
  * @param[in]  aCumulativeEnergyExported -total energy exported in milli-watthours
  */
 CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                                         int64_t aCumulativeEnergyExported)
+        int64_t aCumulativeEnergyExported)
 {
-    const MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
+    const MeasurementData *data = MeasurementDataForEndpoint(aEndpointId);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     EnergyMeasurementStruct::Type energyImported;
@@ -516,8 +486,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
     // Copy last endTimestamp into new startTimestamp if it exists
     energyImported.startTimestamp.ClearValue();
     energyImported.startSystime.ClearValue();
-    if (data->cumulativeImported.HasValue())
-    {
+    if (data->cumulativeImported.HasValue()) {
         energyImported.startTimestamp = data->cumulativeImported.Value().endTimestamp;
         energyImported.startSystime   = data->cumulativeImported.Value().endSystime;
     }
@@ -528,8 +497,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
     // Copy last endTimestamp into new startTimestamp if it exists
     energyExported.startTimestamp.ClearValue();
     energyExported.startSystime.ClearValue();
-    if (data->cumulativeExported.HasValue())
-    {
+    if (data->cumulativeExported.HasValue()) {
         energyExported.startTimestamp = data->cumulativeExported.Value().endTimestamp;
         energyExported.startSystime   = data->cumulativeExported.Value().endSystime;
     }
@@ -539,19 +507,16 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
     // Get current timestamp
     uint32_t currentTimestamp;
     CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
-    if (err == CHIP_NO_ERROR)
-    {
+    if (err == CHIP_NO_ERROR) {
         // use EpochTS
         energyImported.endTimestamp.SetValue(currentTimestamp);
         energyExported.endTimestamp.SetValue(currentTimestamp);
-    }
-    else
-    {
+    } else {
         ChipLogError(AppServer, "GetClock_MatterEpochS returned error getting timestamp %" CHIP_ERROR_FORMAT, err.Format());
 
         // use systemTime as a fallback
         System::Clock::Milliseconds64 system_time_ms =
-            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+                        std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
         uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
 
         energyImported.endSystime.SetValue(nowMS);
@@ -559,8 +524,7 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
     }
 
     // call the SDK to update attributes and generate an event
-    if (!NotifyCumulativeEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported)))
-    {
+    if (!NotifyCumulativeEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported))) {
         ChipLogError(AppServer, "Failed to notify Cumulative Energy reading.");
         return CHIP_ERROR_INTERNAL;
     }
@@ -577,9 +541,9 @@ CHIP_ERROR EVSEManufacturer::SendCumulativeEnergyReading(EndpointId aEndpointId,
  * @param[in]  aPeriodicEnergyExported - energy exported in milli-watthours in last period
  */
 CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aPeriodicEnergyImported,
-                                                       int64_t aPeriodicEnergyExported)
+        int64_t aPeriodicEnergyExported)
 {
-    const MeasurementData * data = MeasurementDataForEndpoint(aEndpointId);
+    const MeasurementData *data = MeasurementDataForEndpoint(aEndpointId);
     VerifyOrReturnError(data != nullptr, CHIP_ERROR_UNINITIALIZED);
 
     EnergyMeasurementStruct::Type energyImported;
@@ -589,8 +553,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
     // Copy last endTimestamp into new startTimestamp if it exists
     energyImported.startTimestamp.ClearValue();
     energyImported.startSystime.ClearValue();
-    if (data->periodicImported.HasValue())
-    {
+    if (data->periodicImported.HasValue()) {
         energyImported.startTimestamp = data->periodicImported.Value().endTimestamp;
         energyImported.startSystime   = data->periodicImported.Value().endSystime;
     }
@@ -601,8 +564,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
     // Copy last endTimestamp into new startTimestamp if it exists
     energyExported.startTimestamp.ClearValue();
     energyExported.startSystime.ClearValue();
-    if (data->periodicExported.HasValue())
-    {
+    if (data->periodicExported.HasValue()) {
         energyExported.startTimestamp = data->periodicExported.Value().endTimestamp;
         energyExported.startSystime   = data->periodicExported.Value().endSystime;
     }
@@ -612,19 +574,16 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
     // Get current timestamp
     uint32_t currentTimestamp;
     CHIP_ERROR err = System::Clock::GetClock_MatterEpochS(currentTimestamp);
-    if (err == CHIP_NO_ERROR)
-    {
+    if (err == CHIP_NO_ERROR) {
         // use EpochTS
         energyImported.endTimestamp.SetValue(currentTimestamp);
         energyExported.endTimestamp.SetValue(currentTimestamp);
-    }
-    else
-    {
+    } else {
         ChipLogError(AppServer, "GetClock_MatterEpochS returned error getting timestamp");
 
         // use systemTime as a fallback
         System::Clock::Milliseconds64 system_time_ms =
-            std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
+                        std::chrono::duration_cast<System::Clock::Milliseconds64>(chip::Server::GetInstance().TimeSinceInit());
         uint64_t nowMS = static_cast<uint64_t>(system_time_ms.count());
 
         energyImported.endSystime.SetValue(nowMS);
@@ -632,8 +591,7 @@ CHIP_ERROR EVSEManufacturer::SendPeriodicEnergyReading(EndpointId aEndpointId, i
     }
 
     // call the SDK to update attributes and generate an event
-    if (!NotifyPeriodicEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported)))
-    {
+    if (!NotifyPeriodicEnergyMeasured(aEndpointId, MakeOptional(energyImported), MakeOptional(energyExported))) {
         ChipLogError(AppServer, "Failed to notify Cumulative Energy reading.");
         return CHIP_ERROR_INTERNAL;
     }
@@ -656,12 +614,11 @@ void EVSEManufacturer::UpdateEVFakeReadings(const Amperage_mA maximumChargeCurre
  *
  * @param    arg - optional pointer to some context information (see register function)
  */
-void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_t arg)
+void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo *cb, intptr_t arg)
 {
-    EVSEManufacturer * pClass = reinterpret_cast<EVSEManufacturer *>(arg);
+    EVSEManufacturer *pClass = reinterpret_cast<EVSEManufacturer *>(arg);
 
-    switch (cb->type)
-    {
+    switch (cb->type) {
     case EVSECallbackType::StateChanged:
         ChipLogProgress(AppServer, "EVSE callback - state changed");
         TEMPORARY_RETURN_IGNORED pClass->ComputeChargingSchedule();
@@ -678,12 +635,9 @@ void EVSEManufacturer::ApplicationCallbackHandler(const EVSECbInfo * cb, intptr_
         break;
     case EVSECallbackType::EnergyMeterReadingRequested:
         ChipLogProgress(AppServer, "EVSE callback - EnergyMeterReadingRequested");
-        if (cb->EnergyMeterReadingRequest.meterType == ChargingDischargingType::kCharging)
-        {
+        if (cb->EnergyMeterReadingRequest.meterType == ChargingDischargingType::kCharging) {
             *(cb->EnergyMeterReadingRequest.energyMeterValuePtr) = pClass->mLastChargingEnergyMeter;
-        }
-        else
-        {
+        } else {
             *(cb->EnergyMeterReadingRequest.energyMeterValuePtr) = pClass->mLastDischargingEnergyMeter;
         }
         break;
@@ -705,7 +659,7 @@ int64_t EVSEManufacturer::GetApproxEnergyDuringSession()
 }
 
 CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
-                                                                            AdjustmentCauseEnum cause)
+        AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }
@@ -721,7 +675,7 @@ CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementCancelPowerAdjustReques
 }
 
 CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTimeUtc,
-                                                                                AdjustmentCauseEnum cause)
+        AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }
@@ -747,16 +701,16 @@ CHIP_ERROR EVSEManufacturer::HandleDeviceEnergyManagementCancelRequest()
 }
 
 CHIP_ERROR EVSEManufacturer::HandleModifyForecastRequest(
-    const uint32_t forecastID,
-    const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
-    AdjustmentCauseEnum cause)
+                const uint32_t forecastID,
+                const DataModel::DecodableList<DeviceEnergyManagement::Structs::SlotAdjustmentStruct::DecodableType> &slotAdjustments,
+                AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EVSEManufacturer::RequestConstraintBasedForecast(
-    const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
-    AdjustmentCauseEnum cause)
+                const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> &constraints,
+                AdjustmentCauseEnum cause)
 {
     return CHIP_NO_ERROR;
 }

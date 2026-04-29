@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,10 +16,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <energy_evse/ameba_charging_targets_mem_manager.h>
 #include <app-common/zap-generated/cluster-objects.h>
-
-#include "energy_evse/ameba_charging_targets_mem_manager.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -34,10 +33,8 @@ ChargingTargetsMemMgr::ChargingTargetsMemMgr() : mChargingTargetSchedulesIdx(0),
 ChargingTargetsMemMgr::~ChargingTargetsMemMgr()
 {
     // Free all memory allocated for the charging targets
-    for (uint16_t idx = 0; idx < kEvseTargetsMaxNumberOfDays; idx++)
-    {
-        if (mpListOfDays[idx] != nullptr)
-        {
+    for (uint16_t idx = 0; idx < kEvseTargetsMaxNumberOfDays; idx++) {
+        if (mpListOfDays[idx] != nullptr) {
             chip::Platform::Delete(mpListOfDays[idx]);
         }
     }
@@ -49,8 +46,7 @@ void ChargingTargetsMemMgr::PrepareDaySchedule(uint16_t chargingTargetSchedulesI
     mNumDailyChargingTargets = 0;
 
     // Should not occur but just to be safe
-    if (chargingTargetSchedulesIdx >= kEvseTargetsMaxNumberOfDays)
-    {
+    if (chargingTargetSchedulesIdx >= kEvseTargetsMaxNumberOfDays) {
         ChipLogError(AppServer, "PrepareDaySchedule bad chargingTargetSchedulesIdx %u", chargingTargetSchedulesIdx);
         return;
     }
@@ -58,26 +54,22 @@ void ChargingTargetsMemMgr::PrepareDaySchedule(uint16_t chargingTargetSchedulesI
     mChargingTargetSchedulesIdx = chargingTargetSchedulesIdx;
 
     // Free up any memory associated with this targetSchedule
-    if (mpListOfDays[mChargingTargetSchedulesIdx] != nullptr)
-    {
+    if (mpListOfDays[mChargingTargetSchedulesIdx] != nullptr) {
         chip::Platform::MemoryFree(mpListOfDays[mChargingTargetSchedulesIdx]);
         mpListOfDays[mChargingTargetSchedulesIdx] = nullptr;
     }
 }
 
-void ChargingTargetsMemMgr::AddChargingTarget(const EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget)
+void ChargingTargetsMemMgr::AddChargingTarget(const EnergyEvse::Structs::ChargingTargetStruct::Type &chargingTarget)
 {
-    if (mNumDailyChargingTargets < kEvseTargetsMaxTargetsPerDay)
-    {
+    if (mNumDailyChargingTargets < kEvseTargetsMaxTargetsPerDay) {
         mDailyChargingTargets[mNumDailyChargingTargets++] = chargingTarget;
-    }
-    else
-    {
+    } else {
         ChipLogError(AppServer, "AddChargingTarget: trying to add too many chargingTargets");
     }
 }
 
-EnergyEvse::Structs::ChargingTargetStruct::Type * ChargingTargetsMemMgr::GetChargingTargets() const
+EnergyEvse::Structs::ChargingTargetStruct::Type *ChargingTargetsMemMgr::GetChargingTargets() const
 {
     return mpListOfDays[mChargingTargetSchedulesIdx];
 }
@@ -95,16 +87,14 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
     VerifyOrDie(mpListOfDays[mChargingTargetSchedulesIdx] == nullptr);
     VerifyOrReturnError(mNumDailyChargingTargets <= kEvseTargetsMaxTargetsPerDay, CHIP_ERROR_NO_MEMORY);
 
-    if (mNumDailyChargingTargets > 0)
-    {
+    if (mNumDailyChargingTargets > 0) {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
         mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
-            chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
+                                chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
 
         VerifyOrReturnError(mpListOfDays[mChargingTargetSchedulesIdx] != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        for (uint16_t idx = 0; idx < mNumDailyChargingTargets; idx++)
-        {
+        for (uint16_t idx = 0; idx < mNumDailyChargingTargets; idx++) {
             // This will cause the ChargingTargetStruct constructor to be called and this element in the array
             new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
 
@@ -117,7 +107,7 @@ CHIP_ERROR ChargingTargetsMemMgr::AllocAndCopy()
 }
 
 CHIP_ERROR
-ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
+ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> &chargingTargets)
 {
     // NOTE: ChargingTargetsMemMgr::PrepareDaySchedule() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
@@ -127,17 +117,15 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::Chargin
     mNumDailyChargingTargets = static_cast<uint16_t>(chargingTargets.size());
     VerifyOrReturnError(mNumDailyChargingTargets <= kEvseTargetsMaxTargetsPerDay, CHIP_ERROR_NO_MEMORY);
 
-    if (mNumDailyChargingTargets > 0)
-    {
+    if (mNumDailyChargingTargets > 0) {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
         mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
-            chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * chargingTargets.size()));
+                                chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * chargingTargets.size()));
 
         VerifyOrReturnError(mpListOfDays[mChargingTargetSchedulesIdx] != nullptr, CHIP_ERROR_NO_MEMORY);
 
         uint16_t idx = 0;
-        for (auto & chargingTarget : chargingTargets)
-        {
+        for (auto &chargingTarget : chargingTargets) {
             // This will cause the ChargingTargetStruct constructor to be called and this element in the array
             new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
 
@@ -152,7 +140,7 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::List<const Structs::Chargin
 }
 
 CHIP_ERROR
-ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets)
+ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> &chargingTargets)
 {
     // NOTE: ChargingTargetsMemMgr::PrepareDaySchedule() must be called as specified in the class comments in
     // ChargingTargetsMemMgr.h before this method can be called.
@@ -165,22 +153,20 @@ ChargingTargetsMemMgr::AllocAndCopy(const DataModel::DecodableList<Structs::Char
     mNumDailyChargingTargets = static_cast<uint16_t>(numDailyChargingTargets);
     VerifyOrReturnError(mNumDailyChargingTargets <= kEvseTargetsMaxTargetsPerDay, CHIP_ERROR_NO_MEMORY);
 
-    if (mNumDailyChargingTargets > 0)
-    {
+    if (mNumDailyChargingTargets > 0) {
         // Allocate the memory first and then use placement new to initialise the memory of each element in the array
         mpListOfDays[mChargingTargetSchedulesIdx] = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
-            chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
+                                chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * mNumDailyChargingTargets));
 
         VerifyOrReturnError(mpListOfDays[mChargingTargetSchedulesIdx] != nullptr, CHIP_ERROR_NO_MEMORY);
 
         uint16_t idx = 0;
         auto it      = chargingTargets.begin();
-        while (it.Next())
-        {
+        while (it.Next()) {
             // Check that the idx is still valid
             VerifyOrReturnError(idx < mNumDailyChargingTargets, CHIP_ERROR_INCORRECT_STATE);
 
-            auto & chargingTarget = it.GetValue();
+            auto &chargingTarget = it.GetValue();
 
             // This will cause the ChargingTargetStruct constructor to be called and this element in the array
             new (mpListOfDays[mChargingTargetSchedulesIdx] + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();

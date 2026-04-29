@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,21 +16,24 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <device_energy_management/ameba_energy_management_common_main.h>
+//#include <device_energy_management/ameba_energy_management_common_main.h>
+#include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
 #include <device_energy_management/ameba_device_energy_management_manager.h>
 #include <device_energy_management/ameba_device_energy_management_mode.h>
-#include <electrical_power_measurement/ameba_electrical_power_measurement_delegate.h>
 #include <energy_evse/ameba_energy_evse_manufacturer_impl.h>
+#include <electrical_power_measurement/ameba_electrical_power_measurement_delegate.h>
 #include <energy_evse/ameba_energy_evse_manager.h>
 #include <energy_evse/ameba_energy_evse_mode.h>
 #include <power_topology/ameba_power_topology_delegate.h>
+#include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
-#include <app/clusters/electrical-energy-measurement-server/electrical-energy-measurement-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/data-model/Nullable.h>
 #include <app/server/Server.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
 
@@ -43,68 +47,82 @@ using namespace chip::app::Clusters::ElectricalEnergyMeasurement;
 using namespace chip::app::Clusters::EnergyEvse;
 using namespace chip::app::Clusters::PowerTopology;
 
-static std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
-static std::unique_ptr<EvseTargetsDelegate> gEvseTargetsDelegate;
-static std::unique_ptr<EnergyEvseManager> gEvseInstance;
-static std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
+namespace {
 
-EVSEManufacturer * EnergyEvse::GetEvseManufacturer()
-{
-    return gEvseManufacturer.get();
-}
+const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type kMeasurementAccuracyRanges[] = {
+    {
+        .rangeMin   = 0,
+        .rangeMax   = 1'000'000'000'000'000, // 1 million Mwh
+        .percentMax = MakeOptional(static_cast<chip::Percent100ths>(500)),
+        .percentMin = MakeOptional(static_cast<chip::Percent100ths>(50))
+    }
+};
+
+const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyStruct::Type kMeasurementAccuracy = {
+    .measurementType  = MeasurementTypeEnum::kElectricalEnergy,
+    .measured         = true,
+    .minMeasuredValue = 0,
+    .maxMeasuredValue = 1'000'000'000'000'000, // 1 million Mwh
+    .accuracyRanges   = DataModel::List<const ElectricalEnergyMeasurement::Structs::MeasurementAccuracyRangeStruct::Type>(
+                    kMeasurementAccuracyRanges)
+};
+
+// Common cluster instances
+std::unique_ptr<DeviceEnergyManagementDelegate> gDEMDelegate;
+std::unique_ptr<DeviceEnergyManagementManager> gDEMInstance;
+std::unique_ptr<ElectricalPowerMeasurementDelegate> gEPMDelegate;
+std::unique_ptr<ElectricalPowerMeasurementInstance> gEPMInstance;
+std::unique_ptr<PowerTopologyDelegate> gPTDelegate;
+std::unique_ptr<PowerTopologyInstance> gPTInstance;
+std::unique_ptr<ElectricalEnergyMeasurementAttrAccess> gEEMAttrAccess;
+bool gCommonClustersInitialized = false;
+
+// EVSE-specific instances
+std::unique_ptr<EnergyEvseDelegate> gEvseDelegate;
+std::unique_ptr<EvseTargetsDelegate> gEvseTargetsDelegate;
+std::unique_ptr<EnergyEvseManager> gEvseInstance;
+std::unique_ptr<EVSEManufacturer> gEvseManufacturer;
 
 /*
- *  @brief  Creates a Delegate and Instance for EVSE cluster
- *
- * The Instance is a container around the Delegate, so
- * create the Delegate first, then wrap it in the Instance
- * Then call the Instance->Init() to register the attribute and command handlers
+ *  @brief  Creates a Delegate and Instance for Energy EVSE cluster
  */
 CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
 {
     CHIP_ERROR err;
 
-    if (gEvseDelegate || gEvseInstance || gEvseTargetsDelegate)
-    {
+    if (gEvseDelegate || gEvseInstance || gEvseTargetsDelegate) {
         ChipLogError(AppServer, "EVSE Instance, Delegate or TargetsDelegate already exist.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
     gEvseTargetsDelegate = std::make_unique<EvseTargetsDelegate>();
-    if (!gEvseTargetsDelegate)
-    {
+    if (!gEvseTargetsDelegate) {
         ChipLogError(AppServer, "Failed to allocate memory for EvseTargetsDelegate");
         return CHIP_ERROR_NO_MEMORY;
     }
 
     gEvseDelegate = std::make_unique<EnergyEvseDelegate>(*gEvseTargetsDelegate);
-    if (!gEvseDelegate)
-    {
+    if (!gEvseDelegate) {
         ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseDelegate");
         gEvseTargetsDelegate.reset();
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    /* Manufacturer may optionally not support all features, commands & attributes */
     gEvseInstance = std::make_unique<EnergyEvseManager>(
-        EndpointId(endpointId), *gEvseDelegate,
-        BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences),
-        BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
-                                                          EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
-                                                          EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
-        BitMask<EnergyEvse::OptionalCommands, uint32_t>(0));
+                                    EndpointId(endpointId), *gEvseDelegate,
+                                    BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences),
+                                    BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
+                                    BitMask<EnergyEvse::OptionalCommands, uint32_t>());
 
-    if (!gEvseInstance)
-    {
+    if (!gEvseInstance) {
         ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseManager");
         gEvseTargetsDelegate.reset();
         gEvseDelegate.reset();
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    err = gEvseInstance->Init(); /* Register Attribute & Command handlers */
-    if (err != CHIP_NO_ERROR)
-    {
+    err = gEvseInstance->Init();
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(AppServer, "Init failed on gEvseInstance");
         gEvseTargetsDelegate.reset();
         gEvseInstance.reset();
@@ -112,9 +130,11 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
         return err;
     }
 
+    // Link the delegate to the instance for attribute access
+    gEvseDelegate->SetInstance(gEvseInstance.get());
+
     err = gEvseTargetsDelegate->LoadTargets();
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(AppServer, "Failed to LoadTargets");
         gEvseTargetsDelegate.reset();
         gEvseInstance.reset();
@@ -127,57 +147,46 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
 
 CHIP_ERROR EnergyEvseShutdown()
 {
-    /* Do this in the order Instance first, then delegate
-     * Ensure we call the Instance->Shutdown to free attribute & command handlers first
-     */
-    if (gEvseInstance)
-    {
-        /* deregister attribute & command handlers */
+    if (gEvseInstance) {
         gEvseInstance->Shutdown();
         gEvseInstance.reset();
     }
-
-    if (gEvseDelegate)
-    {
+    if (gEvseDelegate) {
         gEvseDelegate.reset();
     }
-
+    if (gEvseTargetsDelegate) {
+        gEvseTargetsDelegate.reset();
+    }
     return CHIP_NO_ERROR;
 }
 
 /*
- *  @brief  Creates a EVSEManufacturer class to hold the EVSE & DEM clusters
+ *  @brief  Creates the EVSEManufacturer to coordinate EVSE & DEM clusters
  *
- * The Instance is a container around the Delegate, so
- * create the Delegate first, then wrap it in the Instance
- * Then call the Instance->Init() to register the attribute and command handlers
+ *  The Instance is a container around the Delegate, so
+ *  create the Delegate first, then wrap it in the Instance
+ *  Then call the Instance->Init() to register the attribute and command handlers
  */
-CHIP_ERROR EVSEManufacturerInit(chip::EndpointId powerSourceEndpointId, ElectricalPowerMeasurementInstance & epmInstance,
-                                PowerTopologyInstance & ptInstance, DeviceEnergyManagementManager & demInstance,
-                                DeviceEnergyManagementDelegate & demDelegate)
+CHIP_ERROR EVSEManufacturerInit(chip::EndpointId powerSourceEndpointId)
 {
     CHIP_ERROR err;
 
-    if (gEvseManufacturer)
-    {
+    if (gEvseManufacturer) {
         ChipLogError(AppServer, "EvseManufacturer already exist.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    /* Now create EVSEManufacturer */
-    gEvseManufacturer = std::make_unique<EVSEManufacturer>(gEvseInstance.get(), &epmInstance, &ptInstance, &demInstance);
-    if (!gEvseManufacturer)
-    {
+    gEvseManufacturer =
+                    std::make_unique<EVSEManufacturer>(gEvseInstance.get(), gEPMInstance.get(), gPTInstance.get(), gDEMInstance.get());
+    if (!gEvseManufacturer) {
         ChipLogError(AppServer, "Failed to allocate memory for EvseManufacturer");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    demDelegate.SetDEMManufacturerDelegate(*gEvseManufacturer.get());
+    gDEMDelegate->SetDEMManufacturerDelegate(*gEvseManufacturer.get());
 
-    /* Call Manufacturer specific init */
     err = gEvseManufacturer->Init(powerSourceEndpointId);
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(AppServer, "Init failed on gEvseManufacturer");
         gEvseManufacturer.reset();
         return err;
@@ -188,12 +197,123 @@ CHIP_ERROR EVSEManufacturerInit(chip::EndpointId powerSourceEndpointId, Electric
 
 CHIP_ERROR EVSEManufacturerShutdown()
 {
-    if (gEvseManufacturer)
-    {
-        /* Shutdown the EVSEManufacturer */
-        gEvseManufacturer->Shutdown();
+    if (gEvseManufacturer) {
+        TEMPORARY_RETURN_IGNORED gEvseManufacturer->Shutdown();
         gEvseManufacturer.reset();
     }
-
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR EnergyManagementCommonClustersInit(chip::EndpointId endpointId)
+{
+    if (!gCommonClustersInitialized) {
+        TEMPORARY_RETURN_IGNORED DeviceEnergyManagementInit(
+                        endpointId, gDEMDelegate, gDEMInstance,
+                        BitMask<DeviceEnergyManagement::Feature, uint32_t>(
+                                        DeviceEnergyManagement::Feature::kPowerForecastReporting));
+
+        TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementInit(
+                        endpointId, gEPMDelegate, gEPMInstance,
+                        BitMask<ElectricalPowerMeasurement::Feature, uint32_t>(
+                                        ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kAlternatingCurrent,
+                                        ElectricalPowerMeasurement::Feature::kPolyphasePower, ElectricalPowerMeasurement::Feature::kHarmonics,
+                                        ElectricalPowerMeasurement::Feature::kPowerQuality),
+                        BitMask<ElectricalPowerMeasurement::OptionalAttributes, uint32_t>(
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRanges,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeVoltage,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeActiveCurrent,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactiveCurrent,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentCurrent,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeReactivePower,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeApparentPower,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSVoltage,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSCurrent,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeRMSPower,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeFrequency,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributePowerFactor,
+                                        ElectricalPowerMeasurement::OptionalAttributes::kOptionalAttributeNeutralCurrent));
+        TEMPORARY_RETURN_IGNORED PowerTopologyInit(endpointId, gPTDelegate, gPTInstance);
+    }
+    VerifyOrReturnError(gDEMDelegate && gDEMInstance, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gEPMDelegate && gEPMInstance, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gPTDelegate && gPTInstance, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(gEEMAttrAccess, CHIP_ERROR_INCORRECT_STATE);
+    gCommonClustersInitialized = true;
+    return CHIP_NO_ERROR;
+}
+
+} // namespace
+
+#if 0 // defined in water heater management.
+void emberAfElectricalEnergyMeasurementClusterInitCallback(chip::EndpointId endpointId)
+{
+    VerifyOrDie(!gEEMAttrAccess);
+
+    gEEMAttrAccess = std::make_unique<ElectricalEnergyMeasurementAttrAccess>(
+                                     BitMask<ElectricalEnergyMeasurement::Feature, uint32_t>(
+                                             ElectricalEnergyMeasurement::Feature::kImportedEnergy, ElectricalEnergyMeasurement::Feature::kExportedEnergy,
+                                             ElectricalEnergyMeasurement::Feature::kCumulativeEnergy, ElectricalEnergyMeasurement::Feature::kPeriodicEnergy),
+                                     BitMask<ElectricalEnergyMeasurement::OptionalAttributes, uint32_t>(
+                                             ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset));
+
+    ElectricalEnergyMeasurement::Structs::CumulativeEnergyResetStruct::Type resetStruct = {
+        .importedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
+        .exportedResetTimestamp = MakeOptional(MakeNullable(static_cast<uint32_t>(0))),
+        .importedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
+        .exportedResetSystime   = MakeOptional(MakeNullable(static_cast<uint64_t>(0))),
+    };
+
+    if (gEEMAttrAccess) {
+        TEMPORARY_RETURN_IGNORED gEEMAttrAccess->Init();
+        TEMPORARY_RETURN_IGNORED SetMeasurementAccuracy(endpointId, kMeasurementAccuracy);
+        TEMPORARY_RETURN_IGNORED SetCumulativeReset(endpointId, MakeOptional(resetStruct));
+    }
+}
+
+DeviceEnergyManagement::DeviceEnergyManagementDelegate *GetDEMDelegate()
+{
+    VerifyOrDieWithMsg(gDEMDelegate.get() != nullptr, AppServer, "DEM Delegate is null");
+    return gDEMDelegate.get();
+}
+#endif
+
+EVSEManufacturer *EnergyEvse::GetEvseManufacturer()
+{
+    return gEvseManufacturer.get();
+}
+
+void EvseApplicationInit()
+{
+    auto endpointId = 1;
+    VerifyOrDie(EnergyManagementCommonClustersInit(endpointId) == CHIP_NO_ERROR);
+    VerifyOrDie(EnergyEvseInit(endpointId) == CHIP_NO_ERROR);
+    VerifyOrDie(EVSEManufacturerInit(endpointId) == CHIP_NO_ERROR);
+}
+
+void EvseApplicationShutdown()
+{
+    ChipLogDetail(AppServer, "Evse App: EvseApplicationShutdown()");
+
+    /* Shutdown in reverse order that they were created */
+    TEMPORARY_RETURN_IGNORED EVSEManufacturerShutdown();
+    TEMPORARY_RETURN_IGNORED PowerTopologyShutdown(gPTInstance, gPTDelegate);
+    TEMPORARY_RETURN_IGNORED ElectricalPowerMeasurementShutdown(gEPMInstance, gEPMDelegate);
+    TEMPORARY_RETURN_IGNORED EnergyEvseShutdown();
+    //DeviceEnergyManagementShutdown(gDEMInstance, gDEMDelegate);
+
+    Clusters::DeviceEnergyManagementMode::Shutdown();
+    Clusters::EnergyEvseMode::Shutdown();
+}
+
+void AllClustersEvseApplicationInit()
+{
+    auto endpointId = 1;
+    VerifyOrDie(EnergyEvseInit(endpointId) == CHIP_NO_ERROR);
+}
+
+#if 0
+EndpointId GetIdentifyEndpointId()
+{
+    return 1;
+}
+#endif
