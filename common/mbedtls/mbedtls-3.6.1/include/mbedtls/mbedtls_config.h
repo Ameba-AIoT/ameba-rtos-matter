@@ -4098,6 +4098,10 @@
  * Uncomment to set the maximum plaintext size of the incoming I/O buffer.
  */
 #define MBEDTLS_SSL_IN_CONTENT_LEN              16384
+// Fix build warning
+#ifndef MBEDTLS_SSL_MAX_CONTENT_LEN
+#define MBEDTLS_SSL_MAX_CONTENT_LEN             0
+#endif
 
 /** \def MBEDTLS_SSL_CID_IN_LEN_MAX
  *
