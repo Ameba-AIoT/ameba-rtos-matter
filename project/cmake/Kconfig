@@ -14,6 +14,11 @@ menu "Matter Config"
         config MBEDTLS_V_3_6_2_ENABLE
             bool
             default y
+            depends on (AMEBADPLUS || AMEBALITE || AMEBASMART)
+        config MBEDTLS_V_3_6_5_ENABLE
+            bool
+            default y
+            depends on (AMEBAGREEN2)
         config BLE_MATTER_ADAPTER
             bool "BLE Matter Adapter"
             default n
@@ -32,7 +37,7 @@ menu "Matter Config"
         config MATTER_SECURE_EN
             bool "Enable Matter Secure"
             default n
-            depends on ((AMEBADPLUS || AMEBALITE) && (TRUSTZONE_FOR_KM4 || TRUSTZONE_EN)) || (AMEBASMART)
+            depends on ((AMEBADPLUS || AMEBALITE || AMEBAGREEN2) && (TRUSTZONE_FOR_KM4 || TRUSTZONE_EN)) || (AMEBASMART)
         config MATTER_SECURE
             bool
             default y
@@ -45,7 +50,7 @@ menu "Matter Config"
             int
             default 136 if AMEBADPLUS
             default 120 if AMEBALITE
-            depends on MATTER_SECURE_EN
+            depends on (AMEBARTOS_V1_1 && MATTER_SECURE_EN)
         config SECURE_HEAP_SIZE
             int
             default 14336

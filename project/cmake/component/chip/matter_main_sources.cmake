@@ -55,6 +55,13 @@ list(APPEND LIB_CHIP_CORE_INC_PATH
     ${BASEDIR}/component/soc/amebasmart/hal/src
     ${BASEDIR}/component/soc/amebasmart/misc
 )
+elseif(CONFIG_AMEBAGREEN2)
+list(APPEND LIB_CHIP_CORE_INC_PATH
+    ${BASEDIR}/component/soc/amebagreen2/app/monitor/include
+    ${BASEDIR}/component/soc/amebagreen2/hal/include
+    ${BASEDIR}/component/soc/amebagreen2/hal/src
+    ${BASEDIR}/component/soc/amebagreen2/misc
+)
 endif()
 endif()
 

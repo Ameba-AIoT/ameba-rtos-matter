@@ -14,15 +14,18 @@
 using namespace ::chip::app;
 using chip::Protocols::InteractionModel::Status;
 
-#if defined (CONFIG_AMEBASMART)
-#define FAN_PIN         PA_5
-#define DHT_DATA_PIN    PA_10
-#elif defined (CONFIG_AMEBALITE)
-#define FAN_PIN         PA_31
-#define DHT_DATA_PIN    PA_29
-#elif defined (CONFIG_AMEBADPLUS)
-#define FAN_PIN         PB_18
-#define DHT_DATA_PIN    PA_12
+#if defined(CONFIG_AMEBADPLUS)
+#define FAN_PIN      PB_18
+#define DHT_DATA_PIN PA_12
+#elif defined(CONFIG_AMEBALITE)
+#define FAN_PIN      PA_31
+#define DHT_DATA_PIN PA_29
+#elif defined(CONFIG_AMEBASMART)
+#define FAN_PIN      PA_5
+#define DHT_DATA_PIN PA_10
+#elif defined(CONFIG_AMEBAGREEN2)
+#define FAN_PIN      PA_6
+#define DHT_DATA_PIN PA_26
 #endif
 
 MatterRoomAirCon aircon;

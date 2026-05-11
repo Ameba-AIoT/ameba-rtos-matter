@@ -3,8 +3,11 @@
 
 void MatterDoorLock::Init(PinName pin)
 {
-    mPwm_obj                        = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
-    mPwm_obj->pwm_idx               = 1;
+    mPwm_obj               = (pwmout_t *) pvPortMalloc(sizeof(pwmout_t));
+#if defined(CONFIG_AMEBAGREEN2)
+    mPwm_obj->pwmtimer_idx = 4;
+#endif
+    mPwm_obj->pwm_idx      = 0;
     pwmout_init(mPwm_obj, pin);
 
     // Get lock state by reading sensor or something

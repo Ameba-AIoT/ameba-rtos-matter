@@ -26,6 +26,7 @@ ameba_wifi_config=(
   "$PATH_TO_AMEBA_RTOS/component/soc/usrcfg/amebadplus/ameba_wificfg.c"
   "$PATH_TO_AMEBA_RTOS/component/soc/usrcfg/amebalite/ameba_wificfg.c"
   "$PATH_TO_AMEBA_RTOS/component/soc/usrcfg/amebasmart/ameba_wificfg.c"
+  "$PATH_TO_AMEBA_RTOS/component/soc/usrcfg/amebagreen2/ameba_wificfg.c"
 )
 
 create_matter_env_script(){

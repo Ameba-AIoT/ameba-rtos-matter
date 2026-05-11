@@ -23,17 +23,6 @@ using namespace ::chip::Platform;
 using namespace ::chip::app::Clusters;
 using chip::Protocols::InteractionModel::Status;
 
-#if defined (CONFIG_AMEBASMART)
-#define PWM_PIN         PA_5
-#define GPIO_IRQ_PIN    PA_10
-#elif defined (CONFIG_AMEBALITE)
-#define PWM_PIN         PA_31
-#define GPIO_IRQ_PIN    PA_29
-#elif defined (CONFIG_AMEBADPLUS)
-#define PWM_PIN         PB_18
-#define GPIO_IRQ_PIN    PA_12
-#endif
-
 MatterBridge ALight1;
 MatterBridge ALight2;
 

@@ -43,9 +43,10 @@ echo $PATH
 
 echo "Building firmware"
 
-$AMEBA_PY soc RTL8730E
+$AMEBA_PY soc RTL8721F
 
-cp ${matterdir}/tools/docker/ameba-rtos/v1.2/config/amebasmart_matter_proj.conf ${matterdir}/project/cmake/config/ameba-rtos-v1.2/matter_proj.conf
+cp ${matterdir}/tools/docker/ameba-rtos/v1.2/config/amebadplus_lite_green2_matter_proj.conf ${matterdir}/project/cmake/config/ameba-rtos-v1.2/matter_proj.conf
+cp ${matterdir}/tools/docker/ameba-rtos/v1.2/amebagreen2/PeripheralNames.h ${amebadir}/component/soc/amebagreen2/hal/src/PeripheralNames.h
 
 matter_apply_conf
 

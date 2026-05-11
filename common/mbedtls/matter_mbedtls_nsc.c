@@ -17,34 +17,41 @@
  *    limitations under the License.
  */
 
-#include "platform_autoconf.h"
+// Ameba Includes
+#include <platform_autoconf.h>
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
+#include <cmsis.h>
+#include <platform_stdlib.h>
+#include <FreeRTOS.h>
 #if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
-#include "cmsis.h"
-#include "platform_stdlib.h"
-#include "FreeRTOS.h"
-#include "ameba_crypto_api.h"
+#include <ameba_crypto_api.h>
+#elif defined(CONFIG_AMEBAGREEN2)
+#include <ameba_crypto.h>
+#endif
 #ifndef printf
 #define printf DiagPrintf
 #endif
 #endif
+
+// MbedTLS Includes
 #if defined(MBEDTLS_CONFIG_FILE)
 #include MBEDTLS_CONFIG_FILE
 #else
-#include "mbedtls/config.h"
+#include <mbedtls/config.h>
 #endif
-#include "mbedtls/platform.h"
-#include "mbedtls/ssl.h"
-#include "mbedtls/pk.h"
-#include "mbedtls/version.h"
-#include "mbedtls/sha256.h"
+#include <mbedtls/platform.h>
+#include <mbedtls/ssl.h>
+#include <mbedtls/pk.h>
+#include <mbedtls/version.h>
+#include <mbedtls/sha256.h>
 #if (MBEDTLS_VERSION_NUMBER > 0x03000000)
 #include <mbedtls/compat-2.x.h>
 #endif
-
-#if defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
-#include "matter_utils.h"
 #include <mbedtls/x509_csr.h>
-#include "mbedtls/aes.h"
+#include <mbedtls/aes.h>
+
+// Matter Includes
+#include <matter_utils.h>
 
 __weak const uint8_t kSecureDacPrivateKey[] = {
     0xfe, 0x94, 0x39, 0xea, 0x18, 0xfb, 0x1e, 0x7e, 0xbc, 0xa2, 0x98, 0xf8, 0x87, 0x3a, 0x3c, 0xd5,
@@ -60,7 +67,7 @@ mbedtls_ecp_keypair OpKey;
 
 int keyInitialized = 0;
 
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 
 static void *_calloc(size_t count, size_t size)
 {
@@ -110,31 +117,35 @@ static int _random(void *p_rng, unsigned char *output, size_t output_len)
 
 #endif //defined(CONFIG_XXX)
 
-#if (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+#if ((defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) && defined(CONFIG_AMEBASMART))
+int secure_mbedtls_platform_set_calloc_free(void)
+{
+    return mbedtls_platform_set_calloc_free(_calloc, _free);
+}
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
     (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void)
 #elif defined(CONFIG_AMEBASMART)
 int secure_mbedtls_platform_set_calloc_free(void)
 #endif
 {
-#if defined(CONFIG_AMEBASMART)
-    return mbedtls_platform_set_calloc_free(_calloc, _free);
-#elif (defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE))
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
     CRYPTO_Init(NULL);
     CRYPTO_SHA_Init(NULL);
+#elif defined(CONFIG_AMEBAGREEN2)
+    CRYPTO_Init();
+#endif
     ssl_function_map.ssl_calloc = (void *(*)(unsigned int, unsigned int))_calloc;
     ssl_function_map.ssl_free = (void (*)(void *))_free;
     ssl_function_map.ssl_printf = (long unsigned int (*)(const char *, ...))DiagPrintf;
     ssl_function_map.ssl_snprintf = (int (*)(char *s, size_t n, const char *format, ...))DiagSnPrintf;
     return 0;
-#endif
-}
-#elif ((defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) && defined(CONFIG_AMEBASMART))
-int secure_mbedtls_platform_set_calloc_free(void)
-{
+#elif defined(CONFIG_AMEBASMART)
     return mbedtls_platform_set_calloc_free(_calloc, _free);
+#endif
 }
 #endif
 
@@ -147,7 +158,7 @@ int secure_mbedtls_platform_set_calloc_free(void)
  * Upon successful execution, the key pair associated with the specified Matter Key Type is freed, and
  * the 'keyInitialized' flag is set to 0 to indicate that the key pair is no longer initialized.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 void NS_ENTRY matter_secure_clear_keypair(matter_key_type key_type)
 #elif defined(CONFIG_AMEBASMART)
@@ -176,7 +187,7 @@ void matter_secure_clear_keypair(matter_key_type key_type)
  * @param  out_buf: Pointer to the buffer where the SHA-256 hash will be stored.
  * @return  0 on success, negative value otherwise
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_hash_sha256(const uint8_t *msg, size_t msg_size, uint8_t *out_buf)
 #elif defined(CONFIG_AMEBASMART)
@@ -207,7 +218,7 @@ int matter_hash_sha256(const uint8_t *msg, size_t msg_size, uint8_t *out_buf)
  *  - The ECDSA signature is computed and stored in the 'signature' buffer.
  *  - Error handling includes printing error messages and returning appropriate error codes.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *msg, size_t msg_size, unsigned char *signature)
 #elif defined(CONFIG_AMEBASMART)
@@ -292,7 +303,7 @@ int matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *
  *  - It generates a new keypair using the elliptic curve specified by 'group' (SECP256R1).
  *  - If an error occurs during the key generation process, the function prints an error message and returns the error code.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_opkey_init_keypair()
 #elif defined(CONFIG_AMEBASMART)
@@ -328,7 +339,7 @@ exit:
  * @param  csr_length: Length of the CSR buffer.
  * @return  The length of the generated CSR on success, MATTER_ERROR_INTERNAL otherwise.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_new_csr(uint8_t *out_csr, size_t csr_length)
 #elif defined(CONFIG_AMEBASMART)
@@ -413,7 +424,7 @@ exit:
  * Notes:
  *  - Upon successful encryption, the encrypted Operational Private Key is copied back to the input buffer 'buf'.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_encrypt_key(uint8_t *buf, size_t size)
 #elif defined(CONFIG_AMEBASMART)
@@ -468,7 +479,7 @@ exit:
  * @param  pubkey_size: Size of the buffer to accommodate the public key.
  * @return  0 on success, negative value otherwise.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_get_opkey_pub(uint8_t *pubkey, size_t pubkey_size)
 #elif defined(CONFIG_AMEBASMART)
@@ -500,7 +511,7 @@ int matter_secure_get_opkey_pub(uint8_t *pubkey, size_t pubkey_size)
  * @param  privkey_size: Size of the buffer to accommodate the encrypted private key.
  * @return  0 on success, negative value otherwise.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_get_opkey_priv(uint8_t *privkey, size_t privkey_size)
 #elif defined(CONFIG_AMEBASMART)
@@ -543,7 +554,7 @@ exit:
  * It's important to note that the decrypted private key remains within the secure context and is not exposed to
  * non-secure environments. The Operational Keypair (Opkey) is exclusively used within a secure context.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_get_opkey(uint8_t *buf, size_t size)
 #elif defined(CONFIG_AMEBASMART)
@@ -638,7 +649,7 @@ exit:
  *  - If an error occurs during the retrieval or serialization process, the function prints an error message,
  *    clears the Operational Keypair, and returns the error code.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_serialize(uint8_t *output_buf, size_t output_size)
 #elif defined(CONFIG_AMEBASMART)
@@ -679,7 +690,7 @@ exit:
  * @param  pub_size: Size of the public key buffer.
  * @return  0 on success, negative value otherwise.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_deserialize(uint8_t *pub_buf, size_t pub_size)
 #elif defined(CONFIG_AMEBASMART)
@@ -728,7 +739,7 @@ exit:
  * @param  pub_size: Size of the public key buffer.
  * @return  0 on success, negative value otherwise.
  */
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size)
 #elif defined(CONFIG_AMEBASMART)
@@ -747,4 +758,3 @@ int matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size)
 
     return result;
 }
-#endif /* CONFIG_MATTER_SECURE */

@@ -1,3 +1,5 @@
+set(DIR ${c_MBEDTLS_DIR})
+
 # mbedtls secure library
 #------------------------------#
 ameba_list_append(private_sources

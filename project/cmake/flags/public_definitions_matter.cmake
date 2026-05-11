@@ -28,6 +28,12 @@ ameba_list_append(matter_defintions
 
 )
 
+if(CONFIG_AMEBAGREEN2)
+    ameba_list_append(matter_defintions
+        hw_sha_context=SHA_context
+    )
+endif()
+
 if(CONFIG_MATTER_TC_EN)
     ameba_list_append(matter_defintions
         CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION=1
@@ -98,6 +104,10 @@ elseif(CONFIG_AMEBALITE)
 elseif(CONFIG_AMEBASMART)
     ameba_list_append(matter_defintions
         CONFIG_AMEBASMART=1
+    )
+elseif(CONFIG_AMEBAGREEN2)
+    ameba_list_append(matter_defintions
+        CONFIG_AMEBAGREEN2=1
     )
 endif()
 

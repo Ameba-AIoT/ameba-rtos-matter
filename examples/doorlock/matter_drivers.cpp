@@ -21,15 +21,18 @@ using namespace chip::app::Clusters::DoorLock;
 using chip::Protocols::InteractionModel::Status;
 
 #define DOORLOCK_ENDPOINT 1
-#if defined (CONFIG_AMEBASMART)
-#define PWM_PIN           PA_5
-#define GPIO_IRQ_EDGE_PIN PA_10
-#elif defined (CONFIG_AMEBALITE)
-#define PWM_PIN           PA_31
-#define GPIO_IRQ_EDGE_PIN PA_29
-#elif defined (CONFIG_AMEBADPLUS)
+#if defined(CONFIG_AMEBADPLUS)
 #define PWM_PIN           PB_18
 #define GPIO_IRQ_EDGE_PIN PA_12
+#elif defined(CONFIG_AMEBALITE)
+#define PWM_PIN           PA_31
+#define GPIO_IRQ_EDGE_PIN PA_29
+#elif defined(CONFIG_AMEBASMART)
+#define PWM_PIN           PA_5
+#define GPIO_IRQ_EDGE_PIN PA_10
+#elif defined(CONFIG_AMEBAGREEN2)
+#define PWM_PIN           PA_6
+#define GPIO_IRQ_EDGE_PIN PA_26
 #endif
 
 MatterDoorLock doorLock;
@@ -37,7 +40,12 @@ gpio_irq_t gpio_edge;
 int current_edge = IRQ_FALL;
 
 // Button to trigger unlock or lock downlink event
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
 void matter_gpio_edge_irq_handler(uint32_t id, gpio_irq_event event)
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+void matter_gpio_edge_irq_handler(uint32_t id, uint32_t event)
+#endif
 {
     (void)event;
     gpio_irq_event *edge = (gpio_irq_event *) id;
