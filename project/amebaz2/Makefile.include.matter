@@ -47,7 +47,7 @@ include $(MATTER_INCLUDE_TOOLCHAIN)
 
 FREERTOS_VERSION   = freertos_v10.0.1
 LWIP_VERSION       = lwip_v2.1.2
-MBEDTLS_VERSION    = mbedtls-2.28.1
+MBEDTLS_VERSION    = mbedtls-3.6.6
 
 # -------------------------------------------------------------------
 # Compiler Flags

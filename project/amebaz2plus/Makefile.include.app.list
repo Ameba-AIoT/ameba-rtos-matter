@@ -207,7 +207,7 @@ SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pkcs11.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/rsa_internal.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_srv.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/xtea.c
-else ifeq ($(MBEDTLS_VERSION), mbedtls-3.6.1)
+else ifeq ($(MBEDTLS_VERSION), mbedtls-3.6.6)
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aes_alt.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aesce.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/bignum_core.c

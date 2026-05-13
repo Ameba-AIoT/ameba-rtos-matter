@@ -21,8 +21,8 @@ OBJS =
 #*****************************************************************************#
 all: CORE_TARGETS COPY_RAM_OBJS
 ifeq ($(MBEDTLS_MATTER_ENABLE), y)
-ifeq ($(MBEDTLS_VERSION), mbedtls-3.6.1)
-	@make -C mbedtls-3.6.1 all
+ifeq ($(MBEDTLS_VERSION), mbedtls-3.6.6)
+	@make -C mbedtls-3.6.6 all
 else ifeq ($(MBEDTLS_VERSION), mbedtls-2.28.1)
 	@make -C mbedtls-2.28.1 all
 endif
@@ -38,7 +38,7 @@ CORE_TARGETS: $(OBJS)
 #*****************************************************************************#
 clean: CLEAN_OBJS
 ifeq ($(MBEDTLS_MATTER_ENABLE), y)
-	@make -C mbedtls-3.6.1 clean
+	@make -C mbedtls-3.6.6 clean
 	@make -C mbedtls-2.28.1 clean
 endif
 

@@ -55,7 +55,7 @@ CSRC = $(DIR)/library/aes.c \
 
 ifeq ($(MBEDTLS_VERSION), mbedtls-2.28.1)
 CSRC += $(DIR)/library/rsa_internal.c
-else ifeq ($(MBEDTLS_VERSION), mbedtls-3.6.1)
+else ifeq ($(MBEDTLS_VERSION), mbedtls-3.6.6)
 CSRC += $(DIR)/library/bignum_core.c \
        $(DIR)/library/bignum_mod.c \
        $(DIR)/library/bignum_mod_raw.c \
@@ -73,7 +73,6 @@ OBJS = $(notdir $(CSRC:.c=.o))
 #*****************************************************************************#
 -include $(OBJS:.o=.d)
 
-	
 #*****************************************************************************#
 #                        RULES TO GENERATE TARGETS                            #
 #*****************************************************************************#
