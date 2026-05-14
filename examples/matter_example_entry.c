@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_opts.h>
 
 #if defined(CONFIG_EXAMPLE_MATTER) && (CONFIG_EXAMPLE_MATTER == 1)
-
+#include <string.h>
 #if defined(CONFIG_PLATFORM_8721D)
 #include <atcmd_matter.h>
 #endif /* CONFIG_PLATFORM_8721D */
@@ -54,7 +53,8 @@
 #endif
 
 #if defined(CONFIG_PLATFORM_8710C)
-#include "FreeRTOS.h"
+#include <FreeRTOS.h>
+#include <mbedtls/platform.h>
 static void *matter_mbedtls_calloc_func(size_t nelements, size_t elementSize)
 {
     size_t size;
