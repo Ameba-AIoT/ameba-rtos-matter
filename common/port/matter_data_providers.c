@@ -42,10 +42,10 @@ static const char *kCalendarTypeKey       = "calendar_type";
  ******************************************************/
 static const ameba_fixed_label_t sDefaultFixedLabel[] =
 {
-    { "room", "bedroom 2" },
-    { "orientation", "North" },
-    { "floor", "2" },
-    { "direction", "up" },
+    { "room", "bedroom 2", true},
+    { "orientation", "North", true},
+    { "floor", "2", true},
+    { "direction", "up", true},
 };
 static const size_t sDefaultFixedLabelCount = sizeof(sDefaultFixedLabel) / sizeof(sDefaultFixedLabel[0]);
 

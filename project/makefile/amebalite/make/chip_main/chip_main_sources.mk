@@ -28,7 +28,7 @@ else ifeq ($(DEVICE_TYPE),bridge)
 GLOBAL_CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
 endif
 
-GLOBAL_CFLAGS += -Wno-register
+GLOBAL_CFLAGS += -Wno-missing-field-initializers
 
 # -------------------------------------------------------------------
 # Search Directory

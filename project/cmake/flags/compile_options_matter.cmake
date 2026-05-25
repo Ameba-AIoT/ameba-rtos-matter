@@ -42,4 +42,5 @@ list(
 	
 	-std=gnu++17
 	-fno-rtti
+	-Wno-register
 )

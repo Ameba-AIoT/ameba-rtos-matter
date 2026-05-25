@@ -63,7 +63,7 @@ extern "C" {
 /******************************************************
  *         WiFi Network Mode (BGN)
  ******************************************************/
-typedef int rtw_network_mode_t;
+typedef uint8_t rtw_network_mode_t;
 
 /******************************************************
  *               WiFi Config
@@ -120,7 +120,7 @@ typedef uint8_t rtw_mode_t;
 /******************************************************
  *         WiFi Result
  ******************************************************/
-typedef int rtw_result_t;
+typedef int32_t rtw_result_t;
 
 /******************************************************
  *         WiFi Scan Result
@@ -402,7 +402,7 @@ void matter_wifi_reg_event_handler(matter_wifi_event event_cmds, rtw_event_handl
  * @param[in]  buf_len: Lengrh of buffer to be passed to the handler function (optional).
  * @param[in]  flags: WiFi flags to be passed to the handler function (optional).
  */
-int matter_wifi_indication(u32 event_cmd, u8 *buf, s32 buf_len, s32 flags);
+int matter_wifi_indication(u32 event_cmd, char *buf, s32 buf_len, s32 flags);
 
 /**
  * @brief  Initialize matter WiFis module

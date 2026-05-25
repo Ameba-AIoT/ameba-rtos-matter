@@ -63,7 +63,7 @@ uint8_t matter_get_total_operational_hour(uint32_t *totalOperationalHours)
         err = diagProvider.GetTotalOperationalHours(*totalOperationalHours);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogError(DeviceLayer,"%s: get failed err=%d\n", __FUNCTION__, err);
+            ChipLogError(DeviceLayer,"%s: get failed err=%" CHIP_ERROR_FORMAT, __FUNCTION__, err.Format());
             return -1;
         }
     }
@@ -216,7 +216,7 @@ void matter_store_boot_reason(void)
     err = ConfigurationManagerImpl().StoreBootReason(to_underlying(bootReason));
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "store boot reason (0x%x) failed 0x%X", to_underlying(bootReason), err);
+        ChipLogError(DeviceLayer, "store boot reason (0x%x) failed err=%" CHIP_ERROR_FORMAT, to_underlying(bootReason), err.Format());
     }
     return;
 }

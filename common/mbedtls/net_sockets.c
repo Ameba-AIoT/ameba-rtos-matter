@@ -461,7 +461,7 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
 
     /* Is this a TCP or UDP socket? */
     if ( getsockopt( bind_ctx->fd, SOL_SOCKET, SO_TYPE,
-                    (void *) &type, &type_len ) != 0 ||
+                    (void *) &type, (socklen_t*) &type_len ) != 0 ||
         ( type != SOCK_STREAM && type != SOCK_DGRAM ) )
     {
         return( MBEDTLS_ERR_NET_ACCEPT_FAILED );
@@ -471,7 +471,7 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
     {
         /* TCP: actual accept() */
         ret = client_ctx->fd = (int) accept( bind_ctx->fd,
-                                             (struct sockaddr *) &client_addr, &n );
+                                             (struct sockaddr *) &client_addr, (socklen_t*) &n );
     }
     else
     {
@@ -479,7 +479,7 @@ int mbedtls_net_accept( mbedtls_net_context *bind_ctx,
         char buf[1] = { 0 };
 
         ret = (int) recvfrom( bind_ctx->fd, buf, sizeof( buf ), MSG_PEEK,
-                        (struct sockaddr *) &client_addr, &n );
+                        (struct sockaddr *) &client_addr, (socklen_t*) &n );
 
 #if defined(_WIN32)
         if ( ret == SOCKET_ERROR &&

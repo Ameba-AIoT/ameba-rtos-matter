@@ -6,14 +6,51 @@ AMEBA_PY="python $PATH_TO_AMEBA_RTOS/ameba.py"
 
 PATH_TO_AMEBA_RTOS_MATTER="$PWD"
 MATTER_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/project/cmake/config/ameba-rtos-v1.2/matter_proj.conf"
+CURRENT_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/current_proj.conf"
+TEMP_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/.temp_proj.conf"
 SOC_INFO_JSON="$PATH_TO_AMEBA_RTOS_MATTER/soc_info.json"
 
 if [ ! -e "$SOC_INFO_JSON" ]; then
   echo "$SOC_INFO_JSON does not exist, please run \`ameba.py soc\` and choose the SoC for your project."
 else
   echo "Enabling Matter in menuconfig..."
-  $AMEBA_PY menuconfig -f "$MATTER_PROJ_CONFIG"
-  echo "The following configurations has been enabled:"
-  cat "$MATTER_PROJ_CONFIG"
+
+  # Get SOC name from soc_info.json
+  SOC_NAME=$(jq -r '.soc.name' "$SOC_INFO_JSON")
+  MENUCONFIG_PATH="$PATH_TO_AMEBA_RTOS_MATTER/build_${SOC_NAME}/menuconfig/.config"
+
+  if [ -e "$MENUCONFIG_PATH" ]; then
+    # Save current configuration (only if .config exists)
+    $AMEBA_PY menuconfig -s "$CURRENT_PROJ_CONFIG"
+
+    # Combine both current configuration and matter default configuration into one file
+    if grep -Fxq 'CONFIG_BLE_MATTER_ADAPTER=y' "$CURRENT_PROJ_CONFIG"; then
+      # if CONFIG_BLE_MATTER_ADAPTER is activated, move CONFIG_BT_MENU=y to the first line
+      sed -i '/^CONFIG_BT_MENU=y$/d' "$CURRENT_PROJ_CONFIG"
+      echo "CONFIG_BT_MENU=y" > "$TEMP_PROJ_CONFIG"
+    fi
+    cat "$CURRENT_PROJ_CONFIG" "$MATTER_PROJ_CONFIG" >> "$TEMP_PROJ_CONFIG"
+  else
+    echo "No existing menuconfig found (${MENUCONFIG_PATH}), applying Matter defaults directly..."
+    cp "$MATTER_PROJ_CONFIG" "$TEMP_PROJ_CONFIG"
+  fi
+
+  # Apply the combined configuration
+  $AMEBA_PY menuconfig -f "$TEMP_PROJ_CONFIG"
+
+  # Save and tidy up the current project configuration
+  $AMEBA_PY menuconfig -s "$TEMP_PROJ_CONFIG"
+  sed -i '/python[[:space:]]*menuconfig\.py[[:space:]]*-s/d' "$TEMP_PROJ_CONFIG"
+  echo "# This file is generated automatically by : matter_apply_conf" > "$CURRENT_PROJ_CONFIG"
+  if grep -Fxq 'CONFIG_BLE_MATTER_ADAPTER=y' "$TEMP_PROJ_CONFIG"; then
+    # if CONFIG_BLE_MATTER_ADAPTER is activated, set CONFIG_BT_MENU=y first
+    sed -i '/^CONFIG_BT_MENU=y$/d' "$TEMP_PROJ_CONFIG"
+    echo "CONFIG_BT_MENU=y" >> "$CURRENT_PROJ_CONFIG"
+  fi
+  cat "$TEMP_PROJ_CONFIG" >> "$CURRENT_PROJ_CONFIG"
+  rm "$TEMP_PROJ_CONFIG"
+
+  echo "Current project configuration has been generated to $CURRENT_PROJ_CONFIG :"
+  cat "$CURRENT_PROJ_CONFIG"
   echo "If you need to modify the menuconfig, please run \`ameba.py menuconfig\`"
 fi

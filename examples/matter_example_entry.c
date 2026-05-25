@@ -28,6 +28,8 @@
 #include <aircon/example_matter_aircon.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_BRIDGE) && (CONFIG_EXAMPLE_MATTER_BRIDGE == 1)
 #include <bridge_dm/example_matter_bridge.h>
+#elif defined(CONFIG_EXAMPLE_MATTER_CAMERA) && (CONFIG_EXAMPLE_MATTER_CAMERA == 1)
+#include <camera/example_matter_camera.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_DISHWASHER) && (CONFIG_EXAMPLE_MATTER_DISHWASHER == 1)
 #include <dishwasher/example_matter_dishwasher.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_DOORLOCK) && (CONFIG_EXAMPLE_MATTER_DOORLOCK == 1)
@@ -63,6 +65,8 @@ void app_example(void)
     example_matter_aircon();
 #elif defined(CONFIG_EXAMPLE_MATTER_BRIDGE) && (CONFIG_EXAMPLE_MATTER_BRIDGE == 1)
     example_matter_bridge();
+#elif defined(CONFIG_EXAMPLE_MATTER_CAMERA) && (CONFIG_EXAMPLE_MATTER_CAMERA == 1)
+    example_matter_camera();
 #elif defined(CONFIG_EXAMPLE_MATTER_DISHWASHER) && (CONFIG_EXAMPLE_MATTER_DISHWASHER == 1)
     example_matter_dishwasher();
 #elif defined(CONFIG_EXAMPLE_MATTER_DOORLOCK) && (CONFIG_EXAMPLE_MATTER_DOORLOCK == 1)

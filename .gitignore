@@ -1,3 +1,4 @@
+# Ameba build files
 *.d
 *.o
 *.su
@@ -6,3 +7,18 @@
 *.ii
 *.oo
 build_*
+soc_info.json
+.PATH_TO_AMEBA_RTOS
+matter_env.sh
+*.matter
+
+# Python scripts
+**/__pycache__/**
+
+# Codepilot
+.codepilot*
+AGENTS.md
+
+# Claude
+.claude*
+CLAUDE.md

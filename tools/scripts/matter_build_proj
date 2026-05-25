@@ -13,6 +13,7 @@ matter_examples=(
   "aircon_port"
   "bridge_dm"
   "bridge_port"
+  "camera_port"
   "dishwasher_port"
   "doorlock_port"
   "energy_management_port"

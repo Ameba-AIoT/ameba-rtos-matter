@@ -49,12 +49,12 @@ struct task_struct matter_wifi_autoreconnect_task;
 extern void (*p_wlan_autoreconnect_hdl)(rtw_security_t, char *, int, char *, int, int);
 #endif /* CONFIG_AUTO_RECONNECT */
 
-struct event_list_elem_t {
-    void (*handler)(u8 *buf, s32 len, s32 flags, void *user_data);
+struct matter_event_list_elem_t {
+    void (*handler)(char *buf, int len, int flags, void *user_data);
     void  *handler_user_data;
 };
 #define MATTER_WIFI_EVENT_MAX_ROW 2
-static struct event_list_elem_t matter_event_callback_list[MATTER_WIFI_EVENT_MAX][MATTER_WIFI_EVENT_MAX_ROW] = {0};
+static struct matter_event_list_elem_t matter_event_callback_list[MATTER_WIFI_EVENT_MAX][MATTER_WIFI_EVENT_MAX_ROW] = {0};
 
 chip_connmgr_callback chip_connmgr_callback_func = NULL;
 void *chip_connmgr_callback_data = NULL;
@@ -104,7 +104,12 @@ static void print_matter_scan_result(rtw_scan_result_t *record)
     DiagPrintf("\n");
 }
 
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
 static rtw_result_t matter_scan_result_handler(unsigned int scanned_AP_num, void *user_data)
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+static rtw_result_t matter_scan_result_handler(uint32_t scanned_AP_num, void *user_data)
+#endif
 {
     static int total_ap_num = 0;
     rtw_scan_result_t *scanned_AP_info;
@@ -118,7 +123,12 @@ static rtw_result_t matter_scan_result_handler(unsigned int scanned_AP_num, void
             ret = RTW_ERROR;
             goto exit;
         }
-        if (wifi_get_scan_records(&scanned_AP_num, scan_buf) < 0) {
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+        if (wifi_get_scan_records((unsigned int*) &scanned_AP_num, (char*) scan_buf) < 0) {
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+        if (wifi_get_scan_records((uint32_t*) &scanned_AP_num, (struct rtw_scan_result*) scan_buf) < 0) {
+#endif
             rtos_mem_free(scan_buf);
             ret = RTW_ERROR;
             goto exit;
@@ -182,7 +192,12 @@ void matter_wifi_scan_networks_with_ssid(const unsigned char *ssid, size_t lengt
     rtw_scan_param_t scan_param;
     memset(&scan_param, 0, sizeof(scan_param));
     scan_param.scan_user_callback = matter_scan_result_handler;
-    scan_param.ssid = matter_ssid;
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+    scan_param.ssid = (char*) matter_ssid;
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+    scan_param.ssid = (uint8_t*) matter_ssid;
+#endif
 
     ret = wifi_scan_networks(&scan_param, 0);
     if (ret != RTW_SUCCESS)
@@ -243,10 +258,16 @@ void matter_wifi_set_autoreconnect(uint8_t mode)
             rtw_reconn.b_waiting = 0;
             rtw_reconn.b_enable = 0;
         } else if ((mode != 0) && (rtw_reconn.b_enable == 0)) {
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+            if (rtos_timer_create(&(rtw_reconn.timer), "matter_reconn_timer", 0, wifi_user_config.auto_reconnect_interval * 1000, FALSE,
+                                matter_reconn_timer_hdl) != RTW_SUCCESS) {
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
             if (rtos_timer_create(&(rtw_reconn.timer), "matter_reconn_timer", NULL, wifi_user_config.auto_reconnect_interval * 1000, FALSE,
                                 matter_reconn_timer_hdl) != RTW_SUCCESS) {
+#endif
                 RTK_LOGI(TAG, "matter_reconn_timer create fail\n");
-                return RTW_ERROR;
+                return;
             }
             rtw_reconn.b_enable = 1;
             rtw_reconn.cnt = 0;
@@ -300,7 +321,12 @@ static int matter_get_ap_security_mode(char *ssid, rtw_security_t *security_mode
     rtw_scan_param_t scan_param;
 
     memset(&scan_param, 0, sizeof(scan_param));
-    scan_param.ssid = ssid;
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+    scan_param.ssid = (char*) ssid;
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+    scan_param.ssid = (uint8_t*) ssid;
+#endif
     scan_param.scan_user_callback = matter_scan_result_handler;
     // scan_param.scan_user_data = NULL;
     apNum = 0; // reset counter at the start of scan
@@ -503,7 +529,12 @@ int matter_wifi_get_mac_address(char *mac)
 
 int matter_wifi_sta_get_network_mode(rtw_network_mode_t *pmode)
 {
+#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
     *pmode = wifi_get_network_mode();
+#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
+      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+    wifi_get_wireless_mode(pmode);
+#endif
     return 0;
 }
 
@@ -521,9 +552,9 @@ int matter_get_sta_wifi_info(rtw_wifi_setting_t *pSetting)
     return wifi_get_setting(WLAN0_IDX, pSetting);
 }
 
-int matter_wifi_indication(u32 event_cmd, u8 *buf, s32 buf_len, s32 flags)
+int matter_wifi_indication(u32 event_cmd, char *buf, s32 buf_len, s32 flags)
 {
-    void (*handle)(u8 * buf, s32 len, s32 flags, void *user_data) = NULL;
+    void (*handle)(char *buf, int len, int flags, void *user_data) = NULL;
     int i = 0;
 
     /*user callback handle*/
