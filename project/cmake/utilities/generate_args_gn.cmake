@@ -42,6 +42,7 @@ endif()
 
 file(APPEND ${OUTPUT_DIR}/args.gn "chip_support_enable_storage_api_audit = false\n")
 file(APPEND ${OUTPUT_DIR}/args.gn "chip_use_transitional_commissionable_data_provider = true\n")
+file(APPEND ${OUTPUT_DIR}/args.gn "chip_persist_subscriptions  = true\n")
 file(APPEND ${OUTPUT_DIR}/args.gn "chip_logging = true\n")
 file(APPEND ${OUTPUT_DIR}/args.gn "chip_error_logging  = true\n")
 file(APPEND ${OUTPUT_DIR}/args.gn "chip_progress_logging  = true\n")

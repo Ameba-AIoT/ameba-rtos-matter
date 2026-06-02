@@ -13,6 +13,7 @@ set(MBEDDIR     ${MATTER_DIR}/common/mbedtls)
 set(PORTDIR     ${MATTER_DIR}/common/port)
 set(PROTOBUFDIR ${MATTER_DIR}/common/protobuf)
 set(NANOPBDIR   ${MATTER_DIR}/common/protobuf/nanopb)
+set(WIFIDIR     ${MATTER_DIR}/common/wifi)
 set(EXAMPLEDIR  ${MATTER_DIR}/examples)
 set(CHIPTESTDIR ${MATTER_DIR}/examples/chiptest)
 
@@ -86,10 +87,22 @@ ameba_list_append(private_sources
 )
 
 ameba_list_append(private_includes
-
     ${MBEDTLSDIR}/library
     ${MATTER_DIR}/examples
 )
+
+if(CONFIG_WHC_DEV)
+ameba_list_append(private_sources
+    ${PORTDIR}/whc/matter_whc_dev.c
+)
+
+ameba_list_append(private_includes
+    ${PORTDIR}/whc
+    ${c_CMPT_WIFI_DIR}/whc
+    ${c_CMPT_WIFI_DIR}/whc/whc_dev
+)
+endif()
+
 # Component private part, user config end
 #------------------------------#
 

@@ -13,6 +13,10 @@
 #include <app/clusters/identify-server/identify-server.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief  Initialize the door lock driver.
  * @return  CHIP_NO_ERROR set successfully, CHIP_ERROR_INTERNAL otherwise (if necessary).
@@ -42,3 +46,7 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent);
  * @param[in]  event: Pointer to the AppEvent structure containing event details.
  */
 void matter_driver_downlink_update_handler(AppEvent *event);
+
+#ifdef __cplusplus
+}
+#endif
