@@ -6,7 +6,9 @@
 
 #include <gpio_api.h>
 #include <gpio_irq_api.h>
-
+#if defined(CONFIG_WHC_DEV)
+#include <matter_whc_dev.h>
+#endif
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -142,6 +144,9 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
             {
             case Clusters::DoorLock::Attributes::LockState::Id:
                 {
+#if defined(CONFIG_WHC_DEV)
+                    whc_matter_dev_uplink_hdl(path.mClusterId, path.mAttributeId, &aEvent->value._u8, sizeof(uint8_t));
+#else
                     switch (aEvent->value._u8)
                     {
                     case static_cast<uint8_t>(DlLockState::kNotFullyLocked):
@@ -163,6 +168,7 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
                     default:
                         break;
                     }
+#endif
                 }
                 break;
             default:

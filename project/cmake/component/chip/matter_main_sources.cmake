@@ -99,6 +99,12 @@ ameba_list_append(private_includes
 
 )
 
+if(CONFIG_WHC_DEV)
+ameba_list_append(private_includes
+    ${MATTER_DIR}/common/port/whc
+)
+endif()
+
 list(APPEND LIB_CHIP_CORE_FLAGS
 
     ${c_GLOBAL_COMMON_COMPILE_DEFINES} #needed for the args.gn arguments
