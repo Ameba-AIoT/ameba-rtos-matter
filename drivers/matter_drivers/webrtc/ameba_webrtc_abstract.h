@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <functional>
@@ -29,36 +28,35 @@
 class WebRTCPeerConnection;
 class WebRTCTrack;
 
-enum class SDPType : uint8_t
-{
+/* Forward declaration of C session type from library */
+struct ameba_webrtc_session;
+
+enum class SDPType : uint8_t {
     Offer,
     Answer,
     Pranswer,
     Rollback
 };
 
-enum class MediaType : uint8_t
-{
+enum class MediaType : uint8_t {
     Audio,
     Video,
 };
 
-struct ICECandidateInfo
-{
+struct ICECandidateInfo {
     std::string candidate;
     std::string mid;
     int mlineIndex;
 };
 
-struct ICEServerInfo
-{
+struct ICEServerInfo {
     std::vector<std::string> urls;
     std::string username;
     std::string credential;
 };
 
-using OnLocalDescriptionCallback = std::function<void(const std::string & sdp, SDPType type)>;
-using OnICECandidateCallback     = std::function<void(const ICECandidateInfo & candidateInfo)>;
+using OnLocalDescriptionCallback = std::function<void(const std::string &sdp, SDPType type)>;
+using OnICECandidateCallback     = std::function<void(const ICECandidateInfo &candidateInfo)>;
 using OnConnectionStateCallback  = std::function<void(bool connected)>;
 using OnTrackCallback            = std::function<void(std::shared_ptr<WebRTCTrack> track)>;
 
@@ -68,8 +66,8 @@ class WebRTCTrack
 public:
     virtual ~WebRTCTrack() = default;
 
-    virtual void SendData(const chip::ByteSpan & data)                     = 0;
-    virtual void SendFrame(const chip::ByteSpan & data, int64_t timestamp) = 0;
+    virtual void SendData(const chip::ByteSpan &data)                     = 0;
+    virtual void SendFrame(const chip::ByteSpan &data, int64_t timestamp) = 0;
     virtual bool IsReady()                                                 = 0;
     virtual std::string GetType()                                          = 0; // "video" or "audio"
 };
@@ -85,10 +83,23 @@ public:
     virtual void Close()                                                                                         = 0;
     virtual void CreateOffer()                                                                                   = 0;
     virtual void CreateAnswer()                                                                                  = 0;
-    virtual void SetRemoteDescription(const std::string & sdp, SDPType type)                                     = 0;
-    virtual void AddRemoteCandidate(const std::string & candidate, const std::string & mid)                      = 0;
-    virtual std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType, const std::string & mid, int payloadType) = 0;
-    virtual int GetPayloadType(const std::string & sdp, SDPType type, const std::string & codec) { return -1; };
+    virtual void SetRemoteDescription(const std::string &sdp, SDPType type)                                     = 0;
+    virtual void AddRemoteCandidate(const std::string &candidate, const std::string &mid)                      = 0;
+    virtual std::shared_ptr<WebRTCTrack> AddTrack(MediaType mediaType, const std::string &mid, int payloadType) = 0;
+    virtual int GetPayloadType(const std::string &sdp, SDPType type, const std::string &codec)
+    {
+        return -1;
+    };
+
+    /**
+     * Get the underlying C WebRTC session (ameba_webrtc_session_t).
+     * Used by the transport layer to access ICE/DTLS directly.
+     * Returns NULL if not available.
+     */
+    virtual struct ameba_webrtc_session *GetSession()
+    {
+        return nullptr;
+    };
 };
 
-std::shared_ptr<WebRTCPeerConnection> CreateWebRTCPeerConnection(const std::vector<ICEServerInfo> & iceServers = {});
+std::shared_ptr<WebRTCPeerConnection> CreateWebRTCPeerConnection(const std::vector<ICEServerInfo> &iceServers = {});

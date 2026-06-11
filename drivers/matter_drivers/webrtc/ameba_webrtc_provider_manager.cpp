@@ -496,6 +496,13 @@ CHIP_ERROR WebRTCProviderManager::HandleProvideAnswer(uint16_t sessionId, const 
 
     transport->GetPeerConnection()->SetRemoteDescription(sdpAnswer, SDPType::Answer);
 
+    // The controller may embed its ICE candidates in the answer SDP instead of
+    // sending a separate ProvideICECandidates command (e.g. TC-WEBRTC-1.3).
+    // SetRemoteDescription() has now parsed those into the ICE agent, so start
+    // connectivity checks here; MaybeStartIce() is idempotent if a later
+    // ProvideICECandidates arrives.
+    transport->MaybeStartIce();
+
     transport->MoveToState(WebrtcTransport::State::SendingICECandidates);
     ScheduleICECandidatesSend(sessionId);
 
