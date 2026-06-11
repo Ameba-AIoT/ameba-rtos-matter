@@ -47,6 +47,10 @@ You may add clusters and attributes handling in `matter_driver_uplink_update_han
 
 ## How to build
 
+### WebRTC stack
+
+As of now, there is no WebRTC library provided in ameba-rtos or ameba-rtos-matter repository. Users are recommended to implement the WebRTC stack by themselves by utilizing libdatachannel from [connectedhomeip/third_party/libdatachannel](https://github.com/project-chip/connectedhomeip/tree/v1.5-branch/third_party/libdatachannel) with extra modification to support Ameba platform or the Amazon KVS WebRTC library. Please modify [drivers/matter_drivers/webrtc/ameba_webrtc_libdatachannel.cpp](../../drivers/matter_drivers/webrtc/ameba_webrtc_libdatachannel.cpp) accordingly!
+
 ### Configurations
 1. `CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_CAMERA` are automatically enabled in the Makefiles / CMake.
 
