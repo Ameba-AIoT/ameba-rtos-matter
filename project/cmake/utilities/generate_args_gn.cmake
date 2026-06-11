@@ -28,6 +28,12 @@ else()
 	file(APPEND ${OUTPUT_DIR}/args.gn "chip_inet_config_enable_ipv4 = false\n")
 endif()
 
+if(CHIP_ENABLE_TCP_ENDPOINT)
+    file(APPEND ${OUTPUT_DIR}/args.gn "chip_inet_config_enable_tcp_endpoint = true\n")
+else()
+	file(APPEND ${OUTPUT_DIR}/args.gn "chip_inet_config_enable_tcp_endpoint = false\n")
+endif()
+
 if(CHIP_ENABLE_TC)
 	file(APPEND ${OUTPUT_DIR}/args.gn "chip_terms_and_conditions_required = true\n")
 else()

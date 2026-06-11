@@ -68,5 +68,6 @@ if(CONFIG_BLE_MATTER_ADAPTER)
     ameba_list_append(public_includes
         ${MATTER_DIR}/common/bluetooth
         ${MATTER_DIR}/common/bluetooth/ble_matter_adapter_peripheral
+        ${c_CMPT_BLUETOOTH_DIR}/example/ble_matter_adapter_peripheral
     )
 endif()

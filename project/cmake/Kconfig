@@ -31,6 +31,9 @@ menu "Matter Config"
         config MATTER_ENABLE_IPV4
             bool "Enable Matter IPv4"
             default n
+        config MATTER_ENABLE_TCP_ENDPOINT
+            bool "Enable Matter TCP Endpoint"
+            default n
         config MATTER_TC_EN
             bool "Enable Matter Terms and Condition"
             default n

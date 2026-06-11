@@ -4,6 +4,7 @@
 #if defined(CONFIG_BLE_MATTER_ADAPTER) && CONFIG_BLE_MATTER_ADAPTER
 #include <string.h>
 #include <matter_blemgr_common.h>
+#include <ble_matter_adapter_peripheral_main.h>
 
 /*============================================================================*
  *                              Constants

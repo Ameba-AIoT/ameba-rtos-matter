@@ -64,6 +64,7 @@ endif
 ifeq ($(CONFIG_BLE_MATTER_ADAPTER), y)
 IFLAGS               += -I$(MATTER_DIR)/common/bluetooth
 IFLAGS               += -I$(MATTER_DIR)/common/bluetooth/ble_matter_adapter_peripheral
+IFLAGS               += -I$(BASEDIR)/component/bluetooth/example/ble_matter_adapter_peripheral
 endif
 
 #lwip_default_hooks
@@ -84,6 +85,7 @@ GLOBAL_CFLAGS += -DCONFIG_MATTER=1
 # CPP standards and language
 CPPFLAGS += -std=gnu++17
 CPPFLAGS += -fno-rtti
+CPPFLAGS += -Wno-register
 
 # Compile Warnings
 GLOBAL_CFLAGS += -Wno-sign-compare

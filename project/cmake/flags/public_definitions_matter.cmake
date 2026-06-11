@@ -51,6 +51,7 @@ if(CONFIG_MATTER_SECURE_EN)
     )
 else()
     ameba_list_append(matter_defintions
+        CONFIG_ENABLE_AMEBA_CRYPTO=0
         CONFIG_ENABLE_AMEBA_FACTORY_DATA=0
     )
 endif()
@@ -130,6 +131,13 @@ else()
     ameba_list_append(matter_defintions INET_CONFIG_ENABLE_IPV4=0)
 endif()
 
+# Chip TCP Endpoint
+if(CHIP_ENABLE_TCP_ENDPOINT)
+    ameba_list_append(matter_defintions INET_CONFIG_ENABLE_TCP_ENDPOINT=1)
+else()
+    ameba_list_append(matter_defintions INET_CONFIG_ENABLE_TCP_ENDPOINT=0)
+endif()
+
 # Matter OTA Flags
 if(CHIP_ENABLE_OTA_REQUESTOR)
     ameba_list_append(matter_defintions CONFIG_ENABLE_OTA_REQUESTOR=1)
@@ -155,6 +163,10 @@ elseif(MATTER_EXAMPLE STREQUAL "aircon_port")
 elseif((MATTER_EXAMPLE STREQUAL "bridge_port") OR (MATTER_EXAMPLE STREQUAL "bridge_dm"))
     ameba_list_append(matter_defintions
         CONFIG_EXAMPLE_MATTER_BRIDGE=1
+    )
+elseif(MATTER_EXAMPLE STREQUAL "camera_port")
+    ameba_list_append(matter_defintions
+        CONFIG_EXAMPLE_MATTER_CAMERA=1
     )
 elseif(MATTER_EXAMPLE STREQUAL "dishwasher_port")
     ameba_list_append(matter_defintions

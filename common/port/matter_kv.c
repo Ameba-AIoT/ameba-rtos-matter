@@ -17,14 +17,15 @@
  *    limitations under the License.
  */
 
-#include "kv.h"
-#include "vfs.h"
+#include <kv.h>
+#include <vfs.h>
 #ifdef CONFIG_VFS_FATFS_INCLUDED
-#include "ff.h"
+#include <ff.h>
 #endif
-#include "littlefs_adapter.h"
+#include <littlefs_adapter.h>
 #include <ameba_flashcfg.h>
 #include <flash_api.h>
+#include <os_wrapper.h>
 
 extern FILE *fopen(const char *filename, const char *mode);
 extern int fclose(FILE *stream);
@@ -41,7 +42,7 @@ int rt_kv_deinit(void)
     int res = -1;
     char *path = NULL;
 #if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
-    DIR *directory;
+    void **directory;
     struct dirent *dir;
 
     if ((path = rtos_mem_zmalloc(MAX_KEY_LENGTH + 1)) == NULL) {
@@ -66,7 +67,7 @@ int rt_kv_deinit(void)
         while ((dir = readdir(directory)) != NULL) {
             if (dir->d_type == DT_REG) { // If the entry is a regular file then delete it
                 DiagSnPrintf(path, MAX_KEY_LENGTH + 1, "%s:KV/%s", kv_matter_prefix, dir->d_name);
-                vTaskDelay(10);
+                rtos_time_delay_ms(10);
                 if (remove(path) == 0) {
                     DiagPrintf("rt_kv_deinit: succesfully deleted %s\n", path);
                 }

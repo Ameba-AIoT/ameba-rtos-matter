@@ -22,14 +22,14 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
-
-#if defined(CONFIG_MATTER) && CONFIG_MATTER
 #include <atcmd_service.h>
 #include <main.h>
 #include <sys_api.h>
 #include <wifi_conf.h>
 
-extern u32 deinitPref(void);
+#if defined(CONFIG_MATTER) && CONFIG_MATTER
+#include <chip_porting.h>
+
 #if defined(CONFIG_ENABLE_OTA_REQUESTOR) && CONFIG_ENABLE_OTA_REQUESTOR && \
     defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
 extern void amebaQueryImageCmdHandler();
@@ -39,10 +39,12 @@ extern void amebaApplyUpdateCmdHandler();
 // Queue for matter shell
 QueueHandle_t shell_queue;
 
-void fATchipapp(void *arg)
+u32 fATchipapp(u16 argc, u8 *argv[])
 {
     /* To avoid gcc warnings */
-    (void) arg;
+    (void) argc;
+    (void) argv;
+
     printf("xPortGetTotalHeapSize = %d\n", xPortGetTotalHeapSize());
     printf("xPortGetFreeHeapSize = %d\n", xPortGetFreeHeapSize());
     printf("xPortGetMinimumEverFreeHeapSize = %d\n", xPortGetMinimumEverFreeHeapSize());
@@ -50,29 +52,36 @@ void fATchipapp(void *arg)
     deinitPref();
     wifi_disconnect();
     sys_reset();
+
+    return 0;
 }
 
-void fATchipapp1(void *arg)
+u32 fATchipapp1(u16 argc, u8 *argv[])
 {
+    (void) argc;
+    (void) argv;
 #if defined(CONFIG_ENABLE_OTA_REQUESTOR) && CONFIG_ENABLE_OTA_REQUESTOR && \
     defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
     printf("Calling amebaQueryImageCmdHandler\n");
     amebaQueryImageCmdHandler();
 #endif
+    return 0;
 }
 
-void fATchipapp2(void *arg)
+u32 fATchipapp2(u16 argc, u8 *argv[])
 {
+    (void) argc;
+    (void) argv;
 #if defined(CONFIG_ENABLE_OTA_REQUESTOR) && CONFIG_ENABLE_OTA_REQUESTOR && \
     defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
-    (void) arg;
     printf("Chip Test: amebaApplyUpdateCmdHandler\n");
 
     amebaApplyUpdateCmdHandler();
 #endif
+    return 0;
 }
 
-void fATmattershell(u16 argc, u8 *argv[])
+u32 fATmattershell(u16 argc, u8 *argv[])
 {
     if (argc > 0)
     {
@@ -85,7 +94,7 @@ void fATmattershell(u16 argc, u8 *argv[])
             char *concatenated = (char *)malloc(total_length);
             if (concatenated == NULL) {
                 printf("Failed to allocate memory\r\n");
-                return;
+                return 0;
             }
             concatenated[0] = '\0';
             for (uint16_t i = 0; i < argc; i++) {
@@ -110,14 +119,19 @@ void fATmattershell(u16 argc, u8 *argv[])
     {
         printf("Enter ATMS switch/manual for more options\r\n");
     }
+    return 0;
 }
 
 #if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
-void fATmattersecureheap(void *arg)
+u32 fATmattersecureheap(u16 argc, u8 *argv[])
 {
-    (void) arg;
+    (void) argc;
+    (void) argv;
+
     printf("Checking Secure Heap Status\n");
     matter_check_secure_heap_status();
+
+    return 0;
 }
 #endif
 
@@ -149,19 +163,21 @@ const COMMAND_TABLE matter_atcmd[] = {
 #endif
 };
 const char* matter_atcmd_help[] = {
-    {(const char *)"ATM$ : factory reset. (Usage: ATM$)"},
-    {(const char *)"ATM% : matter ota query image. (Usage: ATM%)"},
-    {(const char *)"ATM^ : matter ota apply update. (Usage: ATM^)"},
-    {(const char *)"ATMH : matter help. (Usage: ATMH)"},
-    {(const char *)"ATMS : matter client console. (Usage: ATMS switch / ATMS manual)"},
+    (const char *)"ATM$ : factory reset. (Usage: ATM$)",
+    (const char *)"ATM% : matter ota query image. (Usage: ATM%)",
+    (const char *)"ATM^ : matter ota apply update. (Usage: ATM^)",
+    (const char *)"ATMH : matter help. (Usage: ATMH)",
+    (const char *)"ATMS : matter client console. (Usage: ATMS switch / ATMS manual)",
 #if defined(CONFIG_MATTER_SECURE) && (CONFIG_MATTER_SECURE == 1)
-    {(const char *)"ATMV : Secure Heap Status. (Usage: ATMV)"},
+    (const char *)"ATMV : Secure Heap Status. (Usage: ATMV)",
 #endif
 };
 #endif
 
 static u32 fATmatterhelp(u16 argc, u8 *argv[])
 {
+    (void) argc;
+    (void) argv;
     u32 index;
     printf("\r\nMatter AT Commands List\r\n\r\n");
     for(index = 0 ; index < (sizeof(matter_atcmd) / sizeof(COMMAND_TABLE)); index++)

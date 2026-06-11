@@ -36,7 +36,7 @@
 #if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
 #include <app/server/TermsAndConditionsManager.h>
 #endif
-#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+#if defined(CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER) && (CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER == 1)
 #include <test_event_trigger/AmebaTestEventTriggerDelegate.h>
 #endif
 #if defined(CONFIG_DISABLE_LAST_FIXED_ENDPOINT) && (CONFIG_DISABLE_LAST_FIXED_ENDPOINT == 1)
@@ -80,11 +80,11 @@
 #include <support/CodeUtils.h>
 #include <core/ErrorStr.h>
 
-#if CONFIG_ENABLE_CHIP_SHELL
+#if defined(CONFIG_ENABLE_CHIP_SHELL) && (CONFIG_ENABLE_CHIP_SHELL == 1)
 #include <shell/launch_shell.h>
 #endif
 
-#if CONFIG_ENABLE_AMEBA_CRYPTO
+#if defined(CONFIG_ENABLE_AMEBA_CRYPTO) && (CONFIG_ENABLE_AMEBA_CRYPTO == 1)
 #include <platform/Ameba/crypto/AmebaPersistentStorageOperationalKeystore.h>
 #endif
 
@@ -124,7 +124,7 @@ constexpr size_t kMaxPendingMdnsPackets = 10u;
 chip::Inet::DropIfTooManyQueuedPacketsFilter sMdnsPacketFilter(kMaxPendingMdnsPackets);
 #endif
 
-#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+#if defined(CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER) && (CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER == 1)
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
                                                                                    0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
 #endif
@@ -134,7 +134,7 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
     switch (event->Type)
     {
     case DeviceEventType::kInternetConnectivityChange:
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR) && (CONFIG_ENABLE_AMEBA_CRYPTO == 1)
         static bool isOTAInitialized = false; // use this static variable to replace CheckInit()
 #endif
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
@@ -151,7 +151,7 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
             ChipLogProgress(DeviceLayer, "IPv6 Server ready...");
             chip::app::DnssdServer::Instance().StartServer();
 
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR) && (CONFIG_ENABLE_AMEBA_CRYPTO == 1)
             // Init OTA requestor only when we have gotten IPv6 address
             if (!isOTAInitialized)
             {
@@ -228,7 +228,7 @@ void matter_core_init_server(intptr_t context)
     initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
 
-#if CONFIG_ENABLE_AMEBA_CRYPTO
+#if defined(CONFIG_ENABLE_AMEBA_CRYPTO) && (CONFIG_ENABLE_AMEBA_CRYPTO == 1)
     ChipLogProgress(DeviceLayer, "platform crypto enabled!");
     static chip::AmebaPersistentStorageOperationalKeystore sAmebaPersistentStorageOpKeystore;
     VerifyOrDie((sAmebaPersistentStorageOpKeystore.Init(initParams.persistentStorageDelegate)) == CHIP_NO_ERROR);
@@ -240,7 +240,7 @@ void matter_core_init_server(intptr_t context)
     initParams.appDelegate = &sAmebaObserver;
 #endif
 
-#if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
+#if defined(CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER) && (CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER == 1)
     static AmebaTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
@@ -280,7 +280,7 @@ void matter_core_init_server(intptr_t context)
         PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
     }
 
-#if CONFIG_ENABLE_CHIP_SHELL
+#if defined(CONFIG_ENABLE_CHIP_SHELL) && (CONFIG_ENABLE_CHIP_SHELL == 1)
     InitBindingHandler();
 #endif
 
@@ -319,7 +319,7 @@ CHIP_ERROR matter_core_init(void)
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(matter_core_device_callback_internal, reinterpret_cast<intptr_t>(NULL));
+    PlatformMgr().AddEventHandler(matter_core_device_callback_internal, reinterpret_cast<intptr_t>(nullptr));
 
     // PlatformMgr().ScheduleWork(matter_core_init_server, 0);
     PlatformMgr().ScheduleWork(matter_core_init_server, reinterpret_cast<intptr_t>(xTaskGetCurrentTaskHandle()));

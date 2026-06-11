@@ -43,79 +43,9 @@
 
 #define US_OVERFLOW_MAX            (0xFFFFFFFFUL * 1000000 / configTICK_RATE_HZ)
 
-extern void vTaskDelay(const TickType_t xTicksToDelay);
-
 static uint64_t current_us = 0;
 static uint32_t tick_count = 0;
 static bool matter_sntp_rtc_sync = FALSE;
-
-int _nanosleep(const struct timespec *rqtp, struct timespec *rmtp)
-{
-    int iStatus = 0;
-    TickType_t xSleepTime = 0;
-
-    /* Silence warnings about unused parameters. */
-    (void) rmtp;
-
-    /* Check rqtp. */
-    if (UTILS_ValidateTimespec(rqtp) == FALSE) {
-        errno = EINVAL;
-        iStatus = -1;
-    }
-
-    if (iStatus == 0) {
-        /* Convert rqtp to ticks and delay. */
-        if (UTILS_TimespecToTicks(rqtp, &xSleepTime) == 0) {
-            vTaskDelay(xSleepTime);
-        }
-    }
-
-    return iStatus;
-}
-
-void __clock_gettime(struct timespec *tp)
-{
-    unsigned int update_tick = 0;
-    long update_sec = 0, update_usec = 0, current_sec = 0, current_usec = 0;
-    unsigned int current_tick = xTaskGetTickCount();
-
-    sntp_get_lasttime(&update_sec, &update_usec, &update_tick);
-
-    long tick_diff_sec, tick_diff_ms;
-
-    tick_diff_sec = (current_tick - update_tick) / configTICK_RATE_HZ;
-    tick_diff_ms = (current_tick - update_tick) % configTICK_RATE_HZ / portTICK_RATE_MS;
-    update_sec += tick_diff_sec;
-    update_usec += (tick_diff_ms * 1000);
-    current_sec = update_sec + update_usec / 1000000;
-    current_usec = update_usec % 1000000;
-
-    tp->tv_sec = current_sec;
-    tp->tv_nsec = current_usec * 1000;
-}
-
-time_t _time(time_t *tloc)
-{
-    time_t xCurrentTime;
-    struct timespec tp;
-
-    __clock_gettime(&tp);
-    xCurrentTime = tp.tv_sec;
-
-    /* Set the output parameter if provided. */
-    if (tloc != NULL) {
-        *tloc = xCurrentTime;
-    }
-
-    return xCurrentTime;
-}
-
-int _vTaskDelay(const TickType_t xTicksToDelay)
-{
-    vTaskDelay(xTicksToDelay);
-
-    return 0;
-}
 
 void matter_rtc_init(void)
 {

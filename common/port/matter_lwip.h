@@ -34,6 +34,12 @@ typedef __uint32_t in_addr_t;
 #undef bind
 static inline int bind(int s, const struct sockaddr *name, socklen_t namelen)
 { return lwip_bind(s,name,namelen); }
+#undef write
+static inline int write(int s, void *mem, size_t len)
+{ return lwip_write(s,mem,len); }
+#undef read
+static inline int read(int s, void *mem, size_t len)
+{ return lwip_read(s,mem,len); }
 #endif
 
 /**

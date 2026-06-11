@@ -10,8 +10,8 @@ ARG TOOLCHAIN_ASDK_LINUX_URL_ALIYUN='https://rs-wn.oss-cn-shanghai.aliyuncs.com/
 ARG TOOLCHAIN_ASDK_FILE_PATH='/opt/rtk-toolchain/prebuilts-linux-1.0.3.tar.gz'
 
 # Redefine following build arguments to respective repo and tag/branch
-ARG AMEBA_MATTER_REPO=https://github.com/xshuqun/ameba-rtos-matter.git
-ARG AMEBA_MATTER_TAG_NAME=ameba-rtos/v1.5-PR/support_wifi_fullmac
+ARG AMEBA_MATTER_REPO=https://github.com/mikaelajiwidodo/ameba-rtos-matter.git
+ARG AMEBA_MATTER_TAG_NAME=ameba-rtos/v1.5-PR/camera-app
 
 # Define fixed build arguments
 ARG AMBRTOS_REPO=https://github.com/Ameba-AIoT/ameba-rtos.git

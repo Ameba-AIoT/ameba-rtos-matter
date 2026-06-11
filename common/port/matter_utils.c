@@ -555,14 +555,14 @@ static unsigned long invoke_matter_secure_smc(
     return res.a0;
 }
 
-#define matter_secure_mbedtls_init(random_seed)                       invoke_matter_secure_smc(MATTER_SECURE_SMC_MBEDTLS_INIT, random_seed, 0, 0)
-#define matter_secure_dac_init_keypair(pub_buf, pub_size)             invoke_matter_secure_smc(MATTER_SECURE_SMC_DAC_INIT_KEYPAIR, pub_buf, pub_size, 0)
-#define matter_secure_dackey_ecdsa_sign_msg(msg, msg_size, signature) invoke_matter_secure_smc(MATTER_SECURE_SMC_DACKEY_ECDSA_SIGN_MSG, msg, msg_size, signature)
-#define matter_secure_opkey_ecdsa_sign_msg(msg, msg_size, signature)  invoke_matter_secure_smc(MATTER_SECURE_SMC_OPKEY_ECDSA_SIGN_MSG, msg, msg_size, signature)
-#define matter_secure_get_opkey(buf, size)                            invoke_matter_secure_smc(MATTER_SECURE_SMC_GET_OPKEY, buf, size, 0)
-#define matter_secure_get_opkey_pub(pubkey, pubkey_size)              invoke_matter_secure_smc(MATTER_SECURE_SMC_GET_OPKEY_PUB, pubkey, pubkey_size, 0)
-#define matter_secure_new_csr(out_csr, csr_length)                    invoke_matter_secure_smc(MATTER_SECURE_SMC_NEW_CSR, out_csr, csr_length, 0)
-#define matter_secure_serialize(output_buf, output_size)              invoke_matter_secure_smc(MATTER_SECURE_SMC_SERIALIZE, output_buf, output_size, 0)
+#define matter_secure_mbedtls_init(random_seed)                       invoke_matter_secure_smc(MATTER_SECURE_SMC_MBEDTLS_INIT, (unsigned long)(random_seed), 0, 0)
+#define matter_secure_dac_init_keypair(pub_buf, pub_size)             invoke_matter_secure_smc(MATTER_SECURE_SMC_DAC_INIT_KEYPAIR, (unsigned long)(pub_buf), (unsigned long)(pub_size), 0)
+#define matter_secure_dackey_ecdsa_sign_msg(msg, msg_size, signature) invoke_matter_secure_smc(MATTER_SECURE_SMC_DACKEY_ECDSA_SIGN_MSG, (unsigned long)(msg), (unsigned long)(msg_size), (unsigned long)(signature))
+#define matter_secure_opkey_ecdsa_sign_msg(msg, msg_size, signature)  invoke_matter_secure_smc(MATTER_SECURE_SMC_OPKEY_ECDSA_SIGN_MSG, (unsigned long)(msg), (unsigned long)(msg_size), (unsigned long)(signature))
+#define matter_secure_get_opkey(buf, size)                            invoke_matter_secure_smc(MATTER_SECURE_SMC_GET_OPKEY, (unsigned long)(buf), (unsigned long)(size), 0)
+#define matter_secure_get_opkey_pub(pubkey, pubkey_size)              invoke_matter_secure_smc(MATTER_SECURE_SMC_GET_OPKEY_PUB, (unsigned long)(pubkey), (unsigned long)(pubkey_size), 0)
+#define matter_secure_new_csr(out_csr, csr_length)                    invoke_matter_secure_smc(MATTER_SECURE_SMC_NEW_CSR, (unsigned long)(out_csr), (unsigned long)(csr_length), 0)
+#define matter_secure_serialize(output_buf, output_size)              invoke_matter_secure_smc(MATTER_SECURE_SMC_SERIALIZE, (unsigned long)(output_buf), (unsigned long)(output_size), 0)
 
 void matter_init_matter_secure_mbedtls(void)
 {

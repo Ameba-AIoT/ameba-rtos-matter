@@ -54,8 +54,6 @@ static void InitAmebaDeviceManager(void)
 
 void AppTaskInit(void)
 {
-    CHIP_ERROR ret = CHIP_NO_ERROR;
-
 #if CONFIG_ENABLE_AMEBA_ATTRIBUTE_CALLBACK
     InitAmebaDeviceManager();
 #endif
@@ -69,7 +67,7 @@ void AppTaskInit(void)
     EvseApplicationInit();
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
-    ret = SmokeCoAlarm::AmebaSmokeCoAlarmTestEventInit(1);
+    CHIP_ERROR ret = SmokeCoAlarm::AmebaSmokeCoAlarmTestEventInit(1);
     if (ret != CHIP_NO_ERROR)
     {
         ChipLogProgress(Zcl, "AmebaSmokeCoAlarmTestEventInit Failed");
