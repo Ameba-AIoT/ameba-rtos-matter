@@ -87,7 +87,7 @@
     __attribute__((__format__(gnu_printf, string_index, first_to_check)))
 #else /* defined(__MINGW32__) && __USE_MINGW_ANSI_STDIO == 1 */
 #define MBEDTLS_PRINTF_ATTRIBUTE(string_index, first_to_check)    \
-    __attribute__((format(printf, string_index, first_to_check)))
+    __attribute__((format(__printf__, string_index, first_to_check)))
 #endif
 #else /* __has_attribute(format) */
 #define MBEDTLS_PRINTF_ATTRIBUTE(string_index, first_to_check)
