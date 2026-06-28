@@ -19,6 +19,7 @@
 
 #include <rvc_run_mode/ameba_rvc_run_mode_delegate.h>
 #include <rvc_run_mode/ameba_rvc_run_mode_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,7 +59,7 @@ void RvcRunMode::AmebaRvcRunModeInstanceShutdown(void)
     }
 }
 
-void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -77,7 +78,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaRvcRunModeInstanceShutdown();
     AmebaRvcRunModeDelegateShutdown();

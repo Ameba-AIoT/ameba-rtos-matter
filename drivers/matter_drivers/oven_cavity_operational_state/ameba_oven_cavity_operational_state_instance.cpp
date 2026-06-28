@@ -19,6 +19,7 @@
 
 #include <oven_cavity_operational_state/ameba_oven_cavity_operational_state_delegate.h>
 #include <oven_cavity_operational_state/ameba_oven_cavity_operational_state_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -57,7 +58,7 @@ void OvenCavityOperationalState::AmebaOvenCavityOperationalStateInstanceShutdown
     }
 }
 
-void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -76,7 +77,7 @@ void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpo
     }
 }
 
-void emberAfOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaOvenCavityOperationalStateInstanceShutdown();
     AmebaOvenCavityOperationalStateDelegateShutdown();

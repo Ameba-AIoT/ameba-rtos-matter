@@ -19,6 +19,7 @@
 
 #include <rvc_clean_mode/ameba_rvc_clean_mode_delegate.h>
 #include <rvc_clean_mode/ameba_rvc_clean_mode_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,7 +59,7 @@ void RvcCleanMode::AmebaRvcCleanModeInstanceShutdown(void)
     }
 }
 
-void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -77,7 +78,7 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaRvcCleanModeInstanceShutdown();
     AmebaRvcCleanModeDelegateShutdown();

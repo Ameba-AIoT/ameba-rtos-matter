@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <stdio.h>
+
 #define SUPPORT_HW_SW_CRYPTO
 
 #if defined(CONFIG_PLATFORM_8710C)

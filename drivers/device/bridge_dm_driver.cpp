@@ -1,3 +1,21 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <algorithm>
 #include <cJSON.h>
 
@@ -9,58 +27,17 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <support/logging/CHIPLogging.h>
 
-EmberAfDeviceType gRootNodeDeviceTypes[] = {
-    { DEVICE_TYPE_ROOT_NODE, DEVICE_VERSION_DEFAULT },
-};
-
-EmberAfDeviceType gAggregatorDeviceTypes[] = {
-    { DEVICE_TYPE_BRIDGE, DEVICE_VERSION_DEFAULT },
-};
-
 void MatterBridge::Init(Node &mNode)
 {
     // start polling task to poll for messages from bridged device
-
-    if ( &mNode == NULL )
-    {
-        ChipLogError(DeviceLayer, "Node is null");
-        return;
-    }
-
     node = &mNode;
-    Endpoint *ep0, *ep1;
-
-    ep0 = node->getEndpoint(0);
-    ep1 = node->getEndpoint(1);
-
-    if (ep0 != NULL) {
-        ep0->disableEndpoint();
-        node->removeEndpoint(0);
-    }
-
-    if (ep1 != NULL) {
-        ep1->disableEndpoint();
-        node->removeEndpoint(1);
-    }
-
-    EndpointConfig rootNodeEndpointConfig;
-    EndpointConfig aggregatorEndpointConfig;
-
-    Presets::Endpoints::matter_root_node_preset(&rootNodeEndpointConfig);
-    Presets::Endpoints::matter_aggregator_preset(&aggregatorEndpointConfig);
-
-    // Initialization for Bridge: Root Node on ep0 and Aggregator on ep1
-    node->addEndpoint(rootNodeEndpointConfig, Span<const EmberAfDeviceType>(gRootNodeDeviceTypes));
-    node->addEndpoint(aggregatorEndpointConfig, Span<const EmberAfDeviceType>(gAggregatorDeviceTypes));
-
-    // Enable endpoints
-    node->enableAllEndpoints();
 }
 
-void MatterBridge::addBridgedEndpoint(EndpointConfig bridgedConfig, Span<const EmberAfDeviceType> bridgedDeviceType)
+chip::EndpointId MatterBridge::addBridgedEndpoint(EndpointConfig bridgedConfig, Span<const EmberAfDeviceType> bridgedDeviceType)
 {
-    node->addEndpoint(bridgedConfig, bridgedDeviceType);
+    chip::EndpointId assignedEndpoint = node->addEndpoint(bridgedConfig, bridgedDeviceType);
     node->enableAllEndpoints();
+    return assignedEndpoint;
 }
 
 void MatterBridge::removeBridgedEndpoint(chip::EndpointId endpointID)
@@ -89,24 +66,19 @@ void MatterBridgeDevice::SetReachable(bool aReachable)
 {
     bool changed = (mReachable != aReachable);
 
-    if (mReachable == aReachable)
-    {
+    if (mReachable == aReachable) {
         return;
     }
 
     mReachable = aReachable;
 
-    if (mReachable)
-    {
+    if (mReachable) {
         ChipLogProgress(DeviceLayer, "Device[%s]: ONLINE", mName);
-    } 
-    else
-    {
+    } else {
         ChipLogProgress(DeviceLayer, "Device[%s]: OFFLINE", mName);
     }
 
-    if (changed)
-    {
+    if (changed) {
         HandleDeviceChange(this, kChanged_Reachable);
     }
 }
@@ -119,8 +91,7 @@ void MatterBridgeDevice::SetName(const char *szDeviceName)
 
     memcpy(mName, szDeviceName, sizeof(mName));
 
-    if (changed)
-    {
+    if (changed) {
         HandleDeviceChange(this, kChanged_Name);
     }
 }
@@ -133,8 +104,7 @@ void MatterBridgeDevice::SetLocation(const char *szLocation)
 
     ChipLogProgress(DeviceLayer, "Device[%s]: Location=\"%s\"", mName, mLocation);
 
-    if (changed)
-    {
+    if (changed) {
         HandleDeviceChange(this, kChanged_Location);
     }
 }
@@ -160,8 +130,7 @@ void MatterBridgedDeviceOnOff::Set(bool state, int call_callback)
 
     ChipLogProgress(DeviceLayer, "Device[%s]: %s", mName, state ? "ON" : "OFF");
 
-    if ((changed) && (mChanged_CB && call_callback))
-    {
+    if ((changed) && (mChanged_CB && call_callback)) {
         mChanged_CB(this, kChanged_OnOff);
     }
 }
@@ -173,8 +142,7 @@ void MatterBridgedDeviceOnOff::SetChangeCallback(DeviceCallback_fn aChanged_CB)
 
 void MatterBridgedDeviceOnOff::HandleDeviceChange(MatterBridgeDevice *device, MatterBridgeDevice::Changed_t changeMask)
 {
-    if (mChanged_CB)
-    {
+    if (mChanged_CB) {
         mChanged_CB(this, (MatterBridgedDeviceOnOff::Changed_t) changeMask);
     }
 }

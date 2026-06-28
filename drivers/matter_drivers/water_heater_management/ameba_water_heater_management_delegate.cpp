@@ -18,6 +18,8 @@
  */
 
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
+#include <app/reporting/reporting.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <water_heater_management/ameba_water_heater_management_delegate.h>
 #include <water_heater_management/ameba_water_heater_management_manufacturer.h>

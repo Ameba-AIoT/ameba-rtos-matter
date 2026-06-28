@@ -19,6 +19,7 @@
 
 #include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <soil_measurement/ameba_soil_measurement_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -73,7 +74,7 @@ void SoilMeasurement::AmebaSoilMeasuremntShutdown(void)
     gAmebaSoilMeasurementInstance.Destroy();
 }
 
-void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
+void MatterSoilMeasurementClusterInitCallback(EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -85,7 +86,7 @@ void emberAfSoilMeasurementClusterInitCallback(EndpointId endpointId)
     }
 }
 
-void emberAfSoilMeasurementClusterShutdownCallback(EndpointId endpointId)
+void MatterSoilMeasurementClusterShutdownCallback(EndpointId endpoint, MatterClusterShutdownType)
 {
     AmebaSoilMeasuremntShutdown();
 }

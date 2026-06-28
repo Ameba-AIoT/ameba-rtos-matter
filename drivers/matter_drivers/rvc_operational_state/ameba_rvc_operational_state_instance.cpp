@@ -19,6 +19,7 @@
 
 #include <rvc_operational_state/ameba_rvc_operational_state_delegate.h>
 #include <rvc_operational_state/ameba_rvc_operational_state_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -57,7 +58,7 @@ void RvcOperationalState::AmebaRvcOperationalStateInstanceShutdown(void)
     }
 }
 
-void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -76,7 +77,7 @@ void emberAfRvcOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfRvcOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterRvcOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaRvcOperationalStateInstanceShutdown();
     AmebaRvcOperationalStateDelegateShutdown();

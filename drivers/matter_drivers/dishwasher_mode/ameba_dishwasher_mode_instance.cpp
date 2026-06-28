@@ -19,6 +19,7 @@
 
 #include <dishwasher_mode/ameba_dishwasher_mode_delegate.h>
 #include <dishwasher_mode/ameba_dishwasher_mode_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,7 +59,7 @@ void DishwasherMode::AmebaDishwasherModeInstanceShutdown(void)
     }
 }
 
-void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -77,7 +78,7 @@ void emberAfDishwasherModeClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterDishwasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaDishwasherModeInstanceShutdown();
     AmebaDishwasherModeDelegateShutdown();
