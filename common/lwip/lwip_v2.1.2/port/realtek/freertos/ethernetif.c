@@ -180,10 +180,6 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
 /*for ethernet mii interface*/
 static err_t low_level_output_mii(struct netif *netif, struct pbuf *p)
 {
-	(void) netif;
-	(void) p;
-
-#if CONFIG_ETHERNET
 	struct eth_drv_sg sg_list[MAX_ETH_DRV_SG];
 	int sg_len = 0;
 	struct pbuf *q;
@@ -191,14 +187,12 @@ static err_t low_level_output_mii(struct netif *netif, struct pbuf *p)
 		sg_list[sg_len].buf = (unsigned int) q->payload;
 		sg_list[sg_len++].len = q->len;
 	}
-
 	if (sg_len) {
 		 if(rltk_mii_send(sg_list, sg_len, p->tot_len) == 0)
 			return ERR_OK;
 		else
 			return ERR_BUF;	// return a non-fatal error
 	}
-#endif
 	return ERR_OK;
 }
 
@@ -243,7 +237,6 @@ void ethernetif_recv(struct netif *netif, int total_len)
     }
 #endif
 
-
     if ((total_len > MAX_ETH_MSG) || (total_len < 0))
         total_len = MAX_ETH_MSG;
 
@@ -278,9 +271,6 @@ void ethernetif_recv(struct netif *netif, int total_len)
 
 void ethernetif_mii_recv(struct netif *netif, int total_len)
 {
-    (void) netif;
-    (void) total_len;
-#if CONFIG_ETHERNET
     struct eth_drv_sg sg_list[MAX_ETH_DRV_SG];
     struct pbuf *p, *q;
     int sg_len = 0;
@@ -305,8 +295,6 @@ void ethernetif_mii_recv(struct netif *netif, int total_len)
     // Pass received packet to the interface
     if (ERR_OK != netif->input(p, netif))
         pbuf_free(p);
-#endif
-
 }
 /**
  * Should be called at the beginning of the program to set up the

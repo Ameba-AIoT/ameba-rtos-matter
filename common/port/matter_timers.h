@@ -1,18 +1,21 @@
-/********************************************************************************
- * @file    matter_timers.h
- * @author
- * @version
- * @brief   Timer API to support Matter protocol (e.g., Real Time Clock and System Time).
- * @ref     http://pubs.opengroup.org/onlinepubs/9699919799/functions/nanosleep.html
- ********************************************************************************
- * @attention
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- * This module is a confidential and proprietary property of RealTek and
- * possession or use of this module requires written permission of RealTek.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
- * Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
-********************************************************************************/
-
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #ifndef __RTK_MATTER_TIMER_H__
 #define __RTK_MATTER_TIMER_H__
 
@@ -21,11 +24,6 @@ extern "C" {
 #endif
 
 #include <time.h>
-
-typedef u32 TickType_t;
-int _nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
-int _vTaskDelay(const TickType_t xTicksToDelay);
-time_t _time(time_t *tloc);
 
 /*
  * @brief  Initialize Matter Real Time Clock.
@@ -73,8 +71,7 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec);
  * @brief  Initialize the system clock timer using SNTP when the Matter application starts running.
  */
 void matter_sntp_init(void);
-
-#endif
+#endif // CONFIG_ENABLE_AMEBA_SNTP
 
 #ifdef __cplusplus
 }

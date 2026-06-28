@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <stdlib.h>
 #include <stdint.h>
 
@@ -40,6 +39,9 @@
 #endif
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
 #include <matter_mdns_filter.h>
+#endif
+#if defined(CONFIG_ENABLE_AMEBA_DATA_MODEL) && (CONFIG_ENABLE_AMEBA_DATA_MODEL == 1)
+#include <matter_data_model.h>
 #endif
 #if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
 #include <app/server/TermsAndConditionsManager.h>
@@ -127,9 +129,9 @@ chip::Inet::DropIfTooManyQueuedPacketsFilter sMdnsPacketFilter(kMaxPendingMdnsPa
 #endif
 
 static matter_app_device_callback_t sDeviceCallback = NULL;
-static void * sDeviceCallbackContext = NULL;
+static void *sDeviceCallbackContext = NULL;
 
-void matter_reg_app_device_callback(matter_app_device_callback_t callback, void * context)
+void matter_reg_app_device_callback(matter_app_device_callback_t callback, void *context)
 {
     sDeviceCallback = callback;
     sDeviceCallbackContext = context;
@@ -249,6 +251,7 @@ void matter_core_init_server(intptr_t context)
     initParams.appDelegate = &sAmebaObserver;
 #endif
 
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     chip::Server::GetInstance().Init(initParams);
 
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
@@ -257,8 +260,6 @@ void matter_core_init_server(intptr_t context)
 
     VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    // TODO: Use our own DeviceInfoProvider
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     SetAttributePersistenceProvider(&gDeferredAttributePersister);
 
 #if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
@@ -273,6 +274,10 @@ void matter_core_init_server(intptr_t context)
     // We only have network commissioning on endpoint 0.
     // TODO: configure the endpoint
     emberAfEndpointEnableDisable(0xFFFE, false);
+    // Only for Dynamic Endpoint Examples. Disable the last fixed endpoint, which is a placeholder endpoint.
+#if defined(CONFIG_ENABLE_AMEBA_DATA_MODEL) && (CONFIG_ENABLE_AMEBA_DATA_MODEL == 1)
+    emberAfEndpointEnableDisable(LAST_FIXED_ENDPOINT_ID, false);
+#endif
 
     if (RTW_SUCCESS != wifi_is_connected_to_ap()) {
         matter_print_onboarding_codes();
@@ -333,7 +338,7 @@ CHIP_ERROR matter_core_init(void)
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(matter_core_device_callback_internal, reinterpret_cast<intptr_t>(NULL));
+    PlatformMgr().AddEventHandler(matter_core_device_callback_internal, reinterpret_cast<intptr_t>(nullptr));
 
     // PlatformMgr().ScheduleWork(matter_core_init_server, 0);
     PlatformMgr().ScheduleWork(matter_core_init_server, reinterpret_cast<intptr_t>(xTaskGetCurrentTaskHandle()));

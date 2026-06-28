@@ -100,7 +100,7 @@ icmp_input(struct pbuf *p, struct netif *inp)
   MIB2_STATS_INC(mib2.icmpinmsgs);
 
 /* Realtek added to suppress ICMP message */
-#if LWIP_ICMP_SUPPRESS
+#if defined(LWIP_ICMP_SUPPRESS) && LWIP_ICMP_SUPPRESS
   u32_t time_now = sys_now();
   if(icmp_suppress_time && !((time_now >= icmp_suppress_time + LWIP_ICMP_SUPPRESS_INTERVAL) || (icmp_suppress_time >= time_now + LWIP_ICMP_SUPPRESS_INTERVAL))) {
     pbuf_free(p);
@@ -367,7 +367,7 @@ icmp_send_response(struct pbuf *p, u8_t type, u8_t code)
   struct netif *netif;
 
 /* Realtek added to suppress ICMP message */
-#if LWIP_ICMP_SUPPRESS
+#if defined(LWIP_ICMP_SUPPRESS) && LWIP_ICMP_SUPPRESS
   u32_t time_now = sys_now();
   if(icmp_suppress_time && !((time_now >= icmp_suppress_time + LWIP_ICMP_SUPPRESS_INTERVAL) || (icmp_suppress_time >= time_now + LWIP_ICMP_SUPPRESS_INTERVAL))) {
     return;

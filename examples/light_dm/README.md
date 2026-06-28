@@ -26,6 +26,25 @@ In this example, the Ameba Data Model demonstrates **dynamic endpoint management
 
 This showcases how the Ameba Data Model can manage device lifecycles in real time—supporting use cases such as **modular lighting systems**, **expandable appliances**, or **multi-instance devices** within a single Matter node.
 
+### Fixed and Dynamic Endpoint
+
+|-------------|-------------------------|------------------|
+|  Allocation |         Fixed           |     Dynamic      |
+|-------------|-------------------------|------------------|
+|  EndpointID |     0     |      1      |      2,3,4,..    |
+| Device Type | Root Node | Placeholder |      Device      |
+|    Status   |  Enabled  |   Disabled  | Enabled/Disabled |
+|-------------|-------------------------|------------------|
+
+- The ZAP-CLI will generate 2 Fixed Endpoints based on the ZAP file.
+- Since there are 2 endpoints, FIXED_ENDPOINT_COUNT will be set to 2.
+- However, the last fixed endpoint is Placeholder, so LAST_FIXED_ENDPOINT_ID is 1.
+  - Placeholder for all of the supported clusters so that ZAP will generate the requisite code.
+- First dynamic endpoint will be allocated right after the last fixed endpoint, so FIRST_DYNAMIC_ENDPOINT_ID is 2.
+- Because the placeholder endpoint is going to be disabled, so ENABLED_FIXED_ENDPOINT_COUNT is 1.
+- The last enabled fixed endpoint becomes the parent of the first dynamic endpoint, which is the Root Node.
+- So, DYNAMIC_ENDPOINTS_FIRST_PARENT_ENDPOINT_ID is 0.
+
 ### 🧠 Implemented APIs
 
 The following APIs are provided to manage dynamic endpoints within the **Ameba Data Model**.  
@@ -33,7 +52,6 @@ They handle initialization, addition, activation, and removal of Matter endpoint
 
 | **API / Task** | **Purpose** | **Function / Description** |
 |----------------|-------------|-----------------------------|
-| `matter_root_node_preset()` | Root node initialization | Initializes **Endpoint 0**, which serves as the Matter **Root Node** for the device. |
 | `matter_dimmable_light_preset()` | Dimmable light setup | Creates and initializes a **Dimmable Light** endpoint at the next available endpoint ID. |
 | `enableAllEndpoints()` | Endpoint activation | Enables all dynamically added endpoints and makes them active within the Matter network. |
 | `addEndpoint()` | Add endpoint | Dynamically adds a new endpoint to the device at runtime. |

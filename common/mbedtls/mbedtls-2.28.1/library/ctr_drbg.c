@@ -603,9 +603,7 @@ int mbedtls_ctr_drbg_random( void *p_rng, unsigned char *output,
 
     device_mutex_lock(RT_DEV_LOCK_CRYPTO);
     ret = crypto_init();
-    if (ret != SUCCESS)
-    {
-        printf("crypto_init() failed\r\n");
+    if (ret != SUCCESS) {
         device_mutex_unlock(RT_DEV_LOCK_CRYPTO);
         return ret;
     }

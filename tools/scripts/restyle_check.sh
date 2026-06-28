@@ -51,7 +51,7 @@ strip_leading_comments() {
     {
         if (!started) {
 
-            # start of any block comment (/, /**, /**** etc.)
+            # start of any block comment
             if ($0 ~ /^[[:space:]]*\/\*/) {
                 in_comment=1
                 next
@@ -59,7 +59,6 @@ strip_leading_comments() {
 
             # inside comment block
             if (in_comment) {
-                # end of comment block
                 if ($0 ~ /\*\//) {
                     in_comment=0
                 }
@@ -85,8 +84,13 @@ strip_leading_comments() {
 
 # =========================
 # Get changed files
+# Exclude third-party code
 # =========================
-changed_files=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(c|cpp|h|hpp)$')
+changed_files=$(
+    git diff --name-only HEAD~1 HEAD |
+    grep -E '\.(c|cpp|h|hpp)$' |
+    grep -Ev '^(common/lwip/lwip_v2\.1\.2|common/mbedtls/)'
+)
 
 
 if [ -n "$changed_files" ]; then
@@ -122,12 +126,18 @@ if [ -n "$changed_files" ]; then
     # Run astyle
     # =========================
     if [ "$CHECK_ONLY" -eq 1 ]; then
-        astyle --style=linux --attach-namespaces -p -xg -H -U -k3 -j -xC160 -xL -T4 -z2 \
+        astyle --style=linux \
+               --attach-namespaces \
+               -p -xg -H -U -k3 -j \
+               -xC160 -xL -T4 -z2 \
                --indent=spaces=4 \
                --indent-continuation=4 \
                --dry-run $changed_files | grep -q "Formatted" && exit 1
     else
-        astyle --style=linux --attach-namespaces -p -xg -H -U -k3 -j -xC160 -xL -T4 -z2 \
+        astyle --style=linux \
+               --attach-namespaces \
+               -p -xg -H -U -k3 -j \
+               -xC160 -xL -T4 -z2 \
                --indent=spaces=4 \
                --indent-continuation=4 \
                -n -q $changed_files

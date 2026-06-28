@@ -111,6 +111,9 @@
 #include "lwip/ip6.h"
 #include "lwip/ip6_addr.h"
 #include "lwip/nd6.h"
+/* Added by Realtek start */
+#include "lwip/sys.h"
+/* Added by Realtek end */
 
 #include <string.h>
 
