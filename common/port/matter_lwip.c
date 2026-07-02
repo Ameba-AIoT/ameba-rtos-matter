@@ -31,27 +31,52 @@ void matter_lwip_dhcp(void)
     netif_set_link_up(&xnetif[0]);
     matter_wifi_set_autoreconnect(0);
 
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     LwIP_DHCP(0, DHCP_START);
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    lwip_dhcp(0, DHCP_START);
+#endif
 }
 
 void matter_lwip_releaseip(void)
 {
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     LwIP_ReleaseIP(0);
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    lwip_clear_ip(0);
+#endif
 }
 
 unsigned char *matter_LwIP_GetIP(uint8_t idx)
 {
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     return LwIP_GetIP(idx);
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    return lwip_get_ip(idx);
+#endif
 }
 
 unsigned char *matter_LwIP_GetGW(uint8_t idx)
 {
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     return LwIP_GetGW(idx);
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    return lwip_get_gw(idx);
+#endif
 }
 
 uint8_t *matter_LwIP_GetMASK(uint8_t idx)
 {
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     return LwIP_GetMASK(idx);
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    return lwip_get_mask(idx);
+#endif
 }
 
 #if LWIP_IPV6
@@ -132,7 +157,7 @@ static void matter_LwIP_IP_Address_Request_thread(void *pvParameters)
 #endif
 #elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
     while (dhcp_ret != DHCP_ADDRESS_ASSIGNED) {
-        dhcp_ret = LwIP_IP_Address_Request(NETIF_WLAN_STA_INDEX);
+        dhcp_ret = lwip_request_ip(NETIF_WLAN_STA_INDEX);
     }
 #if LWIP_IPV6
     matter_lwip_dhcp6();
