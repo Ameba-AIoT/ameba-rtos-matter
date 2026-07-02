@@ -133,7 +133,10 @@ endif()
 
 # Chip TCP Endpoint
 if(CHIP_ENABLE_TCP_ENDPOINT)
-    ameba_list_append(matter_defintions INET_CONFIG_ENABLE_TCP_ENDPOINT=1)
+    ameba_list_append(matter_defintions
+        INET_CONFIG_ENABLE_TCP_ENDPOINT=1
+        CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES=2048
+    )
 else()
     ameba_list_append(matter_defintions INET_CONFIG_ENABLE_TCP_ENDPOINT=0)
 endif()
