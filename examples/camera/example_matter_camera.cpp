@@ -34,7 +34,7 @@ static void example_matter_camera_task(void *pvParameters)
 {
     matter_wifi_wait();
 
-    ChipLogProgress(DeviceLayer, "Matter Lighting Example!");
+    ChipLogProgress(DeviceLayer, "Matter Camera Example!");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 

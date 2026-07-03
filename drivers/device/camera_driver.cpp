@@ -34,6 +34,7 @@ void MatterCamera::Init(void)
 
     instance = this;
 
+#ifdef CONFIG_USB_HOST_EN
     mUsbhConfig   = (usbh_config_t *)  pvPortMalloc(sizeof(usbh_config_t));
     mUvcConfig    = (usbh_uvc_ctx_t *) pvPortMalloc(sizeof(usbh_uvc_ctx_t));
     mUvcCallBacks = (usbh_uvc_cb_t *)  pvPortMalloc(sizeof(usbh_uvc_cb_t));
@@ -68,13 +69,31 @@ void MatterCamera::Init(void)
     if (status != RTK_SUCCESS) {
         ChipLogError(DeviceLayer, "Create thread fail");
     }
+#else
+    //TODO: If camera is not using USBH, please initial it by other means
+    rtos_mutex_create(&mDummyBufMutex);
+    UNUSED(status);
+    UNUSED(task);
+#endif
 }
 
 void MatterCamera::deInit(void)
 {
+#ifdef CONFIG_USB_HOST_EN
     vPortFree(mUsbhConfig);
     vPortFree(mUvcConfig);
     vPortFree(mUvcCallBacks);
+#else
+    if (mDummyTask != NULL) {
+        rtos_task_delete(mDummyTask);
+        mDummyTask = NULL;
+    }
+    if (mDummyBuf != nullptr) {
+        rtos_mem_free(mDummyBuf);
+        mDummyBuf = nullptr;
+    }
+    rtos_mutex_delete(mDummyBufMutex);
+#endif
 }
 
 void MatterCamera::EnableMatterVideoStream(uint16_t streamId)
@@ -82,12 +101,22 @@ void MatterCamera::EnableMatterVideoStream(uint16_t streamId)
     ChipLogProgress(DeviceLayer, "Enabling video stream for streamId(%u)", streamId);
     mCurrentVideoStreamId = streamId;
     mStreamEnabled        = true;
+#ifndef CONFIG_USB_HOST_EN
+    if (mDummyTask == NULL) {
+        int status = rtos_task_create(&mDummyTask, "DummyStreaming", StartDummyStreamingWrapper, NULL,
+                                      DUMMY_STREAMING_THREAD_STACK_SIZE, 1U);
+        if (status != RTK_SUCCESS) {
+            ChipLogError(DeviceLayer, "Create DummyStreaming thread fail");
+            mDummyTask = NULL;
+        }
+    }
+#endif
 }
 
 void MatterCamera::DisableMatterVideoStream(void)
 {
     ChipLogProgress(DeviceLayer, "Disabling video stream for streamId(%u)", mCurrentVideoStreamId);
-    mCurrentVideoStreamId = USBH_UVC_MATTER_INVALID_ID;
+    mCurrentVideoStreamId = MATTER_INVALID_SESSION_ID;
     mStreamEnabled        = false;
 }
 
@@ -101,7 +130,7 @@ void MatterCamera::RegisterWebRtcTransport(WebRTCProviderManager *mWebRTCProvide
 void MatterCamera::DeregisterWebRtcTransport(void)
 {
     ChipLogProgress(DeviceLayer, "Deregistering WebRTC transport for sessionId(%u)", mCurrentSessionId);
-    mCurrentSessionId = USBH_UVC_MATTER_INVALID_ID;
+    mCurrentSessionId = MATTER_INVALID_SESSION_ID;
     mWebrtcTransport  = nullptr;
 }
 
@@ -112,6 +141,7 @@ MatterCamera *MatterCamera::GetInstance(void)
 
 // Private
 
+#ifdef CONFIG_USB_HOST_EN
 void MatterCamera::UsbhUvcMainThread(void *param)
 {
     ChipLogProgress(DeviceLayer, "USBH UVC task start");
@@ -378,7 +408,7 @@ void MatterCamera::UvcMatterThread(void *param)
             ChipLogError(DeviceLayer, "Error, WebRTC transport is null!");
         } else {
             if(mWebrtcTransport->CanSendVideo() == true){
-                mWebrtcTransport->SendVideo(videoData, rtos_time_get_current_system_time_ms_64bit(), mCurrentVideoStreamId);
+                mWebrtcTransport->SendVideo(videoData, (int64_t)(rtos_time_get_current_system_time_ms_64bit() * 90ULL), mCurrentVideoStreamId);
                 ChipLogProgress(DeviceLayer, "Video sent");
             } else {
                 ChipLogError(DeviceLayer, "WebRTC Transport is not ready to send Video");
@@ -396,7 +426,7 @@ void MatterCamera::UvcMatterThread(void *param)
                 ChipLogError(DeviceLayer, "Error, WebRTC transport is null!");
             } else {
                 if(mWebrtcTransport->CanSendVideo() == true){
-                    mWebrtcTransport->SendVideo(videoData, rtos_time_get_current_system_time_ms_64bit(), mCurrentVideoStreamId);
+                    mWebrtcTransport->SendVideo(videoData, (int64_t)(rtos_time_get_current_system_time_ms_64bit() * 90ULL), mCurrentVideoStreamId);
                     ChipLogProgress(DeviceLayer, "Video sent");
                 } else {
                     ChipLogError(DeviceLayer, "WebRTC Transport is not ready to send Video");
@@ -596,3 +626,230 @@ int MatterCamera::UvcSetparamWrapper()
 {
     return instance->UvcSetparam();
 }
+#else
+
+namespace {
+
+/*
+ * Minimal MSB-first bitstream writer used to assemble the dummy H.264 frame.
+ * It supports the few Exp-Golomb / fixed-length syntax elements needed to
+ * build an SPS, PPS and a single I-slice. Writes are clamped to the buffer
+ * capacity so a miscalculation can never overflow mDummyBuf.
+ */
+class BitWriter
+{
+public:
+    BitWriter(uint8_t *buf, size_t cap) : mBuf(buf), mCap(cap) {}
+
+    void PutBit(uint32_t bit)
+    {
+        mCurrent = (uint8_t)((mCurrent << 1) | (bit & 1U));
+        if (++mBitsInByte == 8) {
+            Flush();
+        }
+    }
+
+    void PutBits(uint32_t value, int numBits)
+    {
+        for (int i = numBits - 1; i >= 0; i--) {
+            PutBit((value >> i) & 1U);
+        }
+    }
+
+    /* ue(v): unsigned Exp-Golomb */
+    void PutUE(uint32_t codeNum)
+    {
+        uint32_t v = codeNum + 1;
+        int leadingZeros = 0;
+        for (uint32_t t = v >> 1; t != 0; t >>= 1) {
+            leadingZeros++;
+        }
+        for (int i = 0; i < leadingZeros; i++) {
+            PutBit(0);
+        }
+        PutBits(v, leadingZeros + 1);
+    }
+
+    /* se(v): signed Exp-Golomb */
+    void PutSE(int32_t value)
+    {
+        uint32_t codeNum = (value <= 0) ? (uint32_t)(-2 * value) : (uint32_t)(2 * value - 1);
+        PutUE(codeNum);
+    }
+
+    /* rbsp_trailing_bits(): stop-one bit followed by zero padding to byte align */
+    void Trailing()
+    {
+        PutBit(1);
+        while (mBitsInByte != 0) {
+            PutBit(0);
+        }
+    }
+
+    size_t Bytes() const { return mLen; }
+
+private:
+    void Flush()
+    {
+        if (mLen < mCap) {
+            mBuf[mLen] = mCurrent;
+        }
+        mLen++;
+        mCurrent    = 0;
+        mBitsInByte = 0;
+    }
+
+    uint8_t *mBuf;
+    size_t   mCap;
+    size_t   mLen        = 0;
+    uint8_t  mCurrent    = 0;
+    int      mBitsInByte = 0;
+};
+
+} // namespace
+
+/*
+ * Build a single, fully decodable H.264 Annex-B keyframe (SPS + PPS + IDR
+ * I-slice) for a 1280x720 picture and store it in mDummyBuf.
+ *
+ * Every macroblock is encoded as I_16x16 with DC prediction and no residual
+ * coefficients, so the frame decodes to a flat gray image (luma/chroma = 128).
+ * This is intentionally a placeholder ("dummy") frame whose only purpose is to
+ * feed valid, decodable data into mWebrtcTransport->SendVideo() for testing.
+ *
+ * 1280x720 => 80 x 45 macroblocks = 3600 macroblocks. With the chosen syntax
+ * each macroblock costs exactly 8 bits, so the whole stream is ~3.6 KB.
+ */
+void MatterCamera::GenerateDummyH264Frame(void)
+{
+    const int kMbWidth  = 1280 / 16;            // 80
+    const int kMbHeight = 720 / 16;             // 45
+    const int kNumMbs   = kMbWidth * kMbHeight; // 3600
+
+    BitWriter bw(mDummyBuf, DUMMY_H264_BUF_SIZE);
+
+    /* ---- Sequence Parameter Set (nal_ref_idc=3, nal_unit_type=7) ---- */
+    bw.PutBits(0x00000001, 32);   // Annex-B start code
+    bw.PutBits(0x67, 8);          // NAL unit header
+    bw.PutBits(66, 8);            // profile_idc = Baseline
+    bw.PutBits(0, 8);             // constraint_set flags + reserved_zero_2bits
+    bw.PutBits(31, 8);            // level_idc = 3.1 (supports 1280x720@30)
+    bw.PutUE(0);                  // seq_parameter_set_id
+    bw.PutUE(0);                  // log2_max_frame_num_minus4
+    bw.PutUE(0);                  // pic_order_cnt_type
+    bw.PutUE(0);                  // log2_max_pic_order_cnt_lsb_minus4
+    bw.PutUE(1);                  // max_num_ref_frames
+    bw.PutBits(0, 1);             // gaps_in_frame_num_value_allowed_flag
+    bw.PutUE(kMbWidth - 1);       // pic_width_in_mbs_minus1
+    bw.PutUE(kMbHeight - 1);      // pic_height_in_map_units_minus1
+    bw.PutBits(1, 1);             // frame_mbs_only_flag
+    bw.PutBits(1, 1);             // direct_8x8_inference_flag
+    bw.PutBits(0, 1);             // frame_cropping_flag
+    bw.PutBits(0, 1);             // vui_parameters_present_flag
+    bw.Trailing();
+
+    /* ---- Picture Parameter Set (nal_ref_idc=3, nal_unit_type=8) ---- */
+    bw.PutBits(0x00000001, 32);
+    bw.PutBits(0x68, 8);
+    bw.PutUE(0);                  // pic_parameter_set_id
+    bw.PutUE(0);                  // seq_parameter_set_id
+    bw.PutBits(0, 1);             // entropy_coding_mode_flag (0 = CAVLC)
+    bw.PutBits(0, 1);             // bottom_field_pic_order_in_frame_present_flag
+    bw.PutUE(0);                  // num_slice_groups_minus1
+    bw.PutUE(0);                  // num_ref_idx_l0_default_active_minus1
+    bw.PutUE(0);                  // num_ref_idx_l1_default_active_minus1
+    bw.PutBits(0, 1);             // weighted_pred_flag
+    bw.PutBits(0, 2);             // weighted_bipred_idc
+    bw.PutSE(0);                  // pic_init_qp_minus26 (QP = 26)
+    bw.PutSE(0);                  // pic_init_qs_minus26
+    bw.PutSE(0);                  // chroma_qp_index_offset
+    bw.PutBits(0, 1);             // deblocking_filter_control_present_flag
+    bw.PutBits(0, 1);             // constrained_intra_pred_flag
+    bw.PutBits(0, 1);             // redundant_pic_cnt_present_flag
+    bw.Trailing();
+
+    /* ---- IDR slice (nal_ref_idc=3, nal_unit_type=5) ---- */
+    bw.PutBits(0x00000001, 32);
+    bw.PutBits(0x65, 8);
+    /* slice_header() */
+    bw.PutUE(0);                  // first_mb_in_slice
+    bw.PutUE(7);                  // slice_type = 7 (I, all slices in pic are I)
+    bw.PutUE(0);                  // pic_parameter_set_id
+    bw.PutBits(0, 4);             // frame_num (log2_max_frame_num = 4 bits)
+    bw.PutUE(0);                  // idr_pic_id
+    bw.PutBits(0, 4);             // pic_order_cnt_lsb (4 bits)
+    bw.PutBits(0, 1);             // no_output_of_prior_pics_flag
+    bw.PutBits(0, 1);             // long_term_reference_flag
+    bw.PutSE(0);                  // slice_qp_delta
+
+    /* slice_data(): every macroblock is I_16x16, DC pred, no residual */
+    for (int i = 0; i < kNumMbs; i++) {
+        bw.PutUE(3);              // mb_type = 3 => I_16x16, DC pred, CBP luma/chroma = 0
+        bw.PutUE(0);              // intra_chroma_pred_mode = DC
+        bw.PutSE(0);              // mb_qp_delta = 0
+        bw.PutBits(1, 1);         // luma DC coeff_token (TotalCoeff=0, TrailingOnes=0, nC<2)
+    }
+    bw.Trailing();
+
+    mDummyBufSize = (int) bw.Bytes();
+    ChipLogProgress(DeviceLayer, "Generated dummy H.264 1280x720 keyframe: %d bytes", mDummyBufSize);
+}
+
+void MatterCamera::StartDummyStreaming(void *param)
+{
+    if (mDummyBuf == nullptr) {
+
+        mDummyBuf = (uint8_t*) rtos_mem_zmalloc(DUMMY_H264_BUF_SIZE);
+        if (mDummyBuf == nullptr) {
+            ChipLogError(DeviceLayer, "Failed to allocate dummy H.264 buffer (%d bytes)", DUMMY_H264_BUF_SIZE);
+            mDummyTask = NULL;
+            rtos_task_delete(NULL);
+            return;
+        }
+        GenerateDummyH264Frame();
+    }
+
+    DummyStreaming(param);
+    rtos_task_delete(NULL);
+}
+
+void MatterCamera::StartDummyStreamingWrapper(void *param)
+{
+    instance->StartDummyStreaming(param);
+}
+
+void MatterCamera::DummyStreaming(void *param)
+{
+    UNUSED(param);
+
+    while (1) {
+        while ((mStreamEnabled == false) || (mWebrtcTransport == nullptr)) {
+            ChipLogProgress(DeviceLayer, "Waiting for liveview start request from controller...");
+            rtos_time_delay_ms(1000);
+        }
+
+        ChipLogProgress(DeviceLayer, "Start Matter Dummy Streaming");
+        rtos_time_delay_ms(2000);
+
+        while (mStreamEnabled == true) {
+            rtos_mutex_take(mDummyBufMutex, RTOS_MAX_TIMEOUT);
+            chip::ByteSpan videoData(mDummyBuf, static_cast<size_t>(mDummyBufSize));
+            rtos_mutex_give(mDummyBufMutex);
+
+            if (mWebrtcTransport == nullptr) {
+                ChipLogError(DeviceLayer, "Error, WebRTC transport is null!");
+            } else {
+                if(mWebrtcTransport->CanSendVideo() == true){
+                    mWebrtcTransport->SendVideo(videoData, (int64_t)(rtos_time_get_current_system_time_ms_64bit() * 90ULL), mCurrentVideoStreamId);
+                    ChipLogProgress(DeviceLayer, "Video sent");
+                } else {
+                    ChipLogError(DeviceLayer, "WebRTC Transport is not ready to send Video");
+                }
+            }
+
+            rtos_time_delay_ms(1000);
+        }
+    }
+}
+
+#endif

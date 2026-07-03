@@ -26,13 +26,16 @@
 #include <webrtc/ameba_webrtc_provider_manager.h>
 
 extern "C" {
+#ifdef CONFIG_USB_HOST_EN
 #include <usbh_uvc_intf.h>
 #include <usbh.h>
+#endif
 #include <lwipconf.h>
 #include <lwip_netconf.h>
 #include <ringbuffer.h>
 }
 
+#ifdef CONFIG_USB_HOST_EN
 /* Private defines -----------------------------------------------------------*/
 /* Supported formats: USBH_UVC_FORMAT_MJPEG, USBH_UVC_FORMAT_YUV, USBH_UVC_FORMAT_H264
  * Note: Users must verify which formats their specific camera supports and
@@ -118,7 +121,20 @@ extern "C" {
 #define USBH_UVC_MATTER_WRITE_SIZE        (4 * 1024)
 #define USBH_UVC_MATTER_VIDEO_SIZE        (2 * 1024 * 1024)
 #define USBH_UVC_MATTER_TAG               "MATTER"
-#define USBH_UVC_MATTER_INVALID_ID        0xFFFF
+#endif
+
+#define MATTER_INVALID_SESSION_ID        0xFFFF
+
+/* Buffer size for the generated dummy H.264 1280x720 keyframe.
+ * The frame is ~3.6 KB (SPS + PPS + one 80x45-macroblock I-slice). Keep this
+ * tight: the buffer is allocated permanently in Init(), and oversizing it
+ * starves the heap that WebRTC/CASE negotiation needs (malloc fails otherwise). */
+#define DUMMY_H264_BUF_SIZE              (5 * 1024)
+
+/* Stack size (bytes) for the dummy streaming task. It performs the same deep
+ * WebRTC SendVideo() calls (plus CHIP logging) as the USB UVC Matter thread, so
+ * it needs a comparably large stack. 1 KB overflows on the first log call. */
+#define DUMMY_STREAMING_THREAD_STACK_SIZE (5 * 1024)
 
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 
@@ -135,6 +151,7 @@ public:
     static MatterCamera *GetInstance(void);
 
 private:
+#ifdef CONFIG_USB_HOST_EN
     /* USBH UVC */
     void UsbhUvcMainThread(void *param);
 #if CONFIG_USBH_UVC_HOT_PLUG
@@ -167,8 +184,6 @@ private:
     static int UvcSetupWrapper(void);
     static int UvcSetparamWrapper(void);
 
-    static MatterCamera *instance;
-
     rtos_sema_t mUvcAttachSema;
     rtos_sema_t mUvcDetachSema;
     rtos_sema_t mUvcStartSema;
@@ -185,15 +200,28 @@ private:
     int mUvcMatterIsInit = 0;
     int mUvcBufSize = 0;
     RingBuffer *mUvcRb;
-    bool mStreamEnabled = false;
-    uint16_t mCurrentSessionId        = USBH_UVC_MATTER_INVALID_ID;
-    uint16_t mCurrentVideoStreamId    = USBH_UVC_MATTER_INVALID_ID;
-    WebrtcTransport *mWebrtcTransport = nullptr;
 
     u8 *mUvcBuf = nullptr;
 
     usbh_config_t  *mUsbhConfig   = NULL;
     usbh_uvc_ctx_t *mUvcConfig    = NULL;
     usbh_uvc_cb_t  *mUvcCallBacks = NULL;
+#else
+    void StartDummyStreaming(void *param);
+    static void StartDummyStreamingWrapper(void *param);
+    void DummyStreaming(void *param);
+    void GenerateDummyH264Frame(void);
+
+    rtos_mutex_t mDummyBufMutex = NULL;
+    rtos_task_t mDummyTask = NULL;
+    int mDummyBufSize = 0;
+    u8 *mDummyBuf = nullptr;
+#endif
+    static MatterCamera *instance;
+
+    bool mStreamEnabled = false;
+    uint16_t mCurrentSessionId        = MATTER_INVALID_SESSION_ID;
+    uint16_t mCurrentVideoStreamId    = MATTER_INVALID_SESSION_ID;
+    WebrtcTransport *mWebrtcTransport = nullptr;
 
 };
