@@ -19,7 +19,12 @@ include $(MATTER_INCLUDE_HDR)
 # Variable Declaration
 # -------------------------------------------------------------------
 DEVICE_TYPE  := light_dm
-OUTPUT_DIR   := $(CHIPDIR)/examples/lighting-app/ameba/build/chip
+OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/light_dm/build/chip
+
+# -------------------------------------------------------------------
+# Compilation flag
+# -------------------------------------------------------------------
+CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
 
 # -------------------------------------------------------------------
 # Build Declaration and Source

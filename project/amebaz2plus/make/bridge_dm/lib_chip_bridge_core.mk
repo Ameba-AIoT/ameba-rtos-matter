@@ -22,6 +22,11 @@ DEVICE_TYPE  := bridge_dm
 OUTPUT_DIR   := $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/build/chip
 
 # -------------------------------------------------------------------
+# Compilation flag
+# -------------------------------------------------------------------
+CFLAGS += -DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=20
+
+# -------------------------------------------------------------------
 # Build Declaration and Source
 # -------------------------------------------------------------------
 include $(MATTER_CORE_SRC)

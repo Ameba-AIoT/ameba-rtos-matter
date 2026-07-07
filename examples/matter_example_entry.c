@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_opts.h>
 
 #if defined(CONFIG_EXAMPLE_MATTER) && (CONFIG_EXAMPLE_MATTER == 1)
+
+#include <ameba_matter_version.h>
+#include <string.h>
 
 #if defined(CONFIG_PLATFORM_8721D)
 #include <atcmd_matter.h>
@@ -49,10 +51,13 @@
 #include <temperature_sensor/example_matter_temperature_sensor.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_THERMOSTAT) && (CONFIG_EXAMPLE_MATTER_THERMOSTAT == 1)
 #include <thermostat/example_matter_thermostat.h>
+#elif defined(CONFIG_EXAMPLE_MATTER_DYNAMIC_ENDPOINT) && (CONFIG_EXAMPLE_MATTER_DYNAMIC_ENDPOINT == 1)
+#include <dynamic_endpoint_dm/example_matter_dynamic_endpoint_dm.h>
 #endif
 
 #if defined(CONFIG_PLATFORM_8710C)
-#include "FreeRTOS.h"
+#include <FreeRTOS.h>
+#include <mbedtls/platform.h>
 static void *matter_mbedtls_calloc_func(size_t nelements, size_t elementSize)
 {
     size_t size;
@@ -75,6 +80,7 @@ static void *matter_mbedtls_calloc_func(size_t nelements, size_t elementSize)
  */
 void matter_example_entry(void)
 {
+    app_print_matter_version();
 #if defined(CONFIG_PLATFORM_8721D)
     matter_shell_init();
 #endif /* CONFIG_PLATFORM_8721D */
@@ -107,6 +113,8 @@ void matter_example_entry(void)
     example_matter_temperature_sensor();
 #elif defined(CONFIG_EXAMPLE_MATTER_THERMOSTAT) && (CONFIG_EXAMPLE_MATTER_THERMOSTAT == 1)
     example_matter_thermostat();
+#elif defined(CONFIG_EXAMPLE_MATTER_DYNAMIC_ENDPOINT) && (CONFIG_EXAMPLE_MATTER_DYNAMIC_ENDPOINT == 1)
+    example_matter_dynamic_endpoint();
 #endif
 }
 

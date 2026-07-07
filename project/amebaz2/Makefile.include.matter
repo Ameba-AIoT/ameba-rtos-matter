@@ -47,7 +47,7 @@ include $(MATTER_INCLUDE_TOOLCHAIN)
 
 FREERTOS_VERSION   = freertos_v10.0.1
 LWIP_VERSION       = lwip_v2.1.2
-MBEDTLS_VERSION    = mbedtls-2.28.1
+MBEDTLS_VERSION    = mbedtls-3.6.6
 
 # -------------------------------------------------------------------
 # Compiler Flags
@@ -71,11 +71,11 @@ CFLAGS += -Wno-unused-label
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-unused-result
 
-# compiler warnings
+# chip device options
 CFLAGS += -DCHIP_DEVICE_LAYER_TARGET=Ameba
 CFLAGS += -DCHIP_DEVICE_LAYER_NONE=0
 
-# chip device configuration
+# chip system configurations
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=0
 CFLAGS += -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS=0

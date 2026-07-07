@@ -37,7 +37,6 @@ clean: CLEAN_OBJS
 	@make -C all_clusters_app clean
 	@make -C air_purifier_app clean
 	@make -C bridge_app clean
-	@make -C bridge_app_dm clean
 	@make -C dishwasher_app clean
 	@make -C fan_app clean
 	@make -C generic_switch_app clean
@@ -49,5 +48,8 @@ clean: CLEAN_OBJS
 	@make -C room_air_conditioner_app clean
 	@make -C temperature_sensor_app clean
 	@make -C thermostat_app clean
+	@make -C bridge_app_dm clean
+	@make -C lighting_app_dm clean
+	@make -C dynamic_endpoint_app_dm clean
 
 -include $(DEPS)

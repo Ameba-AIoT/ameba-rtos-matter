@@ -1,3 +1,21 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <refrigerator_driver.h>
@@ -43,17 +61,14 @@ void matter_driver_gpio_level_irq_handler(uint32_t id, gpio_irq_event event)
 {
     uint32_t *level = (uint32_t *) id;
 
-    if (*level == IRQ_LOW) // Door closed
-    {
+    if (*level == IRQ_LOW) { // Door closed
         refrigerator.SetDoorStatus((uint8_t) 0);
         matter_driver_set_door_callback((uint32_t) 0);
 
         // Change to listen to high level event
         *level = IRQ_HIGH;
         gpio_irq_set(&gpio_level, (gpio_irq_event)IRQ_HIGH, 1);
-    }
-    else if (*level == IRQ_HIGH)  // Door opened
-    {
+    } else if (*level == IRQ_HIGH) { // Door opened
         refrigerator.SetDoorStatus((uint8_t) 1);
         matter_driver_set_door_callback((uint32_t) 1);
 
@@ -79,32 +94,30 @@ CHIP_ERROR matter_driver_refrigerator_set_startup_value(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status;
     Clusters::ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
-    Clusters::ModeBase::Instance & refrigeratorObject = *GetAmebaRefrigeratorModeInstance();
-    RefrigeratorAlarmServer & refrigeratorAlarmObject = RefrigeratorAlarmServer::Instance();
+    Clusters::ModeBase::Instance &refrigeratorObject = *GetAmebaRefrigeratorModeInstance();
+    RefrigeratorAlarmServer &refrigeratorAlarmObject = RefrigeratorAlarmServer::Instance();
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    modeChangedResponse.status = to_underlying(refrigeratorObject.UpdateCurrentMode(to_underlying(ModeTag::kRapidCool))); // Set refrigerator mode
-    if (modeChangedResponse.status != to_underlying(Clusters::ModeBase::StatusCode::kSuccess))
-    {
+    uint8_t mode = static_cast<uint8_t>(to_underlying(ModeTag::kRapidCool));
+    modeChangedResponse.status = to_underlying(refrigeratorObject.UpdateCurrentMode(mode)); // Set refrigerator mode
+    if (modeChangedResponse.status != to_underlying(Clusters::ModeBase::StatusCode::kSuccess)) {
         ChipLogProgress(DeviceLayer, "Failed to set Refrigerator Mode!\n");
         err = CHIP_ERROR_INTERNAL;
     }
 
     BitMask<AlarmMap> supported; // Set refrigerator alarm supported value
     supported.SetField(AlarmMap::kDoorOpen, 1);
-    refrigeratorAlarmObject.SetSupportedValue(1, supported);
-    if (status != Status::Success)
-    {
+    status = refrigeratorAlarmObject.SetSupportedValue(1, supported);
+    if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set Refrigerator Alarm Supported Value!\n");
         err = CHIP_ERROR_INTERNAL;
     }
 
     BitMask<AlarmMap> mask; // Set refrigerator alarm mask value
     mask.SetField(AlarmMap::kDoorOpen, 1);
-    refrigeratorAlarmObject.SetMaskValue(1, mask);
-    if (status != Status::Success)
-    {
+    status = refrigeratorAlarmObject.SetMaskValue(1, mask);
+    if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set Refrigerator Alarm Mask Value!\n");
         err = CHIP_ERROR_INTERNAL;
     }
@@ -144,8 +157,7 @@ void matter_driver_on_identify_stop(Identify *identify)
 
 void matter_driver_on_trigger_effect(Identify *identify)
 {
-    switch (identify->mCurrentEffectIdentifier)
-    {
+    switch (identify->mCurrentEffectIdentifier) {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
@@ -172,26 +184,23 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId)
-    {
-    case Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id:
-        {
-            ChipLogProgress(DeviceLayer, "RefrigeratorAndTemperatureControlledCabinetMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-            if (path.mAttributeId == Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CurrentMode::Id)
-            {
-                refrigerator.SetMode(aEvent->value._u16);
-            }
+    switch (path.mClusterId) {
+    case Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Id: {
+        ChipLogProgress(DeviceLayer, "RefrigeratorAndTemperatureControlledCabinetMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId,
+                        path.mClusterId, path.mAttributeId);
+        if (path.mAttributeId == Clusters::RefrigeratorAndTemperatureControlledCabinetMode::Attributes::CurrentMode::Id) {
+            refrigerator.SetMode(aEvent->value._u16);
         }
-        break;
-    case Clusters::RefrigeratorAlarm::Id:
-        {
-            ChipLogProgress(DeviceLayer, "RefrigeratorAlarm(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-            if (path.mAttributeId == Clusters::RefrigeratorAlarm::Attributes::State::Id)
-            {
-                refrigerator.SetAlarm();
-            }
+    }
+    break;
+    case Clusters::RefrigeratorAlarm::Id: {
+        ChipLogProgress(DeviceLayer, "RefrigeratorAlarm(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
+                        path.mAttributeId);
+        if (path.mAttributeId == Clusters::RefrigeratorAlarm::Attributes::State::Id) {
+            refrigerator.SetAlarm();
         }
-        break;
+    }
+    break;
     default:
         break;
     }
@@ -204,34 +213,29 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     Clusters::ModeBase::Commands::ChangeToModeResponse::Type modeChangedResponse;
     Status alarmChangedStatus;
-    Clusters::ModeBase::Instance & refrigeratorObject = *GetAmebaRefrigeratorModeInstance();
-    RefrigeratorAlarmServer & refrigeratorAlarmObject = RefrigeratorAlarmServer::Instance();
+    Clusters::ModeBase::Instance &refrigeratorObject = *GetAmebaRefrigeratorModeInstance();
+    RefrigeratorAlarmServer &refrigeratorAlarmObject = RefrigeratorAlarmServer::Instance();
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type)
-    {
-    case AppEvent::kEventType_Downlink_Refrigerator_Mode:
-        {
-            modeChangedResponse.status = to_underlying(refrigeratorObject.UpdateCurrentMode(event->value._u16));
-            if (modeChangedResponse.status != to_underlying(Clusters::ModeBase::StatusCode::kSuccess))
-            {
-                ChipLogProgress(DeviceLayer, "Failed to set refrigerator mode!\n");
-            }
+    switch (event->Type) {
+    case AppEvent::kEventType_Downlink_Refrigerator_Mode: {
+        modeChangedResponse.status = to_underlying(refrigeratorObject.UpdateCurrentMode(event->value._u16));
+        if (modeChangedResponse.status != to_underlying(Clusters::ModeBase::StatusCode::kSuccess)) {
+            ChipLogProgress(DeviceLayer, "Failed to set refrigerator mode!\n");
         }
-        break;
-    case AppEvent::kEventType_Downlink_Refrigerator_Alarm_State:
-        {
-            BitMask<AlarmMap> value;
-            value.SetField(AlarmMap::kDoorOpen, event->value._u8);
-            ChipLogProgress(DeviceLayer, "Set Refrigerator Alarm State Value 0x%x\n", event->value._u8);
-            alarmChangedStatus = refrigeratorAlarmObject.SetStateValue(1, value);
-            if (alarmChangedStatus != Status::Success)
-            {
-                ChipLogProgress(DeviceLayer, "Failed to set door status!\n");
-            }
+    }
+    break;
+    case AppEvent::kEventType_Downlink_Refrigerator_Alarm_State: {
+        BitMask<AlarmMap> value;
+        value.SetField(AlarmMap::kDoorOpen, event->value._u8);
+        ChipLogProgress(DeviceLayer, "Set Refrigerator Alarm State Value 0x%x\n", event->value._u8);
+        alarmChangedStatus = refrigeratorAlarmObject.SetStateValue(1, value);
+        if (alarmChangedStatus != Status::Success) {
+            ChipLogProgress(DeviceLayer, "Failed to set door status!\n");
         }
-        break;
+    }
+    break;
     default:
         break;
     }
