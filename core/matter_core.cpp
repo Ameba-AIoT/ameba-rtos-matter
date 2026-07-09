@@ -134,7 +134,7 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
     switch (event->Type)
     {
     case DeviceEventType::kInternetConnectivityChange:
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR) && (CONFIG_ENABLE_AMEBA_CRYPTO == 1)
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR) && (CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR == 1)
         static bool isOTAInitialized = false; // use this static variable to replace CheckInit()
 #endif
         if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
@@ -151,7 +151,7 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
             ChipLogProgress(DeviceLayer, "IPv6 Server ready...");
             chip::app::DnssdServer::Instance().StartServer();
 
-#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR) && (CONFIG_ENABLE_AMEBA_CRYPTO == 1)
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR) && (CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR == 1)
             // Init OTA requestor only when we have gotten IPv6 address
             if (!isOTAInitialized)
             {

@@ -49,6 +49,16 @@ void matter_lwip_releaseip(void)
 #endif
 }
 
+void matter_lwip_netif_set_link_up(uint8_t idx)
+{
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+    LwIP_netif_set_link_up(idx);
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    lwip_netif_set_link_up(idx);
+#endif
+}
+
 unsigned char *matter_LwIP_GetIP(uint8_t idx)
 {
 #if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
@@ -76,6 +86,16 @@ uint8_t *matter_LwIP_GetMASK(uint8_t idx)
     return LwIP_GetMASK(idx);
 #elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
     return lwip_get_mask(idx);
+#endif
+}
+
+uint8_t matter_lwip_request_ip(uint8_t idx)
+{
+#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
+    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+    return LwIP_DHCP(idx, DHCP_START);
+#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    return lwip_request_ip(idx);
 #endif
 }
 

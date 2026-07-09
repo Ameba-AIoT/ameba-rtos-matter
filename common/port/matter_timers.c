@@ -43,6 +43,8 @@
 
 #define US_OVERFLOW_MAX            (0xFFFFFFFFUL * 1000000 / configTICK_RATE_HZ)
 
+#define SNTP_SERVER_ADDRESS "pool.ntp.org"
+
 static uint64_t current_us = 0;
 static uint32_t tick_count = 0;
 static bool matter_sntp_rtc_sync = FALSE;
@@ -136,6 +138,10 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 void matter_sntp_init(void)
 {
     sntp_stop();
+// ameba-rtos v1.0 and v1.1 set the SNTP server at component/network/sntp/sntp.c
+#if defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+    sntp_setservername(0, SNTP_SERVER_ADDRESS);
+#endif
     sntp_init();
 }
 #endif

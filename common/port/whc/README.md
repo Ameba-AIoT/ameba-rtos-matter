@@ -36,6 +36,10 @@ CONFIG WHC INTF
         [*] Support WHC SUPPLICANT OFFLOAD
         [*] Support WHC DEV TCPIP KEEPALIVE
         [ ] Support Download to SRAM Only
+
+    Boot Source
+        (X) Boot From Flash
+        ( ) Boot From HCI
 ```
 
 ### Enable Bluetooth

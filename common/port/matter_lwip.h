@@ -53,6 +53,12 @@ void matter_lwip_dhcp(void);
 void matter_lwip_releaseip(void);
 
 /**
+ * @brief   Set the netif link up.
+ * @param   idx Index of the network interface.
+ */
+void matter_lwip_netif_set_link_up(uint8_t idx);
+
+/**
  * @brief   Get the IPv4 address.
  * @param   idx Index of the network interface.
  * @return  Pointer to the IPv4 address.
@@ -72,6 +78,13 @@ unsigned char *matter_LwIP_GetGW(uint8_t idx);
  * @return  Pointer to the IPv4 Subnet Mask.
  */
 uint8_t *matter_LwIP_GetMASK(uint8_t idx);
+
+/**
+ * @brief   Request IP using DHCP service.
+ * @param   idx Index of the network interface.
+ * @return  DHCP return code, DHCP_ADDRESS_ASSIGNED if success.
+ */
+uint8_t matter_lwip_request_ip(uint8_t idx);
 
 #if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
@@ -100,7 +113,6 @@ uint8_t *matter_LwIP_GetIPv6_global(uint8_t idx);
 /**
   * @brief  Create a thread for sta to get ipv4(dhcp) and ipv6 address
   */
-
 void matter_LwIP_IP_Address_Request(void);
 
 #ifdef __cplusplus
