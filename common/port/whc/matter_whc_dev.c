@@ -19,6 +19,7 @@
 
 #include <whc_dev.h>
 #include <matter_whc_dev.h>
+#include <matter_lwip.h>
 #include "whc_dev_app.h"
 #include "lwip/sys.h"
 #include "lwip_netconf.h"
@@ -294,9 +295,9 @@ void whc_dev_pkt_rx_to_user_task(void)
                     whc_dev_cmd_scan();
 #ifdef CONFIG_LWIP_LAYER
                 } else if (*ptr == WHC_WIFI_TEST_DHCP) {
-                    LwIP_netif_set_link_up(NETIF_WLAN_STA_INDEX);
+                    matter_lwip_netif_set_link_up(NETIF_WLAN_STA_INDEX);
                     /* Start DHCPClient */
-                    LwIP_IP_Address_Request(STA_WLAN_INDEX);
+                    matter_lwip_request_ip(STA_WLAN_INDEX);
 #endif
                 } else if (*ptr == WHC_WIFI_TEST_CONNECT) {
                     memset(&wifi, 0, sizeof(struct rtw_network_info));
@@ -321,7 +322,7 @@ void whc_dev_pkt_rx_to_user_task(void)
 #ifdef CONFIG_LWIP_LAYER
                     if (ret == RTK_SUCCESS) {
                         /* Start DHCPClient */
-                        LwIP_IP_Address_Request(NETIF_WLAN_STA_INDEX);
+                        matter_lwip_request_ip(NETIF_WLAN_STA_INDEX);
                     } else {
                         RTK_LOGE(TAG_WLAN_INIC, "connect fail !\n");
                     }
@@ -333,7 +334,7 @@ void whc_dev_pkt_rx_to_user_task(void)
                     if (!wifi_is_running(idx)) {
                         RTK_LOGE(TAG_WLAN_INIC, "%s, port %d is not running!\n", __func__, idx);
                     } else {
-                        ip = LwIP_GetIP(idx);
+                        ip = matter_LwIP_GetIP(idx);
                         ptr = buf;
                         *(u32 *)ptr = WHC_WIFI_TEST;
                         ptr += 4;
@@ -341,7 +342,7 @@ void whc_dev_pkt_rx_to_user_task(void)
                         ptr += 1;
                         memcpy(ptr, ip, 4);
                         ptr += 4;
-                        ip = LwIP_GetGW(idx);
+                        ip = matter_LwIP_GetGW(idx);
                         memcpy(ptr, ip, 4);
                         ptr += 4;
                         whc_dev_api_send_to_host(buf, WHC_WIFI_TEST_BUF_SIZE);
