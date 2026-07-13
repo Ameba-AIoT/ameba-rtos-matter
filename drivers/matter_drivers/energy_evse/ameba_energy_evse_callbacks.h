@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,8 +16,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
+
+#include <clusters/EnergyEvse/Enums.h>
 
 namespace chip {
 namespace app {
@@ -30,8 +32,7 @@ using namespace chip::app::Clusters::EnergyEvse;
  * This is not specific to the EnergyEVSE cluster, but includes DeviceEnergyManagement
  * and potential future clusters.
  */
-enum class EVSECallbackType : uint8_t
-{
+enum class EVSECallbackType : uint8_t {
     /*
      * The State has changed (e.g. from Disabled to Charging, or vice-versa)
      */
@@ -41,6 +42,12 @@ enum class EVSECallbackType : uint8_t
        update to advertise a different charging current to the EV)
      */
     ChargeCurrentChanged,
+    /*
+     * DischargeCurrent has changed (e.g. maxDischargingCurrent so requires an
+       update to EVSE application logic about a new discharging current )
+     */
+    DischargeCurrentChanged,
+
     /*
      * Charging Preferences have changed
      * The daily charging target time, SoC / Added Energy schedules have changed
@@ -59,44 +66,42 @@ enum class EVSECallbackType : uint8_t
     DeviceEnergyManagementChanged,
 };
 
-enum class ChargingDischargingType : uint8_t
-{
+enum class ChargingDischargingType : uint8_t {
     kCharging,
     kDischarging
 };
 
-struct EVSECbInfo
-{
+struct EVSECbInfo {
     EVSECallbackType type;
 
-    union
-    {
+    union {
         /* for type = StateChanged */
-        struct
-        {
+        struct {
             StateEnum state;
             SupplyStateEnum supplyState;
         } StateChange;
 
         /* for type = ChargeCurrentChanged */
-        struct
-        {
+        struct {
             int64_t maximumChargeCurrent;
         } ChargingCurrent;
 
+        /* for type = DischargeCurrentChanged */
+        struct {
+            int64_t maximumDischargeCurrent;
+        } DischargingCurrent;
+
         /* for type = EnergyMeterReadingRequested */
-        struct
-        {
+        struct {
             ChargingDischargingType meterType;
-            int64_t * energyMeterValuePtr;
+            int64_t *energyMeterValuePtr;
         } EnergyMeterReadingRequest;
     };
 };
 
-typedef void (*EVSECallbackFunc)(const EVSECbInfo * cb, intptr_t arg);
+typedef void (*EVSECallbackFunc)(const EVSECbInfo *cb, intptr_t arg);
 
-struct EVSECallbackWrapper
-{
+struct EVSECallbackWrapper {
     EVSECallbackFunc handler;
     intptr_t arg;
 };

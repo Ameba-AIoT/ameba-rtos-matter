@@ -12,7 +12,7 @@ Integrate the `ameba-rtos-matter` repository using the following steps:
 2. Execute matter_setup.sh to setup the SDK
 
 ```bash
-    git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git -b ameba-rtos/release/v1.5
+    git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git -b ameba-rtos/release/v1.6
 
     cd ameba-rtos-matter
 
@@ -34,7 +34,7 @@ Integrate the `ameba-rtos-matter` repository using the following steps:
 
     chmod u+x matter_setup.sh
 
-    ./matter_setup.sh ameba-rtos v1.5
+    ./matter_setup.sh ameba-rtos v1.6
 ```
 
 </details>
@@ -62,7 +62,7 @@ Navigate to `application/matter`:
 
     cd component/application/matter
 
-    git checkout ameba-rtos/release/v1.5
+    git checkout ameba-rtos/release/v1.6
 ```
 
 #### Method 2: Add Repository as a Submodule
@@ -77,7 +77,7 @@ Navigate to `application/matter`:
 
     cd component/application/matter
 
-    git checkout ameba-rtos/release/v1.5
+    git checkout ameba-rtos/release/v1.6
 ```
 
 Ensure to checkout to the respective branch/tag.

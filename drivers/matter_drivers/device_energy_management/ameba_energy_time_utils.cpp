@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <device_energy_management/ameba_energy_time_utils.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -46,26 +46,21 @@ namespace DeviceEnergyManagement {
  *
  * @param[out]   curTime reference to hold return timestamp.
  */
-CHIP_ERROR AmebaGetClock_RealTime(System::Clock::Microseconds64 & curTime)
+CHIP_ERROR AmebaGetClock_RealTime(System::Clock::Microseconds64 &curTime)
 {
 #if CONFIG_ENABLE_AMEBA_SNTP
     time_t seconds = 0, uSeconds = 0;
 
-    if (matter_sntp_rtc_is_sync()) // if RTC is already sync with SNTP, read directly from RTC
-    {
+    if (matter_sntp_rtc_is_sync()) { // if RTC is already sync with SNTP, read directly from RTC
         seconds = matter_rtc_read(); // ameba rtc precission is in seconds only
-    }
-    else // read from SNTP and sync RTC with SNTP
-    {
+    } else { // read from SNTP and sync RTC with SNTP
         matter_sntp_get_current_time(&seconds, &uSeconds);
     }
 
-    if (seconds < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD)
-    {
+    if (seconds < CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    if (uSeconds < 0)
-    {
+    if (uSeconds < 0) {
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative uSeconds values!");
@@ -82,7 +77,7 @@ CHIP_ERROR AmebaGetClock_RealTime(System::Clock::Microseconds64 & curTime)
  *
  * @param[out]   aCurTime reference to hold return timestamp.
  */
-CHIP_ERROR AmebaGetClock_RealTimeMS(System::Clock::Milliseconds64 & aCurTime)
+CHIP_ERROR AmebaGetClock_RealTimeMS(System::Clock::Milliseconds64 &aCurTime)
 {
     System::Clock::Microseconds64 curTimeUs;
     auto err = AmebaGetClock_RealTime(curTimeUs);
@@ -95,7 +90,7 @@ CHIP_ERROR AmebaGetClock_RealTimeMS(System::Clock::Milliseconds64 & aCurTime)
  *
  * @param[out]   chipEpoch reference to hold return timestamp. Set to 0 if an error occurs.
  */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
+CHIP_ERROR GetEpochTS(uint32_t &chipEpoch)
 {
     chipEpoch = 0;
 
@@ -109,21 +104,23 @@ CHIP_ERROR GetEpochTS(uint32_t & chipEpoch)
      */
     VerifyOrDie(err != CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(Zcl, "Unable to get current time - err:%" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
 
     auto unixEpoch = std::chrono::duration_cast<System::Clock::Seconds32>(cTMs).count();
-    if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch))
-    {
+    if (!UnixEpochToChipEpochTime(unixEpoch, chipEpoch)) {
         ChipLogError(Zcl, "Unable to convert Unix Epoch time to Matter Epoch Time");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
     return CHIP_NO_ERROR;
 }
+
+} // namespace DeviceEnergyManagement
+
+namespace EnergyEvse {
 
 /**
  * @brief   Helper function to get current timestamp and work out the day of week
@@ -159,13 +156,12 @@ BitMask<EnergyEvse::TargetDayOfWeekBitmap> GetLocalDayOfWeekFromUnixEpoch(time_t
  * @return  bitmap value for day of week as defined by EnergyEvse::TargetDayOfWeekBitmap. Note
  *          only one bit will be set for the current day.
  */
-CHIP_ERROR GetLocalDayOfWeekNow(BitMask<EnergyEvse::TargetDayOfWeekBitmap> & dayOfWeekMap)
+CHIP_ERROR GetLocalDayOfWeekNow(BitMask<EnergyEvse::TargetDayOfWeekBitmap> &dayOfWeekMap)
 {
     System::Clock::Milliseconds64 cTMs;
     CHIP_ERROR err = chip::System::SystemClock().GetClock_RealTimeMS(cTMs);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Uable to get current time. error=%" CHIP_ERROR_FORMAT, err.Format());
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(Zcl, "Unable to get current time. error=%" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
     time_t unixEpoch = std::chrono::duration_cast<chip::System::Clock::Seconds32>(cTMs).count();
@@ -180,12 +176,11 @@ CHIP_ERROR GetLocalDayOfWeekNow(BitMask<EnergyEvse::TargetDayOfWeekBitmap> & day
  *
  * @param   reference to hold the number of minutes past midnight
  */
-CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight)
+CHIP_ERROR GetMinutesPastMidnight(uint16_t &minutesPastMidnight)
 {
     System::Clock::Milliseconds64 cTMs;
     CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(cTMs);
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(Zcl, "EVSE: unable to get current time to check user schedules error=%" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
@@ -201,7 +196,7 @@ CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight)
     return err;
 }
 
-} // namespace DeviceEnergyManagement
+} // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip

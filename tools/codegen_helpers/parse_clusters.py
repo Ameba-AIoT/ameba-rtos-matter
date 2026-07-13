@@ -26,22 +26,29 @@ def parse_zapfile_clusters(cluster_file, chip_path):
     f.close()
 
     # Open file, prepend filepath and append .cpp extension to every cluster in the list, write to file
-    f = open(cluster_file, 'w')
-    os.chdir('{}/src/app/clusters/'.format(chip_path))
-    chip_cluster_path = os.getcwd()
-    for cluster in cluster_list:
-        for clusters_cpp in glob.glob(chip_cluster_path + '/' + cluster + "/*.cpp"):
-            cpp_filename = os.path.basename(clusters_cpp)
-            if cpp_filename in excluded_files:
-                continue  # Skip excluded files
-            relative_path = os.path.relpath(clusters_cpp, chip_cluster_path)
-            print(relative_path)
-            if relative_path in excluded_files:
-                continue  # Skip excluded files
-            cpp_path = chip_cluster_path + '/' + cluster + '/' + cpp_filename
-            f.write(cpp_path + '\n')
+    with open(cluster_file, 'w') as f:
+        os.chdir(f'{chip_path}/src/app/clusters/')
+        chip_cluster_path = os.getcwd()
 
-    # Restore current working directory and close file
+        for cluster in cluster_list:
+            patterns = [
+                f"{chip_cluster_path}/{cluster}/*.cpp",
+                f"{chip_cluster_path}/{cluster}/codegen/*.cpp",
+            ]
+
+            for pattern in patterns:
+                for clusters_cpp in glob.glob(pattern):
+                    cpp_filename = os.path.basename(clusters_cpp)
+
+                    if cpp_filename in excluded_files:
+                        continue
+
+                    relative_path = os.path.relpath(clusters_cpp, chip_cluster_path)
+                    if relative_path in excluded_files:
+                        continue
+
+                    f.write(clusters_cpp + '\n')
+
     os.chdir(cwd)
     f.close()
 

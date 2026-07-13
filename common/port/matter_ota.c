@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_stdlib.h>
 #include <stdbool.h>
 #include <flash_api.h>
@@ -53,15 +52,15 @@ ota_download_ctrl_t matterOtaCtrl = {0};
 ota_hdr_manager_t matterOtaTargetHdr = {0};
 #endif
 
-bool matter_ota_first_sector_written = false;
-uint32_t matter_ota_flash_sector_base;
-uint32_t matter_ota_new_firmware_addr_start;
-uint32_t matter_ota_new_firmware_addr_end;
+static bool matter_ota_first_sector_written = false;
+static uint32_t matter_ota_flash_sector_base;
+static uint32_t matter_ota_new_firmware_addr_start;
+static uint32_t matter_ota_new_firmware_addr_end;
 
-uint8_t matter_ota_header[MATTER_OTA_HEADER_SIZE];
-uint8_t matter_ota_header_size = 0; // variable to track size of ota header
-uint8_t matter_ota_buffer[MATTER_OTA_SECTOR_SIZE]; // 4KB buffer to be written to one sector
-uint16_t matter_ota_buffer_size = 0; // variable to track size of buffer
+static uint8_t matter_ota_header[MATTER_OTA_HEADER_SIZE];
+static uint8_t matter_ota_header_size = 0; // variable to track size of ota header
+static uint16_t matter_ota_buffer_size = 0; // variable to track size of buffer
+static uint8_t matter_ota_buffer[MATTER_OTA_SECTOR_SIZE]; // 4KB buffer to be written to one sector
 
 static const char *kOTACompleted = "ota_completed";
 
@@ -298,7 +297,7 @@ int8_t matter_ota_flash_burst_write(uint8_t *data, uint32_t size)
     }
 
     if (matter_ota_buffer_size == writeLength) {
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
         // buffer is full, time to erase sector and write buffer data to flash
         flash_erase_sector(&matter_ota_flash, matter_ota_flash_sector_base);
         flash_burst_write(&matter_ota_flash, sectorBase, writeLength, matter_ota_buffer);
@@ -358,7 +357,7 @@ int8_t matter_ota_flash_burst_write(uint8_t *data, uint32_t size)
 int8_t matter_ota_flush_last(void)
 {
     if (matter_ota_buffer_size > 0) {
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
         flash_erase_sector(&matter_ota_flash, matter_ota_flash_sector_base);
         flash_burst_write(&matter_ota_flash, matter_ota_flash_sector_base, matter_ota_buffer_size, matter_ota_buffer);
 #elif defined(CONFIG_AMEBASMART)
@@ -386,7 +385,7 @@ int8_t matter_ota_update_signature(void)
 #if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
     (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     memcpy(&(matterCtx.otaTargetHdr->Manifest[matterCtx.otactrl->index]), matter_ota_header, sizeof(Manifest_TypeDef));
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
     if (!ota_update_manifest(matterCtx.otaTargetHdr, matterCtx.otactrl->targetIdx, matterCtx.otactrl->index)) {
         return OTA_ERROR;
     }
@@ -403,7 +402,7 @@ int8_t matter_ota_update_signature(void)
 #endif // CONFIG_AMEBAXXX
 #elif (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
     memcpy(&(matterCtx.otaHdrManager->Manifest[matterCtx.otaCtrl->index]), matter_ota_header, sizeof(Manifest_TypeDef));
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
     if (ota_storage_update_manifest(matterCtx.otaHdrManager, matterCtx.otaCtrl->slotIdx, matterCtx.otaCtrl->index) != OTA_OK) {
         return OTA_ERROR;
     }
@@ -435,8 +434,7 @@ void matter_ota_platform_reset(void)
 
     deleteKey(kOTACompleted, kOTACompleted);
 
-    if (setPref_new(kOTACompleted, kOTACompleted, &value, sizeof(value)) != DCT_SUCCESS)
-    {
+    if (setPref_new(kOTACompleted, kOTACompleted, &value, sizeof(value)) != DCT_SUCCESS) {
         printf("[%s] set persist storage failed\n", __FUNCTION__);
         return;
     }
@@ -454,7 +452,7 @@ static void matter_ota_abort_task(void *pvParameters)
     if (matter_ota_new_firmware_addr_start != 0) {
         for (size_t i = 0; i < newFWBlkSize; i++) {
             rtos_time_delay_ms(2); // to avoid undefined behaviour when it suddenly resets the ameba during flash erase
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
             flash_erase_sector(&matter_ota_flash, matter_ota_new_firmware_addr_start + (i * MATTER_OTA_SECTOR_SIZE));
 #elif defined(CONFIG_AMEBASMART)
             if (boot_from_nor) { // NOR
@@ -468,6 +466,7 @@ static void matter_ota_abort_task(void *pvParameters)
         }
     }
     matter_ota_first_sector_written = false;
+
     vTaskDelete(NULL);
 }
 
@@ -491,7 +490,7 @@ void matter_ota_nand_create_bbt(void)
     matter_ota_nand_region_block_length   = matter_ota_nand_region_block_id_end - matter_ota_nand_region_block_id_start + 1;
 
     // Dynamically assign the BBT depends on the OTA region size
-    matter_ota_nand_bbt = (uint8_t*) rtos_mem_malloc(matter_ota_nand_region_block_length);
+    matter_ota_nand_bbt = (uint8_t *) rtos_mem_malloc(matter_ota_nand_region_block_length);
     if (matter_ota_nand_bbt == NULL) {
         DiagPrintf("[NAND][OTA] matter_ota_nand_bbt is null\n");
         return;
@@ -500,7 +499,7 @@ void matter_ota_nand_create_bbt(void)
 
     // Init the BBT
     DiagPrintf("[NAND][OTA] Scanning the NAND blocks...\n");
-    for(int bbt_index = 0; bbt_index < matter_ota_nand_region_block_length; bbt_index++) {
+    for (int bbt_index = 0; bbt_index < matter_ota_nand_region_block_length; bbt_index++) {
         matter_ota_nand_bbt[bbt_index] = matter_ota_nand_block_status(matter_ota_nand_region_block_id_start + bbt_index);
     }
     DiagPrintf("[NAND][OTA] Scanning finished!\n");
@@ -612,7 +611,7 @@ int8_t matter_ota_nand_flash_program(uint32_t StartAddr, uint32_t DataLen, uint8
             return OTA_ERROR;
         } else {
             for (int i = 0; i < ByteLen; i++) {
-                if (check_page[i] != *(pNewData+i)) {
+                if (check_page[i] != *(pNewData + i)) {
                     check_page_mismatch += 1;
                 }
             }
@@ -636,7 +635,7 @@ int8_t matter_ota_nand_flash_program(uint32_t StartAddr, uint32_t DataLen, uint8
 
 void matter_ota_nand_flash_erase_new_ota_region()
 {
-    for(int block_id = matter_ota_nand_region_block_id_start; block_id <= matter_ota_nand_region_block_id_end; block_id++) {
+    for (int block_id = matter_ota_nand_region_block_id_start; block_id <= matter_ota_nand_region_block_id_end; block_id++) {
         if (matter_ota_nand_block_status(block_id) == MATTER_OTA_NAND_BBT_BAD) {
             // never erase a bad block (preserve marker)
             continue;
@@ -753,7 +752,7 @@ void matter_ota_nand_flash_check_manifest_pattern(char *var_name, uint8_t *buf)
 {
     printf("\n[NAND][OTA] %s, manifest contains: ", var_name);
     for (int i = 0; i < 8; i++) {
-        printf("0x%02x ", *(buf+i));
+        printf("0x%02x ", *(buf + i));
     }
     printf("\n");
 }

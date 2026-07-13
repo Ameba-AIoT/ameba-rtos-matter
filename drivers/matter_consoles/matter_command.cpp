@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,8 +16,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "matter_command.h"
+#include "matter_binfo_command.h"
+#include "matter_bool_command.h"
 #include "matter_dishwasher_alarm_command.h"
 #include "matter_occupancy_sensing_command.h"
 #include "matter_operational_state_command.h"
@@ -53,16 +55,15 @@ namespace {
  * Manual Operation shell functions
  *********************************************************/
 
-CHIP_ERROR ManualOperationHelpHandler(int argc, char ** argv)
+CHIP_ERROR ManualOperationHelpHandler(int argc, char **argv)
 {
     sShellManualOperationSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ManualOperationCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOperationCommandHandler(int argc, char **argv)
 {
-    if (argc == 0)
-    {
+    if (argc == 0) {
         return ManualOperationHelpHandler(argc, argv);
     }
 
@@ -75,15 +76,10 @@ CHIP_ERROR ManualOperationCommandHandler(int argc, char ** argv)
  */
 static void RegisterManualOperationCommands()
 {
-
-    static const shell_command_t sManualDishWasherAlarmSubCommands[] = {
-        { &ManualDishWasherAlarmCommandHelpHandler, "help", "Usage: manual dishalm <subcommand>" },
-        { &ManualDishWasherAlarmSetRaiseCommandHandler, "raise", "raise Usage: manual dishalm raise" },
-        { &ManualDishWasherAlarmSetLowerCommandHandler, "lower", "lower Usage: manual dishalm lower" },
-    };
-
     static const shell_command_t sManualOperationSubCommands[] = {
         { &ManualOperationHelpHandler, "help", "Usage: manual <subcommand>" },
+        { &ManualBinfoCommandHandler, "binfo", "Usage: manual binfo <subcommand>" },
+        { &ManualBoolCommandHandler, "bool", "Usage: manual bool <subcommand>" },
         { &ManualDishWasherAlarmCommandHandler, "dishalm", " Usage: manual dishalm <subcommand>" },
         { &ManualOccupancySensingCommandHandler, "occ", " Usage: manual occ <subcommand>" },
         { &ManualOperationalStateCommandHandler, "opstate", " Usage: manual opstate <subcommand>" },
@@ -92,6 +88,22 @@ static void RegisterManualOperationCommands()
         { &ManualRVCCommandHandler, "rvc", " Usage: manual rvc <subcommand>" },
         { &ManualSwitchCommandHandler, "switch", " Usage: manual switch <subcommand>" },
         { &ManualSoilCommandHandler, "soil", " Usage: manual soil <subcommand>" },
+    };
+
+    static const shell_command_t sManualBinfoSubCommands[] = {
+        { &ManualBinfoCommandHelpHandler, "help", "Usage: manual <subcommand>" },
+        { &ManualBinfoConfigVerCommandHandler, "config-ver", "config-ver Usage: manual binfo config-ver" },
+    };
+
+    static const shell_command_t sManualBoolSubCommands[] = {
+        { &ManualBoolCommandHelpHandler, "help", "Usage: manual <subcommand>" },
+        { &ManualBoolSetStateCommandHandler, "set-state", "config-ver Usage: manual bool set-state <state>" },
+    };
+
+    static const shell_command_t sManualDishWasherAlarmSubCommands[] = {
+        { &ManualDishWasherAlarmCommandHelpHandler, "help", "Usage: manual dishalm <subcommand>" },
+        { &ManualDishWasherAlarmSetRaiseCommandHandler, "raise", "raise Usage: manual dishalm raise" },
+        { &ManualDishWasherAlarmSetLowerCommandHandler, "lower", "lower Usage: manual dishalm lower" },
     };
 
     static const shell_command_t sManualOccupancySensingSubCommands[] = {
@@ -107,10 +119,14 @@ static void RegisterManualOperationCommands()
 
     static const shell_command_t sManualOvenCavityOperationalStateSubCommands[] = {
         { &ManualOvenCavityOperationalStateCommandHelpHandler, "help", "Usage: manual oven-opstate <subcommand>" },
-        { &ManualOvenCavityOperationalStateSetStateCommandHandler, "set-state",
-          "set-state Usage: manual oven-opstate set-state <state>" },
-        { &ManualOvenCavityOperationalStateSetErrorCommandHandler, "set-error",
-          "set-error Usage: manual oven-opstate set-error <error>" },
+        {
+            &ManualOvenCavityOperationalStateSetStateCommandHandler, "set-state",
+            "set-state Usage: manual oven-opstate set-state <state>"
+        },
+        {
+            &ManualOvenCavityOperationalStateSetErrorCommandHandler, "set-error",
+            "set-error Usage: manual oven-opstate set-error <error>"
+        },
     };
 
     static const shell_command_t sManualRefrigeratorAlarmStateSubCommands[] = {
@@ -152,26 +168,27 @@ static void RegisterManualOperationCommands()
         { &ManualSoilCommandHelpHandler, "help", "Usage: manual soil <subcommand>" },
         { &ManualSoilChangeMoistureCommandHandler, "change-moisture", "change-moisture Usage: manual soil change-moisture <value>" },
     };
-    
+
     static const shell_command_t sManualOperationCommand = { &ManualOperationCommandHandler, "manual",
-                                                             "Manual Operation commands. Usage: manual <subcommand>" };
+                                                             "Manual Operation commands. Usage: manual <subcommand>"
+                                                           };
 
     // Register commands
     sShellManualOperationSubCommands.RegisterCommands(sManualOperationSubCommands, MATTER_ARRAY_SIZE(sManualOperationSubCommands));
 
+    sShellManualBinfoStateSubCommands.RegisterCommands(sManualBinfoSubCommands, MATTER_ARRAY_SIZE(sManualBinfoSubCommands));
+    sShellManualBoolStateSubCommands.RegisterCommands(sManualBoolSubCommands, MATTER_ARRAY_SIZE(sManualBoolSubCommands));
     sShellManualDishWasherAlarmStateSubCommands.RegisterCommands(sManualDishWasherAlarmSubCommands, MATTER_ARRAY_SIZE(sManualDishWasherAlarmSubCommands));
     sShellManualOccupancySensingSubCommands.RegisterCommands(sManualOccupancySensingSubCommands, MATTER_ARRAY_SIZE(sManualOccupancySensingSubCommands));
     sShellManualOperationalStateSubCommands.RegisterCommands(sManualOperationalStateSubCommands, MATTER_ARRAY_SIZE(sManualOperationalStateSubCommands));
-
-    sShellManualOvenCavityOperationalStateSubCommands.RegisterCommands(sManualOvenCavityOperationalStateSubCommands, MATTER_ARRAY_SIZE(sManualOvenCavityOperationalStateSubCommands));
-
-    sShellManualRefrigeratorAlarmStateSubCommands.RegisterCommands(sManualRefrigeratorAlarmStateSubCommands, MATTER_ARRAY_SIZE(sManualRefrigeratorAlarmStateSubCommands));
-
+    sShellManualOvenCavityOperationalStateSubCommands.RegisterCommands(sManualOvenCavityOperationalStateSubCommands,
+            MATTER_ARRAY_SIZE(sManualOvenCavityOperationalStateSubCommands));
+    sShellManualRefrigeratorAlarmStateSubCommands.RegisterCommands(sManualRefrigeratorAlarmStateSubCommands,
+            MATTER_ARRAY_SIZE(sManualRefrigeratorAlarmStateSubCommands));
     sShellManualRVCSubCommands.RegisterCommands(sManualRVCSubCommands, MATTER_ARRAY_SIZE(sManualRVCSubCommands));
     sShellManualRVCCleanModeSubCommands.RegisterCommands(sManualRVCCleanModeSubCommands, MATTER_ARRAY_SIZE(sManualRVCCleanModeSubCommands));
     sShellManualRVCOperationalStateSubCommands.RegisterCommands(sManualRVCOperationalStateSubCommands, MATTER_ARRAY_SIZE(sManualRVCOperationalStateSubCommands));
     sShellManualRVCRunModeSubCommands.RegisterCommands(sManualRVCRunModeSubCommands, MATTER_ARRAY_SIZE(sManualRVCRunModeSubCommands));
-
     sShellManualSwitchSubCommands.RegisterCommands(sManualSwitchSubCommands, MATTER_ARRAY_SIZE(sManualSwitchSubCommands));
     sShellManualSoilSubCommands.RegisterCommands(sManualSoilSubCommands, MATTER_ARRAY_SIZE(sManualSoilSubCommands));
     Engine::Root().RegisterCommands(&sManualOperationCommand, 1);

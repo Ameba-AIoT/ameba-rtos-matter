@@ -1,4 +1,4 @@
-name: Build Ameba RTOS v1.2 + Matter v1.5 Docker Image
+name: Build Ameba RTOS v1.2 + Matter v1.6 Docker Image
 
 on:
   pull_request:

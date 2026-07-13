@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,7 +18,7 @@
  */
 #pragma once
 
-#include <app/clusters/electrical-power-measurement-server/electrical-power-measurement-server.h>
+#include <app/clusters/electrical-power-measurement-server/CodegenIntegration.h>
 #include <app/util/af-types.h>
 #include <lib/core/CHIPError.h>
 
@@ -35,7 +36,10 @@ public:
     static constexpr uint8_t kDefaultNumberOfMeasurementTypes = 1;
 
     // Attribute Accessors
-    PowerModeEnum GetPowerMode() override { return mPowerMode; }
+    PowerModeEnum GetPowerMode() override
+    {
+        return mPowerMode;
+    }
     uint8_t GetNumberOfMeasurementTypes() override;
 
     /* These functions are called by the ReadAttribute handler to iterate through lists
@@ -60,19 +64,58 @@ public:
     CHIP_ERROR GetHarmonicPhasesByIndex(uint8_t, Structs::HarmonicMeasurementStruct::Type &) override;
     CHIP_ERROR EndHarmonicPhasesRead() override;
 
-    DataModel::Nullable<int64_t> GetVoltage() override { return mVoltage; }
-    DataModel::Nullable<int64_t> GetActiveCurrent() override { return mActiveCurrent; }
-    DataModel::Nullable<int64_t> GetReactiveCurrent() override { return mReactiveCurrent; }
-    DataModel::Nullable<int64_t> GetApparentCurrent() override { return mApparentCurrent; }
-    DataModel::Nullable<int64_t> GetActivePower() override { return mActivePower; }
-    DataModel::Nullable<int64_t> GetReactivePower() override { return mReactivePower; }
-    DataModel::Nullable<int64_t> GetApparentPower() override { return mApparentPower; }
-    DataModel::Nullable<int64_t> GetRMSVoltage() override { return mRMSVoltage; }
-    DataModel::Nullable<int64_t> GetRMSCurrent() override { return mRMSCurrent; }
-    DataModel::Nullable<int64_t> GetRMSPower() override { return mRMSPower; }
-    DataModel::Nullable<int64_t> GetFrequency() override { return mFrequency; }
-    DataModel::Nullable<int64_t> GetPowerFactor() override { return mPowerFactor; }
-    DataModel::Nullable<int64_t> GetNeutralCurrent() override { return mNeutralCurrent; };
+    DataModel::Nullable<int64_t> GetVoltage() override
+    {
+        return mVoltage;
+    }
+    DataModel::Nullable<int64_t> GetActiveCurrent() override
+    {
+        return mActiveCurrent;
+    }
+    DataModel::Nullable<int64_t> GetReactiveCurrent() override
+    {
+        return mReactiveCurrent;
+    }
+    DataModel::Nullable<int64_t> GetApparentCurrent() override
+    {
+        return mApparentCurrent;
+    }
+    DataModel::Nullable<int64_t> GetActivePower() override
+    {
+        return mActivePower;
+    }
+    DataModel::Nullable<int64_t> GetReactivePower() override
+    {
+        return mReactivePower;
+    }
+    DataModel::Nullable<int64_t> GetApparentPower() override
+    {
+        return mApparentPower;
+    }
+    DataModel::Nullable<int64_t> GetRMSVoltage() override
+    {
+        return mRMSVoltage;
+    }
+    DataModel::Nullable<int64_t> GetRMSCurrent() override
+    {
+        return mRMSCurrent;
+    }
+    DataModel::Nullable<int64_t> GetRMSPower() override
+    {
+        return mRMSPower;
+    }
+    DataModel::Nullable<int64_t> GetFrequency() override
+    {
+        return mFrequency;
+    }
+    DataModel::Nullable<int64_t> GetPowerFactor() override
+    {
+        return mPowerFactor;
+    }
+    DataModel::Nullable<int64_t> GetNeutralCurrent() override
+    {
+        return mNeutralCurrent;
+    };
 
     // Internal Application API to set attribute values
     CHIP_ERROR SetPowerMode(PowerModeEnum);
@@ -111,7 +154,7 @@ private:
 class ElectricalPowerMeasurementInstance : public Instance
 {
 public:
-    ElectricalPowerMeasurementInstance(EndpointId aEndpointId, ElectricalPowerMeasurementDelegate & aDelegate, Feature aFeature,
+    ElectricalPowerMeasurementInstance(EndpointId aEndpointId, ElectricalPowerMeasurementDelegate &aDelegate, Feature aFeature,
                                        OptionalAttributes aOptionalAttributes) :
         ElectricalPowerMeasurement::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttributes)
     {
@@ -121,16 +164,41 @@ public:
     // Delete copy constructor and assignment operator.
     ElectricalPowerMeasurementInstance(const ElectricalPowerMeasurementInstance &)             = delete;
     ElectricalPowerMeasurementInstance(const ElectricalPowerMeasurementInstance &&)            = delete;
-    ElectricalPowerMeasurementInstance & operator=(const ElectricalPowerMeasurementInstance &) = delete;
+    ElectricalPowerMeasurementInstance &operator=(const ElectricalPowerMeasurementInstance &) = delete;
 
     CHIP_ERROR Init();
     void Shutdown();
 
-    ElectricalPowerMeasurementDelegate * GetDelegate() { return mDelegate; };
+    ElectricalPowerMeasurementDelegate *GetDelegate()
+    {
+        return mDelegate;
+    };
 
 private:
-    ElectricalPowerMeasurementDelegate * mDelegate;
+    ElectricalPowerMeasurementDelegate *mDelegate;
 };
+
+/**
+ * @brief  Creates a Delegate and Instance for Electrical Power Measurement cluster
+ *
+ * The Instance is a container around the Delegate, so
+ * create the Delegate first, then wrap it in the Instance
+ * Then call the Instance->Init() to register the attribute and command handlers
+
+ * @param endpointId The endpoint ID of the Electrical Power Measurement cluster
+ * @param aDelegate The delegate for the Electrical Power Measurement cluster
+ * @param aInstance The instance for the Electrical Power Measurement cluster
+ * @param aFeature The feature for the Electrical Power Measurement cluster
+ * @param aOptionalAttributes The optional attributes for the Electrical Power Measurement cluster
+ * @return CHIP_NO_ERROR if the Electrical Power Measurement cluster is initialized successfully, otherwise an error code
+ */
+CHIP_ERROR ElectricalPowerMeasurementInit(chip::EndpointId endpointId,
+        std::unique_ptr<ElectricalPowerMeasurementDelegate> &aDelegate,
+        std::unique_ptr<ElectricalPowerMeasurementInstance> &aInstance, Feature aFeature,
+        OptionalAttributes aOptionalAttributes);
+
+CHIP_ERROR ElectricalPowerMeasurementShutdown(std::unique_ptr<ElectricalPowerMeasurementInstance> &aInstance,
+        std::unique_ptr<ElectricalPowerMeasurementDelegate> &aDelegate);
 
 } // namespace ElectricalPowerMeasurement
 } // namespace Clusters

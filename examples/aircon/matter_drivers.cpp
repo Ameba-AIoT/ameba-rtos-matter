@@ -1,3 +1,21 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <gpio_api.h>
@@ -9,6 +27,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/attribute-table.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace ::chip::app;
@@ -91,7 +111,6 @@ CHIP_ERROR matter_driver_humidity_sensor_init(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Status status;
     uint16_t minValue = 0;
     uint16_t maxValue = 10000;
 
@@ -100,12 +119,6 @@ CHIP_ERROR matter_driver_humidity_sensor_init(void)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    status = Clusters::RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(ep, minValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
-
-    status = Clusters::RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Set(ep, maxValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
-
     ChipLogProgress(DeviceLayer, "Humidity range: Min = %i, Max = %i", minValue, maxValue);
 
     DHTSensor.setMinMeasuredHumidity(minValue);
@@ -113,11 +126,6 @@ CHIP_ERROR matter_driver_humidity_sensor_init(void)
 
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-exit:
-    if (err == CHIP_ERROR_INTERNAL)
-    {
-        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    }
     return err;
 }
 
@@ -125,7 +133,6 @@ CHIP_ERROR matter_driver_temperature_sensor_init(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Status status;
     int16_t minValue = -500;
     int16_t maxValue = 6000;
 
@@ -134,11 +141,9 @@ CHIP_ERROR matter_driver_temperature_sensor_init(void)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    status = Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::Set(ep, minValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
-
-    status = Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::Set(ep, maxValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
+    err = Clusters::TemperatureMeasurement::SetMeasuredValueRange(ep, DataModel::MakeNullable(minValue),
+                                                                 DataModel::MakeNullable(maxValue));
+    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INTERNAL);
 
     ChipLogProgress(DeviceLayer, "Temperature range: Min = %i, Max = %i", minValue, maxValue);
 
@@ -338,14 +343,14 @@ void matter_driver_downlink_update_handler(AppEvent *aEvent)
         {
             chip::EndpointId ep = DHTSensor.GetHumSensorEp();
             //ChipLogProgress(DeviceLayer, "Set Humidity %i on Endpoint%d", aEvent->value._u16, ep);
-            Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(ep, aEvent->value._u16);
+            Clusters::RelativeHumidityMeasurement::SetMeasuredValue(ep, DataModel::MakeNullable(aEvent->value._u16));
         }
         break;
     case AppEvent::kEventType_Downlink_TemperatureMeasurement_SetValue:
         {
             chip::EndpointId ep = DHTSensor.GetTempSensorEp();
             //ChipLogProgress(DeviceLayer, "Set Temperature %i on Endpoint%d", aEvent->value._i16, ep);
-            Clusters::TemperatureMeasurement::Attributes::MeasuredValue::Set(ep, aEvent->value._i16);
+            Clusters::TemperatureMeasurement::SetMeasuredValue(ep, DataModel::MakeNullable(aEvent->value._i16));
         }
         break;
     default:

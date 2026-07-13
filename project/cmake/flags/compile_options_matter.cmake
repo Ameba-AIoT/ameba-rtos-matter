@@ -35,6 +35,7 @@ list(
 	-Wno-format-security
 	-Wno-address
 	-Wno-stringop-truncation
+	-Wno-type-limits
 )
 
 list(

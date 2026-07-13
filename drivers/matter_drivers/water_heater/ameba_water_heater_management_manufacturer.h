@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <device_energy_management/ameba_device_energy_management_delegate_impl.h>
@@ -28,23 +28,23 @@ namespace Clusters {
 namespace WaterHeaterManagement {
 
 /**
- * The WhmManufacturer example class
+ * The WaterHeaterManufacturer example class
  *
  * Helps with handling the test triggers.
  */
 
-class WhmManufacturer : public DeviceEnergyManagement::DEMManufacturerDelegate
+class WaterHeaterManufacturer : public DeviceEnergyManagement::DEMManufacturerDelegate
 {
 public:
-    WhmManufacturer(WaterHeaterManagementInstance * whmInstance) { mWhmInstance = whmInstance; }
+    WaterHeaterManufacturer(WaterHeaterManagementInstance * waterHeaterInstance) { mWaterHeaterInstance = waterHeaterInstance; }
 
-    WaterHeaterManagementInstance * GetWhmInstance() { return mWhmInstance; }
+    WaterHeaterManagementInstance * GetWaterHeaterInstance() { return mWaterHeaterInstance; }
 
-    WaterHeaterManagementDelegate * GetWhmDelegate()
+    WaterHeaterManagementDelegate * GetWaterHeaterDelegate()
     {
-        if (mWhmInstance)
+        if (mWaterHeaterInstance)
         {
-            return mWhmInstance->GetDelegate();
+            return mWaterHeaterInstance->GetDelegate();
         }
 
         return nullptr;
@@ -148,19 +148,19 @@ public:
     int64_t GetApproxEnergyDuringSession() override;
 
 private:
-    WaterHeaterManagementInstance * mWhmInstance;
+    WaterHeaterManagementInstance * mWaterHeaterInstance;
 };
 
-/** @brief Helper function to return the singleton WhmManufacturer instance
+/** @brief Helper function to return the singleton WaterHeaterManufacturer instance
  *
- * This is needed by the WhmManufacturer class to support TestEventTriggers
- * which are called outside of any class context. This allows the WhmManufacturer
+ * This is needed by the WaterHeaterManufacturer class to support TestEventTriggers
+ * which are called outside of any class context. This allows the WaterHeaterManufacturer
  * class to return the relevant Delegate instance in which to invoke the test
  * events on.
  *
  * This function is typically found in main.cpp or wherever the singleton is created.
  */
-WhmManufacturer * GetWhmManufacturer();
+WaterHeaterManufacturer * GetWaterHeaterManufacturer();
 
 } // namespace WaterHeaterManagement
 } // namespace Clusters

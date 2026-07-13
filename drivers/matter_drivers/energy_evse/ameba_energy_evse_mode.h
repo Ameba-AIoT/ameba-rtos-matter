@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +16,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <app/clusters/mode-base-server/mode-base-server.h>
-#include <app/util/config.h>
 #include <cstring>
 #include <utility>
 
@@ -48,34 +47,38 @@ private:
     };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[4] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Manual"),
-                                                 .mode     = kModeManual,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsManual) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Auto-scheduled"),
-                                                 .mode     = kModeTimeOfUse,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsTimeOfUse) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Solar"),
-                                                 .mode     = kModeSolarCharging,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsSolarCharging) },
-        detail::Structs::ModeOptionStruct::Type{ .label = CharSpan::fromCharString("Auto-scheduled with Solar charging"),
-                                                 .mode  = kModeTimeOfUseAndSolarCharging,
-                                                 .modeTags =
-                                                     DataModel::List<const ModeTagStructType>(ModeTagsTimeOfUseAndSolarCharging) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label    = CharSpan::fromCharString("Manual"),
+            .mode     = kModeManual,
+            .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsManual) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label    = CharSpan::fromCharString("Auto-scheduled"),
+            .mode     = kModeTimeOfUse,
+            .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsTimeOfUse) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label    = CharSpan::fromCharString("Solar"),
+            .mode     = kModeSolarCharging,
+            .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsSolarCharging) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = CharSpan::fromCharString("Auto-scheduled with Solar charging"),
+            .mode  = kModeTimeOfUseAndSolarCharging,
+            .modeTags =
+            DataModel::List<const ModeTagStructType>(ModeTagsTimeOfUseAndSolarCharging) },
 
     };
 
     CHIP_ERROR Init() override;
-    void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type & response) override;
+    void HandleChangeToMode(uint8_t mode, ModeBase::Commands::ChangeToModeResponse::Type &response) override;
 
-    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
-    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t & value) override;
-    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> & tags) override;
+    CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan &label) override;
+    CHIP_ERROR GetModeValueByIndex(uint8_t modeIndex, uint8_t &value) override;
+    CHIP_ERROR GetModeTagsByIndex(uint8_t modeIndex, DataModel::List<ModeTagStructType> &tags) override;
 
 public:
     ~EnergyEvseModeDelegate() override = default;
 };
 
-ModeBase::Instance * Instance();
+ModeBase::Instance *Instance();
 
 void Shutdown();
 

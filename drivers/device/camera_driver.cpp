@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,14 +16,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <algorithm>
 
 #include <camera_driver.h>
 
 #include <support/logging/CHIPLogging.h>
 
-MatterCamera* MatterCamera::instance = nullptr;
+MatterCamera *MatterCamera::instance = nullptr;
 
 // Public
 
@@ -56,16 +55,16 @@ void MatterCamera::Init(void)
 #if USBH_UVC_USE_HW
     mUvcConfig->hw_isr_pri = CONFIG_USBH_UVC_HW_IRQ_PRIORITY,
 #endif
-   
-    // Init UVC Callbacks
-    mUvcCallBacks->init     = UvcInitWrapper;
-    mUvcCallBacks->deinit   = UvcDeinitWrapper;
-    mUvcCallBacks->attach   = UvcAttachWrapper;
-    mUvcCallBacks->detach   = UvcDetachWrapper;
-    mUvcCallBacks->setup    = UvcSetupWrapper;
-    mUvcCallBacks->setparam = UvcSetparamWrapper;
 
-    status = rtos_task_create(&task, "UsbhUvcMainThread", UsbhUvcMainThreadWrapper, NULL, 1024U, 1U);
+                // Init UVC Callbacks
+                mUvcCallBacks->init      = UvcInitWrapper;
+    mUvcCallBacks->deinit    = UvcDeinitWrapper;
+    mUvcCallBacks->attach    = UvcAttachWrapper;
+    mUvcCallBacks->detach    = UvcDetachWrapper;
+    mUvcCallBacks->setup     = UvcSetupWrapper;
+    mUvcCallBacks->set_param = UvcSetparamWrapper;
+
+    status = rtos_task_create(&task, "UsbhUvcMainThread", UsbhUvcMainThreadWrapper, NULL, 2048U, 1U);
     if (status != RTK_SUCCESS) {
         ChipLogError(DeviceLayer, "Create thread fail");
     }
@@ -152,7 +151,7 @@ void MatterCamera::UsbhUvcMainThread(void *param)
 
     UNUSED(param);
 
-    mUvcBuf = (uint8_t*) rtos_mem_zmalloc(CONFIG_USBH_UVC_FRAME_BUF_SIZE);
+    mUvcBuf = (uint8_t *) rtos_mem_zmalloc(CONFIG_USBH_UVC_FRAME_BUF_SIZE);
     rtos_sema_create(&mUvcAttachSema, 0U, 1U);
     rtos_sema_create(&mUvcDetachSema, 0U, 1U);
     rtos_sema_create(&mUvcStartSema, 0U, 1U);
@@ -171,7 +170,8 @@ void MatterCamera::UsbhUvcMainThread(void *param)
     }
 
 #if CONFIG_USBH_UVC_HOT_PLUG
-    ret = rtos_task_create(&hotplug_task, "UvcHotplugThread", UvcHotplugThreadWrapper, NULL, CONFIG_USBH_UVC_HOTPLUG_THREAD_STACK_SIZE, CONFIG_USBH_UVC_HOTPLUG_THREAD_PRIORITY);
+    ret = rtos_task_create(&hotplug_task, "UvcHotplugThread", UvcHotplugThreadWrapper, NULL, CONFIG_USBH_UVC_HOTPLUG_THREAD_STACK_SIZE,
+                           CONFIG_USBH_UVC_HOTPLUG_THREAD_PRIORITY);
     if (ret != RTK_SUCCESS) {
         goto usbh_uvc_deinit_exit;
     }
@@ -258,12 +258,17 @@ void MatterCamera::UvcTestThread(void *param)
         }
 
         /* Wait for the semaphore indicating the setting is actually completed */
-        if (rtos_sema_take(mUvcSetparamSema, 1000) == RTK_SUCCESS) {
+        if (rtos_sema_take(mUvcSetparamSema, 5000) == RTK_SUCCESS) {
+            if (mUvcSetparamStatus != HAL_OK) {
+                ChipLogProgress(DeviceLayer, "Set paras err: %s %d*%d@%dfps status=%d\n",
+                                fmt_name, mUvcSCtx.width, mUvcSCtx.height, mUvcSCtx.frame_rate, mUvcSetparamStatus);
+                goto exit;
+            }
             ChipLogProgress(DeviceLayer, "Set paras ok: %s %d*%d@%dfps",
-                     fmt_name, mUvcSCtx.width, mUvcSCtx.height, mUvcSCtx.frame_rate);
+                            fmt_name, mUvcSCtx.width, mUvcSCtx.height, mUvcSCtx.frame_rate);
         } else {
             ChipLogError(DeviceLayer, "Set paras fail: %s %d*%d@%dfps",
-                     fmt_name, mUvcSCtx.width, mUvcSCtx.height, mUvcSCtx.frame_rate);
+                         fmt_name, mUvcSCtx.width, mUvcSCtx.height, mUvcSCtx.frame_rate);
             goto exit;
         }
 
@@ -383,7 +388,7 @@ void MatterCamera::UvcHotplugThread(void *param)
 void MatterCamera::UvcMatterThread(void *param)
 {
 #if (CONFIG_USBH_UVC_FORMAT_TYPE != USBH_UVC_FORMAT_MJPEG)
-    u8 *buffer_h264 = (u8*) rtos_mem_malloc(USBH_UVC_MATTER_WRITE_SIZE);
+    u8 *buffer_h264 = (u8 *) rtos_mem_malloc(USBH_UVC_MATTER_WRITE_SIZE);
 #endif
     UNUSED(param);
 
@@ -407,7 +412,7 @@ void MatterCamera::UvcMatterThread(void *param)
         if (mWebrtcTransport == nullptr) {
             ChipLogError(DeviceLayer, "Error, WebRTC transport is null!");
         } else {
-            if(mWebrtcTransport->CanSendVideo() == true){
+            if (mWebrtcTransport->CanSendVideo() == true) {
                 mWebrtcTransport->SendVideo(videoData, (int64_t)(rtos_time_get_current_system_time_ms_64bit() * 90ULL), mCurrentVideoStreamId);
                 ChipLogProgress(DeviceLayer, "Video sent");
             } else {
@@ -425,7 +430,7 @@ void MatterCamera::UvcMatterThread(void *param)
             if (mWebrtcTransport == nullptr) {
                 ChipLogError(DeviceLayer, "Error, WebRTC transport is null!");
             } else {
-                if(mWebrtcTransport->CanSendVideo() == true){
+                if (mWebrtcTransport->CanSendVideo() == true) {
                     mWebrtcTransport->SendVideo(videoData, (int64_t)(rtos_time_get_current_system_time_ms_64bit() * 90ULL), mCurrentVideoStreamId);
                     ChipLogProgress(DeviceLayer, "Video sent");
                 } else {
@@ -453,7 +458,7 @@ int MatterCamera::UvcMatterStart(void)
     rtos_task_t task;
 
     // Delay to check successful WiFi connection and obtain of an IP address
-    while (LwIP_Check_Connectivity(NETIF_WLAN_STA_INDEX) != CONNECTION_VALID) {
+    while (lwip_check_connectivity(NETIF_WLAN_STA_INDEX) != CONNECTION_VALID) {
         rtos_time_delay_ms(2000);
     }
 
@@ -461,7 +466,8 @@ int MatterCamera::UvcMatterStart(void)
 
     rtos_sema_create(&mUvcMatterSaveImgSema, 0, 1);
 
-    ret = rtos_task_create(&task, "UvcMatterThread", UvcMatterThreadWrapper, NULL, CONFIG_USBH_UVC_MATTER_THREAD_STACK_SIZE, CONFIG_USBH_UVC_MATTER_THREAD_PRIORITY);
+    ret = rtos_task_create(&task, "UvcMatterThread", UvcMatterThreadWrapper, NULL, CONFIG_USBH_UVC_MATTER_THREAD_STACK_SIZE,
+                           CONFIG_USBH_UVC_MATTER_THREAD_PRIORITY);
     if (ret != RTK_SUCCESS) {
         ChipLogError(DeviceLayer, "Create %s client thread fail", USBH_UVC_MATTER_TAG);
         rtos_sema_delete(&mUvcMatterSaveImgSema);
@@ -568,9 +574,10 @@ int MatterCamera::UvcSetup(void)
     return HAL_OK;
 }
 
-int MatterCamera::UvcSetparam(void)
+int MatterCamera::UvcSetparam(int status)
 {
     ChipLogProgress(DeviceLayer, "MatterCamera: UvcSetparam");
+    mUvcSetparamStatus = status;
     rtos_sema_give(mUvcSetparamSema);
     return HAL_OK;
 }
@@ -622,9 +629,9 @@ int MatterCamera::UvcSetupWrapper()
     return instance->UvcSetup();
 }
 
-int MatterCamera::UvcSetparamWrapper()
+int MatterCamera::UvcSetparamWrapper(int status)
 {
-    return instance->UvcSetparam();
+    return instance->UvcSetparam(status);
 }
 #else
 
@@ -686,7 +693,10 @@ public:
         }
     }
 
-    size_t Bytes() const { return mLen; }
+    size_t Bytes() const
+    {
+        return mLen;
+    }
 
 private:
     void Flush()
@@ -799,7 +809,7 @@ void MatterCamera::StartDummyStreaming(void *param)
 {
     if (mDummyBuf == nullptr) {
 
-        mDummyBuf = (uint8_t*) rtos_mem_zmalloc(DUMMY_H264_BUF_SIZE);
+        mDummyBuf = (uint8_t *) rtos_mem_zmalloc(DUMMY_H264_BUF_SIZE);
         if (mDummyBuf == nullptr) {
             ChipLogError(DeviceLayer, "Failed to allocate dummy H.264 buffer (%d bytes)", DUMMY_H264_BUF_SIZE);
             mDummyTask = NULL;
@@ -839,7 +849,7 @@ void MatterCamera::DummyStreaming(void *param)
             if (mWebrtcTransport == nullptr) {
                 ChipLogError(DeviceLayer, "Error, WebRTC transport is null!");
             } else {
-                if(mWebrtcTransport->CanSendVideo() == true){
+                if (mWebrtcTransport->CanSendVideo() == true) {
                     mWebrtcTransport->SendVideo(videoData, (int64_t)(rtos_time_get_current_system_time_ms_64bit() * 90ULL), mCurrentVideoStreamId);
                     ChipLogProgress(DeviceLayer, "Video sent");
                 } else {

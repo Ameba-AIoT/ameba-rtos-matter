@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <stdlib.h>
 #include <stdint.h>
 
+#include <matter_api.h>
 #include <matter_core.h>
 #include <matter_kvs.h>
 #include <matter_data_providers.h>
@@ -98,8 +98,7 @@ using namespace ::chip::DeviceLayer;
 // DeferredAttribute object describes a deferred attribute, but also holds a buffer with a value to
 // be written, so it must live so long as the DeferredAttributePersistenceProvider object.
 
-DeferredAttribute gDeferredAttributeArray[] =
-{
+DeferredAttribute gDeferredAttributeArray[] = {
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::LevelControl::Id, Clusters::LevelControl::Attributes::CurrentLevel::Id)),
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentHue::Id)),
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentSaturation::Id)),
@@ -126,57 +125,61 @@ chip::Inet::DropIfTooManyQueuedPacketsFilter sMdnsPacketFilter(kMaxPendingMdnsPa
 
 #if defined(CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER) && (CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER == 1)
 uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+                                                                                   0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff
+                                                                                 };
 #endif
+
+static matter_app_device_callback_t sDeviceCallback = NULL;
+static void *sDeviceCallbackContext = NULL;
+
+void matter_reg_app_device_callback(matter_app_device_callback_t callback, void *context)
+{
+    sDeviceCallback = callback;
+    sDeviceCallbackContext = context;
+}
 
 void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t arg)
 {
-    switch (event->Type)
-    {
+    if (sDeviceCallback != NULL) {
+        sDeviceCallback(event->Type, sDeviceCallbackContext);
+    }
+
+    switch (event->Type) {
     case DeviceEventType::kInternetConnectivityChange:
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR) && (CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR == 1)
         static bool isOTAInitialized = false; // use this static variable to replace CheckInit()
 #endif
-        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
-        {
+        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established) {
             ChipLogProgress(DeviceLayer, "IPv4 Server ready...");
             chip::app::DnssdServer::Instance().StartServer();
-        }
-        else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
-        {
+        } else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost) {
             ChipLogProgress(DeviceLayer, "Lost IPv4 connectivity...");
         }
-        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
-        {
+        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established) {
             ChipLogProgress(DeviceLayer, "IPv6 Server ready...");
             chip::app::DnssdServer::Instance().StartServer();
 
 #if defined(CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR) && (CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR == 1)
             // Init OTA requestor only when we have gotten IPv6 address
-            if (!isOTAInitialized)
-            {
+            if (!isOTAInitialized) {
                 matter_ota_initializer();
                 isOTAInitialized = true;
             }
 #endif
-        }
-        else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
-        {
+        } else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost) {
             ChipLogProgress(DeviceLayer, "Lost IPv6 connectivity...");
         }
         break;
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
-                (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
-        {
+            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)) {
             // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
             // will not trigger a 'internet connectivity change' as there is no internet
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
         }
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned) {
             ChipLogProgress(DeviceLayer, "Initializing route hook...");
             ameba_route_hook_init();
         }
@@ -241,9 +244,12 @@ void matter_core_init_server(intptr_t context)
 #endif
 
 #if defined(CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER) && (CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER == 1)
-    static AmebaTestEventTriggerDelegate sTestEventTriggerDelegate{ ByteSpan(sTestEventTriggerEnableKey) };
+    static AmebaTestEventTriggerDelegate sTestEventTriggerDelegate { ByteSpan(sTestEventTriggerEnableKey) };
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif
+    // Starts from v1.6, DeviceInfoProvider shall be init before Server init
+    // TODO: Use our own DeviceInfoProvider
+    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
     chip::Server::GetInstance().Init(initParams);
 
@@ -253,13 +259,11 @@ void matter_core_init_server(intptr_t context)
 
     VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
     gExampleDeviceInfoProvider.SetStorageDelegate(&Server::GetInstance().GetPersistentStorage());
-    // TODO: Use our own DeviceInfoProvider
-    chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
     SetAttributePersistenceProvider(&gDeferredAttributePersister);
 
 #if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
     const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
-                app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
+                            app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
     PersistentStorageDelegate &persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
     chip::app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, termsAndConditions);
 #endif
@@ -274,10 +278,13 @@ void matter_core_init_server(intptr_t context)
     emberAfEndpointEnableDisable(LAST_FIXED_ENDPOINT_ID, false);
 #endif
 
-    if (RTW_SUCCESS != wifi_is_connected_to_ap())
-    {
-        // QR code will be used with CHIP Tool
-        PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+    if (RTW_SUCCESS != wifi_is_connected_to_ap()) {
+        matter_print_onboarding_codes();
+    } else if (matter_server_is_commissioned() != 0) {
+        // Ensure DNSSD server is started for devices connected via user-specific Wi-Fi / fast connect.
+        // Previously, commissioned devices became unreachable/uncontrollable
+        // because the DNSSD service was not initialized after network connection.
+        chip::app::DnssdServer::Instance().StartServer();
     }
 
 #if defined(CONFIG_ENABLE_CHIP_SHELL) && (CONFIG_ENABLE_CHIP_SHELL == 1)
@@ -298,8 +305,7 @@ CHIP_ERROR matter_core_init(void)
     SuccessOrExit(err);
 
     err = mFactoryDataProvider.Init();
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "Error initializing FactoryData!");
         ChipLogError(DeviceLayer, "Check if you have flashed it correctly!");
     }
@@ -308,8 +314,7 @@ CHIP_ERROR matter_core_init(void)
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
-    if (CONFIG_NETWORK_LAYER_BLE)
-    {
+    if (CONFIG_NETWORK_LAYER_BLE) {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
 
@@ -339,8 +344,7 @@ exit:
 
 CHIP_ERROR matter_core_start(void)
 {
-    if (initPref() != 0)
-    {
+    if (initPref() != 0) {
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 

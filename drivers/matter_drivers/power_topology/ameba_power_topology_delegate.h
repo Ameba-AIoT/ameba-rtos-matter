@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -39,9 +40,8 @@ public:
 class PowerTopologyInstance : public Instance
 {
 public:
-    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, Feature aFeature,
-                          OptionalAttributes aOptionalAttributes) :
-        PowerTopology::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttributes)
+    PowerTopologyInstance(EndpointId aEndpointId, PowerTopologyDelegate & aDelegate, Feature aFeature) :
+        PowerTopology::Instance(aEndpointId, aDelegate, aFeature)
     {
         mDelegate = &aDelegate;
     }
@@ -60,7 +60,24 @@ private:
     PowerTopologyDelegate * mDelegate;
 };
 
+/**
+ * @brief   Helper function to create and initialize the PowerTopology cluster
+ *
+ * Creates the delegate and instance, then calls Init() to register attribute and command handlers
+ *
+ * @param endpointId The endpoint ID to create the cluster on
+ * @param aDelegate  Reference to store the created delegate
+ * @param aInstance  Reference to store the created instance
+ * @return CHIP_NO_ERROR if the PowerTopology cluster is initialized successfully, otherwise an error code
+ */
+CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId, std::unique_ptr<PowerTopologyDelegate> & aDelegate,
+                             std::unique_ptr<PowerTopologyInstance> & aInstance);
+
+CHIP_ERROR PowerTopologyShutdown(std::unique_ptr<PowerTopologyInstance> & aInstance,
+                                 std::unique_ptr<PowerTopologyDelegate> & aDelegate);
+
 } // namespace PowerTopology
 } // namespace Clusters
 } // namespace app
 } // namespace chip
+

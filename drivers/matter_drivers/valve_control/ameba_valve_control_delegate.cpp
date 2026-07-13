@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <valve_control/ameba_valve_control_delegate.h>
 
 using namespace chip;
@@ -39,7 +38,7 @@ DataModel::Nullable<chip::Percent> AmebaValveControlDelegate::HandleOpenValve(Da
     ChipLogProgress(NotSpecified, "Valve openinig from level: %d to %d", currentLevel, sLevel);
 
     currentLevel = sLevel;
-    Attributes::CurrentState::Set(kValveEndpoint, ValveConfigurationAndControl::ValveStateEnum::kOpen);
+    ValveConfigurationAndControl::UpdateCurrentState(kValveEndpoint, ValveConfigurationAndControl::ValveStateEnum::kOpen);
 
     return DataModel::Nullable<chip::Percent>(currentLevel);
 }
