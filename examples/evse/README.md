@@ -1,10 +1,9 @@
-# Energy-management-app Example
-This example is an implementation of the *Energy Management App*.
-This example is demonstrated alongside with *Electric Vehicle Supply Equipment* or *Water Heater* device example.
+# EVSE-app Example
+This example is an implementation of the *Electric Vehicle Supply Equipment* alongside with *Energy Management App*.
 Note that these driver codes are meant to be just the skeleton, you should replace them and implement your own.
 
 ## How it works
-The Energy-management-app can be controlled in two ways, by the Matter controller, or by external means. 
+The EVSE-app can be controlled in two ways, by the Matter controller, or by external means. 
 In this example, we demonstrate both methods via Matter controller and external means.
 If you wish to control by external means, you will need to use the `downlink` task shown in `matter_drivers.cpp`. Please feel free to add more based on your implementations. Meanwhile, controlling with Matter controller will trigger the `uplink` handler.
 
@@ -24,7 +23,7 @@ You may add clusters and attributes handling in `matter_driver_uplink_update_han
 ## How to build
 
 ### Configurations
-`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT` are automatically enabled in the Makefiles / CMake.
+`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_EVSE` are automatically enabled in the Makefiles / CMake.
 
 #### Configure Matter Main Feature
 Navigate to `project/amebaxxx/Makefile.include.matter`, and enable the two configurations:
@@ -40,21 +39,6 @@ GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=1
 By default, both configurations are disabled.
 Energy Management App needs both of the features to be enabled.
 Please enable both of them manually in the `Makefile.include.matter`.
-
-#### Configure Device Example
-Navigate to `examples/energy_management/matter_drivers.h`, and find the following configurations:
-
-```C
-/**
- * @brief  Choose which device should be compiled along the Energy Management example.
- */
-#define CONFIG_EXAMPLE_MATTER_EVSE_DEVICE 1
-#define CONFIG_EXAMPLE_MATTER_WHM_DEVICE  0
-```
-
-By default it will compile the Electric Vehicle Supply Equipment device example.
-If Water Heater device wants to be compiled, disable `CONFIG_EXAMPLE_MATTER_EVSE_DEVICE`, then enable `CONFIG_EXAMPLE_MATTER_WHM_DEVICE`.
-Only one device example can be compiled at a time, so make sure only one of them is enabled.
 
 #### Configure Device Energy Management Feature support
 Navigate to `examples/energy_management/matter_drivers.h`, and find the following configurations:
@@ -89,7 +73,7 @@ Only one DEM feature support can be enabled at a time, so make sure only one of 
 
     cd ameba-rtos-matter/
     ameba.py soc RTL8721Dx
-    matter_build_proj energy_management_port
+    matter_build_proj evse_port
 
 #### Flash the Image
 Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
@@ -107,7 +91,7 @@ Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-a
 #### Build Matter Libraries and the Final Firmware
 
     cd ameba-rtos/amebadplus_gcc_project
-    python build.py -D MATTER_EXAMPLE=energy_management_port
+    python build.py -D MATTER_EXAMPLE=evse_port
 
 #### Flash the Image
 Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
@@ -125,7 +109,7 @@ Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-p
 #### Build Matter Libraries
 
     cd ameba-rtos/amebadplus_gcc_project
-    make -C project_km4/asdk energy_management_port
+    make -C project_km4/asdk evse_port
 
 #### Build the Final Firmware
 
@@ -158,7 +142,7 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 
     cd ameba-rtos-matter/
     ameba.py soc < RTL8726E / RTL8720E / RTL8713E / RTL8710E >
-    matter_build_proj energy_management_port
+    matter_build_proj evse_port
 
 #### Flash the Image
 Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
@@ -176,7 +160,7 @@ Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-a
 #### Build Matter Libraries and the Final Firmware
 
     cd ameba-rtos/amebalite_gcc_project
-    python build.py -D MATTER_EXAMPLE=energy_management_port
+    python build.py -D MATTER_EXAMPLE=evse_port
 
 #### Flash the Image
 Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
@@ -194,7 +178,7 @@ Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-p
 #### Build Matter Libraries
 
     cd ameba-rtos/amebalite_gcc_project
-    make -C project_km4/asdk energy_management_port
+    make -C project_km4/asdk evse_port
 
 #### Build the Final Firmware
 
@@ -227,7 +211,7 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 
     cd ameba-rtos-matter/
     ameba.py soc RTL8730E
-    matter_build_proj energy_management_port
+    matter_build_proj evse_port
 
 #### Flash the Image
 Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
@@ -245,7 +229,7 @@ Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-a
 #### Build Matter Libraries and the Final Firmware
 
     cd ameba-rtos/amebasmart_gcc_project
-    python build.py -D MATTER_EXAMPLE=energy_management_port
+    python build.py -D MATTER_EXAMPLE=evse_port
 
 #### Flash the Image
 Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
@@ -263,7 +247,7 @@ Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-p
 #### Build Matter Libraries
 
     cd ameba-rtos/amebasmart_gcc_project
-    make -C project_ap/asdk energy_management_port
+    make -C project_ap/asdk evse_port
 
 #### Build the Final Firmware
 
@@ -296,7 +280,7 @@ Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0
 
     cd ameba-rtos-matter/
     ameba.py soc RTL8721F
-    matter_build_proj energy_management_port
+    matter_build_proj evse_port
 
 #### Flash the Image
 Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.

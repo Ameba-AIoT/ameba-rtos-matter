@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <water_heater/ameba_water_heater_management_instance.h>
 
 using namespace chip::app;

@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +16,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <app-common/zap-generated/cluster-enums.h>
-#include <app/util/config.h>
 #include <cstring>
 #include <lib/core/CHIPError.h>
 #include <lib/support/BitMask.h>
@@ -29,14 +28,7 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace DeviceEnergyManagement {
-
-/**
- * @brief   Helper function to get current timestamp in Epoch format
- *
- * @param   chipEpoch reference to hold return timestamp
- */
-CHIP_ERROR GetEpochTS(uint32_t & chipEpoch);
+namespace EnergyEvse {
 
 /**
  * @brief   Helper function to get current timestamp and work out the day of week
@@ -58,7 +50,7 @@ BitMask<EnergyEvse::TargetDayOfWeekBitmap> GetLocalDayOfWeekFromUnixEpoch(time_t
  * @param   reference to hold the day of week as a bitmap as defined by EnergyEvse::TargetDayOfWeekBitmap.
  *          Note only one bit will be set for the current day.
  */
-CHIP_ERROR GetLocalDayOfWeekNow(BitMask<EnergyEvse::TargetDayOfWeekBitmap> & dayOfWeekMap);
+CHIP_ERROR GetLocalDayOfWeekNow(BitMask<EnergyEvse::TargetDayOfWeekBitmap> &dayOfWeekMap);
 
 /**
  * @brief   Helper function to get current timestamp and work out the current number of minutes
@@ -66,9 +58,9 @@ CHIP_ERROR GetLocalDayOfWeekNow(BitMask<EnergyEvse::TargetDayOfWeekBitmap> & day
  *
  * @param   reference to hold the number of minutes past midnight
  */
-CHIP_ERROR GetMinutesPastMidnight(uint16_t & minutesPastMidnight);
+CHIP_ERROR GetMinutesPastMidnight(uint16_t &minutesPastMidnight);
 
-} // namespace DeviceEnergyManagement
+} // namespace EnergyEvse
 } // namespace Clusters
 } // namespace app
 } // namespace chip

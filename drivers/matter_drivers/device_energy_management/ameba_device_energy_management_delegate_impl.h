@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,12 +16,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
 #include <app/clusters/device-energy-management-server/device-energy-management-server.h>
-#include <app/util/config.h>
 
 namespace chip {
 namespace app {
@@ -35,11 +34,11 @@ class DeviceEnergyManagementDelegate : public DeviceEnergyManagement::Delegate
 public:
     DeviceEnergyManagementDelegate();
 
-    void SetDeviceEnergyManagementInstance(DeviceEnergyManagement::Instance & instance);
+    void SetDeviceEnergyManagementInstance(DeviceEnergyManagement::Instance &instance);
 
-    void SetDEMManufacturerDelegate(DEMManufacturerDelegate & deviceEnergyManagementManufacturerDelegate);
+    void SetDEMManufacturerDelegate(DEMManufacturerDelegate &deviceEnergyManagementManufacturerDelegate);
 
-    chip::app::Clusters::DeviceEnergyManagement::DEMManufacturerDelegate * GetDEMManufacturerDelegate();
+    chip::app::Clusters::DeviceEnergyManagement::DEMManufacturerDelegate *GetDEMManufacturerDelegate();
     /**
      *
      * Implement the DeviceEnergyManagement::Delegate interface
@@ -58,7 +57,7 @@ public:
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
     chip::Protocols::InteractionModel::Status PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
-                                                                 AdjustmentCauseEnum cause) override;
+            AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Make the ESA end the active power adjustment session & return to normal (or idle) power levels.
@@ -85,7 +84,7 @@ public:
      * IM_Status.
      */
     chip::Protocols::InteractionModel::Status StartTimeAdjustRequest(const uint32_t requestedStartTimeUtc,
-                                                                     AdjustmentCauseEnum cause) override;
+            AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Handler for PauseRequest command
@@ -131,7 +130,7 @@ public:
      */
     chip::Protocols::InteractionModel::Status
     ModifyForecastRequest(const uint32_t forecastID,
-                          const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+                          const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> &slotAdjustments,
                           AdjustmentCauseEnum cause) override;
 
     /**
@@ -146,7 +145,7 @@ public:
      * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
      */
     chip::Protocols::InteractionModel::Status
-    RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints,
+    RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> &constraints,
                                    AdjustmentCauseEnum cause) override;
 
     /**
@@ -176,8 +175,8 @@ public:
     ESAStateEnum GetESAState() override;
     int64_t GetAbsMinPower() override;
     int64_t GetAbsMaxPower() override;
-    const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & GetPowerAdjustmentCapability() override;
-    const DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() override;
+    const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> &GetPowerAdjustmentCapability() override;
+    const DataModel::Nullable<Structs::ForecastStruct::Type> &GetForecast() override;
     OptOutStateEnum GetOptOutState() override;
 
     // ------------------------------------------------------------------
@@ -241,7 +240,7 @@ private:
     void HandlePowerAdjustRequestFailure();
 
     // Methods to handle when a PowerAdjustment completes
-    static void PowerAdjustTimerExpiry(System::Layer * systemLayer, void * delegate);
+    static void PowerAdjustTimerExpiry(System::Layer *systemLayer, void *delegate);
     void HandlePowerAdjustTimerExpiry();
 
     // Method to cancel a PowerAdjustment
@@ -258,7 +257,7 @@ private:
     void HandlePauseRequestFailure();
 
     // Methods to handle when a PauseRequest completes
-    static void PauseRequestTimerExpiry(System::Layer * systemLayer, void * delegate);
+    static void PauseRequestTimerExpiry(System::Layer *systemLayer, void *delegate);
     void HandlePauseRequestTimerExpiry();
 
     // Method to cancel a PauseRequest
@@ -269,11 +268,11 @@ private:
 
 private:
     // Have a pointer to partner instance object
-    DeviceEnergyManagement::Instance * mpDEMInstance;
+    DeviceEnergyManagement::Instance *mpDEMInstance;
 
     // The DEMManufacturerDelegate object knows how to handle
     // manufacturer/product specific operations
-    DEMManufacturerDelegate * mpDEMManufacturerDelegate;
+    DEMManufacturerDelegate *mpDEMManufacturerDelegate;
 
     // Various attributes
     ESATypeEnum mEsaType;

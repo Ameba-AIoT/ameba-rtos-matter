@@ -39,11 +39,11 @@ To check out ameba-rtos repository:
 
 To check out ameba-rtos-matter repository:
 
-    git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git -b ameba-rtos/release/v1.5
+    git clone https://github.com/Ameba-AIoT/ameba-rtos-matter.git -b ameba-rtos/release/v1.6
 
 To check out Matter repository:
 
-    git clone https://github.com/project-chip/connectedhomeip.git -b v1.5-branch
+    git clone https://github.com/project-chip/connectedhomeip.git -b v1.6-branch
 
 Make sure ameba-rtos, ameba-rtos-matter, and connectedhomeip are on the same directory level
 
@@ -211,7 +211,7 @@ Create and enter new directory
     mkdir dev
     cd dev
 
-Get ameba-rtos v1.1 SDK + integrated patch + matter v1.5 patch, please contact our FAE to get the SDKs
+Get ameba-rtos v1.1 SDK + integrated patch + matter v1.6 patch, please contact our FAE to get the SDKs
 
 To check out Matter repository:
 
@@ -240,7 +240,7 @@ Navigate to the `ameba-rtos` directory:
 
     cd connectedhomeip
 
-	git switch v1.5-branch
+	git switch v1.6-branch
 
     git submodule sync
 
@@ -264,7 +264,7 @@ Navigate to the `ameba-rtos` directory:
 
     chmod u+x matter_setup.sh
 
-    ./matter_setup.sh ameba-rtos v1.5
+    ./matter_setup.sh ameba-rtos v1.6
 
 ### Build CHIP library by GN and Final Firmware
 
@@ -357,7 +357,7 @@ Create and enter new directory
     mkdir dev
     cd dev
 
-Get ameba-rtos v1.0 SDK + integrated patch + matter v1.5 patch, please contact our FAE to get the SDKs
+Get ameba-rtos v1.0 SDK + integrated patch + matter v1.6 patch, please contact our FAE to get the SDKs
 
 To check out Matter repository:
 
@@ -376,7 +376,7 @@ Make sure ameba-rtos and connectedhomeip are on the same directory level
 
     cd connectedhomeip
 
-	git switch v1.5-branch
+	git switch v1.6-branch
 
     git submodule sync
 
@@ -394,7 +394,7 @@ Navigate to the `ameba-rtos` directory:
 
     chmod u+x matter_setup.sh
 
-    ./matter_setup.sh ameba-rtos v1.5
+    ./matter_setup.sh ameba-rtos v1.6
 
 ### Build CHIP library by GN and Final Firmware
 

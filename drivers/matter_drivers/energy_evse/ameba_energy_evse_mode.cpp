@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <energy_evse/ameba_energy_evse_mode.h>
 
@@ -34,39 +34,35 @@ CHIP_ERROR EnergyEvseModeDelegate::Init()
     return CHIP_NO_ERROR;
 }
 
-void EnergyEvseModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type & response)
+void EnergyEvseModeDelegate::HandleChangeToMode(uint8_t NewMode, ModeBase::Commands::ChangeToModeResponse::Type &response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR EnergyEvseModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+CHIP_ERROR EnergyEvseModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
 {
-    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
-    {
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions)) {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
 }
 
-CHIP_ERROR EnergyEvseModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+CHIP_ERROR EnergyEvseModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t &value)
 {
-    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
-    {
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions)) {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     value = kModeOptions[modeIndex].mode;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EnergyEvseModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
+CHIP_ERROR EnergyEvseModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags)
 {
-    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
-    {
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions)) {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
 
-    if (tags.size() < kModeOptions[modeIndex].modeTags.size())
-    {
+    if (tags.size() < kModeOptions[modeIndex].modeTags.size()) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -76,7 +72,7 @@ CHIP_ERROR EnergyEvseModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<Mo
     return CHIP_NO_ERROR;
 }
 
-ModeBase::Instance * EnergyEvseMode::Instance()
+ModeBase::Instance *EnergyEvseMode::Instance()
 {
     return gEnergyEvseModeInstance.get();
 }
@@ -92,5 +88,13 @@ void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
     VerifyOrDie(!gEnergyEvseModeDelegate && !gEnergyEvseModeInstance);
     gEnergyEvseModeDelegate = std::make_unique<EnergyEvseMode::EnergyEvseModeDelegate>();
     gEnergyEvseModeInstance = std::make_unique<ModeBase::Instance>(gEnergyEvseModeDelegate.get(), 0x1, EnergyEvseMode::Id, 0);
-    gEnergyEvseModeInstance->Init();
+    TEMPORARY_RETURN_IGNORED gEnergyEvseModeInstance->Init();
+}
+
+void emberAfEnergyEvseModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gEnergyEvseModeInstance) {
+        gEnergyEvseModeInstance->Shutdown();
+    }
+    EnergyEvseMode::Shutdown();
 }

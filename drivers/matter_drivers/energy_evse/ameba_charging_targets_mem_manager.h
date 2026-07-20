@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,10 +16,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
-#include <app/clusters/energy-evse-server/energy-evse-server.h>
+#include <energy_evse/ameba_energy_evse_target_config.h>
+#include <app/clusters/energy-evse-server/Constants.h>
 #include <lib/core/CHIPError.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -102,7 +103,7 @@ public:
      *
      * @param chargingTarget  - The chargingTarget that will be added into the current day schedule
      */
-    void AddChargingTarget(const EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget);
+    void AddChargingTarget(const EnergyEvse::Structs::ChargingTargetStruct::Type &chargingTarget);
 
     /**
      * @brief Called to allocate and copy the chargingTargets added via AddChargingTarget into the
@@ -119,7 +120,7 @@ public:
      *
      * @param chargingTargets  - The chargingTargets to add into the current day schedule
      */
-    CHIP_ERROR AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets);
+    CHIP_ERROR AllocAndCopy(const DataModel::List<const Structs::ChargingTargetStruct::Type> &chargingTargets);
 
     /**
      * @brief Called to allocate and copy the chargingTargets into the current day schedule as set
@@ -127,14 +128,14 @@ public:
      *
      * @param chargingTargets  - The chargingTargets to add into the current day schedule
      */
-    CHIP_ERROR AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> & chargingTargets);
+    CHIP_ERROR AllocAndCopy(const DataModel::DecodableList<Structs::ChargingTargetStruct::DecodableType> &chargingTargets);
 
     /**
      * @brief Returns the list of chargingTargets associated with the current day schedule.
      *
      * @return The charging targets associated with the current day schedule.
      */
-    EnergyEvse::Structs::ChargingTargetStruct::Type * GetChargingTargets() const;
+    EnergyEvse::Structs::ChargingTargetStruct::Type *GetChargingTargets() const;
 
     /**
      * @brief Returns the number of chargingTargets associated with current day schedule.
@@ -144,7 +145,7 @@ public:
     uint16_t GetNumDailyChargingTargets() const;
 
 private:
-    EnergyEvse::Structs::ChargingTargetStruct::Type * mpListOfDays[kEvseTargetsMaxNumberOfDays];
+    EnergyEvse::Structs::ChargingTargetStruct::Type *mpListOfDays[kEvseTargetsMaxNumberOfDays];
     EnergyEvse::Structs::ChargingTargetStruct::Type mDailyChargingTargets[kEvseTargetsMaxTargetsPerDay];
     uint16_t mChargingTargetSchedulesIdx;
     uint16_t mNumDailyChargingTargets;

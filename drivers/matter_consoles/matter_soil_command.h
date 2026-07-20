@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,10 +16,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
-#include <app/clusters/soil-measurement-server/soil-measurement-cluster.h>
+#include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <soil_measurement/ameba_soil_measurement_instance.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
@@ -42,25 +42,23 @@ Engine sShellManualSoilSubCommands;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 
-CHIP_ERROR ManualSoilCommandHelpHandler(int argc, char ** argv)
+CHIP_ERROR ManualSoilCommandHelpHandler(int argc, char **argv)
 {
     sShellManualSoilSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ManualSoilCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualSoilCommandHandler(int argc, char **argv)
 {
-    if (argc == 0)
-    {
+    if (argc == 0) {
         return ManualSoilCommandHelpHandler(argc, argv);
     }
     return sShellManualSoilSubCommands.ExecCommand(argc, argv);
 }
 
-CHIP_ERROR ManualSoilChangeMoistureCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualSoilChangeMoistureCommandHandler(int argc, char **argv)
 {
-    if (argc != 1)
-    {
+    if (argc != 1) {
         return ManualSoilCommandHelpHandler(argc, argv);
     }
 
@@ -72,8 +70,7 @@ CHIP_ERROR ManualSoilChangeMoistureCommandHandler(int argc, char ** argv)
     // Call the function to set the moisture value
     CHIP_ERROR err = GetAmebaSoilMeasurementInstance()->Cluster().SetSoilMoistureMeasuredValue(soilMoistureMeasuredValue);
 
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         return err;
     }
 

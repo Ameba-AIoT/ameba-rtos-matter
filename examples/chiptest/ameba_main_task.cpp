@@ -1,6 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,8 +16,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <CHIPDeviceManager.h>
+#include <app/clusters/unit-localization-server/unit-localization-server.h>
 
 #include <matter_attribute_callbacks.h>
 #include <matter_command.h>
@@ -64,7 +66,15 @@ void AppTaskInit(void)
 
     app::Clusters::ModeSelect::setSupportedModesManager(&sAmebaSupportedModesManager);
     WaterHeaterApplicationInit();
-    EvseApplicationInit();
+    AllClustersEvseApplicationInit();
+
+    Clusters::UnitLocalization::TempUnitEnum supportedUnits[2] = { Clusters::UnitLocalization::TempUnitEnum::kFahrenheit,
+                                                                   Clusters::UnitLocalization::TempUnitEnum::kCelsius };
+    DataModel::List<Clusters::UnitLocalization::TempUnitEnum> unitsList(supportedUnits);
+    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetSupportedTemperatureUnits(unitsList) ==
+                CHIP_NO_ERROR);
+    VerifyOrDie(Clusters::UnitLocalization::UnitLocalizationServer::Instance().SetTemperatureUnit(
+                    Clusters::UnitLocalization::TempUnitEnum::kFahrenheit) == CHIP_NO_ERROR);
 
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
     CHIP_ERROR ret = SmokeCoAlarm::AmebaSmokeCoAlarmTestEventInit(1);

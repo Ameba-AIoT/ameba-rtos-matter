@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_autoconf.h>
 #include <atcmd_matter.h>
 
@@ -34,8 +33,8 @@
 #include <dishwasher/example_matter_dishwasher.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_DOORLOCK) && (CONFIG_EXAMPLE_MATTER_DOORLOCK == 1)
 #include <doorlock/example_matter_doorlock.h>
-#elif defined(CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT) && (CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT == 1)
-#include <energy_management/example_matter_energy_management.h>
+#elif defined(CONFIG_EXAMPLE_MATTER_EVSE) && (CONFIG_EXAMPLE_MATTER_EVSE == 1)
+#include <evse/example_matter_evse.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_FAN) && (CONFIG_EXAMPLE_MATTER_FAN == 1)
 #include <fan/example_matter_fan.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER) && (CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER == 1)
@@ -48,6 +47,8 @@
 #include <refrigerator/example_matter_refrigerator.h>
 #elif defined(CONFIG_EXAMPLE_MATTER_THERMOSTAT) && (CONFIG_EXAMPLE_MATTER_THERMOSTAT == 1)
 #include <thermostat/example_matter_thermostat.h>
+#elif defined(CONFIG_EXAMPLE_MATTER_WATER_HEATER) && (CONFIG_EXAMPLE_MATTER_WATER_HEATER == 1)
+#include <water_heater/example_matter_water_heater.h>
 #else
 #error "matter_example_entry.c is included but no example is linked, please define MATTER_EXAMPLE correctly!!!"
 #endif
@@ -71,8 +72,8 @@ void app_example(void)
     example_matter_dishwasher();
 #elif defined(CONFIG_EXAMPLE_MATTER_DOORLOCK) && (CONFIG_EXAMPLE_MATTER_DOORLOCK == 1)
     example_matter_doorlock();
-#elif defined(CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT) && (CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT == 1)
-    example_matter_energy_management();
+#elif defined(CONFIG_EXAMPLE_MATTER_EVSE) && (CONFIG_EXAMPLE_MATTER_EVSE == 1)
+    example_matter_evse();
 #elif defined(CONFIG_EXAMPLE_MATTER_FAN) && (CONFIG_EXAMPLE_MATTER_FAN == 1)
     example_matter_fan();
 #elif defined(CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER) && (CONFIG_EXAMPLE_MATTER_LAUNDRY_WASHER == 1)
@@ -85,6 +86,8 @@ void app_example(void)
     example_matter_refrigerator();
 #elif defined(CONFIG_EXAMPLE_MATTER_THERMOSTAT) && (CONFIG_EXAMPLE_MATTER_THERMOSTAT == 1)
     example_matter_thermostat();
+#elif defined(CONFIG_EXAMPLE_MATTER_WATER_HEATER) && (CONFIG_EXAMPLE_MATTER_WATER_HEATER == 1)
+    example_matter_water_heater();
 #else
     #error "matter_example_entry.c is included but no example is linked, please define MATTER_EXAMPLE correctly!!!"
 #endif

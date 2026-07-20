@@ -16,7 +16,7 @@ matter_examples=(
   "camera_port"
   "dishwasher_port"
   "doorlock_port"
-  "energy_management_port"
+  "evse_port"
   "fan_port"
   "laundrywasher_port"
   "light"
@@ -25,6 +25,7 @@ matter_examples=(
   "microwaveoven_port"
   "refrigerator_port"
   "thermostat_port"
+  "water_heater_port"
 )
 
 valid_example=false

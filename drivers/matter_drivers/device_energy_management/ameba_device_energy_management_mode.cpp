@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +16,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <device_energy_management/ameba_energy_management_common_main.h>
 #include <device_energy_management/ameba_device_energy_management_mode.h>
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <lib/core/CHIPError.h>
+#include <memory>
+#include <protocols/interaction_model/Constants.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DeviceEnergyManagementMode;
@@ -43,39 +45,35 @@ CHIP_ERROR DeviceEnergyManagementModeDelegate::Init()
 }
 
 void DeviceEnergyManagementModeDelegate::HandleChangeToMode(uint8_t NewMode,
-                                                            ModeBase::Commands::ChangeToModeResponse::Type & response)
+        ModeBase::Commands::ChangeToModeResponse::Type &response)
 {
     response.status = to_underlying(ModeBase::StatusCode::kSuccess);
 }
 
-CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan & label)
+CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeLabelByIndex(uint8_t modeIndex, chip::MutableCharSpan &label)
 {
-    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
-    {
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions)) {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     return chip::CopyCharSpanToMutableCharSpan(kModeOptions[modeIndex].label, label);
 }
 
-CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t & value)
+CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeValueByIndex(uint8_t modeIndex, uint8_t &value)
 {
-    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
-    {
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions)) {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
     value = kModeOptions[modeIndex].mode;
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> & tags)
+CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeTagsByIndex(uint8_t modeIndex, List<ModeTagStructType> &tags)
 {
-    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions))
-    {
+    if (modeIndex >= MATTER_ARRAY_SIZE(kModeOptions)) {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
 
-    if (tags.size() < kModeOptions[modeIndex].modeTags.size())
-    {
+    if (tags.size() < kModeOptions[modeIndex].modeTags.size()) {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
@@ -83,11 +81,6 @@ CHIP_ERROR DeviceEnergyManagementModeDelegate::GetModeTagsByIndex(uint8_t modeIn
     tags.reduce_size(kModeOptions[modeIndex].modeTags.size());
 
     return CHIP_NO_ERROR;
-}
-
-ModeBase::Instance * DeviceEnergyManagementMode::Instance()
-{
-    return gDeviceEnergyManagementModeInstance.get();
 }
 
 void DeviceEnergyManagementMode::Shutdown()
@@ -98,29 +91,22 @@ void DeviceEnergyManagementMode::Shutdown()
 
 void emberAfDeviceEnergyManagementModeClusterInitCallback(chip::EndpointId endpointId)
 {
-    /* emberAfDeviceEnergyManagementModeClusterInitCallback() is called for all endpoints
-    that include this cluster (even the one we disable dynamically). So here, we only
-    proceed when it's called for the right endpoint determined by GetEnergyDeviceEndpointId()
-    (a cmd line argument on linux or #define on other platforms).
-    */
-    if (endpointId != GetEnergyDeviceEndpointId())
-    {
-        return;
-    }
-
     VerifyOrDie(!gDeviceEnergyManagementModeDelegate && !gDeviceEnergyManagementModeInstance);
     gDeviceEnergyManagementModeDelegate = std::make_unique<DeviceEnergyManagementMode::DeviceEnergyManagementModeDelegate>();
-    gDeviceEnergyManagementModeInstance =
-        std::make_unique<ModeBase::Instance>(gDeviceEnergyManagementModeDelegate.get(), 0x1, DeviceEnergyManagementMode::Id, 0);
-    gDeviceEnergyManagementModeInstance->Init();
+    gDeviceEnergyManagementModeInstance = std::make_unique<ModeBase::Instance>(gDeviceEnergyManagementModeDelegate.get(),
+                                          endpointId, DeviceEnergyManagementMode::Id, 0);
+    TEMPORARY_RETURN_IGNORED gDeviceEnergyManagementModeInstance->Init();
+}
+
+void emberAfDeviceEnergyManagementModeClusterShutdownCallback(chip::EndpointId endpointId)
+{
+    if (gDeviceEnergyManagementModeInstance) {
+        gDeviceEnergyManagementModeInstance->Shutdown();
+    }
+    DeviceEnergyManagementMode::Shutdown();
 }
 
 void MatterDeviceEnergyManagementModeClusterServerShutdownCallback(chip::EndpointId endpointId)
 {
-    if (endpointId != GetEnergyDeviceEndpointId())
-    {
-        return;
-    }
-
     DeviceEnergyManagementMode::Shutdown();
 }

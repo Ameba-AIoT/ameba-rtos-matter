@@ -75,6 +75,9 @@ ameba_list_append(matter_defintions
     # matter timer
     CONFIG_ENABLE_AMEBA_SNTP=1
 
+    # Matter Commissioning Flow (default: standard)
+    CONFIG_USER_ACTION_REQUIRED=0
+
     # other options
     CHIP_HAVE_CONFIG_H
 
@@ -179,9 +182,9 @@ elseif(MATTER_EXAMPLE STREQUAL "doorlock_port")
     ameba_list_append(matter_defintions
         CONFIG_EXAMPLE_MATTER_DOORLOCK=1
     )
-elseif(MATTER_EXAMPLE STREQUAL "energy_management_port")
+elseif(MATTER_EXAMPLE STREQUAL "evse_port")
     ameba_list_append(matter_defintions
-        CONFIG_EXAMPLE_MATTER_ENERGY_MANAGEMENT=1
+        CONFIG_EXAMPLE_MATTER_EVSE=1
     )
 elseif(MATTER_EXAMPLE STREQUAL "fan_port")
     ameba_list_append(matter_defintions
@@ -206,6 +209,10 @@ elseif(MATTER_EXAMPLE STREQUAL "refrigerator_port")
 elseif(MATTER_EXAMPLE STREQUAL "thermostat_port")
     ameba_list_append(matter_defintions
         CONFIG_EXAMPLE_MATTER_THERMOSTAT=1
+    )
+elseif(MATTER_EXAMPLE STREQUAL "water_heater_port")
+    ameba_list_append(matter_defintions
+        CONFIG_EXAMPLE_MATTER_WATER_HEATER=1
     )
 endif()
 

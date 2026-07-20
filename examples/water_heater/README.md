@@ -1,0 +1,297 @@
+# Water-heater-app Example
+This example is an implementation of the *Water Heater* alongside with *Energy Management App*.
+Note that these driver codes are meant to be just the skeleton, you should replace them and implement your own.
+
+## How it works
+The Water-heater-app can be controlled in two ways, by the Matter controller, or by external means. 
+In this example, we demonstrate both methods via Matter controller and external means.
+If you wish to control by external means, you will need to use the `downlink` task shown in `matter_drivers.cpp`. Please feel free to add more based on your implementations. Meanwhile, controlling with Matter controller will trigger the `uplink` handler.
+
+### Peripheral Initialization
+The initializations are handled in `matter_drivers.cpp`.
+
+### Matter Attribute Change Callback
+Whenever the Matter controller changes the attribute of the Energy Management cluster, 2 types of callbacks will be invoked:
+  1. MatterPreAttributeChangeCallback - Change the status/value before updating the attribute (TBD)
+  2. MatterPostAttributeChangeCallback - Change the status/value after updating the attribute
+
+These callbacks are defined in `core/matter_interaction.cpp`.
+These callbacks will post an event to the uplink queue, which will be handled by `matter_driver_uplink_update_handler` in `matter_drivers.cpp`.
+The driver codes will be called to carry out your actions depending on the Cluster and Attribute ID received.
+You may add clusters and attributes handling in `matter_driver_uplink_update_handler` if they are not present. 
+
+## How to build
+
+### Configurations
+`CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_WATER_HEATER` are automatically enabled in the Makefiles / CMake.
+
+#### Configure Matter Main Feature
+Navigate to `project/amebaxxx/Makefile.include.matter`, and enable the two configurations:
+
+```Makefile
+# matter timer
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_SNTP=1
+
+# ameba TestEvent Trigger EnableKey
+GLOBAL_CFLAGS += -DCONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER=1
+```
+
+By default, both configurations are disabled.
+Energy Management App needs both of the features to be enabled.
+Please enable both of them manually in the `Makefile.include.matter`.
+
+#### Configure Device Energy Management Feature support
+Navigate to `examples/energy_management/matter_drivers.h`, and find the following configurations:
+
+```C
+/**
+ * @brief  Choose which DEM feature support should be enabled, or both can be disabled.
+ */
+#define CONFIG_MATTER_DEM_SUPPORT_POWER_FORECAST_REPORTING 0
+#define CONFIG_MATTER_DEM_SUPPORT_STATE_FORECAST_REPORTING 0
+```
+
+By default, both are disabled.
+Only one DEM feature support can be enabled at a time, so make sure only one of them is enabled.
+
+### Setup the Build Environment
+  
+    cd connectedhomeip
+    source scripts/activate.sh
+
+---
+
+<details>
+  <summary>Building with AmebaDplus</summary>
+
+### AmebaDplus (RTL8721Dx)
+
+<details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc RTL8721Dx
+    matter_build_proj water_heater_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
+
+<details>
+  <summary>Building with ameba-rtos_v1.1 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project
+    python build.py -D MATTER_EXAMPLE=water_heater_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project
+    cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
+
+</details>
+
+<details>
+  <summary>Building with ameba-rtos_v1.0 SDK</summary>
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebadplus_gcc_project
+    make -C project_km4/asdk water_heater_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project
+    make all MATTER_EXAMPLE=energy_management
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0/README.md#flashing) to flash the image with Windows Image Tool.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebadplus_gcc_project
+    make clean
+
+</details>
+
+</details>
+
+---
+
+<details>
+  <summary>Building with AmebaLite</summary>
+
+### AmebaLite (RTL8726E / RTL8720E / RTL8713E / RTL8710E)
+
+<details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc < RTL8726E / RTL8720E / RTL8713E / RTL8710E >
+    matter_build_proj water_heater_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
+
+<details>
+  <summary>Building with ameba-rtos_v1.1 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos/amebalite_gcc_project
+    python build.py -D MATTER_EXAMPLE=water_heater_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebalite_gcc_project
+    cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
+
+</details>
+
+<details>
+  <summary>Building with ameba-rtos_v1.0 SDK</summary>
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebalite_gcc_project
+    make -C project_km4/asdk water_heater_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebalite_gcc_project
+    make all MATTER_EXAMPLE=energy_management
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0/README.md#flashing) to flash the image with Windows Image Tool.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebalite_gcc_project
+    make clean
+
+</details>
+
+</details>
+
+---
+
+<details>
+  <summary>Building with AmebaSmart</summary>
+
+### AmebaSmart (RTL8730E)
+
+<details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc RTL8730E
+    matter_build_proj water_heater_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
+
+<details>
+  <summary>Building with ameba-rtos_v1.1 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project
+    python build.py -D MATTER_EXAMPLE=water_heater_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-python-script) to flash the image with python script.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project
+    cd build/ && ninja clean_matter_libs clean && cd .. && rm -rf build/
+
+</details>
+
+<details>
+  <summary>Building with ameba-rtos_v1.0 SDK</summary>
+
+#### Build Matter Libraries
+
+    cd ameba-rtos/amebasmart_gcc_project
+    make -C project_ap/asdk water_heater_port
+
+#### Build the Final Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project
+    make all MATTER_EXAMPLE=energy_management
+
+#### Flash the Image
+Refer to this [guide](https://github.com/Ameba-AIoT/ameba-rtos/blob/release/v1.0/README.md#flashing) to flash the image with Windows Image Tool.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos/amebasmart_gcc_project
+    make clean
+
+</details>
+
+</details>
+
+---
+
+<details>
+  <summary>Building with AmebaGreen2</summary>
+
+### AmebaGreen2 (RTL8721F)
+
+<details>
+  <summary>Building with ameba-rtos_v1.2 SDK</summary>
+
+#### Build Matter Libraries and the Final Firmware
+
+    cd ameba-rtos-matter/
+    ameba.py soc RTL8721F
+    matter_build_proj water_heater_port
+
+#### Flash the Image
+Refer to this [guide](../../docs/ameba-rtos_general_build.md#flash-image-using-amebapy-command) to flash the image with ameba.py command.
+
+#### Clean Matter Libraries and Firmware
+
+    cd ameba-rtos-matter/
+    matter_clean_proj
+
+</details>
+
+</details>
+
+---

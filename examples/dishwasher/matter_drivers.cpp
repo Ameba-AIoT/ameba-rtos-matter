@@ -1,3 +1,21 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <dishwasher_driver.h>
@@ -11,6 +29,8 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <clusters/dishwasher-alarm-server/dishwasher-alarm-server.h>
+#include <app/clusters/temperature-control-server/CodegenIntegration.h>
+#include <app/clusters/temperature-control-server/TemperatureControlCluster.h>
 #include <protocols/interaction_model/StatusCode.h>
 
 using namespace ::chip::app;
@@ -59,23 +79,9 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
         err = CHIP_ERROR_INTERNAL;
     }
 
-    status = Clusters::TemperatureControl::Attributes::MaxTemperature::Set(1, dishwasher.GetMaxTemperature());
-    if (status != Status::Success)
-    {
-        ChipLogProgress(DeviceLayer, "Failed to set MaxTemperature!\n");
-        err = CHIP_ERROR_INTERNAL;
-    }
-
-    status = Clusters::TemperatureControl::Attributes::MinTemperature::Set(1, dishwasher.GetMinTemperature());
-    if (status != Status::Success)
-    {
-        ChipLogProgress(DeviceLayer, "Failed to set MinTemperature!\n");
-        err = CHIP_ERROR_INTERNAL;
-    }
-
     dishwasher.SetTemperature(55); // Set dishwasher temperature
-    status = Clusters::TemperatureControl::Attributes::TemperatureSetpoint::Set(1, dishwasher.GetTemperature());
-    if (status != Status::Success)
+    err = Clusters::TemperatureControl::SetTemperatureSetpoint(1, dishwasher.GetTemperature());
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Failed to set TemperatureSetpoint!\n");
         err = CHIP_ERROR_INTERNAL;
@@ -308,8 +314,8 @@ void matter_driver_downlink_update_handler(AppEvent *event)
             if ((event->value._i16 >= dishwasher.GetMinTemperature()) && (event->value._i16 <= dishwasher.GetMaxTemperature()))
             {
                 ChipLogProgress(DeviceLayer, "Set TemperatureSetpoint %i", event->value._i16);
-                status = Clusters::TemperatureControl::Attributes::TemperatureSetpoint::Set(1, event->value._i16);
-                if (status != Status::Success)
+                error = Clusters::TemperatureControl::SetTemperatureSetpoint(1, event->value._i16);
+                if (error != CHIP_NO_ERROR)
                 {
                     ChipLogProgress(DeviceLayer, "Failed to set TemperatureSetpoint!\n");
                 }

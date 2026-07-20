@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #ifndef _RTK_CHIP_PORTING_H_
 #define _RTK_CHIP_PORTING_H_
 
@@ -32,6 +31,7 @@ extern "C" {
 #include <kv.h>
 #include <wifi_conf.h>
 
+#include <matter_api.h>
 #include <matter_freertos.h>
 #include <matter_kvs.h>
 #include <matter_lwip.h>

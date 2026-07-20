@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 
@@ -42,8 +41,7 @@ using namespace chip::app;
 using namespace chip::app::Clusters::WaterHeaterManagement;
 using chip::Protocols::InteractionModel::Status;
 
-constexpr chip::EndpointId kEvseEndpoint        = 1;
-constexpr chip::EndpointId kWaterHeaterEndpoint = 2;
+constexpr chip::EndpointId kEnergyDeviceEndpoint = 1;
 
 namespace chip {
 namespace app {
@@ -77,20 +75,9 @@ chip::BitMask<Feature> AmebaGetDEMFeatureMap()
 } // namespace app
 } // namespace chip
 
-// User needs to enable only one of the example in the 
-#if (CONFIG_EXAMPLE_MATTER_EVSE_DEVICE && CONFIG_EXAMPLE_MATTER_WHM_DEVICE)
-#error "Do not set both CONFIG_EXAMPLE_MATTER_EVSE_DEVICE and CONFIG_EXAMPLE_MATTER_WHM_DEVICE to 1!"
-#elif !(CONFIG_EXAMPLE_MATTER_EVSE_DEVICE || CONFIG_EXAMPLE_MATTER_WHM_DEVICE)
-#error "Please set either one of CONFIG_EXAMPLE_MATTER_EVSE_DEVICE or CONFIG_EXAMPLE_MATTER_WHM_DEVICE to 1!"
-#endif
-
 EndpointId GetEnergyDeviceEndpointId()
 {
-#if (CONFIG_EXAMPLE_MATTER_EVSE_DEVICE)
-    return kEvseEndpoint;
-#elif (CONFIG_EXAMPLE_MATTER_WHM_DEVICE)
-    return kWaterHeaterEndpoint;
-#endif
+    return kEnergyDeviceEndpoint;
 }
 
 CHIP_ERROR matter_driver_application_init(void)
@@ -98,15 +85,7 @@ CHIP_ERROR matter_driver_application_init(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-#if (CONFIG_EXAMPLE_MATTER_EVSE_DEVICE)
     EvseApplicationInit();
-    // Disable Water Heater Endpoint
-    emberAfEndpointEnableDisable(kWaterHeaterEndpoint, false);
-#elif (CONFIG_EXAMPLE_MATTER_WHM_DEVICE)
-    WaterHeaterApplicationInit();
-    // Disable EVSE Endpoint
-    emberAfEndpointEnableDisable(kEvseEndpoint, false);
-#endif
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
     return err;
@@ -115,14 +94,8 @@ CHIP_ERROR matter_driver_application_init(void)
 CHIP_ERROR matter_driver_test_event_trigger_init(void)
 {
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
-
-#if (CONFIG_EXAMPLE_MATTER_EVSE_DEVICE)
     static AmebaEnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
     Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sEnergyEvseTestEventTriggerHandler);
-#elif (CONFIG_EXAMPLE_MATTER_WHM_DEVICE)
-    static AmebaWaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
-    Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
-#endif
 
     static AmebaDeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
     Server::GetInstance().GetTestEventTriggerDelegate()->AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
@@ -159,21 +132,12 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     case Clusters::DeviceEnergyManagementMode::Id:
         ChipLogProgress(DeviceLayer, "DeviceEnergyManagementMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
         break;
-#if (CONFIG_EXAMPLE_MATTER_EVSE_DEVICE)
     case Clusters::EnergyEvse::Id:
         ChipLogProgress(DeviceLayer, "EnergyEvse(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
         break;
     case Clusters::EnergyEvseMode::Id:
         ChipLogProgress(DeviceLayer, "EnergyEvseMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
         break;
-#elif (CONFIG_EXAMPLE_MATTER_WHM_DEVICE)
-    case Clusters::WaterHeaterManagement::Id:
-        ChipLogProgress(DeviceLayer, "WaterHeaterManagement(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-        break;
-    case Clusters::WaterHeaterMode::Id:
-        ChipLogProgress(DeviceLayer, "WaterHeaterMode(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-        break;
-#endif
     default:
         break;
     }

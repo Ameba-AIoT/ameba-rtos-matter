@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -28,7 +28,7 @@ namespace app {
 namespace Clusters {
 namespace WaterHeaterManagement {
 
-class WhmManufacturer;
+class WaterHeaterManufacturer;
 
 enum HeatingOp
 {
@@ -47,7 +47,7 @@ public:
 
     void SetWaterHeaterManagementInstance(WaterHeaterManagement::Instance & instance);
 
-    void SetWhmManufacturer(WhmManufacturer & whmManufacturer);
+    void SetWaterHeaterManufacturer(WaterHeaterManufacturer & WaterHeaterManufacturer);
 
     /*********************************************************************************
      *
@@ -245,10 +245,10 @@ private:
      ***************************************************************************/
 
     // Need the following so can determine which features are supported
-    WaterHeaterManagement::Instance * mpWhmInstance;
+    WaterHeaterManagement::Instance * mpWaterHeaterMgmtInstance;
 
     // Pointer to the manufacturer specific object which understand the hardware
-    WhmManufacturer * mpWhmManufacturer;
+    WaterHeaterManufacturer * mpWaterHeaterManufacturer;
 
     // Target water temperature in 100ths of a C
     int16_t mTargetWaterTemperature;

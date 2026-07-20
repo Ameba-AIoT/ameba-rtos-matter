@@ -22,10 +22,10 @@ ameba_list_append(private_sources
     ${MATTER_DRIVER_DIR}/matter_drivers/concentration_measurement/ameba_concentration_measurement_instance.cpp
 
     # device energy management cluster
+    ${MATTER_DRIVER_DIR}/matter_drivers/device_energy_management/ameba_energy_management_common_main.cpp
     ${MATTER_DRIVER_DIR}/matter_drivers/device_energy_management/ameba_device_energy_management_delegate_impl.cpp
     ${MATTER_DRIVER_DIR}/matter_drivers/device_energy_management/ameba_device_energy_management_manager.cpp
     ${MATTER_DRIVER_DIR}/matter_drivers/device_energy_management/ameba_device_energy_management_mode.cpp
-    ${MATTER_DRIVER_DIR}/matter_drivers/device_energy_management/ameba_energy_management_common_main.cpp
     ${MATTER_DRIVER_DIR}/matter_drivers/device_energy_management/ameba_device_management_test_event_trigger.cpp
     ${MATTER_DRIVER_DIR}/matter_drivers/device_energy_management/ameba_energy_time_utils.cpp
 
@@ -77,9 +77,6 @@ ameba_list_append(private_sources
 
     # mode select cluster
     ${MATTER_DRIVER_DIR}/matter_drivers/mode_select/ameba_mode_select_manager.cpp
-
-    # occupancy sensing cluster
-    ${MATTER_DRIVER_DIR}/matter_drivers/occupancy_sensing/ameba_occupancy_sensing_instance.cpp
 
     # operational state cluster
     ${MATTER_DRIVER_DIR}/matter_drivers/operational_state/ameba_operational_state_delegate.cpp

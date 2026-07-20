@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,34 +16,42 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <water_heater/ameba_water_heater_management_instance.h>
-#include <water_heater/ameba_water_heater_management_manufacturer.h>
-
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/water-heater-management-server/water-heater-management-server.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+#include <device_energy_management/ameba_energy_management_common_main.h>
+#include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
+#include <device_energy_management/ameba_device_energy_management_manager.h>
+#include <device_energy_management/ameba_device_energy_management_mode.h>
+#include <water_heater/ameba_water_heater_management_instance.h>
+#include <water_heater/ameba_water_heater_management_main.h>
+#include <water_heater/ameba_water_heater_management_manufacturer.h>
+#include <water_heater/ameba_water_heater_mode_delegate.h>
+#include <water_heater/ameba_water_heater_mode_instance.h>
+#include <app/clusters/water-heater-management-server/water-heater-management-server.h>
+
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/data-model/Nullable.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::DeviceEnergyManagement;
+using namespace chip::app::Clusters::WaterHeaterManagement;
 
-namespace chip {
-namespace app {
-namespace Clusters {
-namespace WaterHeaterManagement {
+namespace {
 
-static std::unique_ptr<WaterHeaterManagementDelegate> gWhmDelegate;
-static std::unique_ptr<WaterHeaterManagementInstance> gWhmInstance;
-
-static std::unique_ptr<WhmManufacturer> gWhmManufacturer;
-
-WhmManufacturer * GetWhmManufacturer()
-{
-    return gWhmManufacturer.get();
-}
+// Water Heater specific instances. The clusters common to every energy device type (DEM, EPM,
+// Power Topology, Electrical Energy Measurement) are owned by ameba_energy_management_common_main.cpp.
+std::unique_ptr<WaterHeaterManagementDelegate> gWaterHeaterMgmtDelegate;
+std::unique_ptr<WaterHeaterManagementInstance> gWaterHeaterMgmtInstance;
+std::unique_ptr<WaterHeaterManufacturer> gWaterHeaterManufacturer;
 
 /*
  *  @brief  Creates a Delegate and Instance for Water Heater Management cluster
@@ -51,139 +60,155 @@ WhmManufacturer * GetWhmManufacturer()
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-CHIP_ERROR WhmInit(EndpointId endpointId)
+CHIP_ERROR WaterHeaterManagementInit(EndpointId endpointId)
 {
     CHIP_ERROR err;
 
-    if (gWhmDelegate || gWhmInstance)
-    {
+    if (gWaterHeaterMgmtDelegate || gWaterHeaterMgmtInstance) {
         ChipLogError(AppServer, "WaterHeaterManager Instance or Delegate already exist.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    gWhmDelegate = std::make_unique<WaterHeaterManagementDelegate>(endpointId);
-    if (!gWhmDelegate)
-    {
+    gWaterHeaterMgmtDelegate = std::make_unique<WaterHeaterManagementDelegate>(endpointId);
+    if (!gWaterHeaterMgmtDelegate) {
         ChipLogError(AppServer, "Failed to allocate memory for WaterHeaterManagementDelegate");
         return CHIP_ERROR_NO_MEMORY;
     }
 
     /* Manufacturer may optionally not support all features, commands & attributes */
-    gWhmInstance = std::make_unique<WaterHeaterManagementInstance>(
-        EndpointId(endpointId), *gWhmDelegate, BitMask<Feature>(0));
-    if (!gWhmInstance)
-    {
+    gWaterHeaterMgmtInstance = std::make_unique<WaterHeaterManagementInstance>(
+            EndpointId(endpointId), *gWaterHeaterMgmtDelegate,
+            BitMask<WaterHeaterManagement::Feature>(0));
+    if (!gWaterHeaterMgmtInstance) {
         ChipLogError(AppServer, "Failed to allocate memory for WaterHeaterManagementInstance");
-        gWhmDelegate.reset();
+        gWaterHeaterMgmtDelegate.reset();
         return CHIP_ERROR_NO_MEMORY;
     }
 
     /* Register Attribute & Command handlers */
-    err = gWhmInstance->Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "gWhmInstance->Init failed %s", chip::ErrorStr(err));
-        gWhmInstance.reset();
-        gWhmDelegate.reset();
+    err = gWaterHeaterMgmtInstance->Init();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "gWaterHeaterMgmtInstance->Init failed: %" CHIP_ERROR_FORMAT, err.Format());
+        gWaterHeaterMgmtInstance.reset();
+        gWaterHeaterMgmtDelegate.reset();
         return err;
     }
 
-    gWhmDelegate->SetWaterHeaterManagementInstance(*gWhmInstance);
+    gWaterHeaterMgmtDelegate->SetWaterHeaterManagementInstance(*gWaterHeaterMgmtInstance);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WhmShutdown()
+CHIP_ERROR WaterHeaterManagementShutdown()
 {
     /* Do this in the order Instance first, then delegate
      * Ensure we call the Instance->Shutdown to free attribute & command handlers first
      */
-    if (gWhmInstance)
-    {
+    if (gWaterHeaterMgmtInstance) {
         /* Deregister attribute & command handlers */
-        gWhmInstance->Shutdown();
-        gWhmInstance.reset();
+        gWaterHeaterMgmtInstance->Shutdown();
+        gWaterHeaterMgmtInstance.reset();
     }
 
-    if (gWhmDelegate)
-    {
-        gWhmDelegate.reset();
+    if (gWaterHeaterMgmtDelegate) {
+        gWaterHeaterMgmtDelegate.reset();
     }
 
     return CHIP_NO_ERROR;
 }
 
 /*
- *  @brief  Creates a WhmManufacturer class to hold the Whm cluster
+ *  @brief  Creates a WaterHeaterManufacturer class to hold the Water Heater Management cluster
  *
  * The Instance is a container around the Delegate, so
  * create the Delegate first, then wrap it in the Instance
  * Then call the Instance->Init() to register the attribute and command handlers
  */
-CHIP_ERROR WhmManufacturerInit()
+CHIP_ERROR WaterHeaterManufacturerInit()
 {
     CHIP_ERROR err;
 
-    if (gWhmManufacturer)
-    {
-        ChipLogError(AppServer, "WhmManufacturer already exist.");
+    if (gWaterHeaterManufacturer) {
+        ChipLogError(AppServer, "WaterHeaterManufacturer already exist.");
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    /* Now create WhmManufacturer */
-    gWhmManufacturer = std::make_unique<WhmManufacturer>(gWhmInstance.get());
-    if (!gWhmManufacturer)
-    {
-        ChipLogError(AppServer, "Failed to allocate memory for WhmManufacturer");
+    /* Now create WaterHeaterManufacturer */
+    gWaterHeaterManufacturer = std::make_unique<WaterHeaterManufacturer>(gWaterHeaterMgmtInstance.get());
+    if (!gWaterHeaterManufacturer) {
+        ChipLogError(AppServer, "Failed to allocate memory for WaterHeaterManufacturer");
         return CHIP_ERROR_NO_MEMORY;
     }
 
     /* Call Manufacturer specific init */
-    err = gWhmManufacturer->Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Init failed on gWhmManufacturer");
-        gWhmManufacturer.reset();
+    err = gWaterHeaterManufacturer->Init();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogError(AppServer, "Init failed on gWaterHeaterManufacturer");
+        gWaterHeaterManufacturer.reset();
         return err;
     }
 
-    // Let the WhmDelegate know about the WhmManufacturer object.
-    gWhmDelegate->SetWhmManufacturer(*gWhmManufacturer);
+    // Let the Water Heater Management Delegate know about the WaterHeaterManufacturer object.
+    gWaterHeaterMgmtDelegate->SetWaterHeaterManufacturer(*gWaterHeaterManufacturer);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WhmManufacturerShutdown()
+CHIP_ERROR WaterHeaterManufacturerShutdown()
 {
-    if (gWhmManufacturer)
-    {
-        /* Shutdown the WhmManufacturer */
-        gWhmManufacturer->Shutdown();
-        gWhmManufacturer.reset();
+    if (gWaterHeaterManufacturer) {
+        /* Shutdown the WaterHeaterManufacturer */
+        TEMPORARY_RETURN_IGNORED gWaterHeaterManufacturer->Shutdown();
+        gWaterHeaterManufacturer.reset();
     }
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WhmApplicationInit(EndpointId endpointId)
+} // namespace
+
+WaterHeaterManufacturer *WaterHeaterManagement::GetWaterHeaterManufacturer()
 {
-    ReturnErrorOnFailure(WhmInit(endpointId));
-
-    /* Do this last so that the instances for other clusters can be wrapped inside */
-    ReturnErrorOnFailure(WhmManufacturerInit());
-
-    return CHIP_NO_ERROR;
+    return gWaterHeaterManufacturer.get();
 }
 
-CHIP_ERROR WhmApplicationShutdown()
+void WaterHeaterApplicationInit()
 {
+    auto endpointId = 1;
+    VerifyOrDie(EnergyManagementCommonClustersInit(endpointId) == CHIP_NO_ERROR);
+
+    // Initialize Water Heater specific clusters
+    VerifyOrDie(WaterHeaterManagementInit(endpointId) == CHIP_NO_ERROR);
+    VerifyOrDie(WaterHeaterManufacturerInit() == CHIP_NO_ERROR);
+
+    /* For Device Energy Management we need the ESA to be Online and ready to accept commands */
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetESAState(ESAStateEnum::kOnline);
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetESAType(ESATypeEnum::kWaterHeating);
+    GetDEMDelegate()->SetDEMManufacturerDelegate(*gWaterHeaterManufacturer.get());
+
+    // Set the abs min and max power
+    // Simulating a heat pump water heater with a max power of 5.6KW
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetAbsMinPower(0);       // 0KW
+    TEMPORARY_RETURN_IGNORED GetDEMDelegate()->SetAbsMaxPower(5600000); // 5.6KW
+}
+
+void WaterHeaterApplicationShutdown()
+{
+    ChipLogDetail(AppServer, "Water Heater App: WaterHeaterShutdown()");
+
     /* Shutdown in reverse order that they were created */
-    WhmManufacturerShutdown();
+    EnergyManagementCommonClustersShutdown(); /* Free the PowerTopology, Energy Meter and DEM */
 
-    return WhmShutdown();
+    // Shutdown Water Heater specific clusters
+    TEMPORARY_RETURN_IGNORED WaterHeaterManufacturerShutdown();
+    TEMPORARY_RETURN_IGNORED WaterHeaterManagementShutdown();
+
+    DeviceEnergyManagementMode::Shutdown();
+    WaterHeaterMode::AmebaWaterHeaterModeInstanceShutdown();
+    WaterHeaterMode::AmebaWaterHeaterModeDelegateShutdown();
 }
 
-} // namespace WaterHeaterManagement
-} // namespace Clusters
-} // namespace app
-} // namespace chip
+EndpointId GetIdentifyEndpointId()
+{
+    return GetEnergyDeviceEndpointId();
+}

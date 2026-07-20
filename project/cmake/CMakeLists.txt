@@ -90,6 +90,7 @@ ameba_list_append(private_compile_options
 	-Wno-format
 	-Wno-unused-parameter
 	-Wno-missing-field-initializers
+	-Wno-unused-result
 )
 
 # Add flags, includes, and source files based on the example 
@@ -131,6 +132,7 @@ set(TARGET_DEFINE_FLAGS)
 foreach(item IN LISTS LIB_CHIP_CORE_FLAGS)
 	set(TARGET_DEFINE_FLAGS "${TARGET_DEFINE_FLAGS}\"-D${item}\",")
 endforeach()
+set(TARGET_COMPILE_FLAGS "${TARGET_COMPILE_FLAGS}\"-Wno-unused-result\",")
 set(TARGET_DEFINE_FLAGS "${TARGET_DEFINE_FLAGS}\"-Drtw_get_random_bytes=TRNG_get_random_bytes\",")
 
 set(TARGET_CFLAGS_C  "${TARGET_COMPILE_FLAGS}${TARGET_DEFINE_FLAGS}${TARGET_INCLUDE_FLAGS}")
@@ -199,7 +201,7 @@ add_custom_target(
 	COMMAND ${CMAKE_COMMAND} -E rm -rf ${ALL_CLUSTERS_OUTPUT_DIR}
 	COMMAND ${CMAKE_COMMAND} -E rm -rf ${AIR_PURIFIER_OUTPUT_DIR}
 	COMMAND ${CMAKE_COMMAND} -E rm -rf ${BRIDGE_PORT_OUTPUT_DIR}
-	COMMAND ${CMAKE_COMMAND} -E rm -rf ${ENERGY_MANAGEMENT_PORT_OUTPUT_DIR}
+	COMMAND ${CMAKE_COMMAND} -E rm -rf ${EVSE_PORT_OUTPUT_DIR}
 	COMMAND ${CMAKE_COMMAND} -E rm -rf ${LIGHTING_OUTPUT_DIR}
 	COMMAND ${CMAKE_COMMAND} -E rm -rf ${THERMOSTAT_PORT_OUTPUT_DIR}
 	COMMAND ${CMAKE_COMMAND} -E rm -rf ${AIRCON_PORT_OUTPUT_DIR}
@@ -212,6 +214,7 @@ add_custom_target(
 	COMMAND ${CMAKE_COMMAND} -E rm -rf ${LIGHTING_DM_OUTPUT_DIR}
 	COMMAND ${CMAKE_COMMAND} -E rm -rf ${MICROWAVEOVEN_PORT_OUTPUT_DIR}
 	COMMAND ${CMAKE_COMMAND} -E rm -rf ${REFRIGERATOR_PORT_OUTPUT_DIR}
+	COMMAND ${CMAKE_COMMAND} -E rm -rf ${WATER_HEATER_PORT_OUTPUT_DIR}
 	COMMAND ${CMAKE_COMMAND} -E echo "cleaned Matter output directories"
 
 	# Clean all .matter files, except from connectedhomeip
