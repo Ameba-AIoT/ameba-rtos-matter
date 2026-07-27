@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <camera_driver.h>
@@ -30,6 +29,9 @@
 
 #include <camera/ameba_camera.h>
 #include <camera/ameba_camera_device.h>
+
+#include <tls_certificate_management/ameba_tls_certificate_management_instance.h>
+#include <tls_client_management/ameba_tls_client_management_instance.h>
 
 using namespace ::chip::app;
 using chip::Protocols::InteractionModel::Status;
@@ -46,6 +48,46 @@ CHIP_ERROR matter_driver_camera_init(void)
 {
     camera.Init();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR matter_driver_tls_management_clusters_init(void)
+{
+    Clusters::InitializeTlsClientManagement();
+    Clusters::InitializeTlsCertificateManagement();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR matter_driver_power_source_cluster_set_startup_value(void)
+{
+    Status status;
+
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
+
+    status = Clusters::PowerSource::Attributes::Status::Set(0, Clusters::PowerSource::PowerSourceStatusEnum::kActive); // 1
+    VerifyOrExit(status == Status::Success,
+                 ChipLogError(DeviceLayer, "Failed to set Status attribute of Power Source Cluster"));
+
+    status = Clusters::PowerSource::Attributes::Order::Set(0, 0);
+    VerifyOrExit(status == Status::Success,
+                 ChipLogError(DeviceLayer, "Failed to set Order attribute of Power Source Cluster"));
+
+    status = Clusters::PowerSource::Attributes::Description::Set(0, chip::CharSpan::fromCharString("Adapter"));
+    VerifyOrExit(status == Status::Success,
+                 ChipLogError(DeviceLayer, "Failed to set Description attribute of Power Source Cluster"));
+
+    status = Clusters::PowerSource::Attributes::WiredCurrentType::Set(0, Clusters::PowerSource::WiredCurrentTypeEnum::kAc);
+    VerifyOrExit(status == Status::Success,
+                 ChipLogError(DeviceLayer, "Failed to set WiredCurrentType attribute of Power Source Cluster"));
+
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+exit:
+    if (status == Status::Success) {
+        return CHIP_NO_ERROR;
+    } else {
+        chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+        return CHIP_ERROR_INTERNAL;
+    }
 }
 
 CHIP_ERROR matter_driver_application_init(void)
@@ -72,8 +114,7 @@ void matter_driver_on_identify_stop(Identify *identify)
 
 void matter_driver_on_trigger_effect(Identify *identify)
 {
-    switch (identify->mCurrentEffectIdentifier)
-    {
+    switch (identify->mCurrentEffectIdentifier) {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
@@ -94,29 +135,28 @@ void matter_driver_on_trigger_effect(Identify *identify)
 
 void matter_driver_uplink_update_handler(AppEvent *aEvent)
 {
-    chip::app::ConcreteAttributePath path = aEvent->path;
+    ConcreteAttributePath path = aEvent->path;
 
     // this example only considers endpoint1
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId)
-    {
-    case Clusters::CameraAvStreamManagement::Id:
-        {
-            ChipLogProgress(DeviceLayer, "CameraAvStreamManagement(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-        }
-        break;
-    case Clusters::WebRTCTransportProvider::Id:
-        {
-            ChipLogProgress(DeviceLayer, "WebRTCTransportProvider(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-        }
-        break;
-    case Clusters::WebRTCTransportRequestor::Id:
-        {
-            ChipLogProgress(DeviceLayer, "WebRTCTransportRequestor(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId, path.mAttributeId);
-        }
-        break;
+    switch (path.mClusterId) {
+    case Clusters::CameraAvStreamManagement::Id: {
+        ChipLogProgress(DeviceLayer, "CameraAvStreamManagement(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
+                        path.mAttributeId);
+    }
+    break;
+    case Clusters::WebRTCTransportProvider::Id: {
+        ChipLogProgress(DeviceLayer, "WebRTCTransportProvider(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
+                        path.mAttributeId);
+    }
+    break;
+    case Clusters::WebRTCTransportRequestor::Id: {
+        ChipLogProgress(DeviceLayer, "WebRTCTransportRequestor(ClusterId=0x%x) at Endpoint%x: change AttributeId=0x%x\n", path.mEndpointId, path.mClusterId,
+                        path.mAttributeId);
+    }
+    break;
     case Clusters::Identify::Id:
         break;
     }
@@ -129,8 +169,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type)
-    {
+    switch (event->Type) {
         break;
     }
 

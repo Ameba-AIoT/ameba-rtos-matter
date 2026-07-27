@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <FreeRTOS.h>
 #include <task.h>
 #include <basic_types.h>
@@ -40,7 +39,7 @@ static void example_matter_task_thread(void *pvParameters)
 void example_matter_task(void)
 {
     if (xTaskCreate(example_matter_task_thread, ((const char *)"example_matter_task_thread"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
-        printf("\n\r%s xTaskCreate(example_matter_task_thread) failed", __FUNCTION__);
+        RTK_LOGE(NOTAG, "\n\r%s xTaskCreate(example_matter_task_thread) failed", __FUNCTION__);
     }
 }
 #endif /* CONFIG_EXAMPLE_MATTER_CHIPTEST */

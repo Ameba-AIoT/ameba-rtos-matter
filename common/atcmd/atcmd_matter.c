@@ -35,6 +35,8 @@ extern void amebaQueryImageCmdHandler();
 extern void amebaApplyUpdateCmdHandler();
 #endif
 
+static const char *const TAG = "AT_MATTER";
+
 // Queue for matter shell
 QueueHandle_t shell_queue;
 
@@ -44,9 +46,9 @@ static u32 atcmd_matter_factory_reset(u16 argc, u8 *argv[])
     (void) argc;
     (void) argv;
 
-    printf("xPortGetTotalHeapSize = %d\n", xPortGetTotalHeapSize());
-    printf("xPortGetFreeHeapSize = %d\n", xPortGetFreeHeapSize());
-    printf("xPortGetMinimumEverFreeHeapSize = %d\n", xPortGetMinimumEverFreeHeapSize());
+    RTK_LOGI(TAG, "xPortGetTotalHeapSize = %d\n", xPortGetTotalHeapSize());
+    RTK_LOGI(TAG, "xPortGetFreeHeapSize = %d\n", xPortGetFreeHeapSize());
+    RTK_LOGI(TAG, "xPortGetMinimumEverFreeHeapSize = %d\n", xPortGetMinimumEverFreeHeapSize());
 
     matter_factory_reset();
 
@@ -59,7 +61,7 @@ static u32 atcmd_matter_ota_query(u16 argc, u8 *argv[])
     (void) argv;
 #if defined(CONFIG_ENABLE_OTA_REQUESTOR) && CONFIG_ENABLE_OTA_REQUESTOR && \
     defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
-    printf("Calling amebaQueryImageCmdHandler\n");
+    RTK_LOGI(TAG, "Calling amebaQueryImageCmdHandler\n");
     amebaQueryImageCmdHandler();
 #endif
     return 0;
@@ -71,7 +73,7 @@ static u32 atcmd_matter_ota_apply(u16 argc, u8 *argv[])
     (void) argv;
 #if defined(CONFIG_ENABLE_OTA_REQUESTOR) && CONFIG_ENABLE_OTA_REQUESTOR && \
     defined(CONFIG_EXAMPLE_MATTER_CHIPTEST) && CONFIG_EXAMPLE_MATTER_CHIPTEST
-    printf("Chip Test: amebaApplyUpdateCmdHandler\n");
+    RTK_LOGI(TAG, "Chip Test: amebaApplyUpdateCmdHandler\n");
 
     amebaApplyUpdateCmdHandler();
 #endif
@@ -83,13 +85,13 @@ static u32 atcmd_matter_ota_apply(u16 argc, u8 *argv[])
 void print_certificate(uint8_t *cert, size_t size)
 {
     for (int i = 0; i < size; i++) {
-        printf("%02X ", cert[i]);
+        RTK_LOGI(NOTAG, "%02X ", cert[i]);
         if ((i + 1) % 16 == 0) {
-            printf("\n");
+            RTK_LOGI(NOTAG, "\n");
         }
     }
     if (size % 16 != 0) {
-        printf("\n");
+        RTK_LOGI(NOTAG, "\n");
     }
 }
 
@@ -110,8 +112,8 @@ static u32 atcmd_matter_device_info(u16 argc, u8 *argv[])
 
     read_buf = (uint8_t *)malloc(DEVICE_INFO_MAX_SIZE);
     if (read_buf == NULL) {
-        printf("[ATMI] malloc failed\n");
-        return;
+        RTK_LOGE(TAG, "[ATMI] malloc failed\n");
+        return 0;
     }
     memset(read_buf, 0, DEVICE_INFO_MAX_SIZE);
 
@@ -119,21 +121,21 @@ static u32 atcmd_matter_device_info(u16 argc, u8 *argv[])
     case ATCMD_GET_MANUAL_PAIRING_CODE:
         ret = matter_get_manual_pairing_code((char *)read_buf, DEVICE_INFO_MAX_SIZE);
         if (ret == 0) {
-            printf("Manual Pairing Code: %s\n", read_buf);
+            RTK_LOGI(TAG, "Manual Pairing Code: %s\n", read_buf);
         }
         break;
 
     case ATCMD_GET_QR_CODE:
         ret = matter_get_qr_code((char *)read_buf, DEVICE_INFO_MAX_SIZE);
         if (ret == 0) {
-            printf("QR Code: %s\n", read_buf);
+            RTK_LOGI(TAG, "QR Code: %s\n", read_buf);
         }
         break;
 
     case ATCMD_GET_CD:
         ret = matter_get_certificate_declaration(read_buf, DEVICE_INFO_MAX_SIZE, &out_len);
         if (ret == 0 && out_len != 0) {
-            printf("CD (%d):\n", out_len);
+            RTK_LOGI(TAG, "CD (%d):\n", out_len);
             print_certificate(read_buf, out_len);
         }
         break;
@@ -141,7 +143,7 @@ static u32 atcmd_matter_device_info(u16 argc, u8 *argv[])
     case ATCMD_GET_DAC_CERT:
         ret = matter_get_dac_cert(read_buf, DEVICE_INFO_MAX_SIZE, &out_len);
         if (ret == 0 && out_len != 0) {
-            printf("DAC Cert (%d):\n", out_len);
+            RTK_LOGI(TAG, "DAC Cert (%d):\n", out_len);
             print_certificate(read_buf, out_len);
         }
         break;
@@ -149,7 +151,7 @@ static u32 atcmd_matter_device_info(u16 argc, u8 *argv[])
     case ATCMD_GET_PAI_CERT:
         ret = matter_get_pai_cert(read_buf, DEVICE_INFO_MAX_SIZE, &out_len);
         if (ret == 0 && out_len != 0) {
-            printf("PAI Cert (%d):\n", out_len);
+            RTK_LOGI(TAG, "PAI Cert (%d):\n", out_len);
             print_certificate(read_buf, out_len);
         }
         break;
@@ -157,49 +159,49 @@ static u32 atcmd_matter_device_info(u16 argc, u8 *argv[])
     case ATCMD_GET_DISCRIMINATOR:
         ret = matter_get_setup_discriminator(&val16);
         if (ret == 0) {
-            printf("Discriminator: %d\n", val16);
+            RTK_LOGI(TAG, "Discriminator: %d\n", val16);
         }
         break;
 
     case ATCMD_GET_PASSCODE:
         ret = matter_get_setup_passcode(&val32);
         if (ret == 0) {
-            printf("Passcode: %d\n", val32);
+            RTK_LOGI(TAG, "Passcode: %d\n", val32);
         }
         break;
 
     case ATCMD_GET_VENDOR_NAME:
         ret = matter_get_vendor_name((char *)read_buf, DEVICE_INFO_MAX_SIZE);
         if (ret == 0) {
-            printf("Vendor Name: %s\n", read_buf);
+            RTK_LOGI(TAG, "Vendor Name: %s\n", read_buf);
         }
         break;
 
     case ATCMD_GET_VENDOR_ID:
         ret = matter_get_vendor_id(&val16);
         if (ret == 0) {
-            printf("Vendor ID: %d\n", val16);
+            RTK_LOGI(TAG, "Vendor ID: %d\n", val16);
         }
         break;
 
     case ATCMD_GET_PRODUCT_NAME:
         ret = matter_get_product_name((char *)read_buf, DEVICE_INFO_MAX_SIZE);
         if (ret == 0) {
-            printf("Product Name: %s\n", read_buf);
+            RTK_LOGI(TAG, "Product Name: %s\n", read_buf);
         }
         break;
 
     case ATCMD_GET_PRODUCT_ID:
         ret = matter_get_product_id(&val16);
         if (ret == 0) {
-            printf("Product ID: %d\n", val16);
+            RTK_LOGI(TAG, "Product ID: %d\n", val16);
         }
         break;
 
     case ATCMD_GET_SERIAL_NUMBER:
         ret = matter_get_serial_number((char *)read_buf, DEVICE_INFO_MAX_SIZE);
         if (ret == 0) {
-            printf("Serial Number: %s\n", read_buf);
+            RTK_LOGI(TAG, "Serial Number: %s\n", read_buf);
         }
         break;
 
@@ -208,7 +210,7 @@ static u32 atcmd_matter_device_info(u16 argc, u8 *argv[])
         uint8_t month = 0, day = 0;
         ret = matter_get_manufacturing_date(&year, &month, &day);
         if (ret == 0) {
-            printf("Manufacturing Date: %d/%d/%d\n", year, month, day);
+            RTK_LOGI(TAG, "Manufacturing Date: %d/%d/%d\n", year, month, day);
         }
         break;
     }
@@ -216,28 +218,28 @@ static u32 atcmd_matter_device_info(u16 argc, u8 *argv[])
     case ATCMD_GET_HARDWARE_VERSION:
         ret = matter_get_hardware_version(&val16);
         if (ret == 0) {
-            printf("Hardware Version: %d\n", val16);
+            RTK_LOGI(TAG, "Hardware Version: %d\n", val16);
         }
         break;
 
     case ATCMD_GET_HARDWARE_VERSION_STRING:
         ret = matter_get_hardware_version_string((char *)read_buf, DEVICE_INFO_MAX_SIZE);
         if (ret == 0) {
-            printf("Hardware Version String: %s\n", read_buf);
+            RTK_LOGI(TAG, "Hardware Version String: %s\n", read_buf);
         }
         break;
 
     case ATCMD_GET_SOFTWARE_VERSION:
         ret = matter_get_software_version(&val32);
         if (ret == 0) {
-            printf("Software Version: %d\n", val32);
+            RTK_LOGI(TAG, "Software Version: %d\n", val32);
         }
         break;
 
     case ATCMD_GET_SOFTWARE_VERSION_STRING:
         ret = matter_get_software_version_string((char *)read_buf, DEVICE_INFO_MAX_SIZE);
         if (ret == 0) {
-            printf("Software Version String: %s\n", read_buf);
+            RTK_LOGI(TAG, "Software Version String: %s\n", read_buf);
         }
         break;
 
@@ -248,31 +250,32 @@ static u32 atcmd_matter_device_info(u16 argc, u8 *argv[])
     goto exit;
 
 usage:
-    printf("[ATMI]: Matter Device Information\n");
-    printf("Usage: ATMI <options>\n");
-    printf("options:\n");
-    printf(" 0  -> Get manual pairing code\n");
-    printf(" 1  -> Get QR code\n");
-    printf(" 2  -> Get Certification Declaration\n");
-    printf(" 3  -> Get DAC cert\n");
-    printf(" 4  -> Get PAI cert\n");
-    printf(" 5  -> Get discriminator\n");
-    printf(" 6  -> Get passcode\n");
-    printf(" 7  -> Get vendor name\n");
-    printf(" 8  -> Get vendor ID\n");
-    printf(" 9  -> Get product name\n");
-    printf(" 10 -> Get product ID\n");
-    printf(" 11 -> Get serial number\n");
-    printf(" 12 -> Get manufacturing date\n");
-    printf(" 13 -> Get hardware version\n");
-    printf(" 14 -> Get hardware version string\n");
-    printf(" 15 -> Get software version\n");
-    printf(" 16 -> Get software version string\n");
+    RTK_LOGI(TAG, "[ATMI]: Matter Device Information\n");
+    RTK_LOGI(TAG, "Usage: ATMI <options>\n");
+    RTK_LOGI(TAG, "options:\n");
+    RTK_LOGI(TAG, " 0  -> Get manual pairing code\n");
+    RTK_LOGI(TAG, " 1  -> Get QR code\n");
+    RTK_LOGI(TAG, " 2  -> Get Certification Declaration\n");
+    RTK_LOGI(TAG, " 3  -> Get DAC cert\n");
+    RTK_LOGI(TAG, " 4  -> Get PAI cert\n");
+    RTK_LOGI(TAG, " 5  -> Get discriminator\n");
+    RTK_LOGI(TAG, " 6  -> Get passcode\n");
+    RTK_LOGI(TAG, " 7  -> Get vendor name\n");
+    RTK_LOGI(TAG, " 8  -> Get vendor ID\n");
+    RTK_LOGI(TAG, " 9  -> Get product name\n");
+    RTK_LOGI(TAG, " 10 -> Get product ID\n");
+    RTK_LOGI(TAG, " 11 -> Get serial number\n");
+    RTK_LOGI(TAG, " 12 -> Get manufacturing date\n");
+    RTK_LOGI(TAG, " 13 -> Get hardware version\n");
+    RTK_LOGI(TAG, " 14 -> Get hardware version string\n");
+    RTK_LOGI(TAG, " 15 -> Get software version\n");
+    RTK_LOGI(TAG, " 16 -> Get software version string\n");
 
 exit:
     if (read_buf != NULL) {
         free(read_buf);
     }
+    return 0;
 }
 #endif // CONFIG_ENABLE_AMEBA_DEVICE_INFO
 
@@ -286,7 +289,7 @@ static u32 atcmd_matter_reg_shell(u16 argc, u8 *argv[])
             }
             char *concatenated = (char *)malloc(total_length);
             if (concatenated == NULL) {
-                printf("Failed to allocate memory\r\n");
+                RTK_LOGE(TAG, "Failed to allocate memory\r\n");
                 return 0;
             }
             concatenated[0] = '\0';
@@ -302,10 +305,10 @@ static u32 atcmd_matter_reg_shell(u16 argc, u8 *argv[])
             }
             free(concatenated);
         } else {
-            printf("Enter ATMS switch/manual for more options\r\n");
+            RTK_LOGI(TAG, "Enter ATMS switch/manual for more options\r\n");
         }
     } else {
-        printf("Enter ATMS switch/manual for more options\r\n");
+        RTK_LOGI(TAG, "Enter ATMS switch/manual for more options\r\n");
     }
     return 0;
 }
@@ -316,7 +319,7 @@ static u32 atcmd_matter_secure_heap(u16 argc, u8 *argv[])
     (void) argc;
     (void) argv;
 
-    printf("Checking Secure Heap Status\n");
+    RTK_LOGI(TAG, "Checking Secure Heap Status\n");
     matter_check_secure_heap_status();
 
     return 0;
@@ -376,20 +379,20 @@ static u32 atcmd_matter_help(u16 argc, u8 *argv[])
     (void) argc;
     (void) argv;
     u32 index;
-    printf("\r\nMatter AT Commands List\r\n\r\n");
+    RTK_LOGI(TAG, "\r\nMatter AT Commands List\r\n\r\n");
     for (index = 0 ; index < (sizeof(matter_atcmd) / sizeof(COMMAND_TABLE)); index++) {
 #if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
     (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
         if (matter_atcmd[index].msg) {
-            printf("    %s\n", matter_atcmd[index].msg);
+            RTK_LOGI(TAG, "    %s\n", matter_atcmd[index].msg);
         }
 #elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
         if (matter_atcmd_help[index]) {
-            printf("    %s\n", matter_atcmd_help[index]);
+            RTK_LOGI(TAG, "    %s\n", matter_atcmd_help[index]);
         }
 #endif
     }
-    printf("\r\n");
+    RTK_LOGI(NOTAG, "\r\n");
     return 0;
 }
 

@@ -78,6 +78,9 @@ ameba_list_append(matter_defintions
     # Matter Commissioning Flow (default: standard)
     CONFIG_USER_ACTION_REQUIRED=0
 
+    # Ameba Fabric Observer
+    CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER=1
+
     # other options
     CHIP_HAVE_CONFIG_H
 
@@ -149,6 +152,24 @@ if(CHIP_ENABLE_OTA_REQUESTOR)
     ameba_list_append(matter_defintions CONFIG_ENABLE_OTA_REQUESTOR=1)
 else()
     ameba_list_append(matter_defintions CONFIG_ENABLE_OTA_REQUESTOR=0)
+endif()
+
+# Matter ICD Flags
+if(CHIP_ENABLE_ICD)
+    ameba_list_append(matter_defintions CHIP_CONFIG_ENABLE_ICD_SERVER=1)
+    ameba_list_append(matter_defintions CHIP_CONFIG_ICD_OBSERVERS_POOL_SIZE=4)
+    ameba_list_append(matter_defintions CHIP_CONFIG_ICD_IDLE_MODE_DURATION_SEC=300) #idle window: 5 min
+    ameba_list_append(matter_defintions CHIP_CONFIG_ICD_ACTIVE_MODE_DURATION_MS=500) #active window after each wake
+    ameba_list_append(matter_defintions CHIP_CONFIG_ICD_ACTIVE_MODE_THRESHOLD_MS=300) #minimum active on any network event
+else()
+    ameba_list_append(matter_defintions CHIP_CONFIG_ENABLE_ICD_SERVER=0)
+endif()
+
+# Matter Time Sync Flags
+if(CONFIG_MATTER_TIME_SYNC_EN)
+    ameba_list_append(matter_defintions CONFIG_ENABLE_AMEBA_TIME_SYNC=1)
+else()
+    ameba_list_append(matter_defintions CONFIG_ENABLE_AMEBA_TIME_SYNC=0)
 endif()
 
 # Matter Shell Flags

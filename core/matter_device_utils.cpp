@@ -49,7 +49,7 @@ using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 uint8_t matter_get_total_operational_hour(uint32_t *totalOperationalHours)
 {
     if (totalOperationalHours == nullptr) {
-        printf("%s: nullptr\n", __FUNCTION__);
+        ChipLogProgress(DeviceLayer, "%s: nullptr\n", __FUNCTION__);
         return -1;
     }
 
@@ -63,7 +63,7 @@ uint8_t matter_get_total_operational_hour(uint32_t *totalOperationalHours)
             return -1;
         }
     } else {
-        printf("%s: DiagnosticDataProvider is invalid\n", __FUNCTION__);
+        ChipLogProgress(DeviceLayer, "%s: DiagnosticDataProvider is invalid\n", __FUNCTION__);
         return -1;
     }
 
@@ -90,13 +90,13 @@ static void matter_op_hours_task(void *pvParameters)
         if (getPref_u32_new(key, key, &prev_hour) == DCT_SUCCESS) {
             ret = matter_set_total_operational_hour(prev_hour);
             if (ret != 0) {
-                printf("matter_store_total_operational_hour failed, ret=%d\n", ret);
+                ChipLogProgress(DeviceLayer, "matter_store_total_operational_hour failed, ret=%d\n", ret);
                 goto loop;
             }
             // 3. Delete "temp_hour" from NVS
             deleteKey(key, key);
         } else {
-            printf("getPref_u32_new: %s not found\n", key);
+            ChipLogProgress(DeviceLayer, "getPref_u32_new: %s not found\n", key);
             goto loop;
         }
     }
@@ -110,7 +110,7 @@ loop:
             if (prev_hour != cur_hour) {
                 prev_hour = cur_hour;
                 if (setPref_new(key, key, (uint8_t *) &cur_hour, sizeof(cur_hour)) != DCT_SUCCESS) {
-                    printf("setPref_new: temp_hour Failed\n");
+                    ChipLogProgress(DeviceLayer, "setPref_new: temp_hour Failed\n");
                 }
             }
         }
@@ -123,7 +123,7 @@ loop:
 void matter_op_hours(void)
 {
     if (xTaskCreate(matter_op_hours_task, ((const char *)"matter_op_hours_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
-        printf("\n\r%s xTaskCreate(matter_op_hours) failed", __FUNCTION__);
+        ChipLogProgress(DeviceLayer, "\n\r%s xTaskCreate(matter_op_hours) failed", __FUNCTION__);
     }
 }
 #endif

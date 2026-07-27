@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "platform_stdlib.h"
 
 #include <stddef.h>
@@ -26,6 +25,8 @@
 #include <matter_kv.h>
 
 #include <chip_porting.h>
+
+static const char *const TAG = "MATTER_KVS";
 
 #if (CONFIG_ENABLE_KV_ENCRYPTION)
 #if defined(MBEDTLS_CIPHER_MODE_CTR)
@@ -121,7 +122,7 @@ s32 initPref(void)
     if (ret < 0) {
         ret = MATTER_KVS_ERROR;
     } else {
-        DiagPrintf("rt_kv_init success\r\n");
+        RTK_LOGI(TAG, "rt_kv_init success\r\n");
         ret = MATTER_KVS_SUCCESS;
     }
 
@@ -144,7 +145,7 @@ s32 deinitPref(void)
     if (ret < 0) {
         ret = MATTER_KVS_ERROR;
     } else {
-        DiagPrintf("deinitPref success\r\n");
+        RTK_LOGI(TAG, "deinitPref success\r\n");
         ret = MATTER_KVS_SUCCESS;
     }
 
@@ -192,7 +193,7 @@ s32 deleteKey(const char *domain, const char *key)
             ret = MATTER_KVS_ERROR;
         }
     } else {
-        DiagPrintf("deleteKey %s success.\r\n", tempKey);
+        RTK_LOGI(TAG, "deleteKey %s success.\r\n", tempKey);
         ret = MATTER_KVS_SUCCESS;
     }
 
@@ -210,7 +211,7 @@ bool checkExist(const char *domain, const char *key)
     ret = rt_kv_size(tempKey);
 
     if (ret > 0) {
-        DiagPrintf("checkExist key=%s found.\n", tempKey);
+        RTK_LOGI(TAG, "checkExist key=%s found.\n", tempKey);
     }
 
     free(tempKey);
@@ -233,7 +234,7 @@ s32 setPref_new(const char *domain, const char *key, u8 *value, size_t byteCount
     if (ret <= 0) { //0 is inclusive because 0 bytes were written
         ret = MATTER_KVS_ERROR;
     } else {
-        DiagPrintf("setPref_new %s success, write %d bytes.\r\n", tempKey, byteCount);
+        RTK_LOGI(TAG, "setPref_new %s success, write %d bytes.\r\n", tempKey, byteCount);
         ret = MATTER_KVS_SUCCESS;
     }
 
@@ -261,7 +262,7 @@ s32 getPref_bool_new(const char *domain, const char *key, u8 *val)
             ret = MATTER_KVS_ERROR;
         }
     } else {
-        DiagPrintf("getPref_bool_new %s success, read %d bytes.\r\n", tempKey, sizeof(u8));
+        RTK_LOGI(TAG, "getPref_bool_new %s success, read %d bytes.\r\n", tempKey, sizeof(u8));
         ret = MATTER_KVS_SUCCESS;
     }
 
@@ -289,7 +290,7 @@ s32 getPref_u32_new(const char *domain, const char *key, u32 *val)
             ret = MATTER_KVS_ERROR;
         }
     } else {
-        DiagPrintf("getPref_u32_new %s success, read %d bytes.\r\n", tempKey, sizeof(u32));
+        RTK_LOGI(TAG, "getPref_u32_new %s success, read %d bytes.\r\n", tempKey, sizeof(u32));
         ret = MATTER_KVS_SUCCESS;
     }
 
@@ -317,7 +318,7 @@ s32 getPref_u64_new(const char *domain, const char *key, u64 *val)
             ret = MATTER_KVS_ERROR;
         }
     } else {
-        DiagPrintf("getPref_u64_new %s success, read %d bytes.\r\n", tempKey, sizeof(u64));
+        RTK_LOGI(TAG, "getPref_u64_new %s success, read %d bytes.\r\n", tempKey, sizeof(u64));
         ret = MATTER_KVS_SUCCESS;
     }
 
@@ -347,7 +348,7 @@ s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSi
             ret = MATTER_KVS_ERROR;
         }
     } else {
-        DiagPrintf("getPref_str_new %s success, read %d bytes.\r\n", tempKey, bufSize);
+        RTK_LOGI(TAG, "getPref_str_new %s success, read %d bytes.\r\n", tempKey, bufSize);
         ret = MATTER_KVS_SUCCESS;
     }
 
@@ -377,7 +378,7 @@ s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize
             ret = MATTER_KVS_ERROR;
         }
     } else {
-        DiagPrintf("getPref_bin_new %s success, read %d bytes.\r\n", tempKey, bufSize);
+        RTK_LOGI(TAG, "getPref_bin_new %s success, read %d bytes.\r\n", tempKey, bufSize);
         ret = MATTER_KVS_SUCCESS;
     }
 

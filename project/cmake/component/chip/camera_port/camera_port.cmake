@@ -13,11 +13,13 @@ ameba_list_append(private_includes
 
 ameba_list_append(private_sources
 
-	# light_port source files
+	# camera_port source files
 	${MATTER_DRIVER_DIR}/device/camera_driver.cpp
 	${MATTER_DRIVER_DIR}/matter_drivers/camera/ameba_camera.cpp
 	${MATTER_DRIVER_DIR}/matter_drivers/camera/ameba_camera_av_stream_manager.cpp
 	${MATTER_DRIVER_DIR}/matter_drivers/camera/ameba_camera_device.cpp
+	${MATTER_DRIVER_DIR}/matter_drivers/tls_certificate_management/ameba_tls_certificate_management_instance.cpp
+	${MATTER_DRIVER_DIR}/matter_drivers/tls_client_management/ameba_tls_client_management_instance.cpp
 	${MATTER_DRIVER_DIR}/matter_drivers/webrtc/ameba_webrtc_libdatachannel.cpp
 	${MATTER_DRIVER_DIR}/matter_drivers/webrtc/ameba_webrtc_provider_manager.cpp
 	${MATTER_DRIVER_DIR}/matter_drivers/webrtc/ameba_webrtc_transport.cpp

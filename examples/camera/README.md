@@ -66,6 +66,18 @@ As of now, there is no WebRTC library provided in ameba-rtos or ameba-rtos-matte
             USB Mode (Host)
         [*] UVC
 
+4. Additionally, on the latest ameba-rtos release/v1.2, please update the following file `component/soc/usrcfg/amebagreen2/ameba_bootcfg.c` by changing the following definition:
+
+    ```c
+    #define CLKCFG_0P9_RMII
+    ```
+
+    to:
+
+    ```c
+    #define CLKCFG_1P0_RMII_USB
+    ```
+
 ### Setup the Build Environment
   
     cd connectedhomeip
