@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@
 #include <matter_data_providers.h>
 #include <matter_kvs.h>
 
+static const char *const TAG = "MATTER_DP";
+
 /******************************************************
  *           Key Value Declarations
  ******************************************************/
@@ -40,8 +42,7 @@ static const char *kCalendarTypeKey       = "calendar_type";
 /******************************************************
  *           Default Declarations
  ******************************************************/
-static const ameba_fixed_label_t sDefaultFixedLabel[] =
-{
+static const ameba_fixed_label_t sDefaultFixedLabel[] = {
     { "room", "bedroom 2", true},
     { "orientation", "North", true},
     { "floor", "2", true},
@@ -49,15 +50,13 @@ static const ameba_fixed_label_t sDefaultFixedLabel[] =
 };
 static const size_t sDefaultFixedLabelCount = sizeof(sDefaultFixedLabel) / sizeof(sDefaultFixedLabel[0]);
 
-static const char *sDefaultSupportedLocales[] =
-{
+static const char *sDefaultSupportedLocales[] = {
     "en-US", "de-DE", "fr-FR", "en-GB",
     "es-ES", "zh-CN", "it-IT", "ja-JP"
 };
 static size_t sDefaultSupportedLocalesCount = sizeof(sDefaultSupportedLocales) / sizeof(sDefaultSupportedLocales[0]);
 
-static const uint8_t sDefaultCalendarTypes[MAX_CALENDAR_TYPE_COUNT] =
-{
+static const uint8_t sDefaultCalendarTypes[MAX_CALENDAR_TYPE_COUNT] = {
     CALENDAR_BUDDHIST,
     CALENDAR_CHINESE,
     CALENDAR_COPTIC,
@@ -90,8 +89,7 @@ static size_t sAmebaCalendarTypeCount = 0;
 
 bool matter_set_fixed_label(uint8_t index, const char *key, const char *value)
 {
-    if (index >= MAX_FIXED_LABELS_COUNT || key == NULL || value == NULL)
-    {
+    if (index >= MAX_FIXED_LABELS_COUNT || key == NULL || value == NULL) {
         return false;
     }
 
@@ -112,8 +110,7 @@ size_t matter_get_fixed_label_count(void)
 
 const char *matter_get_fixed_label_name(uint8_t index)
 {
-    if (index >= MAX_FIXED_LABELS_COUNT)
-    {
+    if (index >= MAX_FIXED_LABELS_COUNT) {
         return NULL;
     }
 
@@ -122,8 +119,7 @@ const char *matter_get_fixed_label_name(uint8_t index)
 
 const char *matter_get_fixed_label_value(uint8_t index)
 {
-    if (index >= MAX_FIXED_LABELS_COUNT)
-    {
+    if (index >= MAX_FIXED_LABELS_COUNT) {
         return NULL;
     }
 
@@ -140,26 +136,21 @@ void matter_init_supported_locale(void)
     size_t max_size = sizeof(sAmebaSupportedLocales);
     uint8_t *buf = (uint8_t *)malloc(max_size);
 
-    if (buf == NULL)
-    {
-        printf("Failed to allocate buffer for supported locales\n");
+    if (buf == NULL) {
+        RTK_LOGE(TAG, "Failed to allocate buffer for supported locales\n");
         return;
     }
 
-    if (getPref_str_new(kSupportedLocalesKey, kSupportedLocalesKey, (char *)buf, max_size, &len) == DCT_SUCCESS)
-    {
-        if (len > 0)
-        {
+    if (getPref_str_new(kSupportedLocalesKey, kSupportedLocalesKey, (char *)buf, max_size, &len) == DCT_SUCCESS) {
+        if (len > 0) {
             buf[len - 1] = '\0'; // Ensure null-terminated
 
             char *p = (char *)buf;
             size_t index = 0;
 
-            while ((p - (char *)buf) < (ptrdiff_t)len && index < MAX_ACTIVE_LOCALE_LENGTH)
-            {
+            while ((p - (char *)buf) < (ptrdiff_t)len && index < MAX_ACTIVE_LOCALE_LENGTH) {
                 size_t str_len = strlen(p);
-                if (str_len == 0)
-                {
+                if (str_len == 0) {
                     break;
                 }
 
@@ -175,10 +166,8 @@ void matter_init_supported_locale(void)
 
 void matter_deinit_supported_locales(void)
 {
-    for (size_t i = 0; i < sAmebaSupportedLocalesCount; ++i)
-    {
-        if (sAmebaSupportedLocales[i] != NULL)
-        {
+    for (size_t i = 0; i < sAmebaSupportedLocalesCount; ++i) {
+        if (sAmebaSupportedLocales[i] != NULL) {
             free((void *)sAmebaSupportedLocales[i]);
             sAmebaSupportedLocales[i] = NULL;
         }
@@ -193,13 +182,11 @@ size_t matter_get_supported_locale_count(void)
 
 const char *matter_get_supported_locale_value(uint8_t index)
 {
-    if (index < sAmebaSupportedLocalesCount)
-    {
+    if (index < sAmebaSupportedLocalesCount) {
         return sAmebaSupportedLocales[index];
     }
 
-    if (index < sDefaultSupportedLocalesCount)
-    {
+    if (index < sDefaultSupportedLocalesCount) {
         return sDefaultSupportedLocales[index];
     }
 
@@ -215,14 +202,10 @@ void matter_init_calendar_type(void)
     size_t len = 0;
     size_t max_size = MAX_CALENDAR_TYPE_COUNT;
 
-    if (getPref_bin_new(kCalendarTypeKey, kCalendarTypeKey, sAmebaCalendarTypes, max_size, &len) == DCT_SUCCESS)
-    {
-        if (len > 0 && len <= max_size)
-        {
-            for (int i = 0; i < len; i++)
-            {
-                if (sAmebaCalendarTypes[i] >= CALENDAR_UNKNOWN)
-                {
+    if (getPref_bin_new(kCalendarTypeKey, kCalendarTypeKey, sAmebaCalendarTypes, max_size, &len) == DCT_SUCCESS) {
+        if (len > 0 && len <= max_size) {
+            for (int i = 0; i < len; i++) {
+                if (sAmebaCalendarTypes[i] >= CALENDAR_UNKNOWN) {
                     len--;
                 }
             }
@@ -238,17 +221,13 @@ size_t matter_get_calendar_type_count(void)
 
 bool matter_get_calendar_type_value(uint8_t index, uint8_t *output)
 {
-    if (output == NULL)
-    {
+    if (output == NULL) {
         return false;
     }
 
-    if (sAmebaCalendarTypeCount != 0)
-    {
+    if (sAmebaCalendarTypeCount != 0) {
         *output = sAmebaCalendarTypes[index];
-    }
-    else
-    {
+    } else {
         *output = sDefaultCalendarTypes[index];
     }
 
@@ -257,8 +236,7 @@ bool matter_get_calendar_type_value(uint8_t index, uint8_t *output)
 
 bool matter_data_provider_set_key_value(const char *key, uint8_t *value, size_t size)
 {
-    if (key == NULL || value == NULL || size == 0)
-    {
+    if (key == NULL || value == NULL || size == 0) {
         return false;
     }
 
@@ -304,8 +282,7 @@ void test_example_set_fixed_label(void)
 
 void test_example_set_supported_locale(void)
 {
-    const char *sTestSupportedLocales[] =
-    {
+    const char *sTestSupportedLocales[] = {
         "en-US",
         "zh-CN",
         "ja-JP"
@@ -314,29 +291,25 @@ void test_example_set_supported_locale(void)
     size_t count = sizeof(sTestSupportedLocales) / sizeof(sTestSupportedLocales[0]);
 
     size_t total_len = 0;
-    for (size_t i = 0; i < count; i++)
-    {
+    for (size_t i = 0; i < count; i++) {
         total_len += strlen(sTestSupportedLocales[i]) + 1;
     }
 
     char *buf = (char *)malloc(total_len);
-    if (buf == NULL)
-    {
-        printf("Failed to allocate buffer\n");
+    if (buf == NULL) {
+        RTK_LOGE(TAG, "Failed to allocate buffer\n");
         return;
     }
 
     char *ptr = buf;
-    for (size_t i = 0; i < count; i++)
-    {
+    for (size_t i = 0; i < count; i++) {
         size_t len = strlen(sTestSupportedLocales[i]) + 1;
         memcpy(ptr, sTestSupportedLocales[i], len);
         ptr += len;
     }
 
-    if (matter_data_provider_set_key_value(kSupportedLocalesKey, (uint8_t *)buf, total_len) != true)
-    {
-        printf("Set supported locales failed\n");
+    if (matter_data_provider_set_key_value(kSupportedLocalesKey, (uint8_t *)buf, total_len) != true) {
+        RTK_LOGE(TAG, "Set supported locales failed\n");
     }
 
     free(buf);
@@ -348,9 +321,8 @@ void test_example_set_calendar_type(void)
 
     size_t count = sizeof(sTestCalendarTypes) / sizeof(sTestCalendarTypes[0]);
 
-    if (matter_data_provider_set_key_value(kCalendarTypeKey, sTestCalendarTypes, count) != true)
-    {
-        printf("Set calendar type failed\n");
+    if (matter_data_provider_set_key_value(kCalendarTypeKey, sTestCalendarTypes, count) != true) {
+        RTK_LOGE(TAG, "Set calendar type failed\n");
     }
 }
 #endif

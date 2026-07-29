@@ -42,6 +42,10 @@
 #if defined(CONFIG_DISABLE_LAST_FIXED_ENDPOINT) && (CONFIG_DISABLE_LAST_FIXED_ENDPOINT == 1)
 #include <matter_data_model.h>
 #endif
+#if defined(CONFIG_ENABLE_AMEBA_TIME_SYNC) && (CONFIG_ENABLE_AMEBA_TIME_SYNC == 1)
+#include <app/clusters/time-synchronization-server/CodegenIntegration.h>
+#include <time_synchronization/ameba_time_sync_delegate.h>
+#endif
 
 #include <DeviceInfoProviderImpl.h>
 
@@ -251,6 +255,15 @@ void matter_core_init_server(intptr_t context)
     // TODO: Use our own DeviceInfoProvider
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
+    // Must be registered before Server::Init() so the Time Synchronization cluster picks it up
+    // instead of falling back to DefaultTimeSyncDelegate.
+#if defined(CONFIG_ENABLE_AMEBA_TIME_SYNC) && (CONFIG_ENABLE_AMEBA_TIME_SYNC == 1)
+    static Clusters::TimeSynchronization::AmebaTimeSyncDelegate sAmebaTimeSyncDelegate;
+    sAmebaTimeSyncDelegate.SetSimulatePlatformSourceUnavailable(false);
+    sAmebaTimeSyncDelegate.SetTimeResyncQuickTest(false);
+    Clusters::TimeSynchronization::SetDefaultDelegate(&sAmebaTimeSyncDelegate);
+#endif
+
     chip::Server::GetInstance().Init(initParams);
 
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
@@ -286,6 +299,13 @@ void matter_core_init_server(intptr_t context)
         // because the DNSSD service was not initialized after network connection.
         chip::app::DnssdServer::Instance().StartServer();
     }
+
+#if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
+    chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
+#if defined(CHIP_CONFIG_ENABLE_ICD_SERVER) && (CHIP_CONFIG_ENABLE_ICD_SERVER == 1)
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&sAmebaObserver);
+#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
+#endif // CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER
 
 #if defined(CONFIG_ENABLE_CHIP_SHELL) && (CONFIG_ENABLE_CHIP_SHELL == 1)
     InitBindingHandler();

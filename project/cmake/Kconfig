@@ -5,7 +5,7 @@ menu "Matter Config"
     if MATTER_EN
         choice
             prompt "Ameba RTOS version"
-            default AMEBARTOS_V1_1
+            default AMEBARTOS_V1_2
             config AMEBARTOS_V1_1
                 bool "Ameba RTOS v1.1"
             config AMEBARTOS_V1_2
@@ -36,6 +36,17 @@ menu "Matter Config"
             default n
         config MATTER_TC_EN
             bool "Enable Matter Terms and Condition"
+            default n
+        config MATTER_ICD_EN
+            bool "Enable Matter ICD"
+            default n
+            if MATTER_ICD_EN
+                config MATTER_ICD_LIT_EN
+                    bool "Enable Matter ICD LIT"
+                    default n
+            endif
+        config MATTER_TIME_SYNC_EN
+            bool "Enable Matter Time Sync"
             default n
         config MATTER_SECURE_EN
             bool "Enable Matter Secure"

@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <kv.h>
 #include <vfs.h>
 #ifdef CONFIG_VFS_FATFS_INCLUDED
@@ -36,6 +35,7 @@ extern size_t fread(void *ptr, size_t size, size_t count, FILE *stream);
 extern int kv_init_done;
 #endif
 static char *kv_matter_prefix;
+static const char *const TAG = "MATTER_KV";
 
 int rt_kv_deinit(void)
 {
@@ -69,7 +69,7 @@ int rt_kv_deinit(void)
                 DiagSnPrintf(path, MAX_KEY_LENGTH + 1, "%s:KV/%s", kv_matter_prefix, dir->d_name);
                 rtos_time_delay_ms(10);
                 if (remove(path) == 0) {
-                    DiagPrintf("rt_kv_deinit: succesfully deleted %s\n", path);
+                    RTK_LOGI(TAG, "%s: succesfully deleted %s\n", __func__, path);
                 }
             }
             rtos_mem_free(dir);
@@ -109,14 +109,11 @@ int rt_kv_deinit(void)
             break;
         } else if (strcmp(info->d_name, ".") != 0 && strcmp(info->d_name, "..") != 0) {
             res = rt_kv_delete(info->d_name);
-            if (res < 0)
-            {
-                DiagPrintf("rt_kv_deinit: failed to delete %s\n", info->d_name);
+            if (res < 0) {
+                RTK_LOGE(TAG, "%s: failed to delete %s\n", __func__, info->d_name);
                 goto exit;
-            }
-            else
-            {
-                DiagPrintf("rt_kv_deinit: succesfully deleted %s\n", info->d_name);
+            } else {
+                RTK_LOGI(TAG, "%s: succesfully deleted %s\n", __func__, info->d_name);
             }
         }
     }
@@ -156,14 +153,11 @@ int rt_kv_deinit(void)
             break;
         } else if (strcmp(info->d_name, ".") != 0 && strcmp(info->d_name, "..") != 0) {
             res = rt_kv_delete(info->d_name);
-            if (res < 0)
-            {
-                DiagPrintf("rt_kv_deinit: failed to delete %s\n", info->d_name);
+            if (res < 0) {
+                RTK_LOGE(TAG, "%s: failed to delete %s\n", __func__, info->d_name);
                 goto exit;
-            }
-            else
-            {
-                DiagPrintf("rt_kv_deinit: succesfully deleted %s\n", info->d_name);
+            } else {
+                RTK_LOGI(TAG, "%s: succesfully deleted %s\n", __func__, info->d_name);
             }
         }
     }

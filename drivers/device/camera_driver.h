@@ -26,7 +26,7 @@
 
 extern "C" {
 #ifdef CONFIG_USB_HOST_EN
-#include <usbh_uvc_intf.h>
+#include <usbh_uvc.h>
 #include <usbh.h>
 #endif
 #include <lwipconf.h>
@@ -36,24 +36,23 @@ extern "C" {
 
 #ifdef CONFIG_USB_HOST_EN
 /* Private defines -----------------------------------------------------------*/
-/* Supported formats: USBH_UVC_FORMAT_MJPEG, USBH_UVC_FORMAT_YUV, USBH_UVC_FORMAT_H264
- * Note: Users must verify which formats their specific camera supports and
- * adjust the definition below accordingly. */
+
+/*
+ * IMPORTANT: The Matter WebRTC live video stream is H.264 only. The camera's
+ * captured bytes are fed directly into an H.264 RTP packetizer (no on-device
+ * transcode), so a non-H.264 format will NOT decode on the viewer. You must use
+ * a UVC camera that natively outputs H.264.
+ */
+
 #define CONFIG_USBH_UVC_FORMAT_TYPE                USBH_UVC_FORMAT_H264
 
-/* Target resolution and compression ratio.
- * If the specific camera device does not support
- * these values, the host stack will automatically select the closest match.
- * Always check the logs to confirm the actual parameters applied. */
-#if ((CONFIG_USBH_UVC_FORMAT_TYPE == USBH_UVC_FORMAT_MJPEG) || (CONFIG_USBH_UVC_FORMAT_TYPE == USBH_UVC_FORMAT_H264))
+#if (CONFIG_USBH_UVC_FORMAT_TYPE != USBH_UVC_FORMAT_H264)
+#error "CONFIG_USBH_UVC_FORMAT_TYPE must be set to USBH_UVC_FORMAT_H264"
+#endif
+
 #define CONFIG_USBH_UVC_WIDTH                      1280
 #define CONFIG_USBH_UVC_HEIGHT                     720
 #define CONFIG_USBH_UVC_FRAME_RATE                 30
-#elif (CONFIG_USBH_UVC_FORMAT_TYPE == USBH_UVC_FORMAT_YUV) // Uncompressed YUV format takes a lot of space for the settings above
-#define CONFIG_USBH_UVC_WIDTH                      640
-#define CONFIG_USBH_UVC_HEIGHT                     480
-#define CONFIG_USBH_UVC_FRAME_RATE                 30
-#endif
 
 /* Frame buffer size in bytes
  * Size depends on format, resolution, and scene complexity.
@@ -61,19 +60,10 @@ extern "C" {
  * ┌────────┬─────────────────────────────┬─────────┬──────────┐
  * │ Format │           Formula           | 640×480 │ 1280×720 │
  * ├────────┼─────────────────────────────┼─────────┼──────────┤
- * │ YUYV   │ W × H × 2                   | 600 KB  │ 1.8 MB   │
- * ├────────┼─────────────────────────────┼─────────┼──────────┤
- * │ MJPEG  │ W × H × 2 x 0.05 (estimate) | ~30 KB  │ ~90 KB   │
- * ├────────┼─────────────────────────────┼─────────┼──────────┤
  * │ H.264  │ W × H × 2 x 0.05 (estimate) | ~30 KB  │ ~90 KB   │
  * └────────┴─────────────────────────────┴─────────┴──────────┘
- * MJPEG and H.264 size only takes 5% of YUV size
  */
-#if ((CONFIG_USBH_UVC_FORMAT_TYPE == USBH_UVC_FORMAT_MJPEG) || (CONFIG_USBH_UVC_FORMAT_TYPE == USBH_UVC_FORMAT_H264))
 #define CONFIG_USBH_UVC_FRAME_BUF_SIZE             (100 * 1024)
-#elif (CONFIG_USBH_UVC_FORMAT_TYPE == USBH_UVC_FORMAT_YUV) // Uncompressed YUV format takes a lot of space even after lowering the resolution
-#define CONFIG_USBH_UVC_FRAME_BUF_SIZE             (610 * 1024)
-#endif
 
 /* Most cameras have a single video stream interface, so use default 0.
  * If the camera supports dual streams, set this to 1.
@@ -83,9 +73,6 @@ extern "C" {
 /* Hot plug / memory leak test */
 #define CONFIG_USBH_UVC_HOT_PLUG                   1
 
-/* Check image data validity (0: Disable, 1: Enable) */
-#define CONFIG_USBH_UVC_CHECK_MJEPG_DATA           1
-
 /* Number of frames to capture in the loop */
 #define CONFIG_USBH_UVC_LOOP                       200
 
@@ -94,6 +81,8 @@ extern "C" {
 
 /* Base Stack Size of the UVC threads */
 #define CONFIG_USBH_UVC_BASE_STACK_SIZE              1024
+/* Stack Size of the USB host core main task */
+#define CONFIG_USBH_UVC_MAIN_TASK_STACK_SIZE         CONFIG_USBH_UVC_BASE_STACK_SIZE * 2
 /* Stack Size of the UVC test thread */
 #define CONFIG_USBH_UVC_TEST_THREAD_STACK_SIZE       CONFIG_USBH_UVC_BASE_STACK_SIZE * 2
 /* Stack Size of the USB hotplug detection thread */
@@ -202,6 +191,13 @@ private:
     RingBuffer *mUvcRb;
 
     u8 *mUvcBuf = nullptr;
+
+    static constexpr uint32_t kUvcFrameQueueDepth = 8;
+    uint32_t mUvcFrameLen[kUvcFrameQueueDepth] = { 0 };
+    volatile uint32_t mUvcFrameQHead = 0;
+    volatile uint32_t mUvcFrameQTail = 0;
+    rtos_sema_t mUvcFrameSema = NULL;
+    uint64_t mUvcFramesSent = 0;
 
     usbh_config_t  *mUsbhConfig   = NULL;
     usbh_uvc_ctx_t *mUvcConfig    = NULL;

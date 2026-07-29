@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 // Ameba Includes
 #include <platform_autoconf.h>
 #if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
@@ -27,9 +26,6 @@
 #include <ameba_crypto_api.h>
 #elif defined(CONFIG_AMEBAGREEN2)
 #include <ameba_crypto.h>
-#endif
-#ifndef printf
-#define printf DiagPrintf
 #endif
 #endif
 
@@ -52,6 +48,8 @@
 
 // Matter Includes
 #include <matter_utils.h>
+
+static const char *const TAG = "MATTER_TLS_NSC";
 
 __weak const uint8_t kSecureDacPrivateKey[] = {
     0xfe, 0x94, 0x39, 0xea, 0x18, 0xfb, 0x1e, 0x7e, 0xbc, 0xa2, 0x98, 0xf8, 0x87, 0x3a, 0x3c, 0xd5,
@@ -196,7 +194,7 @@ int matter_hash_sha256(const uint8_t *msg, size_t msg_size, uint8_t *out_buf)
 {
     // Check if 'msg' or 'out_buf' pointers are nullptr
     if ((msg == NULL) || (out_buf == NULL)) {
-        printf("ERROR: %s nullptr \n\r", __FUNCTION__);
+        RTK_LOGE(TAG, "%s nullptr \n\r", __FUNCTION__);
         return MATTER_INVALID_ARGUMENT;
     }
 
@@ -233,7 +231,7 @@ int matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *
 
     result = matter_hash_sha256(msg, msg_size, &digest[0]);
     if (result != 0) {
-        printf("ERROR: %s hash failed result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s hash failed result=%d \n\r", __FUNCTION__, result);
         return MATTER_INVALID_ARGUMENT;
     }
 
@@ -256,7 +254,7 @@ int matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *
     }
 
     if (result != 0) {
-        printf("ERROR: %s setup ECDSA failed result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s setup ECDSA failed result=%d \n\r", __FUNCTION__, result);
         return result;
     }
 
@@ -264,7 +262,7 @@ int matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *
     result = mbedtls_ecdsa_sign(&ecdsa_ctxt.grp, &r, &s, &ecdsa_ctxt.d,
                                 (unsigned char const *)digest, sizeof(digest), _random, NULL);
     if (result != 0) {
-        printf("ERROR: %s ECDSA sign failed result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s ECDSA sign failed result=%d \n\r", __FUNCTION__, result);
         return result;
     }
 
@@ -275,13 +273,13 @@ int matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *
     // Write the signature into the 'signature' buffer
     result = mbedtls_mpi_write_binary(&r, signature, MATTER_P256_FE_LENGTH);
     if (result != 0) {
-        printf("ERROR: %s write binary failed result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s write binary failed result=%d \n\r", __FUNCTION__, result);
         return result;
     }
 
     result = mbedtls_mpi_write_binary(&s, signature + MATTER_P256_FE_LENGTH, MATTER_P256_FE_LENGTH);
     if (result != 0) {
-        printf("ERROR: %s write binary failed result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s write binary failed result=%d \n\r", __FUNCTION__, result);
         return result;
     }
 
@@ -321,7 +319,7 @@ int matter_secure_opkey_init_keypair()
     // Generate a new keypair using the specified elliptic curve group
     result = mbedtls_ecp_gen_key(group, &OpKey, _random, NULL);
     if (result != 0) {
-        printf("Error: %s gen key failed, result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s gen key failed, result=%d \n\r", __FUNCTION__, result);
         goto exit;
     }
 
@@ -376,14 +374,14 @@ int matter_secure_new_csr(uint8_t *out_csr, size_t csr_length)
     // Set the subject name of the CSR
     result = mbedtls_x509write_csr_set_subject_name(&csr, "O=CSR");
     if (result != 0) {
-        printf("Error: %s set subject failed, result=%d\n", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s set subject failed, result=%d\n", __FUNCTION__, result);
         return MATTER_ERROR_INTERNAL;
     }
 
     // Generate the CSR and store it in the output buffer 'out_csr'
     result = mbedtls_x509write_csr_der(&csr, out_csr, csr_length, _random, NULL);
     if (result <= 0) {
-        printf("Error: %s write csr der failed, length=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s write csr der failed, length=%d \n\r", __FUNCTION__, result);
         return MATTER_ERROR_INTERNAL;
     }
 
@@ -392,7 +390,7 @@ int matter_secure_new_csr(uint8_t *out_csr, size_t csr_length)
 
     // Check for CSR length
     if (out_length > csr_length) {
-        printf("Error: %s length error, length=%d \n\r", __FUNCTION__, out_length);
+        RTK_LOGE(TAG, "%s length error, length=%d \n\r", __FUNCTION__, out_length);
         return MATTER_ERROR_INTERNAL;
     }
 
@@ -410,7 +408,7 @@ exit:
 
     return csr_length;
 #else
-    printf("Error: %s MBEDTLS_X509_CSR_WRITE_C is not enabled. CSR cannot be created \n\r", __FUNCTION__);
+    RTK_LOGE(TAG, "%s MBEDTLS_X509_CSR_WRITE_C is not enabled. CSR cannot be created \n\r", __FUNCTION__);
     return MATTER_NOT_IMPLEMENTED;
 #endif
 }
@@ -456,7 +454,7 @@ int matter_secure_encrypt_key(uint8_t *buf, size_t size)
     // Decrypt the encrypted Operational private key using AES-CTR
     result = mbedtls_aes_crypt_ctr(&aes_ctx, size, &nc_off, nonce_counter, stream_block, buf, encrypted_privkey);
     if (result != 0) {
-        printf("ERROR: %s privkey decrypt failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s privkey decrypt failed! result=%d \n\r", __FUNCTION__, result);
         goto exit;
     }
 
@@ -493,7 +491,7 @@ int matter_secure_get_opkey_pub(uint8_t *pubkey, size_t pubkey_size)
     result = mbedtls_ecp_point_write_binary(&OpKey.grp, &OpKey.Q, MBEDTLS_ECP_PF_UNCOMPRESSED,
                                             &temp_size, (unsigned char *) pubkey, pubkey_size);
     if (result != 0) {
-        printf("ERROR: %s write public key failed, result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s write public key failed, result=%d \n\r", __FUNCTION__, result);
         return result;
     }
 
@@ -523,7 +521,7 @@ int matter_secure_get_opkey_priv(uint8_t *privkey, size_t privkey_size)
     // Retrieve the encrypted private key of the Operational Keypair and write it into the buffer 'privkey'
     result = mbedtls_mpi_write_binary(&OpKey.d, privkey, privkey_size);
     if (result != 0) {
-        printf("ERROR: %s get private key failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s get private key failed! result=%d \n\r", __FUNCTION__, result);
         matter_secure_clear_keypair(MATTER_OPKEY_KEY_TYPE);
         goto exit;
     }
@@ -531,7 +529,7 @@ int matter_secure_get_opkey_priv(uint8_t *privkey, size_t privkey_size)
     // Decrypt the encrypted private key
     result = matter_secure_encrypt_key(privkey, privkey_size);
     if (result != 0) {
-        printf("ERROR: %s encrypt private key failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s encrypt private key failed! result=%d \n\r", __FUNCTION__, result);
         matter_secure_clear_keypair(MATTER_OPKEY_KEY_TYPE);
         goto exit;
     }
@@ -594,7 +592,7 @@ int matter_secure_get_opkey(uint8_t *buf, size_t size)
     //decrypt operational private key
     result = mbedtls_aes_crypt_ctr(&aes_ctx, MATTER_P256_FE_LENGTH, &nc_off, nonce_counter, stream_block, buf + MATTER_PUBLIC_KEY_SIZE, decrypted_privkey);
     if (result != 0) {
-        printf("ERROR: %s decryption failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s decryption failed! result=%d \n\r", __FUNCTION__, result);
         goto exit;
     }
 
@@ -606,21 +604,21 @@ int matter_secure_get_opkey(uint8_t *buf, size_t size)
     //set Operational keypair ecp group as MBEDTLS_ECP_DP_SECP256R1
     result = mbedtls_ecp_group_load(&OpKey.grp, MBEDTLS_ECP_DP_SECP256R1);
     if (result != 0) {
-        printf("ERROR: %s load grp failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s load grp failed! result=%d \n\r", __FUNCTION__, result);
         goto exit;
     }
 
     // set Opkey public key
     result = mbedtls_ecp_point_read_binary(&OpKey.grp, &OpKey.Q, (const unsigned char *)pubkey, MATTER_PUBLIC_KEY_SIZE);
     if (result != 0) {
-        printf("ERROR: %s set pubkey failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s set pubkey failed! result=%d \n\r", __FUNCTION__, result);
         goto exit;
     }
 
     // set decrypted priv key into Opkey
     result = mbedtls_mpi_read_binary(&OpKey.d, decrypted_privkey, MATTER_P256_FE_LENGTH);
     if (result != 0) {
-        printf("ERROR: %s set privkey failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s set privkey failed! result=%d \n\r", __FUNCTION__, result);
         goto exit;
     }
 
@@ -663,14 +661,14 @@ int matter_secure_serialize(uint8_t *output_buf, size_t output_size)
     // Get the public key of the Operational Keypair
     result = matter_secure_get_opkey_pub(pubkey, sizeof(pubkey));
     if (result != 0) {
-        printf("ERROR: %s get public key failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s get public key failed! result=%d \n\r", __FUNCTION__, result);
         goto exit;
     }
 
     // Get the private key of the Operational Keypair
     result = matter_secure_get_opkey_priv(privkey, sizeof(privkey));
     if (result != 0) {
-        printf("ERROR: %s get private key failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s get private key failed! result=%d \n\r", __FUNCTION__, result);
         goto exit;
     }
 
@@ -708,7 +706,7 @@ int matter_secure_deserialize(uint8_t *pub_buf, size_t pub_size)
     // Set the ECP group for the DAC keypair to MBEDTLS_ECP_DP_SECP256R1
     result = mbedtls_ecp_group_load(&DacKey.grp, MBEDTLS_ECP_DP_SECP256R1);
     if (result != 0) {
-        printf("ERROR: %s load grp failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s load grp failed! result=%d \n\r", __FUNCTION__, result);
         matter_secure_clear_keypair(MATTER_DACKEY_KEY_TYPE);
         goto exit;
     }
@@ -716,7 +714,7 @@ int matter_secure_deserialize(uint8_t *pub_buf, size_t pub_size)
     // Set the DAC public key into DacKey
     result = mbedtls_ecp_point_read_binary(&DacKey.grp, &DacKey.Q, (const unsigned char *)pub_buf, pub_size);
     if (result != 0) {
-        printf("ERROR: %s set public key failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s set public key failed! result=%d \n\r", __FUNCTION__, result);
         matter_secure_clear_keypair(MATTER_DACKEY_KEY_TYPE);
         goto exit;
     }
@@ -724,7 +722,7 @@ int matter_secure_deserialize(uint8_t *pub_buf, size_t pub_size)
     // Set the DAC private key into DacKey
     result = mbedtls_mpi_read_binary(&DacKey.d, kSecureDacPrivateKey, MATTER_DAC_PRIVATE_KEY_LENGTH);
     if (result != 0) {
-        printf("ERROR: %s set private key failed! result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s set private key failed! result=%d \n\r", __FUNCTION__, result);
         matter_secure_clear_keypair(MATTER_DACKEY_KEY_TYPE);
         goto exit;
     }
@@ -752,7 +750,7 @@ int matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size)
     // Deserialize the DAC keypair
     result = matter_secure_deserialize(pub_buf, pub_size);
     if (result != 0) {
-        printf("Error: %s deserialize failed result=%d \n\r", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s deserialize failed result=%d \n\r", __FUNCTION__, result);
         return result;
     }
 

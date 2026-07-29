@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <FreeRTOS.h>
 #include <task.h>
 #include <basic_types.h>
@@ -40,9 +39,21 @@ static void example_matter_camera_task(void *pvParameters)
 
     initPref();     // init NVS
 
+    // Initialize TLS Client and Certificate Management delegates before server starts
+    // This must be called before matter_core_start() which initializes the server
+    err = matter_driver_tls_management_clusters_init();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogProgress(DeviceLayer, "matter_driver_tls_management_clusters_init failed!");
+    }
+
     err = matter_core_start();
     if (err != CHIP_NO_ERROR) {
         ChipLogProgress(DeviceLayer, "matter_core_start failed!");
+    }
+
+    err = matter_driver_power_source_cluster_set_startup_value();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogProgress(DeviceLayer, "matter_driver_power_source_cluster_set_startup_value failed!");
     }
 
     ChipLogProgress(DeviceLayer, "matter_driver_application_init start!");

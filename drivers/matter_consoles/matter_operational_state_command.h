@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
 #include <operational_state/ameba_operational_state_delegate.h>
@@ -51,39 +51,37 @@ Engine sShellManualOvenCavityOperationalStateSubCommands;
  * Operational State Functions
  *********************************************************/
 
-CHIP_ERROR ManualOperationalStateCommandHelpHandler(int argc, char ** argv)
+CHIP_ERROR ManualOperationalStateCommandHelpHandler(int argc, char **argv)
 {
     sShellManualOperationalStateSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
 
-    printf("OperationalState Values: \n");
-    printf("    0: kStopped\n");
-    printf("    1: kRunning\n");
-    printf("    2: kPaused\n");
-    printf("    3: kError\n\n");
+    RTK_LOGI(NOTAG, "OperationalState Values: \n");
+    RTK_LOGI(NOTAG, "    0: kStopped\n");
+    RTK_LOGI(NOTAG, "    1: kRunning\n");
+    RTK_LOGI(NOTAG, "    2: kPaused\n");
+    RTK_LOGI(NOTAG, "    3: kError\n\n");
 
-    printf("OperationalStateError Values: \n");
-    printf("    0: kNoError\n");
-    printf("    1: kUnableToStartOrResume\n");
-    printf("    2: kUnableToCompleteOperation\n");
-    printf("    3: kCommandInvalidInState\n\n");
+    RTK_LOGI(NOTAG, "OperationalStateError Values: \n");
+    RTK_LOGI(NOTAG, "    0: kNoError\n");
+    RTK_LOGI(NOTAG, "    1: kUnableToStartOrResume\n");
+    RTK_LOGI(NOTAG, "    2: kUnableToCompleteOperation\n");
+    RTK_LOGI(NOTAG, "    3: kCommandInvalidInState\n\n");
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ManualOperationalStateCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOperationalStateCommandHandler(int argc, char **argv)
 {
-    if (argc == 0)
-    {
+    if (argc == 0) {
         return ManualOperationalStateCommandHelpHandler(argc, argv);
     }
 
     return sShellManualOperationalStateSubCommands.ExecCommand(argc, argv);
 }
 
-CHIP_ERROR ManualOperationalStateSetStateCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOperationalStateSetStateCommandHandler(int argc, char **argv)
 {
-    if (argc != 1)
-    {
+    if (argc != 1) {
         return ManualOperationalStateCommandHelpHandler(argc, argv);
     }
     uint32_t state = atoi(argv[0]);
@@ -91,26 +89,23 @@ CHIP_ERROR ManualOperationalStateSetStateCommandHandler(int argc, char ** argv)
     CHIP_ERROR err;
     err = OperationalState::GetAmebaOperationalStateInstance()->SetOperationalState(state);
 
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "ManualOperationalStateSetStateCommandHandler Failed!\r\n");
     }
 
     return err;
 }
 
-CHIP_ERROR ManualOperationalStateSetErrorCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOperationalStateSetErrorCommandHandler(int argc, char **argv)
 {
-    if (argc != 1)
-    {
+    if (argc != 1) {
         return ManualOperationalStateCommandHelpHandler(argc, argv);
     }
 
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     uint32_t error = atoi(argv[0]);
 
-    switch (error)
-    {
+    switch (error) {
     case to_underlying(OperationalState::ErrorStateEnum::kNoError):                   // 0x00, 0
     case to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume):     // 0x01, 1
     case to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation): // 0x02, 2
@@ -131,87 +126,82 @@ CHIP_ERROR ManualOperationalStateSetErrorCommandHandler(int argc, char ** argv)
  * RVC Operational State Functions
  *********************************************************/
 
-CHIP_ERROR ManualRVCOperationalStateCommandHelpHandler(int argc, char ** argv)
+CHIP_ERROR ManualRVCOperationalStateCommandHelpHandler(int argc, char **argv)
 {
     sShellManualRVCOperationalStateSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
 
-    printf("OperationalState Values: \n");
-    printf("    0: kStopped\n");
-    printf("    1: kRunning\n");
-    printf("    2: kPaused\n");
-    printf("    3: kError\n");
-    printf("    64: kSeekingCharger\n");
-    printf("    65: kCharging\n");
-    printf("    66: kDocked\n");
-    printf("    67: kEmptyingDustBin\n");
-    printf("    68: kCleaningMop\n");
-    printf("    69: kFillingWaterTank\n");
-    printf("    70: kUpdatingMaps\n\n");
+    RTK_LOGI(NOTAG, "OperationalState Values: \n");
+    RTK_LOGI(NOTAG, "    0: kStopped\n");
+    RTK_LOGI(NOTAG, "    1: kRunning\n");
+    RTK_LOGI(NOTAG, "    2: kPaused\n");
+    RTK_LOGI(NOTAG, "    3: kError\n");
+    RTK_LOGI(NOTAG, "    64: kSeekingCharger\n");
+    RTK_LOGI(NOTAG, "    65: kCharging\n");
+    RTK_LOGI(NOTAG, "    66: kDocked\n");
+    RTK_LOGI(NOTAG, "    67: kEmptyingDustBin\n");
+    RTK_LOGI(NOTAG, "    68: kCleaningMop\n");
+    RTK_LOGI(NOTAG, "    69: kFillingWaterTank\n");
+    RTK_LOGI(NOTAG, "    70: kUpdatingMaps\n\n");
 
-    printf("OperationalStateError Values: \n");
-    printf("    0: kNoError\n");
-    printf("    1: kUnableToStartOrResume\n");
-    printf("    2: kUnableToCompleteOperation\n");
-    printf("    3: kCommandInvalidInState\n");
-    printf("    64: kFailedToFindChargingDock\n");
-    printf("    65: kStuck\n");
-    printf("    66: kDustBinMissing\n");
-    printf("    67: kDustBinFull\n");
-    printf("    68: kWaterTankEmpty\n");
-    printf("    69: kWaterTankMissing\n");
-    printf("    70: kWaterTankLidOpen\n");
-    printf("    71: kMopCleaningPadMissing\n");
-    printf("    72: kLowBattery\n");
-    printf("    73: kCannotReachTargetArea\n");
-    printf("    74: kDirtyWaterTankFull\n");
-    printf("    75: kDirtyWaterTankMissing\n");
-    printf("    76: kWheelsJammed\n");
-    printf("    77: kBrushJammed\n");
-    printf("    78: kNavigationSensorObscured\n\n");
+    RTK_LOGI(NOTAG, "OperationalStateError Values: \n");
+    RTK_LOGI(NOTAG, "    0: kNoError\n");
+    RTK_LOGI(NOTAG, "    1: kUnableToStartOrResume\n");
+    RTK_LOGI(NOTAG, "    2: kUnableToCompleteOperation\n");
+    RTK_LOGI(NOTAG, "    3: kCommandInvalidInState\n");
+    RTK_LOGI(NOTAG, "    64: kFailedToFindChargingDock\n");
+    RTK_LOGI(NOTAG, "    65: kStuck\n");
+    RTK_LOGI(NOTAG, "    66: kDustBinMissing\n");
+    RTK_LOGI(NOTAG, "    67: kDustBinFull\n");
+    RTK_LOGI(NOTAG, "    68: kWaterTankEmpty\n");
+    RTK_LOGI(NOTAG, "    69: kWaterTankMissing\n");
+    RTK_LOGI(NOTAG, "    70: kWaterTankLidOpen\n");
+    RTK_LOGI(NOTAG, "    71: kMopCleaningPadMissing\n");
+    RTK_LOGI(NOTAG, "    72: kLowBattery\n");
+    RTK_LOGI(NOTAG, "    73: kCannotReachTargetArea\n");
+    RTK_LOGI(NOTAG, "    74: kDirtyWaterTankFull\n");
+    RTK_LOGI(NOTAG, "    75: kDirtyWaterTankMissing\n");
+    RTK_LOGI(NOTAG, "    76: kWheelsJammed\n");
+    RTK_LOGI(NOTAG, "    77: kBrushJammed\n");
+    RTK_LOGI(NOTAG, "    78: kNavigationSensorObscured\n\n");
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ManualRVCOperationalStateCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualRVCOperationalStateCommandHandler(int argc, char **argv)
 {
-    if (argc == 0)
-    {
+    if (argc == 0) {
         return ManualRVCOperationalStateCommandHelpHandler(argc, argv);
     }
 
     return sShellManualRVCOperationalStateSubCommands.ExecCommand(argc, argv);
 }
 
-CHIP_ERROR ManualRVCOperationalStateSetStateCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualRVCOperationalStateSetStateCommandHandler(int argc, char **argv)
 {
-    if (argc != 1)
-    {
+    if (argc != 1) {
         return ManualRVCOperationalStateCommandHelpHandler(argc, argv);
     }
     uint32_t state = atoi(argv[0]);
 
     CHIP_ERROR err;
     err = RvcOperationalState::GetAmebaRvcOperationalStateInstance()->SetOperationalState(state);
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "ManualRVCOperationalStateSetStateCommandHandler Failed!\r\n");
     }
 
     return err;
 }
 
-CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char **argv)
 {
-    if (argc != 1)
-    {
+    if (argc != 1) {
         return ManualRVCOperationalStateCommandHelpHandler(argc, argv);
     }
 
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     uint32_t error = atoi(argv[0]);
 
-    switch (error)
-    {
+    switch (error) {
     case to_underlying(OperationalState::ErrorStateEnum::kNoError):                     // 0x00, 0
     case to_underlying(OperationalState::ErrorStateEnum::kUnableToStartOrResume):       // 0x01, 1
     case to_underlying(OperationalState::ErrorStateEnum::kUnableToCompleteOperation):   // 0x02, 2
@@ -247,39 +237,37 @@ CHIP_ERROR ManualRVCOperationalStateSetErrorCommandHandler(int argc, char ** arg
  * Oven Cavity Operational State Functions
  *********************************************************/
 
-CHIP_ERROR ManualOvenCavityOperationalStateCommandHelpHandler(int argc, char ** argv)
+CHIP_ERROR ManualOvenCavityOperationalStateCommandHelpHandler(int argc, char **argv)
 {
     sShellManualOvenCavityOperationalStateSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
 
-    printf("OperationalState Values: \n");
-    printf("    0: kStopped\n");
-    printf("    1: kRunning\n");
-    printf("    2: kPaused\n");
-    printf("    3: kError\n\n");
+    RTK_LOGI(NOTAG, "OperationalState Values: \n");
+    RTK_LOGI(NOTAG, "    0: kStopped\n");
+    RTK_LOGI(NOTAG, "    1: kRunning\n");
+    RTK_LOGI(NOTAG, "    2: kPaused\n");
+    RTK_LOGI(NOTAG, "    3: kError\n\n");
 
-    printf("OperationalStateError Values: \n");
-    printf("    0: kNoError\n");
-    printf("    1: kUnableToStartOrResume\n");
-    printf("    2: kUnableToCompleteOperation\n");
-    printf("    3: kCommandInvalidInState\n\n");
+    RTK_LOGI(NOTAG, "OperationalStateError Values: \n");
+    RTK_LOGI(NOTAG, "    0: kNoError\n");
+    RTK_LOGI(NOTAG, "    1: kUnableToStartOrResume\n");
+    RTK_LOGI(NOTAG, "    2: kUnableToCompleteOperation\n");
+    RTK_LOGI(NOTAG, "    3: kCommandInvalidInState\n\n");
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ManualOvenCavityOperationalStateCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOvenCavityOperationalStateCommandHandler(int argc, char **argv)
 {
-    if (argc == 0)
-    {
+    if (argc == 0) {
         return ManualOvenCavityOperationalStateCommandHelpHandler(argc, argv);
     }
 
     return sShellManualOvenCavityOperationalStateSubCommands.ExecCommand(argc, argv);
 }
 
-CHIP_ERROR ManualOvenCavityOperationalStateSetStateCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOvenCavityOperationalStateSetStateCommandHandler(int argc, char **argv)
 {
-    if (argc != 1)
-    {
+    if (argc != 1) {
         return ManualOvenCavityOperationalStateCommandHelpHandler(argc, argv);
     }
     uint32_t state = atoi(argv[0]);
@@ -287,26 +275,23 @@ CHIP_ERROR ManualOvenCavityOperationalStateSetStateCommandHandler(int argc, char
     CHIP_ERROR err;
     err = OvenCavityOperationalState::GetAmebaOvenCavityOperationalStateInstance()->SetOperationalState(state);
 
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "ManualOvenCavityOperationalStateSetStateCommandHandler Failed!\r\n");
     }
 
     return err;
 }
 
-CHIP_ERROR ManualOvenCavityOperationalStateSetErrorCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOvenCavityOperationalStateSetErrorCommandHandler(int argc, char **argv)
 {
-    if (argc != 1)
-    {
+    if (argc != 1) {
         return ManualOvenCavityOperationalStateCommandHelpHandler(argc, argv);
     }
 
     GenericOperationalError err(to_underlying(ErrorStateEnum::kNoError));
     uint32_t error = atoi(argv[0]);
 
-    switch (error)
-    {
+    switch (error) {
     case to_underlying(OvenCavityOperationalState::ErrorStateEnum::kNoError):                   // 0x00, 0
     case to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToStartOrResume):     // 0x01, 1
     case to_underlying(OvenCavityOperationalState::ErrorStateEnum::kUnableToCompleteOperation): // 0x02, 2
