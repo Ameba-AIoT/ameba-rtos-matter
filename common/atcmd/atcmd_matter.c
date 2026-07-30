@@ -78,6 +78,32 @@ static u32 atcmd_matter_ota_apply(u16 argc, u8 *argv[])
     return 0;
 }
 
+#if defined(CONFIG_BLE_MATTER_ADAPTER) && CONFIG_BLE_MATTER_ADAPTER
+static u32 atcmd_matter_deinit_ble(u16 argc, u8 *argv[])
+{
+    (void) argc;
+    (void) argv;
+
+    RTK_LOGI(TAG, "Matter Deinitialize BLE\n");
+    extern int matter_blemgr_deinit(void);
+    matter_blemgr_deinit();
+
+    return 0;
+}
+
+static u32 atcmd_matter_stop_adv(u16 argc, u8 *argv[])
+{
+    (void) argc;
+    (void) argv;
+
+    RTK_LOGI(TAG, "Matter Stop BLE Adv\n");
+    extern int matter_blemgr_stop_adv(void);
+    matter_blemgr_stop_adv();
+
+    return 0;
+}
+#endif
+
 #if defined(CONFIG_ENABLE_AMEBA_DEVICE_INFO) && (CONFIG_ENABLE_AMEBA_DEVICE_INFO == 1)
 
 void print_certificate(uint8_t *cert, size_t size)
@@ -347,6 +373,10 @@ const COMMAND_TABLE matter_atcmd[] = {
     {(const char *)"ATM$", atcmd_matter_factory_reset},
     {(const char *)"ATM%", atcmd_matter_ota_query},
     {(const char *)"ATM^", atcmd_matter_ota_apply},
+#if defined(CONFIG_BLE_MATTER_ADAPTER) && CONFIG_BLE_MATTER_ADAPTER
+    {(const char *)"ATM1", atcmd_matter_deinit_ble},
+    {(const char *)"ATM2", atcmd_matter_stop_adv},
+#endif
     {(const char *)"ATMH", atcmd_matter_help},
 #if defined(CONFIG_ENABLE_AMEBA_DEVICE_INFO) && (CONFIG_ENABLE_AMEBA_DEVICE_INFO == 1)
     {(const char *)"ATMI", atcmd_matter_device_info},
@@ -360,6 +390,10 @@ const char *matter_atcmd_help[] = {
     (const char *)"ATM$ : factory reset. (Usage: ATM$)",
     (const char *)"ATM% : matter ota query image. (Usage: ATM%)",
     (const char *)"ATM^ : matter ota apply update. (Usage: ATM^)",
+#if defined(CONFIG_BLE_MATTER_ADAPTER) && CONFIG_BLE_MATTER_ADAPTER
+    (const char *)"ATM1 : deinit ble. (Usage: ATM1)",
+    (const char *)"ATM2 : stop adv. (Usage: ATM2)",
+#endif
     (const char *)"ATMH : matter help. (Usage: ATMH)",
 #if defined(CONFIG_ENABLE_AMEBA_DEVICE_INFO) && (CONFIG_ENABLE_AMEBA_DEVICE_INFO == 1)
     (const char *)"ATMI : matter device info. (Usage: ATMI)",
