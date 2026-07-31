@@ -97,9 +97,9 @@ int get_mbedtls_heap_helper(void **heap_addr, size_t *heap_size)
 void matter_secure_mbedtls_heap_status(void)
 {
 #if defined(MBEDTLS_MEMORY_DEBUG)
-    RTK_LOGI(NOTAG, "MATTER_MBEDTLS_SECURE_HEAP_SIZE = %d\n", MATTER_MBEDTLS_SECURE_HEAP_SIZE);
+    INFO("MATTER_MBEDTLS_SECURE_HEAP_SIZE = %d\n", MATTER_MBEDTLS_SECURE_HEAP_SIZE);
     mbedtls_memory_buffer_alloc_status();
 #else
-    RTK_LOGI(NOTAG, "Enable MBEDTLS_MEMORY_DEBUG to check the secure mbedtls heap status!\n");
+    INFO("Enable MBEDTLS_MEMORY_DEBUG to check the secure mbedtls heap status!\n");
 #endif
 }

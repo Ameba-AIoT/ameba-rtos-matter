@@ -27,6 +27,9 @@
 #elif defined(CONFIG_AMEBAGREEN2)
 #include <ameba_crypto.h>
 #endif
+#elif defined(CONFIG_AMEBASMART)
+#include <common/debug.h>
+#define RTK_LOGE(tag, format, ...) ERROR(format, ##__VA_ARGS__)
 #endif
 
 // MbedTLS Includes

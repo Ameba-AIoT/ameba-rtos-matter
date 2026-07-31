@@ -56,6 +56,11 @@ static void example_matter_camera_task(void *pvParameters)
         ChipLogProgress(DeviceLayer, "matter_driver_power_source_cluster_set_startup_value failed!");
     }
 
+    err = matter_driver_camera_manual_operation_init();
+    if (err != CHIP_NO_ERROR) {
+        ChipLogProgress(DeviceLayer, "matter_driver_camera_manual_operation_init failed!");
+    }
+
     ChipLogProgress(DeviceLayer, "matter_driver_application_init start!");
     err = matter_driver_application_init();
     if (err != CHIP_NO_ERROR) {

@@ -33,6 +33,8 @@
 #include <tls_certificate_management/ameba_tls_certificate_management_instance.h>
 #include <tls_client_management/ameba_tls_client_management_instance.h>
 
+extern CHIP_ERROR InitCameraManualOperation(void);
+
 using namespace ::chip::app;
 using chip::Protocols::InteractionModel::Status;
 
@@ -88,6 +90,12 @@ exit:
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
         return CHIP_ERROR_INTERNAL;
     }
+}
+
+CHIP_ERROR matter_driver_camera_manual_operation_init(void)
+{
+    InitCameraManualOperation();
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR matter_driver_application_init(void)

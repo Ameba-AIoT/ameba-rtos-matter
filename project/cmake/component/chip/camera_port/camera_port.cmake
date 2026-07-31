@@ -24,6 +24,7 @@ ameba_list_append(private_sources
 	${MATTER_DRIVER_DIR}/matter_drivers/webrtc/ameba_webrtc_provider_manager.cpp
 	${MATTER_DRIVER_DIR}/matter_drivers/webrtc/ameba_webrtc_transport.cpp
 	${MATTER_EXAMPLE_DIR}/camera/example_matter_camera.cpp
+	${MATTER_EXAMPLE_DIR}/camera/matter_camera_command.cpp
 	${MATTER_EXAMPLE_DIR}/camera/matter_drivers.cpp
 
 )

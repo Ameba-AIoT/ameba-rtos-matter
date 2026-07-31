@@ -66,6 +66,12 @@ CHIP_ERROR matter_driver_tls_management_clusters_init(void);
 CHIP_ERROR matter_driver_power_source_cluster_set_startup_value(void);
 
 /**
+ * @brief  Initialize Camera Manual Operation.
+ * @return  CHIP_NO_ERROR set successfully, CHIP_ERROR_INTERNAL otherwise (if necessary).
+ */
+CHIP_ERROR matter_driver_camera_manual_operation_init(void);
+
+/**
  * @brief  Set the startup values for Camera.
  * @return  CHIP_NO_ERROR set successfully, CHIP_ERROR_INTERNAL otherwise.
  */
