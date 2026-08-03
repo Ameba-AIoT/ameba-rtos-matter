@@ -307,10 +307,6 @@ void matter_core_init_server(intptr_t context)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER
 
-#if defined(CONFIG_ENABLE_CHIP_SHELL) && (CONFIG_ENABLE_CHIP_SHELL == 1)
-    InitBindingHandler();
-#endif
-
     xTaskNotifyGive(task_to_notify);
 }
 

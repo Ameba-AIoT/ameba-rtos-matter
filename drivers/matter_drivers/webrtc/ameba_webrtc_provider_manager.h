@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <camera/ameba_camera_device_interface.h>
@@ -47,45 +46,48 @@ public:
         mOnConnectedCallback(OnDeviceConnected, this), mOnConnectionFailureCallback(OnDeviceConnectionFailure, this)
     {}
 
-    ~WebRTCProviderManager() { CloseConnection(); };
+    ~WebRTCProviderManager()
+    {
+        CloseConnection();
+    };
 
     void Init();
 
     void CloseConnection();
 
-    void SetWebRTCTransportProvider(WebRTCTransportProviderCluster * webRTCTransportProvider);
+    void SetWebRTCTransportProvider(WebRTCTransportProviderCluster *webRTCTransportProvider);
 
-    CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs & args, WebRTCSessionStruct & outSession,
-                                  bool & outDeferredOffer) override;
+    CHIP_ERROR HandleSolicitOffer(const OfferRequestArgs &args, WebRTCSessionStruct &outSession,
+                                  bool &outDeferredOffer) override;
 
-    CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs & args, WebRTCSessionStruct & outSession) override;
+    CHIP_ERROR HandleProvideOffer(const ProvideOfferRequestArgs &args, WebRTCSessionStruct &outSession) override;
 
-    CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string & sdpAnswer) override;
+    CHIP_ERROR HandleProvideAnswer(uint16_t sessionId, const std::string &sdpAnswer) override;
 
-    CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> & candidates) override;
+    CHIP_ERROR HandleProvideICECandidates(uint16_t sessionId, const std::vector<ICECandidateStruct> &candidates) override;
 
     CHIP_ERROR HandleEndSession(uint16_t sessionId, WebRTCEndReasonEnum reasonCode) override;
 
-    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, chip::Optional<std::vector<uint16_t>> & videoStreams,
-                                   chip::Optional<std::vector<uint16_t>> & audioStreams) override;
+    CHIP_ERROR ValidateStreamUsage(StreamUsageEnum streamUsage, chip::Optional<std::vector<uint16_t>> &videoStreams,
+                                   chip::Optional<std::vector<uint16_t>> &audioStreams) override;
 
-    void SetCameraDevice(CameraDeviceInterface * aCameraDevice);
+    void SetCameraDevice(CameraDeviceInterface *aCameraDevice);
 
     CHIP_ERROR ValidateVideoStreamID(uint16_t videoStreamId) override;
 
     CHIP_ERROR ValidateAudioStreamID(uint16_t audioStreamId) override;
 
-    CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> & videoStreams) override;
+    CHIP_ERROR ValidateVideoStreams(const std::vector<uint16_t> &videoStreams) override;
 
-    CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> & audioStreams) override;
+    CHIP_ERROR ValidateAudioStreams(const std::vector<uint16_t> &audioStreams) override;
 
     CHIP_ERROR IsStreamUsageSupported(StreamUsageEnum streamUsage) override;
 
-    CHIP_ERROR IsHardPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsHardPrivacyModeActive(bool &isActive) override;
 
-    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsSoftRecordingPrivacyModeActive(bool &isActive) override;
 
-    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool & isActive) override;
+    CHIP_ERROR IsSoftLivestreamPrivacyModeActive(bool &isActive) override;
 
     bool HasAllocatedVideoStreams() override;
 
@@ -93,14 +95,18 @@ public:
 
     CHIP_ERROR ValidateSFrameConfig(uint16_t cipherSuite, size_t baseKeyLength) override;
 
-    CHIP_ERROR IsUTCTimeNull(bool & isNull) override;
+    CHIP_ERROR IsUTCTimeNull(bool &isNull) override;
 
     void LiveStreamPrivacyModeChanged(bool privacyModeEnabled);
 
-    WebrtcTransport * GetTransport(uint16_t sessionId); // Ameba Modify
+    WebrtcTransport *GetTransport(uint16_t sessionId);  // Ameba Modify
+
+    void SetWebRTCDeferredOffer(bool enable);
+
+    bool GetWebRTCDeferredOffer(void);
 
 private:
-    std::string ExtractMidFromSdp(const std::string & sdp, const std::string & mediaType);
+    std::string ExtractMidFromSdp(const std::string &sdp, const std::string &mediaType);
 
     void ScheduleOfferSend(uint16_t sessionId);
 
@@ -114,29 +120,29 @@ private:
 
     void UnregisterWebrtcTransport(uint16_t sessionId);
 
-    CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+    CHIP_ERROR SendOfferCommand(chip::Messaging::ExchangeManager &exchangeMgr, const chip::SessionHandle &sessionHandle,
                                 uint16_t sessionId);
 
-    CHIP_ERROR SendAnswerCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+    CHIP_ERROR SendAnswerCommand(chip::Messaging::ExchangeManager &exchangeMgr, const chip::SessionHandle &sessionHandle,
                                  uint16_t sessionId);
 
-    CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+    CHIP_ERROR SendICECandidatesCommand(chip::Messaging::ExchangeManager &exchangeMgr, const chip::SessionHandle &sessionHandle,
                                         uint16_t sessionId);
 
-    CHIP_ERROR SendEndCommand(chip::Messaging::ExchangeManager & exchangeMgr, const chip::SessionHandle & sessionHandle,
+    CHIP_ERROR SendEndCommand(chip::Messaging::ExchangeManager &exchangeMgr, const chip::SessionHandle &sessionHandle,
                               uint16_t sessionId, WebRTCEndReasonEnum endReason);
 
     CHIP_ERROR AcquireAudioVideoStreams(uint16_t sessionId);
 
     CHIP_ERROR ReleaseAudioVideoStreams(uint16_t sessionId);
 
-    static void OnDeviceConnected(void * context, chip::Messaging::ExchangeManager & exchangeMgr,
-                                  const chip::SessionHandle & sessionHandle);
+    static void OnDeviceConnected(void *context, chip::Messaging::ExchangeManager &exchangeMgr,
+                                  const chip::SessionHandle &sessionHandle);
 
-    static void OnDeviceConnectionFailure(void * context, const chip::ScopedNodeId & peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailure(void *context, const chip::ScopedNodeId &peerId, CHIP_ERROR error);
 
     // WebRTC Callbacks
-    void OnLocalDescription(const std::string & sdp, SDPType type, const uint16_t sessionId);
+    void OnLocalDescription(const std::string &sdp, SDPType type, const uint16_t sessionId);
     void OnConnectionStateChanged(bool connected, const uint16_t sessionId);
 
     void CleanupSession(uint16_t sessionId);
@@ -147,7 +153,7 @@ private:
 
     void HandleConnectionTimeout(uint16_t sessionId);
 
-    static void OnConnectionTimeoutCallback(chip::System::Layer * systemLayer, void * context);
+    static void OnConnectionTimeoutCallback(chip::System::Layer *systemLayer, void *context);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectionFailureCallback;
@@ -156,22 +162,30 @@ private:
     // This is to retrieve the sessionIds for a given ScopedNodeId (NodeId + FabricIndex)
     std::map<ScopedNodeId, uint16_t> mSessionIdMap;
 
-    WebRTCTransportProviderCluster * mWebRTCTransportProvider = nullptr;
+    WebRTCTransportProviderCluster *mWebRTCTransportProvider = nullptr;
 
     // Handle to the Camera Device interface. For accessing other
     // clusters, if required.
-    CameraDeviceInterface * mCameraDevice = nullptr;
+    CameraDeviceInterface *mCameraDevice = nullptr;
 
     bool mSoftLiveStreamPrivacyEnabled = false;
 
-    struct ConnectionTimeoutContext
-    {
-        WebRTCProviderManager * manager;
+    struct ConnectionTimeoutContext {
+        WebRTCProviderManager *manager;
         uint16_t sessionId;
     };
 
     // Map to track active connection timeout timers for cancellation
     std::unordered_map<uint16_t, ConnectionTimeoutContext *> mConnectionTimerContexts;
+
+    // Runtime-selectable DeferredOffer flag reported in SolicitOfferResponse.
+    // Per the WebRTC Transport Provider spec, DeferredOffer=TRUE means the camera is
+    // in standby and will deliver the Offer within 30s (exercised by TC-WEBRTC-1.3),
+    // while FALSE means the camera is active and sends the Offer promptly
+    // (TC-WEBRTC-1.4). The two tests send an identical SolicitOffer and differ only
+    // by the device's power state, so this cannot be derived from the request.
+    // This can be set by calling the SetWebRTCDeferredOffer method
+    bool mWebrtcDeferredOffer = true;
 };
 
 } // namespace WebRTCTransportProvider

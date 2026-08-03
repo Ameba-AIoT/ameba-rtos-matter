@@ -215,7 +215,7 @@ private:
 #endif
     static MatterCamera *instance;
 
-    bool mStreamEnabled = false;
+    volatile bool mStreamEnabled = false;
     uint16_t mCurrentSessionId        = MATTER_INVALID_SESSION_ID;
     uint16_t mCurrentVideoStreamId    = MATTER_INVALID_SESSION_ID;
     WebrtcTransport *mWebrtcTransport = nullptr;

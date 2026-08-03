@@ -59,8 +59,8 @@ void MatterCamera::Init(void)
     mUvcConfig->hw_isr_pri     = CONFIG_USBH_UVC_HW_IRQ_PRIORITY;
 #endif
 
-                // Init UVC Callbacks
-                mUvcCallBacks->init      = UvcInitWrapper;
+    // Init UVC Callbacks
+    mUvcCallBacks->init      = UvcInitWrapper;
     mUvcCallBacks->deinit    = UvcDeinitWrapper;
     mUvcCallBacks->attach    = UvcAttachWrapper;
     mUvcCallBacks->detach    = UvcDetachWrapper;
@@ -134,6 +134,7 @@ void MatterCamera::DeregisterWebRtcTransport(void)
     ChipLogProgress(DeviceLayer, "Deregistering WebRTC transport for sessionId(%u)", mCurrentSessionId);
     mCurrentSessionId = MATTER_INVALID_SESSION_ID;
     mWebrtcTransport  = nullptr;
+    mStreamEnabled    = false;
 }
 
 MatterCamera *MatterCamera::GetInstance(void)
@@ -398,8 +399,7 @@ void MatterCamera::UvcMatterThread(void *param)
     }
 
     while ((mStreamEnabled == false) || (mWebrtcTransport == nullptr)) {
-        ChipLogProgress(DeviceLayer, "Waiting for liveview start request from controller...");
-        rtos_time_delay_ms(1000);
+        rtos_time_delay_ms(100);
     }
 
     ChipLogProgress(DeviceLayer, "Start UVC Matter");
@@ -425,7 +425,8 @@ void MatterCamera::UvcMatterThread(void *param)
 #endif
 
         if (mWebrtcTransport == nullptr) {
-            ChipLogError(DeviceLayer, "Error, WebRTC transport is null!");
+            ChipLogDetail(DeviceLayer, "WebRTC transport deregistered, stopping stream");
+            break;
         } else if (mWebrtcTransport->CanSendVideo() == true) {
             chip::ByteSpan videoData(buffer_h264, frameLen);
             mWebrtcTransport->SendVideo(videoData, (int64_t) current_time_usec, mCurrentVideoStreamId);
@@ -450,7 +451,7 @@ int MatterCamera::UvcMatterStart(void)
 
     // Delay to check successful WiFi connection and obtain of an IP address
     while (lwip_check_connectivity(NETIF_WLAN_STA_INDEX) != CONNECTION_VALID) {
-        rtos_time_delay_ms(2000);
+        rtos_time_delay_ms(1000);
     }
 
     mUvcRb = RingBuffer_Create(mUvcBuf, CONFIG_USBH_UVC_FRAME_BUF_SIZE, LOCAL_RINGBUFF, 0);
@@ -824,8 +825,7 @@ void MatterCamera::DummyStreaming(void *param)
 
     while (1) {
         while ((mStreamEnabled == false) || (mWebrtcTransport == nullptr)) {
-            ChipLogProgress(DeviceLayer, "Waiting for liveview start request from controller...");
-            rtos_time_delay_ms(1000);
+            rtos_time_delay_ms(100);
         }
 
         ChipLogProgress(DeviceLayer, "Start Matter Dummy Streaming");
@@ -837,7 +837,8 @@ void MatterCamera::DummyStreaming(void *param)
             rtos_mutex_give(mDummyBufMutex);
 
             if (mWebrtcTransport == nullptr) {
-                ChipLogError(DeviceLayer, "Error, WebRTC transport is null!");
+                ChipLogDetail(DeviceLayer, "WebRTC transport deregistered, stopping stream");
+                break;
             } else {
                 if (mWebrtcTransport->CanSendVideo() == true) {
 #if CONFIG_ENABLE_AMEBA_SNTP
@@ -853,7 +854,7 @@ void MatterCamera::DummyStreaming(void *param)
                 }
             }
 
-            rtos_time_delay_ms(1000);
+            rtos_time_delay_ms(100);
         }
     }
 }
