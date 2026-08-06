@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <camera/ameba_camera_device.h>
 #include <camera_driver.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -65,41 +64,37 @@ CameraError CameraDevice::InitializeStreams()
 }
 
 // Find the closest allocated snapshot stream with resolution >= requested, or closest possible
-bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requested, VideoResolutionStruct & matchedResolution,
-                                              ImageCodecEnum & matchedCodec)
+bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct &requested, VideoResolutionStruct &matchedResolution,
+        ImageCodecEnum &matchedCodec)
 {
     int64_t requestedPixels = static_cast<int64_t>(requested.width) * requested.height;
     int64_t bestDiff        = std::numeric_limits<int64_t>::max();
     int64_t bestGEQDiff     = std::numeric_limits<int64_t>::max();
 
-    const SnapshotStream * bestStream    = nullptr;
-    const SnapshotStream * bestGEQStream = nullptr;
+    const SnapshotStream *bestStream    = nullptr;
+    const SnapshotStream *bestGEQStream = nullptr;
 
-    for (const auto & stream : mSnapshotStreams)
-    {
+    for (const auto &stream : mSnapshotStreams) {
         int64_t streamPixels = static_cast<int64_t>(stream.snapshotStreamParams.minResolution.width) *
-            stream.snapshotStreamParams.minResolution.height;
+                               stream.snapshotStreamParams.minResolution.height;
         int64_t diff    = streamPixels - requestedPixels;
         int64_t absDiff = std::abs(diff);
 
         // Candidate 1: First stream with resolution >= requested
-        if (diff >= 0 && diff < bestGEQDiff)
-        {
+        if (diff >= 0 && diff < bestGEQDiff) {
             bestGEQDiff   = diff;
             bestGEQStream = &stream;
         }
 
         // Candidate 2: Closest stream (absolute difference)
-        if (absDiff < bestDiff)
-        {
+        if (absDiff < bestDiff) {
             bestDiff   = absDiff;
             bestStream = &stream;
         }
     }
 
-    const SnapshotStream * chosen = bestGEQStream ? bestGEQStream : bestStream;
-    if (chosen)
-    {
+    const SnapshotStream *chosen = bestGEQStream ? bestGEQStream : bestStream;
+    if (chosen) {
         matchedResolution = chosen->snapshotStreamParams.minResolution;
         matchedCodec      = chosen->snapshotStreamParams.imageCodec;
         return true;
@@ -108,29 +103,23 @@ bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requ
 }
 
 CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
-                                          const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot)
+        const VideoResolutionStruct &resolution, ImageSnapshot &outImageSnapshot)
 {
-#if 1 // TODO
     VideoResolutionStruct matchedRes;
     ImageCodecEnum matchedCodec;
 
-    if (streamID.IsNull())
-    {
-        if (!MatchClosestSnapshotParams(resolution, matchedRes, matchedCodec))
-        {
+    if (streamID.IsNull()) {
+        if (!MatchClosestSnapshotParams(resolution, matchedRes, matchedCodec)) {
             ChipLogError(Camera, "No matching snapshot stream found for requested resolution %ux%u", resolution.width,
                          resolution.height);
             return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
         }
-    }
-    else
-    {
+    } else {
         uint16_t streamId = streamID.Value();
         auto it           = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
             return s.snapshotStreamParams.snapshotStreamID == streamId;
         });
-        if (it == mSnapshotStreams.end())
-        {
+        if (it == mSnapshotStreams.end()) {
             ChipLogError(Camera, "Snapshot stream not found for stream ID %u", streamId);
             return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
         }
@@ -138,6 +127,35 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
         matchedCodec = it->snapshotStreamParams.imageCodec;
     }
 
+#ifdef CONFIG_USB_HOST_EN
+    if (matchedCodec != ImageCodecEnum::kJpeg) {
+        ChipLogError(Camera, "Camera only supports JPEG snapshot!");
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+
+    bool captured = false;
+    MatterCamera *cameraDriver = MatterCamera::GetInstance();
+    if (cameraDriver != nullptr) {
+        uint8_t *jpegBuf = nullptr;
+        uint32_t jpegLen = 0;
+        jpegLen = cameraDriver->CaptureJpegSnapshot(matchedRes.width, matchedRes.height, &jpegBuf);
+        if ((jpegBuf != nullptr) && (jpegLen != 0)) {
+            outImageSnapshot.data.assign(jpegBuf, jpegBuf + jpegLen);
+            matchedRes.width  = CONFIG_USBH_UVC_SNAPSHOT_WIDTH;
+            matchedRes.height = CONFIG_USBH_UVC_SNAPSHOT_HEIGHT;
+            captured = true;
+        }
+    }
+
+    if (captured) {
+        outImageSnapshot.imageRes   = matchedRes;
+        outImageSnapshot.imageCodec = matchedCodec;
+        return CameraError::SUCCESS;
+    } else {
+        ChipLogError(Camera, "Camera failed to capture snapshot!");
+        return CameraError::ERROR_CAPTURE_SNAPSHOT_FAILED;
+    }
+#else
     // Create a dummy JPEG image
     static const uint8_t dummy_jpeg[] = {
         0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00,
@@ -158,26 +176,24 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     outImageSnapshot.imageCodec = matchedCodec;
 
     return CameraError::SUCCESS;
-#else
-    return CameraError::ERROR_NOT_IMPLEMENTED;
 #endif
 }
 
 // Start video stream
-CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedStream)
+CameraError CameraDevice::StartVideoStream(const VideoStreamStruct &allocatedStream)
 {
     uint16_t streamID = allocatedStream.videoStreamID;
     auto it           = std::find_if(mVideoStreams.begin(), mVideoStreams.end(),
-                                     [streamID](const VideoStream & s) { return s.videoStreamParams.videoStreamID == streamID; });
+    [streamID](const VideoStream & s) {
+        return s.videoStreamParams.videoStreamID == streamID;
+    });
 
-    if (it == mVideoStreams.end())
-    {
+    if (it == mVideoStreams.end()) {
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
     MatterCamera *cameraDriver = MatterCamera::GetInstance();
-    if (cameraDriver == nullptr)
-    {
+    if (cameraDriver == nullptr) {
         ChipLogError(Camera, "MatterCamera instance not initialized yet");
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
@@ -194,16 +210,16 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
 CameraError CameraDevice::StopVideoStream(uint16_t streamID)
 {
     auto it = std::find_if(mVideoStreams.begin(), mVideoStreams.end(),
-                           [streamID](const VideoStream & s) { return s.videoStreamParams.videoStreamID == streamID; });
+    [streamID](const VideoStream & s) {
+        return s.videoStreamParams.videoStreamID == streamID;
+    });
 
-    if (it == mVideoStreams.end())
-    {
+    if (it == mVideoStreams.end()) {
         return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
     }
 
     MatterCamera *cameraDriver = MatterCamera::GetInstance();
-    if (cameraDriver == nullptr)
-    {
+    if (cameraDriver == nullptr) {
         ChipLogError(Camera, "MatterCamera instance not initialized yet");
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
@@ -220,10 +236,11 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
 CameraError CameraDevice::StartAudioStream(uint16_t streamID)
 {
     auto it = std::find_if(mAudioStreams.begin(), mAudioStreams.end(),
-                           [streamID](const AudioStream & s) { return s.audioStreamParams.audioStreamID == streamID; });
+    [streamID](const AudioStream & s) {
+        return s.audioStreamParams.audioStreamID == streamID;
+    });
 
-    if (it == mAudioStreams.end())
-    {
+    if (it == mAudioStreams.end()) {
         ChipLogError(Camera, "Audio streamID : %u not found", streamID);
         return CameraError::ERROR_AUDIO_STREAM_START_FAILED;
     }
@@ -239,10 +256,11 @@ CameraError CameraDevice::StartAudioStream(uint16_t streamID)
 CameraError CameraDevice::StopAudioStream(uint16_t streamID)
 {
     auto it = std::find_if(mAudioStreams.begin(), mAudioStreams.end(),
-                           [streamID](const AudioStream & s) { return s.audioStreamParams.audioStreamID == streamID; });
+    [streamID](const AudioStream & s) {
+        return s.audioStreamParams.audioStreamID == streamID;
+    });
 
-    if (it == mAudioStreams.end())
-    {
+    if (it == mAudioStreams.end()) {
         return CameraError::ERROR_AUDIO_STREAM_STOP_FAILED;
     }
 
@@ -254,17 +272,15 @@ CameraError CameraDevice::StopAudioStream(uint16_t streamID)
 }
 
 // Allocate snapshot stream
-CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
-                                                 uint16_t & outStreamID)
+CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs &args,
+        uint16_t &outStreamID)
 {
 
-    if (AddSnapshotStream(args, outStreamID))
-    {
+    if (AddSnapshotStream(args, outStreamID)) {
         auto it = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [outStreamID](const SnapshotStream & s) {
             return s.snapshotStreamParams.snapshotStreamID == outStreamID;
         });
-        if (it == mSnapshotStreams.end())
-        {
+        if (it == mSnapshotStreams.end()) {
             ChipLogError(Camera, "Snapshot stream with ID %u not found", outStreamID);
             return CameraError::ERROR_RESOURCE_EXHAUSTED;
         }
@@ -279,10 +295,11 @@ CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamManagementD
 CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 {
     auto it = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(),
-                           [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
+    [streamID](const SnapshotStream & s) {
+        return s.snapshotStreamParams.snapshotStreamID == streamID;
+    });
 
-    if (it == mSnapshotStreams.end())
-    {
+    if (it == mSnapshotStreams.end()) {
         ChipLogError(Camera, "Snapshot streamID : %u not found", streamID);
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
     }
@@ -298,10 +315,11 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
 {
     auto it = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(),
-                           [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
+    [streamID](const SnapshotStream & s) {
+        return s.snapshotStreamParams.snapshotStreamID == streamID;
+    });
 
-    if (it == mSnapshotStreams.end())
-    {
+    if (it == mSnapshotStreams.end()) {
         return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
     }
 
@@ -322,10 +340,11 @@ uint32_t CameraDevice::GetMaxEncodedPixelRate()
     return kMaxEncodedPixelRate;
 }
 
-VideoSensorParamsStruct & CameraDevice::GetVideoSensorParams()
+VideoSensorParamsStruct &CameraDevice::GetVideoSensorParams()
 {
     static VideoSensorParamsStruct videoSensorParams = { kVideoSensorWidthPixels, kVideoSensorHeightPixels, kMaxVideoFrameRate,
-                                                         chip::Optional<uint16_t>(30) }; // Typical numbers for Pi camera.
+                                                         chip::Optional<uint16_t>(30)
+                                                       }; // Typical numbers for Pi camera.
     return videoSensorParams;
 }
 
@@ -364,13 +383,13 @@ bool CameraDevice::GetCameraSupportsImageControl()
     return true;
 }
 
-VideoResolutionStruct & CameraDevice::GetMinViewport()
+VideoResolutionStruct &CameraDevice::GetMinViewport()
 {
     static VideoResolutionStruct minViewport = { kMinResolutionWidth, kMinResolutionHeight };
     return minViewport;
 }
 
-std::vector<RateDistortionTradeOffStruct> & CameraDevice::GetRateDistortionTradeOffPoints()
+std::vector<RateDistortionTradeOffStruct> &CameraDevice::GetRateDistortionTradeOffPoints()
 {
     static std::vector<RateDistortionTradeOffStruct> rateDistTradeOffs = {
         { VideoCodecEnum::kH264, { kMinResolutionWidth, kMinResolutionHeight }, 10000 /* bitrate */ }
@@ -383,39 +402,43 @@ uint32_t CameraDevice::GetMaxContentBufferSize()
     return kMaxContentBufferSizeBytes;
 }
 
-AudioCapabilitiesStruct & CameraDevice::GetMicrophoneCapabilities()
+AudioCapabilitiesStruct &CameraDevice::GetMicrophoneCapabilities()
 {
     static std::array<AudioCodecEnum, 2> audioCodecs = { AudioCodecEnum::kOpus, AudioCodecEnum::kAacLc };
     static std::array<uint32_t, 2> sampleRates       = { 48000, 32000 }; // Sample rates in Hz
     static std::array<uint8_t, 2> bitDepths          = { 24, 32 };
     static AudioCapabilitiesStruct audioCapabilities = { kMicrophoneMaxChannelCount, chip::Span<AudioCodecEnum>(audioCodecs),
-                                                         chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths) };
+                                                         chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths)
+                                                       };
     return audioCapabilities;
 }
 
-AudioCapabilitiesStruct & CameraDevice::GetSpeakerCapabilities()
+AudioCapabilitiesStruct &CameraDevice::GetSpeakerCapabilities()
 {
     static std::array<AudioCodecEnum, 2> audioCodecs   = { AudioCodecEnum::kOpus, AudioCodecEnum::kAacLc };
     static std::array<uint32_t, 2> sampleRates         = { 48000, 32000 }; // Sample rates in Hz
     static std::array<uint8_t, 2> bitDepths            = { 24, 32 };
     static AudioCapabilitiesStruct speakerCapabilities = { kSpeakerMaxChannelCount, chip::Span<AudioCodecEnum>(audioCodecs),
-                                                           chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths) };
+                                                           chip::Span<uint32_t>(sampleRates), chip::Span<uint8_t>(bitDepths)
+                                                         };
     return speakerCapabilities;
 }
 
-std::vector<SnapshotCapabilitiesStruct> & CameraDevice::GetSnapshotCapabilities()
+std::vector<SnapshotCapabilitiesStruct> &CameraDevice::GetSnapshotCapabilities()
 {
     static std::vector<SnapshotCapabilitiesStruct> snapshotCapabilities = {
-        { { kMinResolutionWidth, kMinResolutionHeight },
-          kSnapshotStreamFrameRate,
-          ImageCodecEnum::kJpeg,
-          false,
-          chip::MakeOptional(static_cast<bool>(false)) },
-        { { k720pResolutionWidth, k720pResolutionHeight },
-          kSnapshotStreamFrameRate,
-          ImageCodecEnum::kJpeg,
-          true,
-          chip::MakeOptional(static_cast<bool>(true)) },
+        {   { kMinResolutionWidth, kMinResolutionHeight },
+            kSnapshotStreamFrameRate,
+            ImageCodecEnum::kJpeg,
+            false,
+            chip::MakeOptional(static_cast<bool>(false))
+        },
+        {   { k720pResolutionWidth, k720pResolutionHeight },
+            kSnapshotStreamFrameRate,
+            ImageCodecEnum::kJpeg,
+            true,
+            chip::MakeOptional(static_cast<bool>(true))
+        },
     };
     return snapshotCapabilities;
 }
@@ -459,21 +482,21 @@ CameraError CameraDevice::SetStreamUsagePriorities(std::vector<StreamUsageEnum> 
     return CameraError::SUCCESS;
 }
 
-std::vector<StreamUsageEnum> & CameraDevice::GetSupportedStreamUsages()
+std::vector<StreamUsageEnum> &CameraDevice::GetSupportedStreamUsages()
 {
     static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
     return supportedStreamUsage;
 }
 
-CameraError CameraDevice::SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewPort)
+CameraError CameraDevice::SetViewport(const chip::app::Clusters::Globals::Structs::ViewportStruct::Type &viewPort)
 {
     mViewport = viewPort;
 
     return CameraError::SUCCESS;
 }
 
-CameraError CameraDevice::SetViewport(VideoStream & stream,
-                                      const chip::app::Clusters::Globals::Structs::ViewportStruct::Type & viewport)
+CameraError CameraDevice::SetViewport(VideoStream &stream,
+                                      const chip::app::Clusters::Globals::Structs::ViewportStruct::Type &viewport)
 {
     ChipLogDetail(Camera, "Setting per stream viewport for stream %d.", stream.videoStreamParams.videoStreamID);
     ChipLogDetail(Camera, "New viewport. x1=%d, x2=%d, y1=%d, y2=%d.", viewport.x1, viewport.x2, viewport.y1, viewport.y2);
@@ -577,62 +600,71 @@ void CameraDevice::InitializeVideoStreams()
 {
     // Create a video stream with a max resolution of 720p and max frame rate of
     // 60 fps
-    VideoStream videoStream1 = { { 1 /* Id */,
-                                   StreamUsageEnum::kLiveView /* StreamUsage */,
-                                   VideoCodecEnum::kH264,
-                                   kMinVideoFrameRate /* MinFrameRate */,
-                                   k60fpsVideoFrameRate /* MaxFrameRate */,
-                                   { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution */,
-                                   { k720pResolutionWidth, k720pResolutionHeight } /* MaxResolution */,
-                                   kMinBitRateBps /* MinBitRate */,
-                                   kMaxBitRateBps /* MaxBitRate */,
-                                   kKeyFrameIntervalMsec /* KeyFrameInterval */,
-                                   chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
-                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
-                                   0 /* RefCount */ },
-                                 false,
-                                 { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
-                                 nullptr };
+    VideoStream videoStream1 = { {
+            1 /* Id */,
+            StreamUsageEnum::kLiveView /* StreamUsage */,
+            VideoCodecEnum::kH264,
+            kMinVideoFrameRate /* MinFrameRate */,
+            k60fpsVideoFrameRate /* MaxFrameRate */,
+            { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution */,
+            { k720pResolutionWidth, k720pResolutionHeight } /* MaxResolution */,
+            kMinBitRateBps /* MinBitRate */,
+            kMaxBitRateBps /* MaxBitRate */,
+            kKeyFrameIntervalMsec /* KeyFrameInterval */,
+            chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
+            chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
+            0 /* RefCount */
+        },
+        false,
+        { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
+        nullptr
+    };
     mVideoStreams.push_back(videoStream1);
 
     // Create a video stream with a min framerate of 60 fps and min resolution
     // of 720p
-    VideoStream videoStream2 = { { 2 /* Id */,
-                                   StreamUsageEnum::kLiveView /* StreamUsage */,
-                                   VideoCodecEnum::kH264,
-                                   k60fpsVideoFrameRate /* MinFrameRate */,
-                                   kMaxVideoFrameRate /* MaxFrameRate */,
-                                   { k720pResolutionWidth, k720pResolutionHeight } /* MinResolution */,
-                                   { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                                   kMinBitRateBps /* MinBitRate */,
-                                   kMaxBitRateBps /* MaxBitRate */,
-                                   kKeyFrameIntervalMsec /* KeyFrameInterval */,
-                                   chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
-                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
-                                   0 /* RefCount */ },
-                                 false,
-                                 { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
-                                 nullptr };
+    VideoStream videoStream2 = { {
+            2 /* Id */,
+            StreamUsageEnum::kLiveView /* StreamUsage */,
+            VideoCodecEnum::kH264,
+            k60fpsVideoFrameRate /* MinFrameRate */,
+            kMaxVideoFrameRate /* MaxFrameRate */,
+            { k720pResolutionWidth, k720pResolutionHeight } /* MinResolution */,
+            { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
+            kMinBitRateBps /* MinBitRate */,
+            kMaxBitRateBps /* MaxBitRate */,
+            kKeyFrameIntervalMsec /* KeyFrameInterval */,
+            chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
+            chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
+            0 /* RefCount */
+        },
+        false,
+        { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
+        nullptr
+    };
 
     mVideoStreams.push_back(videoStream2);
 
     // Create a video stream for the full range(fps, resolution, bitrate) supported by the camera.
-    VideoStream videoStream3 = { { 3 /* Id */,
-                                   StreamUsageEnum::kLiveView /* StreamUsage */,
-                                   VideoCodecEnum::kH264,
-                                   kMinVideoFrameRate /* MinFrameRate */,
-                                   kMaxVideoFrameRate /* MaxFrameRate */,
-                                   { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution */,
-                                   { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                                   kMinBitRateBps /* MinBitRate */,
-                                   kMaxBitRateBps /* MaxBitRate */,
-                                   kKeyFrameIntervalMsec /* KeyFrameInterval */,
-                                   chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
-                                   chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
-                                   0 /* RefCount */ },
-                                 false,
-                                 { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
-                                 nullptr };
+    VideoStream videoStream3 = { {
+            3 /* Id */,
+            StreamUsageEnum::kLiveView /* StreamUsage */,
+            VideoCodecEnum::kH264,
+            kMinVideoFrameRate /* MinFrameRate */,
+            kMaxVideoFrameRate /* MaxFrameRate */,
+            { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution */,
+            { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
+            kMinBitRateBps /* MinBitRate */,
+            kMaxBitRateBps /* MaxBitRate */,
+            kKeyFrameIntervalMsec /* KeyFrameInterval */,
+            chip::MakeOptional(static_cast<bool>(false)) /* WMark */,
+            chip::MakeOptional(static_cast<bool>(false)) /* OSD */,
+            0 /* RefCount */
+        },
+        false,
+        { mViewport.x1, mViewport.y1, mViewport.x2, mViewport.y2 },
+        nullptr
+    };
 
     mVideoStreams.push_back(videoStream3);
 }
@@ -640,25 +672,34 @@ void CameraDevice::InitializeVideoStreams()
 void CameraDevice::InitializeAudioStreams()
 {
     // Mono stream
-    AudioStream monoStream = { { 1 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus, 1 /* ChannelCount: Mono */,
-                                 48000 /* SampleRate */, 20000 /* BitRate */, 24 /* BitDepth */, 0 /* RefCount */ },
-                               false,
-                               nullptr };
+    AudioStream monoStream = { {
+            1 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus, 1 /* ChannelCount: Mono */,
+            48000 /* SampleRate */, 20000 /* BitRate */, 24 /* BitDepth */, 0 /* RefCount */
+        },
+        false,
+        nullptr
+    };
     mAudioStreams.push_back(monoStream);
 
     // Stereo stream
-    AudioStream stereoStream = { { 2 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus, 2 /* ChannelCount: Stereo */,
-                                   48000 /* SampleRate */, 32000 /* BitRate */, 24 /* BitDepth */, 0 /* RefCount */ },
-                                 false,
-                                 nullptr };
+    AudioStream stereoStream = { {
+            2 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus, 2 /* ChannelCount: Stereo */,
+            48000 /* SampleRate */, 32000 /* BitRate */, 24 /* BitDepth */, 0 /* RefCount */
+        },
+        false,
+        nullptr
+    };
     mAudioStreams.push_back(stereoStream);
 
     // Max channel count stream (from spec constant)
-    AudioStream maxChannelStream = { { 3 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus,
-                                       kMicrophoneMaxChannelCount /* Max from Spec */, 48000 /* SampleRate */, 64000 /* BitRate */,
-                                       24 /* BitDepth */, 0 /* RefCount */ },
-                                     false,
-                                     nullptr };
+    AudioStream maxChannelStream = { {
+            3 /* Id */, StreamUsageEnum::kLiveView, AudioCodecEnum::kOpus,
+            kMicrophoneMaxChannelCount /* Max from Spec */, 48000 /* SampleRate */, 64000 /* BitRate */,
+            24 /* BitDepth */, 0 /* RefCount */
+        },
+        false,
+        nullptr
+    };
     mAudioStreams.push_back(maxChannelStream);
 }
 
@@ -668,19 +709,18 @@ void CameraDevice::InitializeSnapshotStreams()
     uint16_t streamId = kInvalidStreamID;
     AddSnapshotStream({ ImageCodecEnum::kJpeg,
                         kSnapshotStreamFrameRate /* FrameRate */,
-                        { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
-                        { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                        90 /* Quality */ },
-                      streamId);
+    { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
+    { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
+    90 /* Quality */ },
+    streamId);
 }
 
 bool CameraDevice::AddSnapshotStream(
-    const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & snapshotStreamAllocateArgs, uint16_t & outStreamID)
+                const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs &snapshotStreamAllocateArgs, uint16_t &outStreamID)
 {
     constexpr uint16_t kMaxSnapshotStreams = std::numeric_limits<uint16_t>::max();
 
-    if (mSnapshotStreams.size() >= kMaxSnapshotStreams)
-    {
+    if (mSnapshotStreams.size() >= kMaxSnapshotStreams) {
         ChipLogError(Camera, "Maximum number of snapshot streams reached. Cannot a allocate new one");
         return false;
     }
@@ -690,29 +730,23 @@ bool CameraDevice::AddSnapshotStream(
     // the ID that was passed in. A valid streamID would be passed in when the
     // stream list is being constructed from the persisted list of allocated
     // streams that was loaded at Init()
-    if (outStreamID == kInvalidStreamID)
-    {
-        for (const auto & s : mSnapshotStreams)
-        {
+    if (outStreamID == kInvalidStreamID) {
+        for (const auto &s : mSnapshotStreams) {
             // Find the highest existing stream ID.
-            if (s.snapshotStreamParams.snapshotStreamID > streamId)
-            {
+            if (s.snapshotStreamParams.snapshotStreamID > streamId) {
                 streamId = s.snapshotStreamParams.snapshotStreamID;
             }
         }
 
         // Find a unique stream id, starting from the last used one above, incrementing and wrapping at 65535.
-        for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts)
-        {
+        for (uint16_t attempts = 0; attempts < kMaxSnapshotStreams; ++attempts) {
             auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
                 return s.snapshotStreamParams.snapshotStreamID == streamId;
             });
-            if (found == mSnapshotStreams.end())
-            {
+            if (found == mSnapshotStreams.end()) {
                 break;
             }
-            if (attempts == kMaxSnapshotStreams - 1)
-            {
+            if (attempts == kMaxSnapshotStreams - 1) {
                 ChipLogError(Camera, "No available slot for stream allocation");
                 return false;
             }
@@ -720,52 +754,50 @@ bool CameraDevice::AddSnapshotStream(
         }
 
         outStreamID = streamId;
-    }
-    else
-    {
+    } else {
         // Have a sanity check that the passed streamID does not already exist
         // in the list
         auto found = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [outStreamID](const SnapshotStream & s) {
             return s.snapshotStreamParams.snapshotStreamID == outStreamID;
         });
 
-        if (found == mSnapshotStreams.end())
-        {
+        if (found == mSnapshotStreams.end()) {
             streamId = outStreamID;
-        }
-        else
-        {
+        } else {
             ChipLogError(Camera, "StreamID %d already exists in the available snapshot stream list", outStreamID);
             return false;
         }
     }
 
-    SnapshotStream snapshotStream = { { streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
-                                        snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
-                                        snapshotStreamAllocateArgs.quality, 0 /* RefCount */ },
-                                      false,
-                                      nullptr };
+    SnapshotStream snapshotStream = { {
+            streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
+            snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
+            snapshotStreamAllocateArgs.quality, 0 /* RefCount */
+        },
+        false,
+        nullptr
+    };
 
     mSnapshotStreams.push_back(snapshotStream);
     return true;
 }
 
-WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()
+WebRTCTransportProvider::Delegate &CameraDevice::GetWebRTCProviderDelegate()
 {
     return mWebRTCProviderManager;
 }
 
-void CameraDevice::SetWebRTCTransportProvider(WebRTCTransportProvider::WebRTCTransportProviderCluster * provider)
+void CameraDevice::SetWebRTCTransportProvider(WebRTCTransportProvider::WebRTCTransportProviderCluster *provider)
 {
     mWebRTCProviderManager.SetWebRTCTransportProvider(provider);
 }
 
-CameraAVStreamManagementDelegate & CameraDevice::GetCameraAVStreamMgmtDelegate()
+CameraAVStreamManagementDelegate &CameraDevice::GetCameraAVStreamMgmtDelegate()
 {
     return mCameraAVStreamManager;
 }
 
-CameraAVStreamController & CameraDevice::GetCameraAVStreamMgmtController()
+CameraAVStreamController &CameraDevice::GetCameraAVStreamMgmtController()
 {
     return mCameraAVStreamManager;
 }

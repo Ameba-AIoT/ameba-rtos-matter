@@ -37,6 +37,7 @@ extern "C" {
 #ifdef CONFIG_USB_HOST_EN
 /* Private defines -----------------------------------------------------------*/
 
+/* Video Stream Related ------------------------------------------------------*/
 /*
  * IMPORTANT: The Matter WebRTC live video stream is H.264 only. The camera's
  * captured bytes are fed directly into an H.264 RTP packetizer (no on-device
@@ -78,6 +79,35 @@ extern "C" {
 
 /* Maximum continuous error count before stopping */
 #define CONFIG_USBH_UVC_MAX_FAIL_COUNT             5
+
+/* Snapshot Stream Related ---------------------------------------------------*/
+/*
+ * IMPORTANT: The Matter snapshot is JPEG only (no on-device transcode), so the
+ * UVC camera must natively output MJPEG.
+ */
+
+#define CONFIG_USBH_UVC_SNAPSHOT_FORMAT_TYPE      USBH_UVC_FORMAT_MJPEG
+
+#if (CONFIG_USBH_UVC_SNAPSHOT_FORMAT_TYPE != USBH_UVC_FORMAT_MJPEG)
+#error "CONFIG_USBH_UVC_SNAPSHOT_FORMAT_TYPE must be set to USBH_UVC_FORMAT_MJPEG"
+#endif
+
+#define CONFIG_USBH_UVC_SNAPSHOT_WIDTH            320
+#define CONFIG_USBH_UVC_SNAPSHOT_HEIGHT           240
+
+/* Frame buffer size in bytes
+ * Size depends on format, resolution, and scene complexity.
+ * Please increase this value if an oversize error occurs.
+ * ┌────────┬─────────────────────────────┬─────────┬─────────┐
+ * │ Format │           Formula           │ 320×240 │ 640×480 │
+ * ├────────┼─────────────────────────────┼─────────┼─────────┤
+ * │ JPEG   │ W × H × 2 x 0.15 (estimate) │ ~25 KB  │ ~100 KB │
+ * └────────┴─────────────────────────────┴─────────┴─────────┘
+ */
+#define CONFIG_USBH_UVC_SNAPSHOT_FRAME_BUF_SIZE   (30 * 1024)
+
+#define CONFIG_USBH_UVC_SNAPSHOT_TIMEOUT_MS       12000
+#define CONFIG_USBH_UVC_SNAPSHOT_MAX_RETRY_FRAMES 10
 
 /* Base Stack Size of the UVC threads */
 #define CONFIG_USBH_UVC_BASE_STACK_SIZE              1024
@@ -132,10 +162,13 @@ public:
     /* USBH UVC */
     void Init(void);
     void deInit(void);
+    /* Video Stream Related */
     void EnableMatterVideoStream(uint16_t streamId);
     void DisableMatterVideoStream(void);
     void RegisterWebRtcTransport(WebRTCProviderManager *mWebRTCProviderManager, uint16_t sessionId);
     void DeregisterWebRtcTransport(void);
+    /* Snapshot Stream Related */
+    uint32_t CaptureJpegSnapshot(uint16_t width, uint16_t height, uint8_t **jpegBuf);
     static MatterCamera *GetInstance(void);
 
 private:
@@ -150,6 +183,8 @@ private:
     int UvcMatterStart(void);
     void UsbhUvcImgPrepare(usbh_uvc_frame_t *frame);
     void UvcCalculateTp(u32 loop);
+    void ServiceSnapshotRequest(bool h264Streaming);
+    bool UvcSetFormat(uint8_t fmtType, uint16_t width, uint16_t height, uint16_t frameRate, uint32_t frameBufSize);
 
     int UvcInit(void);
     int UvcDeinit(void);
@@ -172,6 +207,7 @@ private:
     static int UvcSetupWrapper(void);
     static int UvcSetparamWrapper(int status);
 
+    /* Video Stream Related */
     rtos_sema_t mUvcAttachSema;
     rtos_sema_t mUvcDetachSema;
     rtos_sema_t mUvcStartSema;
@@ -202,6 +238,18 @@ private:
     usbh_config_t  *mUsbhConfig   = NULL;
     usbh_uvc_ctx_t *mUvcConfig    = NULL;
     usbh_uvc_cb_t  *mUvcCallBacks = NULL;
+
+    /* Snapshot Stream Related */
+    rtos_mutex_t mSnapshotMutex      = NULL;
+    rtos_sema_t  mSnapshotDoneSema   = NULL;
+
+    volatile bool mUvcReady          = false;
+    volatile bool mSnapshotRequested = false;
+    bool mSnapshotOk                 = false;
+    uint16_t mSnapshotWidth          = CONFIG_USBH_UVC_SNAPSHOT_WIDTH;
+    uint16_t mSnapshotHeight         = CONFIG_USBH_UVC_SNAPSHOT_HEIGHT;
+    uint8_t *mSnapshotBuf            = nullptr;
+    uint32_t mSnapshotLen            = 0;
 #else
     void StartDummyStreaming(void *param);
     static void StartDummyStreamingWrapper(void *param);
