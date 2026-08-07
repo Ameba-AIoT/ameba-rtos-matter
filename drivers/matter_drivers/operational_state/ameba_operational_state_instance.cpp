@@ -19,6 +19,7 @@
 
 #include <operational_state/ameba_operational_state_delegate.h>
 #include <operational_state/ameba_operational_state_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,7 +59,7 @@ void OperationalState::AmebaOperationalStateInstanceShutdown(void)
     }
 }
 
-void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -77,7 +78,7 @@ void emberAfOperationalStateClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaOperationalStateDelegateShutdown();
     AmebaOperationalStateInstanceShutdown();

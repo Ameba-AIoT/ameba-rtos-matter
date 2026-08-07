@@ -18,6 +18,7 @@
  */
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <energy_evse/ameba_energy_evse_mode.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::EnergyEvseMode;
@@ -83,7 +84,7 @@ void EnergyEvseMode::Shutdown()
     gEnergyEvseModeDelegate.reset();
 }
 
-void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(!gEnergyEvseModeDelegate && !gEnergyEvseModeInstance);
     gEnergyEvseModeDelegate = std::make_unique<EnergyEvseMode::EnergyEvseModeDelegate>();
@@ -91,7 +92,7 @@ void emberAfEnergyEvseModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gEnergyEvseModeInstance->Init();
 }
 
-void emberAfEnergyEvseModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterEnergyEvseModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gEnergyEvseModeInstance) {
         gEnergyEvseModeInstance->Shutdown();

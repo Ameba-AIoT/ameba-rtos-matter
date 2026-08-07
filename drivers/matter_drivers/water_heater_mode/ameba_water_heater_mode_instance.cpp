@@ -19,6 +19,7 @@
 
 #include <water_heater_mode/ameba_water_heater_mode_delegate.h>
 #include <water_heater_mode/ameba_water_heater_mode_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,7 +59,7 @@ void WaterHeaterMode::AmebaWaterHeaterModeInstanceShutdown(void)
     }
 }
 
-void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -77,7 +78,7 @@ void emberAfWaterHeaterModeClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfWaterHeaterModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterWaterHeaterModeClusterShutdownCallback(EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaWaterHeaterModeInstanceShutdown();
     AmebaWaterHeaterModeDelegateShutdown();

@@ -19,6 +19,10 @@ Status emberAfExternalAttributeReadCallback(EndpointId endpoint_id, ClusterId cl
                                                    const EmberAfAttributeMetadata *matter_attribute, uint8_t *buffer,
                                                    uint16_t max_read_length)
 {
+    if (endpoint_id == 0) {
+        return Status::Failure;
+    }
+
     Node  &node = Node::getInstance();
     Endpoint *endpoint = node.getEndpoint(endpoint_id);
     Cluster *cluster = endpoint->getCluster(cluster_id);

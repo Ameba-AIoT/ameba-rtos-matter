@@ -19,6 +19,7 @@
 
 #include <refrigerator_mode/ameba_refrigerator_mode_delegate.h>
 #include <refrigerator_mode/ameba_refrigerator_mode_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -64,7 +65,7 @@ void RefrigeratorAndTemperatureControlledCabinetMode::AmebaRefrigeratorModeInsta
     }
 }
 
-void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -83,7 +84,7 @@ void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterInitCallback(c
     }
 }
 
-void emberAfRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterRefrigeratorAndTemperatureControlledCabinetModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaRefrigeratorModeInstanceShutdown();
     AmebaRefrigeratorModeDelegateShutdown();

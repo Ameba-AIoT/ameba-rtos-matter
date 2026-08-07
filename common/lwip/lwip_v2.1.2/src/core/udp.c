@@ -61,6 +61,9 @@
 #include "lwip/icmp6.h"
 #include "lwip/stats.h"
 #include "lwip/snmp.h"
+/* Added by Realtek start */
+#include "lwip/sys.h"
+/* Added by Realtek end */
 #include "lwip/dhcp.h"
 
 #include <string.h>

@@ -19,6 +19,7 @@
 
 #include <oven_mode/ameba_oven_mode_delegate.h>
 #include <oven_mode/ameba_oven_mode_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,7 +59,7 @@ void OvenMode::AmebaOvenModeInstanceShutdown(void)
     }
 }
 
-void emberAfOvenModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -77,7 +78,7 @@ void emberAfOvenModeClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfOvenModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaOvenModeInstanceShutdown();
     AmebaOvenModeDelegateShutdown();

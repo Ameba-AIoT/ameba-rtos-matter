@@ -10,6 +10,7 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/clusters/temperature-measurement-server/TemperatureMeasurementCluster.h>
+#include <app/clusters/relative-humidity-measurement-server/CodegenIntegration.h>
 #include <app/util/attribute-table.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -112,19 +113,25 @@ CHIP_ERROR matter_driver_humidity_sensor_init(void)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     Status status;
+    // possible range: -27315 to 32766
     uint16_t minValue = 0;
-    uint16_t maxValue = 10000;
+    uint16_t maxValue = 32766;
 
     chip::EndpointId ep = DHTSensor.GetHumSensorEp();
     ChipLogProgress(DeviceLayer, "Humidity Sensor on Endpoint%d", ep);
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
+    auto config = Clusters::RelativeHumidityMeasurement::FindClusterOnEndpoint(ep);
 
-    status = Clusters::RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Set(ep, minValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
+    auto minMeasured = config->GetMinMeasuredValue();
+    if (!minMeasured.IsNull()) {
+        minValue = minMeasured.Value();
+    }
 
-    status = Clusters::RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Set(ep, maxValue);
-    VerifyOrExit(status == Status::Success, err = CHIP_ERROR_INTERNAL);
+    auto maxMeasured = config->GetMaxMeasuredValue();
+    if (!maxMeasured.IsNull()) {
+        maxValue = maxMeasured.Value();
+    }
 
     ChipLogProgress(DeviceLayer, "Humidity range: Min = %i, Max = %i", minValue, maxValue);
 
@@ -322,7 +329,7 @@ void matter_driver_downlink_update_handler(AppEvent *aEvent)
         {
             chip::EndpointId ep = DHTSensor.GetHumSensorEp();
             //ChipLogProgress(DeviceLayer, "Set Humidity %i on Endpoint%d", aEvent->value._u16, ep);
-            Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::Set(ep, aEvent->value._u16);
+            Clusters::RelativeHumidityMeasurement::SetMeasuredValue(ep, aEvent->value._u16);
         }
         break;
     case AppEvent::kEventType_Downlink_TemperatureMeasurement_SetValue:

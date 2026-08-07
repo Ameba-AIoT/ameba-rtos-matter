@@ -19,6 +19,7 @@
 
 #include <microwave_oven_mode/ameba_microwave_oven_mode_delegate.h>
 #include <microwave_oven_mode/ameba_microwave_oven_mode_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -61,7 +62,7 @@ void MicrowaveOvenMode::AmebaMicrowaveOvenModeInstanceShutdown(void)
     }
 }
 
-void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -80,7 +81,7 @@ void emberAfMicrowaveOvenModeClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterMicrowaveOvenModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaMicrowaveOvenModeInstanceShutdown();
     AmebaMicrowaveOvenModeDelegateShutdown();

@@ -19,6 +19,7 @@
 
 #include <laundry_washer_mode/ameba_laundry_washer_mode_delegate.h>
 #include <laundry_washer_mode/ameba_laundry_washer_mode_instance.h>
+#include <app/util/generic-callbacks.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -58,7 +59,7 @@ void LaundryWasherMode::AmebaLaundryWasherModeInstanceShutdown(void)
     }
 }
 
-void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     CHIP_ERROR ret = CHIP_NO_ERROR;
 
@@ -77,7 +78,7 @@ void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
     }
 }
 
-void emberAfLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     AmebaLaundryWasherModeInstanceShutdown();
     AmebaLaundryWasherModeDelegateShutdown();
