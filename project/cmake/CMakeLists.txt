@@ -169,27 +169,54 @@ ameba_add_internal_library(chip_main
         ${private_compile_options}
 )
 
+# Generate only the buildconfig headers chip_main needs, without the full lib_chip_core.a archive.
+set(CHIP_GEN_HEADERS_STAMP ${OUTPUT_DIR}/gen/.chip_gen_headers.stamp)
 add_custom_command(
-	OUTPUT ${c_SDK_LIB_APPLICATION_DIR}/lib_chip_core.a
+	OUTPUT ${CHIP_GEN_HEADERS_STAMP}
 
 	DEPENDS ${ARGS_GN}
 
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${CHIP_DIR}/config/ameba/components/chip
 	COMMAND ${CMAKE_COMMAND} -E chdir ${CHIP_DIR}/config/ameba/components/chip gn gen --check --fail-on-unused-args ${OUTPUT_DIR}
+	COMMAND ${CMAKE_COMMAND} -E chdir ${CHIP_DIR}/config/ameba/components/chip ninja -C ${OUTPUT_DIR}
+		gen_access_buildconfig gen_additional_data_payload_buildconfig gen_app_buildconfig
+		gen_asn1oid gen_ble_buildconfig gen_build_time_header gen_chip_buildconfig
+		gen_chip_version gen_crypto_buildconfig gen_icd-server-buildconfig gen_inet_buildconfig
+		gen_lwip_buildconfig gen_minmdns_buildconfig gen_platform_buildconfig
+		gen_processing-buildconfig gen_system_buildconfig gen_tracing_buildconfig
+	COMMAND ${CMAKE_COMMAND} -E touch ${CHIP_GEN_HEADERS_STAMP}
+)
+add_custom_target(
+	lib_chip_core_headers
+	DEPENDS ${CHIP_GEN_HEADERS_STAMP}
+)
+
+add_custom_command(
+	OUTPUT ${c_SDK_LIB_APPLICATION_DIR}/lib_chip_core.a
+
+	# Depend on the header stamp so gn gen runs once, keeping the two inner ninja builds serialized on OUTPUT_DIR.
+	DEPENDS ${CHIP_GEN_HEADERS_STAMP}
+
 	COMMAND ${CMAKE_COMMAND} -E chdir ${CHIP_DIR}/config/ameba/components/chip ninja -C ${OUTPUT_DIR} :ameba
 	COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/lib/* ${c_SDK_LIB_APPLICATION_DIR}/
 	COMMAND ${CMAKE_COMMAND} -E rename ${c_SDK_LIB_APPLICATION_DIR}/libCHIP.a ${c_SDK_LIB_APPLICATION_DIR}/lib_chip_core.a
 )
 
-# set lib_chip_core as target for lib_chip_main
+# set lib_chip_core as target for the full archive
 add_custom_target(
 	lib_chip_core
 	DEPENDS ${c_SDK_LIB_APPLICATION_DIR}/lib_chip_core.a
 )
 
-# before compiling lib_chip_main.a, make sure lib_chip_core.a is compiled
+# chip_main only needs the generated headers, so it can build in parallel with the lib_chip_core.a archive.
 ameba_target_depend(
 	${c_CURRENT_TARGET_NAME}
+	lib_chip_core_headers
+)
+
+# The image still links lib_chip_core.a, so it must now trigger the archive build itself.
+ameba_target_depend(
+	${c_CURRENT_IMAGE}
 	lib_chip_core
 )
 

@@ -221,6 +221,17 @@ CHIP_ERROR WebRTCProviderManager::HandleSolicitOffer(const OfferRequestArgs &arg
 
     transport->SetRequestArgs(requestArgs);
 
+    // Populate videoStreams/audioStreams (WebRTCSessionStruct fields 7/8) in outSession.
+    const auto &storedArgs = transport->GetRequestArgs();
+    if (!storedArgs.videoStreams.empty()) {
+        outSession.videoStreams.SetValue(
+                        DataModel::List<const uint16_t>(storedArgs.videoStreams.data(), storedArgs.videoStreams.size()));
+    }
+    if (!storedArgs.audioStreams.empty()) {
+        outSession.audioStreams.SetValue(
+                        DataModel::List<const uint16_t>(storedArgs.audioStreams.data(), storedArgs.audioStreams.size()));
+    }
+
     // Store SFrameConfig in Transport base class if provided for later use in frame encryption
     if (args.sFrameConfig.HasValue()) {
         transport->sFrameConfig = args.sFrameConfig;

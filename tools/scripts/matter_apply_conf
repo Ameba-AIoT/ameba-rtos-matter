@@ -1,14 +1,63 @@
 #!/bin/bash -l
 
-MATTER_EXAMPLE=$1
+MATTER_DEVICE_CONFIG=$1
 PATH_TO_AMEBA_RTOS=$(cat .PATH_TO_AMEBA_RTOS)
 AMEBA_PY="python $PATH_TO_AMEBA_RTOS/ameba.py"
 
 PATH_TO_AMEBA_RTOS_MATTER="$PWD"
-MATTER_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/project/cmake/config/ameba-rtos-v1.2/matter_proj.conf"
+PATH_TO_MATTER_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/project/cmake/config/ameba-rtos-v1.2/"
 CURRENT_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/current_proj.conf"
 TEMP_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/.temp_proj.conf"
 SOC_INFO_JSON="$PATH_TO_AMEBA_RTOS_MATTER/soc_info.json"
+MBEDTLS_CONFIG_GREEN2="$PATH_TO_AMEBA_RTOS/component/ssl/mbedtls-3.6.5/include/mbedtls/mbedtls_config_green2.h"
+
+matter_device_configs=(
+  "camera"
+  "default"
+)
+
+valid_device_configs=false
+
+list_matter_device_configs() {
+  echo "Available Matter device configs:"
+  for matter_device_config in "${matter_device_configs[@]}"; do
+    echo "- $matter_device_config"
+  done
+}
+
+if [ "$#" -lt 1 ]; then
+  echo "No device config argument, using Matter default config"
+  MATTER_PROJ_CONFIG="$PATH_TO_MATTER_PROJ_CONFIG/matter_default_proj.conf"
+  valid_device_configs=true
+else # check if MATTER_DEVICE_CONFIG is valid
+  for matter_device_config in "${matter_device_configs[@]}"; do
+    if [[ "$matter_device_config" == "$MATTER_DEVICE_CONFIG" ]]; then
+      echo "Applying ${matter_device_config} config"
+      MATTER_PROJ_CONFIG="$PATH_TO_MATTER_PROJ_CONFIG/matter_${matter_device_config}_proj.conf"
+      valid_device_configs=true
+      break
+    fi
+  done
+  if [[ "$valid_device_configs" == "false" ]]; then
+    echo "Invalid Matter device config"
+    list_matter_device_configs
+    exit 1
+  fi
+fi
+
+if [[ "$MATTER_DEVICE_CONFIG" == "camera" ]]; then
+  echo "Enabling MBEDTLS_SSL_DTLS_SRTP in $MBEDTLS_CONFIG_GREEN2 (required for camera WebRTC)"
+  if [ -e "$MBEDTLS_CONFIG_GREEN2" ]; then
+    if grep -qE '^[[:space:]]*//[[:space:]]*#define[[:space:]]+MBEDTLS_SSL_DTLS_SRTP[[:space:]]*$' "$MBEDTLS_CONFIG_GREEN2"; then
+      sed -i -E 's|^[[:space:]]*//[[:space:]]*#define[[:space:]]+MBEDTLS_SSL_DTLS_SRTP[[:space:]]*$|#define MBEDTLS_SSL_DTLS_SRTP|' "$MBEDTLS_CONFIG_GREEN2"
+      echo "Enabling MBEDTLS_SSL_DTLS_SRTP successful!"
+    else
+      echo "MBEDTLS_SSL_DTLS_SRTP already enabled in $MBEDTLS_CONFIG_GREEN2"
+    fi
+  else
+    echo "Warning: $MBEDTLS_CONFIG_GREEN2 not found; cannot enable MBEDTLS_SSL_DTLS_SRTP for camera WebRTC"
+  fi
+fi
 
 if [ ! -e "$SOC_INFO_JSON" ]; then
   echo "$SOC_INFO_JSON does not exist, please run \`ameba.py soc\` and choose the SoC for your project."

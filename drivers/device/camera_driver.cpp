@@ -156,11 +156,16 @@ void MatterCamera::UsbhUvcMainThread(void *param)
     UNUSED(param);
 
     mUvcBuf = (uint8_t *) rtos_mem_zmalloc(CONFIG_USBH_UVC_FRAME_BUF_SIZE);
+    mSnapshotBuf = (uint8_t *) rtos_mem_zmalloc(CONFIG_USBH_UVC_SNAPSHOT_FRAME_BUF_SIZE);
+    // video stream related
     rtos_sema_create(&mUvcAttachSema, 0U, 1U);
     rtos_sema_create(&mUvcDetachSema, 0U, 1U);
     rtos_sema_create(&mUvcStartSema, 0U, 1U);
     rtos_sema_create(&mUvcSetparamSema, 0U, 1U);
     rtos_mutex_create(&mUvcBufMutex);
+    // snapshot related
+    rtos_sema_create(&mSnapshotDoneSema, 0U, 1U);
+    rtos_mutex_create(&mSnapshotMutex);
 
     ret = usbh_init(mUsbhConfig, NULL);
     if (ret != HAL_OK) {
@@ -209,13 +214,18 @@ usb_deinit_exit:
     usbh_deinit();
 
 free_sema_exit:
+    // video stream related
     rtos_mutex_delete(mUvcBufMutex);
     rtos_sema_delete(mUvcAttachSema);
     rtos_sema_delete(mUvcDetachSema);
     rtos_sema_delete(mUvcStartSema);
     rtos_sema_delete(mUvcSetparamSema);
+    // snapshots related
+    rtos_mutex_delete(mSnapshotMutex);
+    rtos_sema_delete(mSnapshotDoneSema);
 example_exit:
     rtos_mem_free(mUvcBuf);
+    rtos_mem_free(mSnapshotBuf);
     ChipLogProgress(DeviceLayer, "USBH UVC task ends");
     rtos_task_delete(NULL);
 }
@@ -279,8 +289,17 @@ void MatterCamera::UvcTestThread(void *param)
             goto exit;
         }
 
+        /* H.264 negotiated: ready to serve snapshots even before a live stream. */
+        mUvcReady = true;
+
+        /* Park until a live stream starts. H.264 is negotiated but not yet
+         * transferring here, so an idle snapshot must not stop/restart it. */
         while (mUvcMatterIsInit == 0) {
-            rtos_time_delay_ms(500);
+            if (mSnapshotRequested) {
+                ServiceSnapshotRequest(false /* h264Streaming */);
+            } else {
+                rtos_time_delay_ms(100);
+            }
         }
 
         img_cnt = 0;
@@ -294,6 +313,13 @@ void MatterCamera::UvcTestThread(void *param)
             goto exit;
         }
         while (mUvcMatterIsInit) {
+            /* Serve snapshots here (this thread owns get_frame/stop/start).
+             * H.264 is streaming, so it is stopped first and restarted after. */
+            if (mSnapshotRequested) {
+                ServiceSnapshotRequest(true /* h264Streaming */);
+                continue;
+            }
+
             buf = usbh_uvc_get_frame(CONFIG_USBH_UVC_IF_NUM_0);
 
             if (buf == NULL) {
@@ -330,8 +356,160 @@ void MatterCamera::UvcTestThread(void *param)
     }
 
 exit:
+    mUvcReady = false;
     rtos_task_delete(NULL);
     mUvcTask = NULL;
+}
+
+/* Negotiate the interface to the given format/resolution, then wait for the
+ * completion callback. Returns true on success. */
+bool MatterCamera::UvcSetFormat(uint8_t fmtType, uint16_t width, uint16_t height, uint16_t frameRate, uint32_t frameBufSize)
+{
+    mUvcSCtx.fmt_type       = fmtType;
+    mUvcSCtx.width          = width;
+    mUvcSCtx.height         = height;
+    mUvcSCtx.frame_rate     = frameRate;
+    mUvcSCtx.frame_buf_size = frameBufSize;
+
+    /* Drain any stale signal so we observe this request's status. */
+    while (rtos_sema_take(mUvcSetparamSema, 0) == RTK_SUCCESS) { /* drain */ }
+
+    if (usbh_uvc_set_param(&mUvcSCtx, CONFIG_USBH_UVC_IF_NUM_0) != RTK_SUCCESS) {
+        ChipLogError(DeviceLayer, "Snapshot: set_param req fail (fmt %u)", fmtType);
+        return false;
+    }
+    if (rtos_sema_take(mUvcSetparamSema, 5000) != RTK_SUCCESS || mUvcSetparamStatus != HAL_OK) {
+        ChipLogError(DeviceLayer, "Snapshot: set_param fail (fmt %u %ux%u)", fmtType, width, height);
+        return false;
+    }
+    return true;
+}
+
+namespace {
+/* Strip trailing zero padding some cameras add, then require both the SOI
+ * (0xFFD8) and EOI (0xFFD9) markers (matching example_usbh_uvc.c). Returns the
+ * trimmed length, or 0 if the frame is not a complete JPEG. */
+u32 ValidateAndTrimJpeg(const uint8_t *buf, u32 len)
+{
+    if (len < 4) {
+        return 0;
+    }
+    while (len > 2 && buf[len - 1] == 0x00) {
+        len--;
+    }
+    if (len < 4 || buf[0] != 0xFF || buf[1] != 0xD8 || buf[len - 2] != 0xFF || buf[len - 1] != 0xD9) {
+        return 0;
+    }
+    return len;
+}
+} // namespace
+
+void MatterCamera::ServiceSnapshotRequest(bool h264Streaming)
+{
+    usbh_uvc_frame_t *buf;
+    int attempts = 0;
+
+    mSnapshotOk  = false;
+    mSnapshotLen = 0;
+    memset(mSnapshotBuf, 0, CONFIG_USBH_UVC_SNAPSHOT_FRAME_BUF_SIZE);
+
+    ChipLogProgress(DeviceLayer, "Snapshot: switching to MJPEG %ux%u (h264Streaming=%d)", mSnapshotWidth, mSnapshotHeight,
+                    h264Streaming);
+
+    /* Stop H.264 before re-negotiating (nothing to stop when idle). */
+    if (h264Streaming) {
+        usbh_uvc_stop(CONFIG_USBH_UVC_IF_NUM_0);
+    }
+
+    if (!UvcSetFormat(CONFIG_USBH_UVC_SNAPSHOT_FORMAT_TYPE, mSnapshotWidth, mSnapshotHeight, CONFIG_USBH_UVC_FRAME_RATE, CONFIG_USBH_UVC_SNAPSHOT_FRAME_BUF_SIZE)) {
+        goto restore;
+    }
+
+    if (usbh_uvc_start(CONFIG_USBH_UVC_IF_NUM_0) != RTK_SUCCESS) {
+        ChipLogError(DeviceLayer, "Snapshot: MJPEG stream on fail");
+        goto restore;
+    }
+
+    /* Grab frames until one is a complete JPEG; the first after a switch may be partial. */
+    for (attempts = 0; attempts < CONFIG_USBH_UVC_SNAPSHOT_MAX_RETRY_FRAMES; attempts++) {
+        buf = usbh_uvc_get_frame(CONFIG_USBH_UVC_IF_NUM_0);
+        if (buf == NULL) {
+            rtos_time_delay_ms(10);
+            continue;
+        }
+
+        u32 validLen = ValidateAndTrimJpeg(buf->buf, buf->byteused);
+        if (validLen > 0) {
+            memcpy(mSnapshotBuf, buf->buf, validLen);
+            mSnapshotLen = validLen;
+            mSnapshotOk  = true;
+            usbh_uvc_put_frame(buf, CONFIG_USBH_UVC_IF_NUM_0);
+            ChipLogProgress(DeviceLayer, "Snapshot: captured JPEG %lu bytes", (unsigned long) validLen);
+            break;
+        }
+
+        usbh_uvc_put_frame(buf, CONFIG_USBH_UVC_IF_NUM_0);
+    }
+
+    if (!mSnapshotOk) {
+        ChipLogError(DeviceLayer, "Snapshot: no valid JPEG after %d frames", attempts);
+    }
+
+    usbh_uvc_stop(CONFIG_USBH_UVC_IF_NUM_0);
+
+restore:
+    /* Always restore H.264 negotiation (even on failure) so we never stay stuck
+     * in MJPEG; only restart the transfer if it was streaming before. */
+    if (UvcSetFormat(CONFIG_USBH_UVC_FORMAT_TYPE, CONFIG_USBH_UVC_WIDTH, CONFIG_USBH_UVC_HEIGHT, CONFIG_USBH_UVC_FRAME_RATE, CONFIG_USBH_UVC_FRAME_BUF_SIZE)) {
+        if (h264Streaming && usbh_uvc_start(CONFIG_USBH_UVC_IF_NUM_0) != RTK_SUCCESS) {
+            ChipLogError(DeviceLayer, "Snapshot: failed to restart H.264 stream");
+        }
+    } else {
+        ChipLogError(DeviceLayer, "Snapshot: failed to restore H.264 format");
+    }
+
+    mSnapshotRequested = false;
+    rtos_sema_give(mSnapshotDoneSema);
+}
+
+uint32_t MatterCamera::CaptureJpegSnapshot(uint16_t width, uint16_t height, uint8_t **jpegBuf)
+{
+    *jpegBuf = nullptr;
+
+    /* Serialize concurrent callers. */
+    rtos_mutex_take(mSnapshotMutex, RTOS_MAX_TIMEOUT);
+
+    /* Needs a ready (H.264-negotiated) camera, but not an active WebRTC stream:
+     * snapshots are served both while idle and while streaming. */
+    if (instance == nullptr || !mUvcReady) {
+        ChipLogError(DeviceLayer, "Snapshot: camera not ready, cannot capture");
+        rtos_mutex_give(mSnapshotMutex);
+        return 0;
+    }
+
+    /* Requested resolution is not honored: only the fixed
+     * CONFIG_USBH_UVC_SNAPSHOT_WIDTH/HEIGHT fits in one CaptureSnapshotResponse
+     * message (see camera_driver.h). width/height are logged for diagnostics only. */
+    if (width != CONFIG_USBH_UVC_SNAPSHOT_WIDTH || height != CONFIG_USBH_UVC_SNAPSHOT_HEIGHT) {
+        ChipLogProgress(DeviceLayer, "Snapshot: requested %ux%u, capturing at fixed %ux%u instead", width, height,
+                        CONFIG_USBH_UVC_SNAPSHOT_WIDTH, CONFIG_USBH_UVC_SNAPSHOT_HEIGHT);
+    }
+    mSnapshotWidth  = CONFIG_USBH_UVC_SNAPSHOT_WIDTH;
+    mSnapshotHeight = CONFIG_USBH_UVC_SNAPSHOT_HEIGHT;
+
+    /* Drain any stale signal, then arm the request. */
+    while (rtos_sema_take(mSnapshotDoneSema, 0) == RTK_SUCCESS) { /* drain */ }
+    mSnapshotRequested = true;
+
+    if (rtos_sema_take(mSnapshotDoneSema, CONFIG_USBH_UVC_SNAPSHOT_TIMEOUT_MS) == RTK_SUCCESS && mSnapshotOk) {
+        *jpegBuf = mSnapshotBuf;
+    } else {
+        ChipLogError(DeviceLayer, "Snapshot: capture timed out or failed");
+        mSnapshotRequested = false;
+    }
+
+    rtos_mutex_give(mSnapshotMutex);
+    return mSnapshotLen;
 }
 
 #if CONFIG_USBH_UVC_HOT_PLUG
@@ -524,6 +702,9 @@ void MatterCamera::UvcCalculateTp(u32 loop)
     rx_perf_total = rx_perf + ((mRxTotalH * 10000 << 12) / rx_elapse);
     ChipLogDetail(DeviceLayer, "TP %lu.%lu MB/s-%lu (%lu_%lu/%lu)", rx_perf_total / 10, rx_perf_total % 10, rx_perf, mRxTotalH, mRxTotalL, loop);
 
+    (void) rx_fps;
+    (void) rx_perf_total;
+
     mRxTotalL = 0;
     mRxTotalH = 0;
 }
@@ -550,6 +731,8 @@ int MatterCamera::UvcAttach(void)
 int MatterCamera::UvcDetach(void)
 {
     ChipLogProgress(DeviceLayer, "MatterCamera: UvcDetach");
+    /* Interface is going away; block snapshot capture until it is re-negotiated. */
+    mUvcReady = false;
 #if CONFIG_USBH_UVC_HOT_PLUG
     rtos_sema_give(mUvcDetachSema);
 #endif
