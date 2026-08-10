@@ -35,13 +35,6 @@ using namespace chip::app::Clusters::WaterHeaterManagement;
 
 using Protocols::InteractionModel::Status;
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::WaterHeaterManagement;
-
-using Protocols::InteractionModel::Status;
-
 WaterHeaterManagementDelegate::WaterHeaterManagementDelegate(EndpointId clustersEndpoint) :
     mpWaterHeaterMgmtInstance(nullptr), mpWaterHeaterManufacturer(nullptr), mTargetWaterTemperature(0), mWaterTemperature(0),
     mColdWaterTemperature(0), mBoostTargetTemperatureReached(false), mTankVolume(0), mEstimatedHeatRequired(0), mTankPercentage(0),
