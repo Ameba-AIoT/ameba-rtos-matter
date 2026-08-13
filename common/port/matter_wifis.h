@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #ifndef _RTK_MATTER_WIFIS_H_
 #define _RTK_MATTER_WIFIS_H_
 
@@ -283,13 +282,13 @@ void matter_wifi_set_autoreconnect(uint8_t mode);
  * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
  */
 int matter_wifi_connect(
-    char              *ssid,
-    rtw_security_t    security_type,
-    char              *password,
-    int               ssid_len,
-    int               password_len,
-    int               key_id,
-    void              *semaphore);
+                char              *ssid,
+                rtw_security_t    security_type,
+                char              *password,
+                int               ssid_len,
+                int               password_len,
+                int               key_id,
+                void              *semaphore);
 /**
  * @brief  Disconnect from the currently connected WiFi network.
  * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
@@ -413,6 +412,21 @@ void matter_wifi_init(void);
  * @brief  Wait until WiFi module are ready
  */
 void matter_wifi_wait(void);
+
+/**
+ * @brief  Set the powersave mode for both IPS and LPS mode
+ * @param[in]  ips_enable: 1 to enable IPS, 0 to disable IPS
+ * @param[in]  lps_enable: 1 to enable LPS, 0 to disable LPS
+ * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
+ */
+int matter_wifi_set_powersave_mode(uint8_t ips_enable, uint8_t lps_enable);
+
+/**
+ * @brief  Set the listen interval for WiFi Legacy Power Save (LPS) mode
+ * @param[in]  interval: The listen interval for LPS, in units of ~100 ms
+ * @return  RTW_SUCCESS on success, RTW_ERROR otherwise.
+ */
+int matter_wifi_set_lps_listen_interval(uint8_t interval);
 
 /******************************************************
  * Matter Feature: Wi-Fi Network Diagnostics

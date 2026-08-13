@@ -66,7 +66,6 @@ ameba_list_append(private_includes
     ${MBEDTLS_DIR}/include/mbedtls
     ${MBEDTLS_DIR}/library
     ${c_CMPT_SSL_DIR}/mbedtls_ram_map/rom
-    # ${c_SOC_PROJECT_DIR}/menuconfig/project_ap
     ${c_MENUCONFIG_DIR}/project_${c_MCU_PROJECT_NAME}
 )
 #ameba-rtos-matter includes
@@ -126,7 +125,13 @@ ameba_list_append(private_sources
 ameba_list_append(private_sources
     ${MATTER_DIR}/common/mbedtls/matter_mbedtls_nsc.c
 )
-                
+
+set_source_files_properties(
+    ${MATTER_DIR}/common/mbedtls/matter_mbedtls_nsc.c
+    PROPERTIES INCLUDE_DIRECTORIES
+        "${c_CMPT_SOC_DIR}/atf/include;${c_CMPT_SOC_DIR}/atf/include/lib/libc;${c_CMPT_SOC_DIR}/atf/include/lib/libc/aarch64;${c_CMPT_SOC_DIR}/atf/plat/realtek/sheipa/include"
+)
+
 # As MBEDTLS_CONFIG_FILE is defined as INTERFACE_COMPILE_DEFINITIONS of {c_PROJ_CONFIG},
 # use ameba_target_add to avoid MBEDTLS_CONFIG_FILE redefined error, {c_PROJ_CONFIG} will not be linked
 ameba_target_add(atf_mbedtls_secure

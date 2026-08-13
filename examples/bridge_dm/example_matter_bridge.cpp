@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <FreeRTOS.h>
 #include <task.h>
 #include <basic_types.h>
@@ -96,7 +95,7 @@ static void example_matter_bridge_task(void *pvParameters)
     firstBridgedDeviceEndpointId = bridge.addBridgedEndpoint(bridgedonoffEndpointConfig, Span<const EmberAfDeviceType>(gBridgedOnOffDeviceTypes));
 
     if (xTaskCreate(matter_customer_bridge_code, ((const char *)"matter_customer_bridge_code"), 1024, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
-        printf("\r%s xTaskCreate(matter_customer_bridge_code) failed", __FUNCTION__);
+        ChipLogProgress(DeviceLayer, "\r%s xTaskCreate(matter_customer_bridge_code) failed", __FUNCTION__);
     }
 
     vTaskDelay(20000);

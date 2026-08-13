@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
 #include <app/clusters/occupancy-sensor-server/occupancy-hal.h>
@@ -43,7 +43,7 @@ Engine sShellManualOccupancySensingSubCommands;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 
-CHIP_ERROR ManualOccupancySensingCommandHelpHandler(int argc, char ** argv)
+CHIP_ERROR ManualOccupancySensingCommandHelpHandler(int argc, char **argv)
 {
     sShellManualOccupancySensingSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
 
@@ -54,26 +54,23 @@ CHIP_ERROR ManualOccupancySensingCommandHelpHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ManualOccupancySensingCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOccupancySensingCommandHandler(int argc, char **argv)
 {
-    if (argc == 0)
-    {
+    if (argc == 0) {
         return ManualOccupancySensingCommandHelpHandler(argc, argv);
     }
     return sShellManualOccupancySensingSubCommands.ExecCommand(argc, argv);
 }
 
 
-CHIP_ERROR ManualOccupancySensingSetOccupancyCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOccupancySensingSetOccupancyCommandHandler(int argc, char **argv)
 {
-    if (argc != 1)
-    {
+    if (argc != 1) {
         return ManualOccupancySensingCommandHelpHandler(argc, argv);
     }
     Protocols::InteractionModel::Status status;
     status = chip::app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, (uint8_t) atoi(argv[0]));
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
+    if (status != Protocols::InteractionModel::Status::Success) {
         ChipLogError(DeviceLayer, "ManualOCCSetOccupancyCommandHandler Error!");
         return CHIP_ERROR_INTERNAL;
     }

@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_stdlib.h>
 #include <ameba.h>
 
@@ -49,29 +48,25 @@ using BootReasonType = GeneralDiagnostics::BootReasonEnum;
 
 uint8_t matter_get_total_operational_hour(uint32_t *totalOperationalHours)
 {
-    if (totalOperationalHours == nullptr)
-    {
-        ChipLogError(DeviceLayer,"%s: nullptr\n", __FUNCTION__);
+    if (totalOperationalHours == nullptr) {
+        ChipLogProgress(DeviceLayer, "%s: nullptr\n", __FUNCTION__);
         return -1;
     }
 
     CHIP_ERROR err;
     DiagnosticDataProvider &diagProvider = chip::DeviceLayer::GetDiagnosticDataProviderImpl();
 
-    if (&diagProvider != nullptr)
-    {
+    if (&diagProvider != nullptr) {
         err = diagProvider.GetTotalOperationalHours(*totalOperationalHours);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer,"%s: get failed err=%" CHIP_ERROR_FORMAT, __FUNCTION__, err.Format());
+        if (err != CHIP_NO_ERROR) {
+            ChipLogError(DeviceLayer, "%s: get failed err=%" CHIP_ERROR_FORMAT, __FUNCTION__, err.Format());
             return -1;
         }
-    }
-    else
-    {
-        printf("%s: DiagnosticDataProvider is invalid\n", __FUNCTION__);
+    } else {
+        ChipLogProgress(DeviceLayer, "%s: DiagnosticDataProvider is invalid\n", __FUNCTION__);
         return -1;
     }
+
     return 0;
 }
 
@@ -90,40 +85,32 @@ static void matter_op_hours_task(void *pvParameters)
     char key[] = "temp_hour";
 
     // 1. Check if "temp_hour" exist in NVS
-    if (checkExist(key, key) != true)
-    {
+    if (checkExist(key, key) != DCT_SUCCESS) {
         // 2. If "temp_hour" exist, get "temp_hour" and set as "total_hour" into NVS
-        if (getPref_u32_new(key, key, &prev_hour) == DCT_SUCCESS)
-        {
+        if (getPref_u32_new(key, key, &prev_hour) == DCT_SUCCESS) {
             ret = matter_set_total_operational_hour(prev_hour);
-            if (ret != 0)
-            {
-                ChipLogError(DeviceLayer,"matter_store_total_operational_hour failed, ret=%d\n", ret);
+            if (ret != 0) {
+                ChipLogProgress(DeviceLayer, "matter_store_total_operational_hour failed, ret=%d\n", ret);
                 goto loop;
             }
             // 3. Delete "temp_hour" from NVS
             deleteKey(key, key);
-        }
-        else
-        {
+        } else {
+            ChipLogProgress(DeviceLayer, "getPref_u32_new: %s not found\n", key);
             goto loop;
         }
     }
 
 loop:
-    while (1)
-    {
+    while (1) {
         // 4. Every hour get Total operational hour
         ret = matter_get_total_operational_hour(&cur_hour);
-        if (ret == 0)
-        {
+        if (ret == 0) {
             // 5. If "prev_hour" and "cur_hour" differs, enter and store new value into NVS using "temp_hour"
-            if (prev_hour != cur_hour)
-            {
+            if (prev_hour != cur_hour) {
                 prev_hour = cur_hour;
-                if (setPref_new(key, key, (uint8_t *) &cur_hour, sizeof(cur_hour)) != DCT_SUCCESS)
-                {
-                    ChipLogError(DeviceLayer,"setPref_new: temp_hour failed\n");
+                if (setPref_new(key, key, (uint8_t *) &cur_hour, sizeof(cur_hour)) != DCT_SUCCESS) {
+                    ChipLogProgress(DeviceLayer, "setPref_new: temp_hour Failed\n");
                 }
             }
         }
@@ -135,9 +122,8 @@ loop:
 
 void matter_op_hours(void)
 {
-    if (xTaskCreate(matter_op_hours_task, ((const char *)"matter_op_hours_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS)
-    {
-        printf("\n\r%s xTaskCreate(matter_op_hours) failed", __FUNCTION__);
+    if (xTaskCreate(matter_op_hours_task, ((const char *)"matter_op_hours_task"), 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
+        ChipLogProgress(DeviceLayer, "\n\r%s xTaskCreate(matter_op_hours) failed", __FUNCTION__);
     }
 }
 #endif
@@ -176,28 +162,17 @@ void matter_op_hours(void)
 
 BootReasonType ameba_rtos_map_reset_reason(uint32_t reason, bool isOta)
 {
-    if (reason == 0)
-    {
+    if (reason == 0) {
         return BootReasonType::kPowerOnReboot;
-    }
-    else if (reason & BOR_RESET_SRC)
-    {
+    } else if (reason & BOR_RESET_SRC) {
         return BootReasonType::kBrownOutReset;
-    }
-    else if (reason & SW_WDG_RESET_SRC)
-    {
+    } else if (reason & SW_WDG_RESET_SRC) {
         return BootReasonType::kSoftwareWatchdogReset;
-    }
-    else if (reason & HW_WDG_RESET_SRC)
-    {
+    } else if (reason & HW_WDG_RESET_SRC) {
         return BootReasonType::kHardwareWatchdogReset;
-    }
-    else if (reason & SW_RESET_SRC)
-    {
+    } else if (reason & SW_RESET_SRC) {
         return isOta ? BootReasonType::kSoftwareUpdateCompleted : BootReasonType::kSoftwareReset;
-    }
-    else
-    {
+    } else {
         return BootReasonType::kUnspecified;
     }
 }
@@ -214,8 +189,7 @@ void matter_store_boot_reason(void)
     ChipLogDetail(DeviceLayer, "store boot reason 0x%x", to_underlying(bootReason));
 
     err = ConfigurationManagerImpl().StoreBootReason(to_underlying(bootReason));
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "store boot reason (0x%x) failed err=%" CHIP_ERROR_FORMAT, to_underlying(bootReason), err.Format());
     }
     return;

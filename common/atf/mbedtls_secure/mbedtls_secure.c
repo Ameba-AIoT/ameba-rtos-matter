@@ -1,9 +1,21 @@
 /*
- * Copyright (c) 2015-2019, ARM Limited and Contributors. All rights reserved.
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- * SPDX-License-Identifier: BSD-3-Clause
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
-
 #include <assert.h>
 #include <stddef.h>
 
@@ -85,9 +97,9 @@ int get_mbedtls_heap_helper(void **heap_addr, size_t *heap_size)
 void matter_secure_mbedtls_heap_status(void)
 {
 #if defined(MBEDTLS_MEMORY_DEBUG)
-    printf("MATTER_MBEDTLS_SECURE_HEAP_SIZE = %d\n", MATTER_MBEDTLS_SECURE_HEAP_SIZE);
+    INFO("MATTER_MBEDTLS_SECURE_HEAP_SIZE = %d\n", MATTER_MBEDTLS_SECURE_HEAP_SIZE);
     mbedtls_memory_buffer_alloc_status();
 #else
-    printf("Enable MBEDTLS_MEMORY_DEBUG to check the secure mbedtls heap status!\n");
+    INFO("Enable MBEDTLS_MEMORY_DEBUG to check the secure mbedtls heap status!\n");
 #endif
 }

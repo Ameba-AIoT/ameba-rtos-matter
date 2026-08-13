@@ -90,6 +90,7 @@ ameba_list_append(private_compile_options
 	-Wno-format
 	-Wno-unused-parameter
 	-Wno-missing-field-initializers
+	-Wno-unused-result
 )
 
 # Add flags, includes, and source files based on the example 
@@ -131,18 +132,19 @@ set(TARGET_DEFINE_FLAGS)
 foreach(item IN LISTS LIB_CHIP_CORE_FLAGS)
 	set(TARGET_DEFINE_FLAGS "${TARGET_DEFINE_FLAGS}\"-D${item}\",")
 endforeach()
+set(TARGET_COMPILE_FLAGS "${TARGET_COMPILE_FLAGS}\"-Wno-unused-result\",")
 set(TARGET_DEFINE_FLAGS "${TARGET_DEFINE_FLAGS}\"-Drtw_get_random_bytes=TRNG_get_random_bytes\",")
 
 set(TARGET_CFLAGS_C  "${TARGET_COMPILE_FLAGS}${TARGET_DEFINE_FLAGS}${TARGET_INCLUDE_FLAGS}")
 set(TARGET_CFLAGS_CC "${TARGET_COMPILE_FLAGS}${TARGET_DEFINE_FLAGS}${TARGET_INCLUDE_FLAGS}")
 
-execute_process(COMMAND ${CMAKE_COMMAND} -DCHIP_ENABLE_OTA_REQUESTOR=${CHIP_ENABLE_OTA_REQUESTOR} -DCHIP_ENABLE_CHIPOBLE=${CHIP_ENABLE_CHIPOBLE} -DCHIP_ENABLE_IPV4=${CHIP_ENABLE_IPV4} -DCHIP_ENABLE_TCP_ENDPOINT=${CHIP_ENABLE_TCP_ENDPOINT} -DCHIP_ENABLE_TC=${CHIP_ENABLE_TC} -DCHIP_ENABLE_SHELL=${CHIP_ENABLE_SHELL} -DOUTPUT_DIR=${OUTPUT_DIR} -DCHIP_DIR=${CHIP_DIR} -DTARGET_CFLAGS_C=${TARGET_CFLAGS_C} -DTARGET_CFLAGS_CC=${TARGET_CFLAGS_CC} -P ${GENERATE_ARGS_GN})
+execute_process(COMMAND ${CMAKE_COMMAND} -DCHIP_ENABLE_OTA_REQUESTOR=${CHIP_ENABLE_OTA_REQUESTOR} -DCHIP_ENABLE_CHIPOBLE=${CHIP_ENABLE_CHIPOBLE} -DCHIP_ENABLE_IPV4=${CHIP_ENABLE_IPV4} -DCHIP_ENABLE_TCP_ENDPOINT=${CHIP_ENABLE_TCP_ENDPOINT} -DCHIP_ENABLE_TC=${CHIP_ENABLE_TC} -DCHIP_ENABLE_ICD=${CHIP_ENABLE_ICD} -DCHIP_ENABLE_ICD_LIT=${CHIP_ENABLE_ICD_LIT} -DCHIP_ENABLE_SHELL=${CHIP_ENABLE_SHELL} -DOUTPUT_DIR=${OUTPUT_DIR} -DCHIP_DIR=${CHIP_DIR} -DTARGET_CFLAGS_C=${TARGET_CFLAGS_C} -DTARGET_CFLAGS_CC=${TARGET_CFLAGS_CC} -P ${GENERATE_ARGS_GN})
 
 # generate args.gn file again after ninja clean_matter_libs is run
 add_custom_command(
 	OUTPUT  ${ARGS_GN}
 	DEPENDS ${CLUSTER_FILE}
-	COMMAND ${CMAKE_COMMAND} -DCHIP_ENABLE_OTA_REQUESTOR=${CHIP_ENABLE_OTA_REQUESTOR} -DCHIP_ENABLE_CHIPOBLE=${CHIP_ENABLE_CHIPOBLE} -DCHIP_ENABLE_IPV4=${CHIP_ENABLE_IPV4} -DCHIP_ENABLE_TCP_ENDPOINT=${CHIP_ENABLE_TCP_ENDPOINT} -DCHIP_ENABLE_TC=${CHIP_ENABLE_TC} -DCHIP_ENABLE_SHELL=${CHIP_ENABLE_SHELL} -DOUTPUT_DIR=${OUTPUT_DIR} -DCHIP_DIR=${CHIP_DIR} -DTARGET_CFLAGS_C=\"${TARGET_CFLAGS_C}\" -DTARGET_CFLAGS_CC=\"${TARGET_CFLAGS_CC}\" -DREGEN_ARGS_GN=1 -P ${GENERATE_ARGS_GN}
+	COMMAND ${CMAKE_COMMAND} -DCHIP_ENABLE_OTA_REQUESTOR=${CHIP_ENABLE_OTA_REQUESTOR} -DCHIP_ENABLE_CHIPOBLE=${CHIP_ENABLE_CHIPOBLE} -DCHIP_ENABLE_IPV4=${CHIP_ENABLE_IPV4} -DCHIP_ENABLE_TCP_ENDPOINT=${CHIP_ENABLE_TCP_ENDPOINT} -DCHIP_ENABLE_TC=${CHIP_ENABLE_TC} -DCHIP_ENABLE_ICD=${CHIP_ENABLE_ICD} -DCHIP_ENABLE_ICD_LIT=${CHIP_ENABLE_ICD_LIT} -DCHIP_ENABLE_SHELL=${CHIP_ENABLE_SHELL} -DOUTPUT_DIR=${OUTPUT_DIR} -DCHIP_DIR=${CHIP_DIR} -DTARGET_CFLAGS_C=\"${TARGET_CFLAGS_C}\" -DTARGET_CFLAGS_CC=\"${TARGET_CFLAGS_CC}\" -DREGEN_ARGS_GN=1 -P ${GENERATE_ARGS_GN}
 )
 
 # Compiling Configurations
@@ -167,27 +169,54 @@ ameba_add_internal_library(chip_main
         ${private_compile_options}
 )
 
+# Generate only the buildconfig headers chip_main needs, without the full lib_chip_core.a archive.
+set(CHIP_GEN_HEADERS_STAMP ${OUTPUT_DIR}/gen/.chip_gen_headers.stamp)
 add_custom_command(
-	OUTPUT ${c_SDK_LIB_APPLICATION_DIR}/lib_chip_core.a
+	OUTPUT ${CHIP_GEN_HEADERS_STAMP}
 
 	DEPENDS ${ARGS_GN}
 
 	COMMAND ${CMAKE_COMMAND} -E make_directory ${CHIP_DIR}/config/ameba/components/chip
 	COMMAND ${CMAKE_COMMAND} -E chdir ${CHIP_DIR}/config/ameba/components/chip gn gen --check --fail-on-unused-args ${OUTPUT_DIR}
+	COMMAND ${CMAKE_COMMAND} -E chdir ${CHIP_DIR}/config/ameba/components/chip ninja -C ${OUTPUT_DIR}
+		gen_access_buildconfig gen_additional_data_payload_buildconfig gen_app_buildconfig
+		gen_asn1oid gen_ble_buildconfig gen_build_time_header gen_chip_buildconfig
+		gen_chip_version gen_crypto_buildconfig gen_icd-server-buildconfig gen_inet_buildconfig
+		gen_lwip_buildconfig gen_platform_buildconfig
+		gen_processing-buildconfig gen_system_buildconfig gen_tracing_buildconfig
+	COMMAND ${CMAKE_COMMAND} -E touch ${CHIP_GEN_HEADERS_STAMP}
+)
+add_custom_target(
+	lib_chip_core_headers
+	DEPENDS ${CHIP_GEN_HEADERS_STAMP}
+)
+
+add_custom_command(
+	OUTPUT ${c_SDK_LIB_APPLICATION_DIR}/lib_chip_core.a
+
+	# Depend on the header stamp so gn gen runs once, keeping the two inner ninja builds serialized on OUTPUT_DIR.
+	DEPENDS ${CHIP_GEN_HEADERS_STAMP}
+
 	COMMAND ${CMAKE_COMMAND} -E chdir ${CHIP_DIR}/config/ameba/components/chip ninja -C ${OUTPUT_DIR} :ameba
 	COMMAND ${CMAKE_COMMAND} -E copy ${OUTPUT_DIR}/lib/* ${c_SDK_LIB_APPLICATION_DIR}/
 	COMMAND ${CMAKE_COMMAND} -E rename ${c_SDK_LIB_APPLICATION_DIR}/libCHIP.a ${c_SDK_LIB_APPLICATION_DIR}/lib_chip_core.a
 )
 
-# set lib_chip_core as target for lib_chip_main
+# set lib_chip_core as target for the full archive
 add_custom_target(
 	lib_chip_core
 	DEPENDS ${c_SDK_LIB_APPLICATION_DIR}/lib_chip_core.a
 )
 
-# before compiling lib_chip_main.a, make sure lib_chip_core.a is compiled
+# chip_main only needs the generated headers, so it can build in parallel with the lib_chip_core.a archive.
 ameba_target_depend(
 	${c_CURRENT_TARGET_NAME}
+	lib_chip_core_headers
+)
+
+# The image still links lib_chip_core.a, so it must now trigger the archive build itself.
+ameba_target_depend(
+	${c_CURRENT_IMAGE}
 	lib_chip_core
 )
 

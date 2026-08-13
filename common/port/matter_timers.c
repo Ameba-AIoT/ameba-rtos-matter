@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_stdlib.h>
 
 #include <stddef.h>
@@ -43,11 +42,19 @@
 
 #define US_OVERFLOW_MAX            (0xFFFFFFFFUL * 1000000 / configTICK_RATE_HZ)
 
-#define SNTP_SERVER_ADDRESS "pool.ntp.org"
-
 static uint64_t current_us = 0;
 static uint32_t tick_count = 0;
+
+#if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
+#define DEFAULT_SNTP_SERVER_ADDRESS "pool.ntp.org"
+
+// Minimum plausible epoch time (2000-01-01 00:00:00 UTC)
+// matching CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD
+#define MATTER_SNTP_VALID_TIME_THRESHOLD ((time_t) 946684800)
+
 static bool matter_sntp_rtc_sync = FALSE;
+bool matter_sntp_initialized = FALSE;
+#endif
 
 void matter_rtc_init(void)
 {
@@ -94,6 +101,12 @@ bool matter_sntp_rtc_is_sync(void)
     return matter_sntp_rtc_sync;
 }
 
+__weak void matter_sntp_prepare_sleep(void)
+{
+    // If WHC DEV is enabled, this api is defined in common\port\whc\matter_whc_dev.c.
+    return;
+}
+
 void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 {
 #if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
@@ -116,6 +129,7 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
         matter_rtc_write(*current_sec);
         matter_sntp_rtc_sync = TRUE;
+        matter_sntp_prepare_sleep();
     } else { //if the sntp is not reachable yet, use the last known epoch time if available
         *current_sec = matter_rtc_read();
     }
@@ -123,12 +137,13 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
     uint32_t sec  = 0;
     uint32_t usec = 0;
     SNTP_GET_SYSTEM_TIME(sec, usec);
-    if ((sec != 0) && (usec != 0)) { //if sntp server is reachable, write to the dct and rtc
-        *current_sec  = sec;
-        *current_usec = usec;
+    if ((time_t)sec >= MATTER_SNTP_VALID_TIME_THRESHOLD) { //if sntp server is reachable, write to the dct and rtc
+        *current_sec  = (time_t)sec;
+        *current_usec = (time_t)usec;
 
         matter_rtc_write(*current_sec);
         matter_sntp_rtc_sync = TRUE;
+        matter_sntp_prepare_sleep();
     } else { //if the sntp is not reachable yet, use the last known epoch time if available
         *current_sec = matter_rtc_read();
     }
@@ -137,11 +152,20 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
 void matter_sntp_init(void)
 {
-    sntp_stop();
+    matter_sntp_init_with_server(DEFAULT_SNTP_SERVER_ADDRESS);
+}
+
+void matter_sntp_init_with_server(const char *server)
+{
+    if (!matter_sntp_initialized) {
+        sntp_stop();
+    }
 // ameba-rtos v1.0 and v1.1 set the SNTP server at component/network/sntp/sntp.c
 #if defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
-    sntp_setservername(0, SNTP_SERVER_ADDRESS);
+    sntp_setservername(0, server);
 #endif
+    matter_sntp_rtc_sync = FALSE;
     sntp_init();
+    matter_sntp_initialized = TRUE;
 }
 #endif

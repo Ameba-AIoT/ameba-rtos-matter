@@ -48,8 +48,8 @@ else()
     set(CHIP_ENABLE_OTA_REQUESTOR ON)
 endif()
 
-#Matter Shell is only enabled for all_clusters
-if(MATTER_EXAMPLE STREQUAL "all_clusters")
+#Matter Shell is only enabled for all_clusters and camera_port
+if((MATTER_EXAMPLE STREQUAL "all_clusters") OR (MATTER_EXAMPLE STREQUAL "camera_port"))
     message(STATUS "Enabling Shell for Matter")
     set(CHIP_ENABLE_SHELL ON)
 else()
@@ -63,6 +63,22 @@ if(CONFIG_MATTER_TC_EN)
 else()
     message(STATUS "Disabling T&C for Matter")
     set(CHIP_ENABLE_TC OFF)
+endif()
+
+if(CONFIG_MATTER_ICD_EN)
+    message(STATUS "Enabling ICD for Matter")
+    set(CHIP_ENABLE_ICD ON)
+else()
+    message(STATUS "Disabling ICD for Matter")
+    set(CHIP_ENABLE_ICD OFF)
+endif()
+
+if(CONFIG_MATTER_ICD_LIT_EN)
+    message(STATUS "Enabling ICD LIT for Matter")
+    set(CHIP_ENABLE_ICD_LIT ON)
+else()
+    message(STATUS "Disabling ICD LIT for Matter")
+    set(CHIP_ENABLE_ICD_LIT OFF)
 endif()
 
 string(FIND "${MATTER_EXAMPLE}" "_dm"   _DM_FOUND)
