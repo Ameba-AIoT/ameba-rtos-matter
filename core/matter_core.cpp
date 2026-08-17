@@ -261,7 +261,7 @@ void matter_core_init_server(intptr_t context)
     const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
                 app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
     PersistentStorageDelegate &persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
-    chip::app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, termsAndConditions);
+    chip::app::TermsAndConditionsManager::GetInstance().Init(&persistentStorageDelegate, termsAndConditions);
 #endif
 
     sWiFiNetworkCommissioningInstance.Init();
