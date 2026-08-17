@@ -104,7 +104,7 @@ private:
     static constexpr size_t kMaxServerNameSize           = 128;
     static constexpr uint16_t kPollIntervalMs            = 500;
     static constexpr uint8_t kMaxPollAttempts            = 20;           // ~10s total
-    static constexpr uint64_t kResyncIntervalMs          = 6ULL * 3600ULL * 1000ULL; // 6 hours
+    static constexpr uint64_t kResyncIntervalMs          = 3ULL * 60ULL * 1000ULL; // 30 minutes
     static constexpr uint64_t kQuickTestResyncIntervalMs = 10ULL * 60ULL * 1000ULL; // 10 minutes, for quick test
 
     bool mSimulatePlatformSourceUnavailable = false;

@@ -779,7 +779,8 @@ int matter_wifi_set_powersave_mode(uint8_t ips_enable, uint8_t lps_enable) {
 }
 
 int matter_wifi_set_lps_listen_interval(uint8_t interval) {
-    return wifi_set_lps_listen_interval(interval);
+    // return wifi_set_lps_listen_interval(interval);
+    return RTW_SUCCESS;
 }
 
 /* Support for WiFi Network Diagnostics. */
