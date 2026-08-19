@@ -13,6 +13,7 @@ ARG TOOLCHAIN_ASDK_FILE_PATH='/opt/rtk-toolchain/prebuilts-linux-1.0.3.tar.gz'
 ARG AMEBA_MATTER_REPO=https://github.com/jack155069/ameba-rtos-matter.git
 ARG AMEBA_MATTER_TAG_NAME=ameba-rtos/v1.6/update_sdk_260819
 
+
 # Define fixed build arguments
 ARG AMBRTOS_REPO=https://github.com/Ameba-AIoT/ameba-rtos.git
 ARG AMBRTOS_TAG_NAME=release/v1.2

@@ -42,15 +42,19 @@
 
 #define US_OVERFLOW_MAX            (0xFFFFFFFFUL * 1000000 / configTICK_RATE_HZ)
 
+static uint64_t current_us = 0;
+static uint32_t tick_count = 0;
+
+#if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
 #define DEFAULT_SNTP_SERVER_ADDRESS "pool.ntp.org"
 
 // Minimum plausible epoch time (2000-01-01 00:00:00 UTC)
 // matching CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD
 #define MATTER_SNTP_VALID_TIME_THRESHOLD ((time_t) 946684800)
 
-static uint64_t current_us = 0;
-static uint32_t tick_count = 0;
 static bool matter_sntp_rtc_sync = FALSE;
+bool matter_sntp_initialized = FALSE;
+#endif
 
 void matter_rtc_init(void)
 {
@@ -97,6 +101,12 @@ bool matter_sntp_rtc_is_sync(void)
     return matter_sntp_rtc_sync;
 }
 
+__weak void matter_sntp_prepare_sleep(void)
+{
+    // If WHC DEV is enabled, this api is defined in common\port\whc\matter_whc_dev.c.
+    return;
+}
+
 void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 {
 #if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
@@ -119,6 +129,7 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
         matter_rtc_write(*current_sec);
         matter_sntp_rtc_sync = TRUE;
+        matter_sntp_prepare_sleep();
     } else { //if the sntp is not reachable yet, use the last known epoch time if available
         *current_sec = matter_rtc_read();
     }
@@ -132,6 +143,7 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
         matter_rtc_write(*current_sec);
         matter_sntp_rtc_sync = TRUE;
+        matter_sntp_prepare_sleep();
     } else { //if the sntp is not reachable yet, use the last known epoch time if available
         *current_sec = matter_rtc_read();
     }
@@ -145,12 +157,15 @@ void matter_sntp_init(void)
 
 void matter_sntp_init_with_server(const char *server)
 {
-    sntp_stop();
+    if (!matter_sntp_initialized) {
+        sntp_stop();
+    }
 // ameba-rtos v1.0 and v1.1 set the SNTP server at component/network/sntp/sntp.c
 #if defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
     sntp_setservername(0, server);
 #endif
     matter_sntp_rtc_sync = FALSE;
     sntp_init();
+    matter_sntp_initialized = TRUE;
 }
 #endif
