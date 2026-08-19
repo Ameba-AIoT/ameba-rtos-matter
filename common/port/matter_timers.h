@@ -60,6 +60,11 @@ void matter_timer_init(void);
 bool matter_sntp_rtc_is_sync(void);
 
 /*
+ * @brief  Return 0 if sntp has been sync; otherwise -1.
+ */
+int matter_sntp_sync(void);
+
+/*
  * @brief  Get SNTP Current Time and write it to the DCT and RTC if SNTP server is reachable.
  *         If not reachable, retain the last known epoch time written in DCT if available
  * @param  current_sec : Pointer to be set as current epoch in seconds.
