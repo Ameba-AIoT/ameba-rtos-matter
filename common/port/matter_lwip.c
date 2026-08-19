@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_stdlib.h>
 #include <platform_autoconf.h>
 
@@ -190,7 +189,8 @@ static void matter_LwIP_IP_Address_Request_thread(void *pvParameters)
 // Create another thread so it does not block the task that triggered this event
 void matter_LwIP_IP_Address_Request(void)
 {
-    if (xTaskCreate(matter_LwIP_IP_Address_Request_thread, ((const char *)"matter_LwIP_IP_Address_Request_thread"), 512, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
-        printf("\n\r%s xTaskCreate(matter_LwIP_IP_Address_Request_thread) failed", __FUNCTION__);
+    if (xTaskCreate(matter_LwIP_IP_Address_Request_thread, ((const char *)"matter_LwIP_IP_Address_Request_thread"), 512, NULL, tskIDLE_PRIORITY + 1,
+                    NULL) != pdPASS) {
+        RTK_LOGE(NOTAG, "\n\r%s xTaskCreate(matter_LwIP_IP_Address_Request_thread) failed", __FUNCTION__);
     }
 }

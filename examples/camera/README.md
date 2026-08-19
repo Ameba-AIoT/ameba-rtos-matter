@@ -54,17 +54,23 @@ As of now, there is no WebRTC library provided in ameba-rtos or ameba-rtos-matte
 ### Configurations
 1. `CONFIG_EXAMPLE_MATTER` and `CONFIG_EXAMPLE_MATTER_CAMERA` are automatically enabled in the Makefiles / CMake.
 
-2. In menuconfig, navigate to `Matter Config` enable Matter TCP Endpoint:
+2. In menuconfig, navigate to `Matter Config` enable additional Matter settings:
 
         [*]     Enable Matter TCP Endpoint
+        [*]     Enable Matter ICD
+        [*]     Enable Matter Time Sync
 
-    This is to support the WebRTC clusters.
+    Or, easily run the command `matter_apply_conf camera`
 
 3. In menuconfig, navigate to `CONFIG USB` and set the USB configuration as the following:
 
         [*] Enable USB
             USB Mode (Host)
         [*] UVC
+
+4. Additionally for Ameba Green2, on the latest ameba-rtos release/v1.2, navigate to `Clock Configuration` and please update the `SoC Clock Config`:
+
+        (X) [5] 1.0V, RMII/USB, CPU 320MHz
 
 ### Setup the Build Environment
   

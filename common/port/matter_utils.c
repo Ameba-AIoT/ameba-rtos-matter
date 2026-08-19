@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_stdlib.h>
 #include <platform_autoconf.h>
 // These addresses are located right after VFS1
@@ -42,6 +41,8 @@
 #if defined(CONFIG_AMEBASMART) && defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
 #include <matter_rtk_svc_setup.h>
 #endif
+
+static const char *const TAG = "MATTER_UTILS";
 
 #if CONFIG_ENABLE_FACTORY_DATA_ENCRYPTION
 #include <mbedtls/aes.h>
@@ -418,16 +419,15 @@ int32_t ReadFromOtp(uint32_t addr, uint8_t *data, uint8_t length)
 {
     uint32_t bytes_read = 0;
 
-    for(uint32_t index = 0; index < length; index++)
-    {
+    for (uint32_t index = 0; index < length; index++) {
 #if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
-        if(OTP_Read8(addr + index, data + index) == _FAIL)
+        if (OTP_Read8(addr + index, data + index) == _FAIL)
 #elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
       (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
-        if(OTP_Read8(addr + index, data + index) == RTK_FAIL)
+        if (OTP_Read8(addr + index, data + index) == RTK_FAIL)
 #endif
         {
-            printf("[%s] OTP_Read8(0x%03x) failed!\n", __func__, addr + index);
+            RTK_LOGE(TAG, "[%s] OTP_Read8(0x%03x) failed!\n", __func__, addr + index);
             return -1;
         }
         bytes_read += 1;
@@ -441,37 +441,33 @@ int32_t WriteToOtp(uint32_t addr, uint8_t *data, uint8_t length)
     uint8_t  buffer        = 0;
     uint32_t bytes_written = 0;
 
-    for(uint32_t index = 0; index < length; index++)
-    {
+    for (uint32_t index = 0; index < length; index++) {
         // check OTP value of the address
 #if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
-        if(OTP_Read8(addr + index, &buffer) == _SUCCESS)
+        if (OTP_Read8(addr + index, &buffer) == _SUCCESS)
 #elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
       (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
-        if(OTP_Read8(addr + index, &buffer) == RTK_SUCCESS)
+        if (OTP_Read8(addr + index, &buffer) == RTK_SUCCESS)
 #endif
         {
             // Two conditions to write on OTP:
             // 1. OTP has not been written (buffer == 0xff)
             // 2. The data that is going to be written is not 0xff (*(data + index) != 0xff)
-            if((buffer == 0xff) && (*(data + index) != 0xff))
-            {
+            if ((buffer == 0xff) && (*(data + index) != 0xff)) {
 #if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
-                if(OTP_Write8(addr + index, *(data + index)) == _FAIL)
+                if (OTP_Write8(addr + index, *(data + index)) == _FAIL)
 #elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
       (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
-                if(OTP_Write8(addr + index, *(data + index)) == RTK_FAIL)
+                if (OTP_Write8(addr + index, *(data + index)) == RTK_FAIL)
 #endif
                 {
-                    printf("[%s] OTP_Write8(0x%03x) failed!\n", __func__, addr + index);
+                    RTK_LOGE(TAG, "[%s] OTP_Write8(0x%03x) failed!\n", __func__, addr + index);
                     return -1;
                 }
                 bytes_written += 1;
             }
-        }
-        else
-        {
-            printf("[%s] OTP_Read8(0x%03x) failed!\n", __func__, addr + index);
+        } else {
+            RTK_LOGE(TAG, "[%s] OTP_Read8(0x%03x) failed!\n", __func__, addr + index);
             return -1;
         }
     }
@@ -545,13 +541,13 @@ extern void __arm_smccc_smc(unsigned long a0, unsigned long a1,
 
 #define arm_smccc_smc(...) __arm_smccc_smc(__VA_ARGS__, NULL)
 static unsigned long invoke_matter_secure_smc(
-        unsigned long arg0, unsigned long arg1,
-        unsigned long arg2, unsigned long arg3)
+                unsigned long arg0, unsigned long arg1,
+                unsigned long arg2, unsigned long arg3)
 {
     struct arm_smccc_res res;
-    printf("invoke_matter_secure_smc: matter_secure_function_id(0x%x)\n", arg0);
+    RTK_LOGI(TAG, "invoke_matter_secure_smc: matter_secure_function_id(0x%x)\n", arg0);
     arm_smccc_smc(RTK_SMC_MATTER_SECURE, arg0, arg1, arg2, arg3, 0, 0, 0, &res);
-    printf("invoke_matter_secure_smc: res.a0(0x%x) \n", res.a0);
+    RTK_LOGI(TAG, "invoke_matter_secure_smc: res.a0(0x%x) \n", res.a0);
     return res.a0;
 }
 
@@ -598,7 +594,7 @@ int matter_get_signature(uint8_t *pub_buf, size_t pub_size, const unsigned char 
 
     result = matter_secure_dac_init_keypair(pub_buf, pub_size);
     if (result != 0) {
-        printf("Error: %s DAC init failed, result=%d\n", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s DAC init failed, result=%d\n", __FUNCTION__, result);
         goto exit;
     }
 
@@ -608,7 +604,7 @@ int matter_get_signature(uint8_t *pub_buf, size_t pub_size, const unsigned char 
     result = matter_secure_dackey_ecdsa_sign_msg(msg, msg_size, signature);
 #endif
     if (result != 0) {
-        printf("Error: %s ecdsa sign failed, result=%d\n", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s ecdsa sign failed, result=%d\n", __FUNCTION__, result);
         goto exit;
     }
 
@@ -626,7 +622,7 @@ int matter_ecdsa_sign_msg(const unsigned char *msg, size_t msg_size, unsigned ch
     result = matter_secure_opkey_ecdsa_sign_msg(msg, msg_size, signature);
 #endif
     if (result != 0) {
-        printf("ERROR: %s get signature failed, result=%d\n", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s get signature failed, result=%d\n", __FUNCTION__, result);
     }
 
     return result;
@@ -638,7 +634,7 @@ int matter_get_publickey(uint8_t *pubkey, size_t pubkey_size)
 
     result = matter_secure_get_opkey_pub(pubkey, pubkey_size);
     if (result != 0) {
-        printf("ERROR: %s get public key failed, result=%d\n", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s get public key failed, result=%d\n", __FUNCTION__, result);
     }
 
     return result;
@@ -650,7 +646,7 @@ size_t matter_gen_new_csr(uint8_t *out_csr, size_t csr_length)
 
     result = matter_secure_new_csr(out_csr, csr_length);
     if (result <= 0) {
-        printf("ERROR: %s create csr failed, return=%d\n", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s create csr failed, return=%d\n", __FUNCTION__, result);
     }
 
     return result;
@@ -662,7 +658,7 @@ int matter_serialize(uint8_t *output_buf, size_t output_size)
 
     result = matter_secure_serialize(output_buf, output_size);
     if (result != 0) {
-        printf("ERROR: %s serialize failed, result=%d\n", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s serialize failed, result=%d\n", __FUNCTION__, result);
     }
 
     return result;
@@ -680,7 +676,7 @@ int matter_deserialize(uint8_t *buf, size_t size)
 
     result = matter_secure_get_opkey(buf, size);
     if (result != 0) {
-        printf("ERROR: %s decrypt failed, result=%d\n", __FUNCTION__, result);
+        RTK_LOGE(TAG, "%s decrypt failed, result=%d\n", __FUNCTION__, result);
         return result;
     }
 

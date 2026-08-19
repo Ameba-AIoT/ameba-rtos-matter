@@ -245,6 +245,15 @@ ameba_list_append(private_sources
 endif()
 endif()
 
+# time sync
+if(CONFIG_MATTER_TIME_SYNC_EN)
+if(PORT_DM_EXAMPLE OR PORT_EXAMPLE)
+ameba_list_append(private_sources
+    ${MATTER_DRIVER_DIR}/matter_drivers/time_synchronization/ameba_time_sync_delegate.cpp
+)
+endif()
+endif()
+
 # matter - core
 # porting layer source files
 if(PORT_DM_EXAMPLE OR PORT_EXAMPLE)

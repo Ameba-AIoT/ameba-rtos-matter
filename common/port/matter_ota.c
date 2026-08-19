@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_stdlib.h>
 #include <stdbool.h>
 #include <flash_api.h>
@@ -37,6 +36,8 @@
 #include <ota_api.h>
 #endif
 
+static const char *const TAG = "MATTER_OTA";
+
 #define MATTER_OTA_SECTOR_SIZE 4096
 
 #define MATTER_OTA_HEADER_SIZE 32
@@ -53,20 +54,22 @@ ota_download_ctrl_t matterOtaCtrl = {0};
 ota_hdr_manager_t matterOtaTargetHdr = {0};
 #endif
 
-bool matter_ota_first_sector_written = false;
-uint32_t matter_ota_flash_sector_base;
-uint32_t matter_ota_new_firmware_addr_start;
-uint32_t matter_ota_new_firmware_addr_end;
+static bool matter_ota_first_sector_written = false;
+static uint32_t matter_ota_flash_sector_base;
+static uint32_t matter_ota_new_firmware_addr_start;
+static uint32_t matter_ota_new_firmware_addr_end;
 
-uint8_t matter_ota_header[MATTER_OTA_HEADER_SIZE];
-uint8_t matter_ota_header_size = 0; // variable to track size of ota header
-uint8_t matter_ota_buffer[MATTER_OTA_SECTOR_SIZE]; // 4KB buffer to be written to one sector
-uint16_t matter_ota_buffer_size = 0; // variable to track size of buffer
+static uint8_t matter_ota_header[MATTER_OTA_HEADER_SIZE];
+static uint8_t matter_ota_header_size = 0; // variable to track size of ota header
+static uint16_t matter_ota_buffer_size = 0; // variable to track size of buffer
+static uint8_t matter_ota_buffer[MATTER_OTA_SECTOR_SIZE]; // 4KB buffer to be written to one sector
 
 static const char *kOTACompleted = "ota_completed";
 
 // SPI NAND Flash APIs for AmebaSmart
 #if defined(CONFIG_AMEBASMART)
+
+static const char *const TAG_NAND = "MATTER_OTA_NAND";
 
 #define MATTER_OTA_NAND_FLASH_DEBUG 0
 extern uint32_t IMG_ADDR[OTA_IMGID_MAX][2];
@@ -252,7 +255,7 @@ void matter_ota_prepare_partition(void)
         matter_ota_nand_create_bbt();
         matter_ota_nand_flash_erase_new_ota_region();
         if (matter_ota_nand_block_status(matter_ota_nand_region_block_id_start) == MATTER_OTA_NAND_BBT_BAD) {
-            DiagPrintf("[NAND][OTA] CRITICAL ERROR: FIRST BLOCK IS BAD BLOCK, OTA MAY NOT PROCEED!!!!!\n");
+            RTK_LOGE(TAG_NAND, "CRITICAL ERROR: FIRST BLOCK IS BAD BLOCK, OTA MAY NOT PROCEED!!!!!\n");
         }
     }
 #endif
@@ -298,7 +301,7 @@ int8_t matter_ota_flash_burst_write(uint8_t *data, uint32_t size)
     }
 
     if (matter_ota_buffer_size == writeLength) {
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
         // buffer is full, time to erase sector and write buffer data to flash
         flash_erase_sector(&matter_ota_flash, matter_ota_flash_sector_base);
         flash_burst_write(&matter_ota_flash, sectorBase, writeLength, matter_ota_buffer);
@@ -313,7 +316,7 @@ int8_t matter_ota_flash_burst_write(uint8_t *data, uint32_t size)
                 memcpy(matter_ota_nand_first_sector + matter_ota_header_size, matter_ota_buffer, writeLength);
                 // Immediately abort OTA if first sector is bad block
                 if (matter_ota_nand_block_status(matter_ota_nand_region_block_id_start) == MATTER_OTA_NAND_BBT_BAD) {
-                    DiagPrintf("[NAND][OTA] CRITICAL ERROR: FIRST BLOCK IS BAD BLOCK, OTA MAY NOT PROCEED!!!!!\n");
+                    RTK_LOGE(TAG_NAND, "CRITICAL ERROR: FIRST BLOCK IS BAD BLOCK, OTA MAY NOT PROCEED!!!!!\n");
                     return OTA_ERROR;
                 }
             } else {
@@ -336,7 +339,7 @@ int8_t matter_ota_flash_burst_write(uint8_t *data, uint32_t size)
             if ((current_page & NAND_BLOCK_PAGE_MASK) == 0) {
                 // It will not skip block(s) if it is a good block
                 if (matter_ota_nand_skip_bad_block(&matter_ota_flash_sector_base) != OTA_SUCCESS) {
-                    DiagPrintf("[NAND][OTA] No good block left in OTA region!\n");
+                    RTK_LOGE(TAG_NAND, "No good block left in OTA region!\n");
                     return OTA_ERROR;
                 }
             }
@@ -358,7 +361,7 @@ int8_t matter_ota_flash_burst_write(uint8_t *data, uint32_t size)
 int8_t matter_ota_flush_last(void)
 {
     if (matter_ota_buffer_size > 0) {
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
         flash_erase_sector(&matter_ota_flash, matter_ota_flash_sector_base);
         flash_burst_write(&matter_ota_flash, matter_ota_flash_sector_base, matter_ota_buffer_size, matter_ota_buffer);
 #elif defined(CONFIG_AMEBASMART)
@@ -386,7 +389,7 @@ int8_t matter_ota_update_signature(void)
 #if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
     (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
     memcpy(&(matterCtx.otaTargetHdr->Manifest[matterCtx.otactrl->index]), matter_ota_header, sizeof(Manifest_TypeDef));
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
     if (!ota_update_manifest(matterCtx.otaTargetHdr, matterCtx.otactrl->targetIdx, matterCtx.otactrl->index)) {
         return OTA_ERROR;
     }
@@ -403,7 +406,7 @@ int8_t matter_ota_update_signature(void)
 #endif // CONFIG_AMEBAXXX
 #elif (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
     memcpy(&(matterCtx.otaHdrManager->Manifest[matterCtx.otaCtrl->index]), matter_ota_header, sizeof(Manifest_TypeDef));
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
     if (ota_storage_update_manifest(matterCtx.otaHdrManager, matterCtx.otaCtrl->slotIdx, matterCtx.otaCtrl->index) != OTA_OK) {
         return OTA_ERROR;
     }
@@ -435,9 +438,8 @@ void matter_ota_platform_reset(void)
 
     deleteKey(kOTACompleted, kOTACompleted);
 
-    if (setPref_new(kOTACompleted, kOTACompleted, &value, sizeof(value)) != DCT_SUCCESS)
-    {
-        printf("[%s] set persist storage failed\n", __FUNCTION__);
+    if (setPref_new(kOTACompleted, kOTACompleted, &value, sizeof(value)) != DCT_SUCCESS) {
+        RTK_LOGI(TAG, "[%s] set persist storage failed\n", __FUNCTION__);
         return;
     }
 
@@ -448,13 +450,13 @@ void matter_ota_platform_reset(void)
 static void matter_ota_abort_task(void *pvParameters)
 {
     uint32_t newFWBlkSize = (MATTER_OTA_FIRMWARE_LENGTH - 1) / MATTER_OTA_SECTOR_SIZE + 1;
-    DiagPrintf("Cleaning up aborted OTA\r\n");
-    DiagPrintf("Erasing %d sectors\r\n", newFWBlkSize);
+    RTK_LOGI(TAG, "Cleaning up aborted OTA\r\n");
+    RTK_LOGI(TAG, "Erasing %d sectors\r\n", newFWBlkSize);
 
     if (matter_ota_new_firmware_addr_start != 0) {
         for (size_t i = 0; i < newFWBlkSize; i++) {
             rtos_time_delay_ms(2); // to avoid undefined behaviour when it suddenly resets the ameba during flash erase
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
             flash_erase_sector(&matter_ota_flash, matter_ota_new_firmware_addr_start + (i * MATTER_OTA_SECTOR_SIZE));
 #elif defined(CONFIG_AMEBASMART)
             if (boot_from_nor) { // NOR
@@ -468,13 +470,14 @@ static void matter_ota_abort_task(void *pvParameters)
         }
     }
     matter_ota_first_sector_written = false;
+
     vTaskDelete(NULL);
 }
 
 void matter_ota_create_abort_task(void)
 {
     if (xTaskCreate(matter_ota_abort_task, "matter_ota_abort", 2048, NULL, tskIDLE_PRIORITY + 1, NULL) != pdPASS) {
-        printf("[%s] Failed to create matter_ota_abort_task\n", __FUNCTION__);
+        RTK_LOGE(TAG, "[%s] Failed to create matter_ota_abort_task\n", __FUNCTION__);
     }
 }
 
@@ -491,19 +494,19 @@ void matter_ota_nand_create_bbt(void)
     matter_ota_nand_region_block_length   = matter_ota_nand_region_block_id_end - matter_ota_nand_region_block_id_start + 1;
 
     // Dynamically assign the BBT depends on the OTA region size
-    matter_ota_nand_bbt = (uint8_t*) rtos_mem_malloc(matter_ota_nand_region_block_length);
+    matter_ota_nand_bbt = (uint8_t *) rtos_mem_malloc(matter_ota_nand_region_block_length);
     if (matter_ota_nand_bbt == NULL) {
-        DiagPrintf("[NAND][OTA] matter_ota_nand_bbt is null\n");
+        RTK_LOGE(TAG_NAND, "matter_ota_nand_bbt is null\n");
         return;
     }
     memset(matter_ota_nand_bbt, MATTER_OTA_NAND_BBT_UNCHECKED, matter_ota_nand_region_block_length);
 
     // Init the BBT
-    DiagPrintf("[NAND][OTA] Scanning the NAND blocks...\n");
-    for(int bbt_index = 0; bbt_index < matter_ota_nand_region_block_length; bbt_index++) {
+    RTK_LOGI(TAG_NAND, "Scanning the NAND blocks...\n");
+    for (int bbt_index = 0; bbt_index < matter_ota_nand_region_block_length; bbt_index++) {
         matter_ota_nand_bbt[bbt_index] = matter_ota_nand_block_status(matter_ota_nand_region_block_id_start + bbt_index);
     }
-    DiagPrintf("[NAND][OTA] Scanning finished!\n");
+    RTK_LOGI(TAG_NAND, "Scanning finished!\n");
 }
 
 void matter_ota_nand_free_bbt(void)
@@ -518,7 +521,7 @@ uint8_t matter_ota_nand_block_status(uint32_t block_id)
 {
     uint32_t bbt_index = block_id - matter_ota_nand_region_block_id_start;
     if (bbt_index >= matter_ota_nand_region_block_length) {
-        DiagPrintf("[NAND][OTA] block_id 0x%x out of OTA region\n", block_id);
+        RTK_LOGI(TAG_NAND, "block_id 0x%x out of OTA region\n", block_id);
         return MATTER_OTA_NAND_BBT_UNCHECKED;
     }
 
@@ -532,7 +535,7 @@ uint8_t matter_ota_nand_block_status(uint32_t block_id)
     uint8_t oob[4];
     NAND_Page_Read(NAND_BLOCK_ID_TO_PAGE_ADDR(block_id), NAND_PAGE_SIZE_MAIN, 4, oob);
     if (oob[0] != 0xFF || oob[1] != 0xFF) {
-        DiagPrintf("[NAND][OTA] Block 0x%x is bad (OOB=0x%02x 0x%02x)\n", block_id, oob[0], oob[1]);
+        RTK_LOGI(TAG_NAND, "Block 0x%x is bad (OOB=0x%02x 0x%02x)\n", block_id, oob[0], oob[1]);
         return MATTER_OTA_NAND_BBT_BAD;
     }
 
@@ -564,9 +567,9 @@ void matter_ota_nand_mark_bad_block(uint32_t block_id)
     uint8_t oob[2] = {0};
 
     // Physically mark it as bad block
-    DiagPrintf("[NAND][OTA] Block 0x%x Mark BB!\n", block_id);
+    RTK_LOGI(TAG_NAND, "Block 0x%x Mark BB!\n", block_id);
     if (NAND_Page_Write(NAND_BLOCK_ID_TO_PAGE_ADDR(block_id), NAND_PAGE_SIZE_MAIN, 2, oob)) {
-        DiagPrintf("[NAND][OTA] Block 0x%x Mark BB Fail!\n", block_id);
+        RTK_LOGE(TAG_NAND, "Block 0x%x Mark BB Fail!\n", block_id);
     }
 
     // Update the BBT
@@ -599,7 +602,7 @@ int8_t matter_ota_nand_flash_program(uint32_t StartAddr, uint32_t DataLen, uint8
 
         if (NAND_Page_Write(PageAddr, ByteAddr, ByteLen, pNewData)) {
             // Bad block detected, mark the current block as bad, abort OTA!
-            DiagPrintf("[NAND][OTA] Block 0x%x Page 0x%x Program Fail!\n", BlockId, PageAddr & NAND_BLOCK_PAGE_MASK);
+            RTK_LOGE(TAG_NAND, "Block 0x%x Page 0x%x Program Fail!\n", BlockId, PageAddr & NAND_BLOCK_PAGE_MASK);
             matter_ota_nand_mark_bad_block(BlockId);
             return OTA_ERROR;
         }
@@ -607,12 +610,12 @@ int8_t matter_ota_nand_flash_program(uint32_t StartAddr, uint32_t DataLen, uint8
 #if MATTER_OTA_NAND_FLASH_DEBUG
         if (NAND_Page_Read(PageAddr, ByteAddr, ByteLen, check_page)) {
             // Bad block detected, mark the current block as bad, abort OTA!
-            DiagPrintf("[NAND][OTA] Block 0x%x Page 0x%x Read Fail!\n", BlockId, PageAddr & NAND_BLOCK_PAGE_MASK);
+            RTK_LOGE(TAG_NAND, "Block 0x%x Page 0x%x Read Fail!\n", BlockId, PageAddr & NAND_BLOCK_PAGE_MASK);
             matter_ota_nand_mark_bad_block(BlockId);
             return OTA_ERROR;
         } else {
             for (int i = 0; i < ByteLen; i++) {
-                if (check_page[i] != *(pNewData+i)) {
+                if (check_page[i] != *(pNewData + i)) {
                     check_page_mismatch += 1;
                 }
             }
@@ -627,7 +630,7 @@ int8_t matter_ota_nand_flash_program(uint32_t StartAddr, uint32_t DataLen, uint8
 
 #if MATTER_OTA_NAND_FLASH_DEBUG
     if (check_page_mismatch > 0) {
-        DiagPrintf("Total mismatch is %d\n", check_page_mismatch);
+        RTK_LOGD(TAG_NAND, "Total mismatch is %d\n", check_page_mismatch);
     }
 #endif // MATTER_OTA_NAND_FLASH_DEBUG
 
@@ -636,16 +639,16 @@ int8_t matter_ota_nand_flash_program(uint32_t StartAddr, uint32_t DataLen, uint8
 
 void matter_ota_nand_flash_erase_new_ota_region()
 {
-    for(int block_id = matter_ota_nand_region_block_id_start; block_id <= matter_ota_nand_region_block_id_end; block_id++) {
+    for (int block_id = matter_ota_nand_region_block_id_start; block_id <= matter_ota_nand_region_block_id_end; block_id++) {
         if (matter_ota_nand_block_status(block_id) == MATTER_OTA_NAND_BBT_BAD) {
             // never erase a bad block (preserve marker)
             continue;
         } else if (NAND_Erase(NAND_BLOCK_ID_TO_PAGE_ADDR(block_id))) {
             // Bad block detected, mark the current block as bad, continue erasing the other blocks
-            DiagPrintf("[NAND][OTA] Block 0x%x Erase Fail!\n", block_id);
+            RTK_LOGE(TAG_NAND, "Block 0x%x Erase Fail!\n", block_id);
             matter_ota_nand_mark_bad_block(block_id);
         } else {
-            DiagPrintf("[NAND][OTA] Block 0x%x Erased Successfully!\n", block_id);
+            RTK_LOGI(TAG_NAND, "Block 0x%x Erased Successfully!\n", block_id);
         }
     }
 }
@@ -680,12 +683,12 @@ uint32_t matter_ota_nand_flash_update_manifest(ota_hdr_manager_t *pOtaTgtHdr, ui
     matter_ota_nand_flash_check_manifest_pattern("manifest->Pattern", manifest->Pattern);
 #endif // MATTER_OTA_NAND_FLASH_DEBUG
 
-    DiagPrintf("[NAND][OTA] update addr: 0x%08x\n", (unsigned int)addr);
+    RTK_LOGI(TAG_NAND, "update addr: 0x%08x\n", (unsigned int)addr);
 #if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
     (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
-    DiagPrintf("[NAND][OTA] update version major: %d, minor: %d\n", manifest->MajorImgVer, manifest->MinorImgVer);
+    RTK_LOGI(TAG_NAND, "update version major: %d, minor: %d\n", manifest->MajorImgVer, manifest->MinorImgVer);
 #elif (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
-    DiagPrintf("[NAND][OTA] update version major: %d, minor: %d\n", manifest->MajorKeyVer, manifest->MinorKeyVer);
+    RTK_LOGI(TAG_NAND, "update version major: %d, minor: %d\n", manifest->MajorKeyVer, manifest->MinorKeyVer);
 #endif
 
     PageAddr = NAND_ADDR_TO_PAGE_ADDR(addr - SPI_FLASH_BASE);
@@ -711,7 +714,7 @@ uint32_t matter_ota_nand_flash_update_manifest(ota_hdr_manager_t *pOtaTgtHdr, ui
     }
 
     /*clear the old FW pattern to 0 finally*/
-    DiagPrintf("[NAND][OTA] ImgID: %lu, clear the old FW pattern, addr: 0x%08x\n", pOtaTgtHdr->FileImgHdr[index].ImgID, (unsigned int)addr);
+    RTK_LOGI(TAG_NAND, "ImgID: %lu, clear the old FW pattern, addr: 0x%08x\n", pOtaTgtHdr->FileImgHdr[index].ImgID, (unsigned int)addr);
     memcpy(matter_ota_nand_first_sector, empty_sig, 8);
 #endif
 
@@ -720,23 +723,23 @@ uint32_t matter_ota_nand_flash_update_manifest(ota_hdr_manager_t *pOtaTgtHdr, ui
 #endif // MATTER_OTA_NAND_FLASH_DEBUG
     // Immediately abort if first sector is bad block
     if (matter_ota_nand_block_status(matter_ota_nand_region_block_id_start) == MATTER_OTA_NAND_BBT_BAD) {
-        DiagPrintf("[NAND][OTA] CRITICAL ERROR: FIRST BLOCK IS BAD BLOCK, MANIFEST MAY NOT BE UPDATED!!!!!\n");
+        RTK_LOGE(TAG_NAND, "CRITICAL ERROR: FIRST BLOCK IS BAD BLOCK, MANIFEST MAY NOT BE UPDATED!!!!!\n");
         matter_ota_nand_free_bbt();
         return 0;
     }
     if (matter_ota_nand_flash_program(addr - SPI_FLASH_BASE, ByteLen, matter_ota_nand_first_sector) != OTA_SUCCESS) {
         // Bad block detected, block is marked bad inside the API, return 0
-        DiagPrintf("[NAND][OTA] Block 0x%x Page 0x%x Program Fail!\n", BlockId, PageAddr & NAND_BLOCK_PAGE_MASK);
+        RTK_LOGE(TAG_NAND, "Block 0x%x Page 0x%x Program Fail!\n", BlockId, PageAddr & NAND_BLOCK_PAGE_MASK);
         matter_ota_nand_free_bbt();
         return 0;
     } else {
-        DiagPrintf("[NAND][OTA] Update OTA success!\n");
+        RTK_LOGI(TAG_NAND, "Update OTA success!\n");
     }
 
 #if MATTER_OTA_NAND_FLASH_DEBUG
     if (NAND_Page_Read(PageAddr, ByteAddr, NAND_PAGE_SIZE, matter_ota_nand_first_sector)) {
         // Bad block detected, mark the starting block as bad.
-        DiagPrintf("[NAND][OTA] Block 0x%x Page 0x%x Read Fail!\n", BlockId, PageAddr & NAND_BLOCK_PAGE_MASK);
+        RTK_LOGE(TAG_NAND, "Block 0x%x Page 0x%x Read Fail!\n", BlockId, PageAddr & NAND_BLOCK_PAGE_MASK);
         matter_ota_nand_mark_bad_block(BlockId);
         matter_ota_nand_free_bbt();
         return 0;
@@ -751,11 +754,11 @@ uint32_t matter_ota_nand_flash_update_manifest(ota_hdr_manager_t *pOtaTgtHdr, ui
 #if MATTER_OTA_NAND_FLASH_DEBUG
 void matter_ota_nand_flash_check_manifest_pattern(char *var_name, uint8_t *buf)
 {
-    printf("\n[NAND][OTA] %s, manifest contains: ", var_name);
+    RTK_LOGD(TAG_NAND, "\n %s, manifest contains: ", var_name);
     for (int i = 0; i < 8; i++) {
-        printf("0x%02x ", *(buf+i));
+        RTK_LOGD(NOTAG, "0x%02x ", *(buf + i));
     }
-    printf("\n");
+    RTK_LOGD(NOTAG, "\n");
 }
 #endif // MATTER_OTA_NAND_FLASH_DEBUG
 
