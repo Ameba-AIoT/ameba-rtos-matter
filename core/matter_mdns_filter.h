@@ -145,7 +145,7 @@ public:
 
         // Drop all IPv4 Mdns packets
         if (pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == chip::Dnssd::kMdnsPort) {
-            ChipLogProgress(DeviceLayer, "IPv4 MDNS packet dropped...");
+            ChipLogDetail(DeviceLayer, "IPv4 MDNS packet dropped...");
             return FilterOutcome::kDropPacket;
         }
 
@@ -172,7 +172,7 @@ public:
         // NOTE: This is always called from Matter platform event loop
 
         if (pktInfo.DestAddress.IsIPv4() && pktInfo.DestPort == chip::Dnssd::kMdnsPort) {
-            ChipLogProgress(DeviceLayer, "IPv4 MDNS packet dropped...");
+            ChipLogDetail(DeviceLayer, "IPv4 MDNS packet dropped...");
             return FilterOutcome::kDropPacket;
         }
 

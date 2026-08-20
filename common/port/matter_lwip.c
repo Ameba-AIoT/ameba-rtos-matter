@@ -183,6 +183,10 @@ static void matter_LwIP_IP_Address_Request_thread(void *pvParameters)
 #endif
 #endif
 
+#if CONFIG_ENABLE_AMEBA_SNTP
+    matter_sntp_init();
+#endif
+
     vTaskDelete(NULL);
 }
 
