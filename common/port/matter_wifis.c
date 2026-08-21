@@ -627,9 +627,6 @@ static void matter_wifi_join_status_event_hdl(u8 * buf, s32 buf_len, s32 flags, 
     case RTW_JOINSTATUS_SUCCESS: // Connecting --> Connected Succesfully
         error_flag = RTW_NO_ERROR;
         RTK_LOGI(TAG, "Join success!\n");
-#if CONFIG_ENABLE_AMEBA_SNTP
-        matter_sntp_init();
-#endif
         matter_wifi_indication(MATTER_WIFI_EVENT_CONNECT, NULL, 0, flags);
         matter_LwIP_IP_Address_Request();
         break;
@@ -679,9 +676,6 @@ static void matter_wifi_join_status_event_hdl(u8 * buf) {
     case RTW_JOINSTATUS_SUCCESS: // Connecting --> Connected Succesfully
         error_flag = RTW_NO_ERROR;
         RTK_LOGI(TAG, "Join success!\n");
-#if CONFIG_ENABLE_AMEBA_SNTP
-        matter_sntp_init();
-#endif
         matter_wifi_indication(MATTER_WIFI_EVENT_CONNECT, NULL, 0, flags);
         matter_LwIP_IP_Address_Request();
         break;
