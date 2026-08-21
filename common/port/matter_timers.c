@@ -25,6 +25,7 @@
 #include <task.h>
 #include <errno.h>
 #include <time.h>
+#include <matter_timers.h>
 #if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
     (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
 #include <sntp/sntp.h>
@@ -48,12 +49,10 @@ static uint64_t current_us = 0;
 static uint32_t tick_count = 0;
 
 #if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
-#define DEFAULT_SNTP_SERVER_ADDRESS "pool.ntp.org"
 
 // Minimum plausible epoch time (2000-01-01 00:00:00 UTC)
 // matching CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD
 #define MATTER_SNTP_VALID_TIME_THRESHOLD ((time_t) 946684800)
-#define MATTER_SNTP_SYNC_TIMEOUT_MS    5000
 
 static bool matter_sntp_rtc_sync = FALSE;
 bool matter_sntp_initialized = FALSE;
@@ -104,24 +103,10 @@ bool matter_sntp_rtc_is_sync(void)
     return matter_sntp_rtc_sync;
 }
 
-__weak void matter_sntp_prepare_sleep(void)
+__weak void sntp_set_oneshot(int enable)
 {
-    // If WHC DEV is enabled, this api is defined in common\port\whc\matter_whc_dev.c.
+    (void) enable;
     return;
-}
-
-int matter_sntp_sync(void)
-{
-    uint32_t sec  = 0;
-    uint32_t usec = 0;
-    SNTP_GET_SYSTEM_TIME(sec, usec);
-    if ((time_t)sec >= MATTER_SNTP_VALID_TIME_THRESHOLD) { //if sntp server is reachable, write to the dct and rtc
-        matter_rtc_write((time_t)sec);
-        matter_sntp_rtc_sync = TRUE;
-        matter_sntp_prepare_sleep();
-        return 0;
-    }
-    return -1;
 }
 
 void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
@@ -146,7 +131,6 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
         matter_rtc_write(*current_sec);
         matter_sntp_rtc_sync = TRUE;
-        matter_sntp_prepare_sleep();
     } else { //if the sntp is not reachable yet, use the last known epoch time if available
         *current_sec = matter_rtc_read();
     }
@@ -160,7 +144,6 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 
         matter_rtc_write(*current_sec);
         matter_sntp_rtc_sync = TRUE;
-        matter_sntp_prepare_sleep();
     } else { //if the sntp is not reachable yet, use the last known epoch time if available
         *current_sec = matter_rtc_read();
     }
@@ -177,31 +160,19 @@ void matter_sntp_init_with_server(const char *server)
     if (matter_sntp_initialized) {
         sntp_stop();
     }
-// ameba-rtos v1.0 and v1.1 set the SNTP server at component/network/sntp/sntp.c
+    // ameba-rtos v1.0 and v1.1 set the SNTP server at component/network/sntp/sntp.c
 #if defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
     sntp_setservername(0, server);
+#if SNTP_MAX_SERVERS > 1
+    sntp_setservername(1, SNTP_FALLBACK_SERVER_1);
+#endif
+#if SNTP_MAX_SERVERS > 2
+    sntp_setservername(2, SNTP_FALLBACK_SERVER_2);
+#endif
+    sntp_set_oneshot(1);
 #endif
     matter_sntp_rtc_sync = FALSE;
     sntp_init();
     matter_sntp_initialized = TRUE;
-
-    uint32_t start_time = xTaskGetTickCount();
-    int sync_result;
-
-    if (lwip_check_connectivity(NETIF_WLAN_STA_INDEX) == CONNECTION_VALID) {
-        while ((sync_result = matter_sntp_sync()) != 0) {
-            if ((xTaskGetTickCount() - start_time) >= pdMS_TO_TICKS(MATTER_SNTP_SYNC_TIMEOUT_MS)) {
-                RTK_LOGW(TAG, "SNTP sync timeout\n");
-                break;
-            }
-            vTaskDelay(pdMS_TO_TICKS(100));
-        }
-
-        if (sync_result == 0) {
-            RTK_LOGD(TAG, "SNTP sync successful\n");
-        } else {
-            RTK_LOGD(TAG, "SNTP sync failed\n");
-        }
-    }
 }
 #endif

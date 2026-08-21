@@ -25,6 +25,22 @@ extern "C" {
 
 #include <time.h>
 
+#if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
+/*
+ * SNTP server addresses — override via -D at build time without modifying source.
+ */
+#ifndef DEFAULT_SNTP_SERVER_ADDRESS
+#define DEFAULT_SNTP_SERVER_ADDRESS "pool.ntp.org"
+#endif
+#ifndef SNTP_FALLBACK_SERVER_1
+#define SNTP_FALLBACK_SERVER_1      "ntp.aliyun.com"
+#endif
+#ifndef SNTP_FALLBACK_SERVER_2
+#define SNTP_FALLBACK_SERVER_2      "time.google.com"
+#endif
+
+#endif
+
 /*
  * @brief  Initialize Matter Real Time Clock.
  */
@@ -58,11 +74,6 @@ void matter_timer_init(void);
  * @brief  Return true if ameba RTC is sync with SNTP.
  */
 bool matter_sntp_rtc_is_sync(void);
-
-/*
- * @brief  Return 0 if sntp has been sync; otherwise -1.
- */
-int matter_sntp_sync(void);
 
 /*
  * @brief  Get SNTP Current Time and write it to the DCT and RTC if SNTP server is reachable.

@@ -41,18 +41,6 @@ static void whc_matter_dev_doorlock_update(u8 lock_state)
 }
 #endif
 
-#if defined(CONFIG_ENABLE_AMEBA_SNTP) && (CONFIG_ENABLE_AMEBA_SNTP == 1)
-extern bool matter_sntp_initialized;
-void matter_sntp_prepare_sleep(void)
-{
-    if (matter_sntp_initialized) {
-        sntp_stop();
-        matter_sntp_initialized = FALSE;
-    }
-    return;
-}
-#endif
-
 void whc_matter_dev_downlink_hdl(u8 *buf)
 {
     u8 event = *buf;
