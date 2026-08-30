@@ -1,0 +1,73 @@
+#!/bin/bash
+# Validates commit message format for all commits being pushed.
+#
+# Required format:
+#   [IC][component] Short description
+#
+#   Body explaining what this commit does and why.  (mandatory)
+#
+
+ZERO_SHA=0000000000000000000000000000000000000000
+
+VALID_ICS="amebaz2|amebaz2plus|amebad|amebalite|amebad+|amebasmart|amebagreen2|common"
+VALID_COMPONENTS="api|atcmd|ble|core|data-model|dct|docs|drivers|examples|kvs|lwip|mbedtls|ota|scripts|sdk|soc|timer|tools|wifi"
+
+SUBJECT_RE="^\[($VALID_ICS)\]\[($VALID_COMPONENTS)\] .{3,}"
+
+errors=0
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+    # Skip branch deletions
+    [ "$local_sha" = "$ZERO_SHA" ] && continue
+
+    if [ "$remote_sha" = "$ZERO_SHA" ]; then
+        # New remote branch: check commits not reachable from any existing remote ref
+        commits=$(git rev-list "$local_sha" --not --remotes=origin 2>/dev/null)
+    else
+        commits=$(git rev-list "$remote_sha..$local_sha")
+    fi
+
+    for commit in $commits; do
+        short=$(git rev-parse --short "$commit")
+        subject=$(git log -1 --format="%s" "$commit")
+        body=$(git log -1 --format="%b" "$commit" | sed '/^[[:space:]]*$/d')
+
+        if ! echo "$subject" | grep -qE "$SUBJECT_RE"; then
+            printf "\n[FAIL] %s  bad subject:\n  %s\n" "$short" "$subject"
+            printf "  Expected: [IC][component] description (min 3 chars)\n"
+            printf "  ICs:       amebaz2 | amebaz2plus | amebad | amebalite | amebad+ | amebasmart | amebagreen2 | common\n"
+            printf "  Components: api | atcmd | ble | core | data-model | dct |docs | drivers | examples | kvs | lwip | mbedtls | ota | scripts | sdk | soc | timer | tools | wifi\n"
+            errors=$((errors + 1))
+        fi
+
+        if [ -z "$body" ]; then
+            printf "\n[FAIL] %s  missing commit body:\n  %s\n" "$short" "$subject"
+            printf "  Add a body that explains what this commit does and why.\n"
+            errors=$((errors + 1))
+        fi
+    done
+done
+
+if [ "$errors" -gt 0 ]; then
+    printf "\nPush rejected: %d commit message error(s).\n" "$errors"
+    printf "Fix with:  git rebase -i <base-sha>  then reword the flagged commits.\n\n"
+    exit 1
+fi
+
+# =========================
+# Restyle check
+# =========================
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+RESTYLE="$REPO_ROOT/tools/scripts/restyle_check.sh"
+
+if [ -f "$RESTYLE" ]; then
+    printf "\nRunning restyle check...\n"
+    if ! sh "$RESTYLE" --check; then
+        printf "\nPush rejected: code style or header check failed.\n"
+        printf "Fix with: tools/scripts/restyle_check.sh  (auto-fixes in place)\n\n"
+        exit 1
+    fi
+    printf "Restyle check passed.\n"
+fi
+
+exit 0
