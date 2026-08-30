@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <platform_stdlib.h>
 #if defined(CONFIG_PLATFORM_8710C)
 #include <reset_reason_api.h>
@@ -34,6 +33,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #include <matter_api.h>
+#include <matter_data_providers.h>
 #include <matter_ota.h>
 
 #ifdef __cplusplus
@@ -141,8 +141,7 @@ void matter_op_hours(void)
 #if defined(CONFIG_PLATFORM_8710C)
 BootReasonType rtl8710c_map_reset_reason(uint32_t reason, bool isOta)
 {
-    switch (reason)
-    {
+    switch (reason) {
     case RESET_REASON_POWER_ON:
         return BootReasonType::kPowerOnReboot;
     case RESET_REASON_BROWN_OUT:
@@ -159,8 +158,7 @@ BootReasonType rtl8710c_map_reset_reason(uint32_t reason, bool isOta)
 #elif defined(CONFIG_PLATFORM_8721D)
 BootReasonType rtl8721d_map_reset_reason(uint32_t reason, bool isOta)
 {
-    switch (reason)
-    {
+    switch (reason) {
     case 0:
         return BootReasonType::kPowerOnReboot;
     case BIT_BOOT_BOD_RESET_HAPPEN:
@@ -193,11 +191,24 @@ void matter_store_boot_reason(void)
     ChipLogDetail(DeviceLayer, "store boot reason 0x%x", to_underlying(bootReason));
 
     err = ConfigurationManagerImpl().StoreBootReason(to_underlying(bootReason));
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "store boot reason (0x%x) failed 0x%X", to_underlying(bootReason), err);
     }
     return;
+}
+
+static void MatterDevicePostInitWork(intptr_t context)
+{
+    matter_data_provider_init();
+    matter_store_boot_reason();
+#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
+    matter_op_hours();
+#endif
+}
+
+void matter_device_post_init(void)
+{
+    chip::DeviceLayer::PlatformMgr().ScheduleWork(MatterDevicePostInitWork, 0);
 }
 
 #ifdef __cplusplus
