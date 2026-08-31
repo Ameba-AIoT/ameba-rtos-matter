@@ -1,12 +1,11 @@
 # Inherit from the common base image
 FROM ameba-rtos-matter:common
 
-# Redefine following build arguments to respective repo and tag/branch
-ARG AMEBA_MATTER_REPO=https://github.com/jack155069/ameba-rtos-matter.git
-ARG AMEBA_MATTER_TAG_NAME=ameba-rtos/v1.6/update_sdk_260819
+ARG AMEBA_MATTER_REPO=https://github.com/Ameba-AIoT/ameba-rtos-matter.git
+ARG AMEBA_MATTER_TAG_NAME=main
 
 # Define fixed build arguments
-ARG AMBRTOS_REPO=https://github.com/mikaelajiwidodo/ameba-rtos.git
+ARG AMBRTOS_REPO=https://github.com/ambcs/ameba-rtos.git
 ARG AMBRTOS_TAG_NAME=release/v1.0+matter_v1.5
 ARG AMEBA_MATTER_DIR=component/application/matter
 ARG AMEBA_DIR=/opt/ameba
