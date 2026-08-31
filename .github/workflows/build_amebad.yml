@@ -39,7 +39,10 @@ jobs:
 
     - name: Build AmebaD Docker image
       run: |
-        docker buildx build --file tools/docker/amebad/Dockerfile --tag ameba-rtos-matter:amebad --load .
+        docker buildx build \
+          --build-arg TAG_NAME=${{ github.head_ref || github.ref_name }} \
+          --build-arg AMEBA_MATTER_REPO=${{ github.event.pull_request.head.repo.clone_url || format('{0}/{1}.git', github.server_url, github.repository) }} \
+          --file tools/docker/amebad/Dockerfile --tag ameba-rtos-matter:amebad --load .
 
     - name: Check Docker images
       run: docker images

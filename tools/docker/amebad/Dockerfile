@@ -1,9 +1,10 @@
 # Inherit from the common base image
 FROM ameba-rtos-matter:common
 
-# Redefine following build arguments to respective repo and tag/branch
-ARG AMEBA_MATTER_REPO=https://github.com/xshuqun/ameba-rtos-matter.git
-ARG TAG_NAME=v1.5-PR/fix_compile_warning
+# Redefine following build arguments to respective repo
+ARG AMEBA_MATTER_REPO=https://github.com/Ameba-AIoT/ameba-rtos-matter.git
+# Do not modify the TAG_NAME
+ARG TAG_NAME=main
 
 # Define fixed build arguments
 ARG AMBD_REPO=https://github.com/Ameba-AIoT/ameba-rtos-d.git
