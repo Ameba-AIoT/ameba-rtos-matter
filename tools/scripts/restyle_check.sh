@@ -10,6 +10,16 @@ fi
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 1
 cd "$REPO_ROOT" || exit 1
 
+# =========================
+# Hook installation check
+# =========================
+_hooks_path=$(git config core.hooksPath 2>/dev/null)
+if [ "$_hooks_path" != "tools/scripts/hooks" ] && [ ! -f "$REPO_ROOT/.git/hooks/pre-push" ]; then
+    echo "WARNING: Git hooks are not installed — commit message and restyle checks will not run on push."
+    echo "         Run once to enable:  sh tools/scripts/hooks/install.sh"
+    echo ""
+fi
+
 
 # =========================
 # Canonical header content
@@ -85,12 +95,21 @@ strip_leading_comments() {
 # =========================
 # Get changed files
 # Exclude third-party code
+# RESTYLE_BASE env var overrides the diff base (used by CI for PR checks)
 # =========================
-changed_files=$(
-    git diff --name-only HEAD~1 HEAD |
-    grep -E '\.(c|cpp|h|hpp)$' |
-    grep -Ev '^(common/lwip/lwip_v2\.1\.2|common/mbedtls/)'
-)
+if [ -n "$RESTYLE_BASE" ]; then
+    changed_files=$(
+        git diff --name-only "$RESTYLE_BASE...HEAD" |
+        grep -E '\.(c|cpp|h|hpp)$' |
+        grep -Ev '^(common/lwip/lwip_v2\.1\.2|common/mbedtls/)'
+    )
+else
+    changed_files=$(
+        git diff --name-only HEAD~1 HEAD |
+        grep -E '\.(c|cpp|h|hpp)$' |
+        grep -Ev '^(common/lwip/lwip_v2\.1\.2|common/mbedtls/)'
+    )
+fi
 
 
 if [ -n "$changed_files" ]; then
