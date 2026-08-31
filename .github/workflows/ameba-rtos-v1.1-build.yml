@@ -30,7 +30,10 @@ jobs:
 
     - name: Build AmebaRTOS Docker image
       run: |
-        docker buildx build --file tools/docker/ameba-rtos/v1.1/Dockerfile --tag ameba-rtos-matter:ameba-rtos-v1.1 --load .
+        docker buildx build \
+          --build-arg AMEBA_MATTER_TAG_NAME=${{ github.head_ref || github.ref_name }} \
+          --build-arg AMEBA_MATTER_REPO=${{ github.event.pull_request.head.repo.clone_url || format('{0}/{1}.git', github.server_url, github.repository) }} \
+          --file tools/docker/ameba-rtos/v1.1/Dockerfile --tag ameba-rtos-matter:ameba-rtos-v1.1 --load .
 
     - name: Check Docker images
       run: docker images
