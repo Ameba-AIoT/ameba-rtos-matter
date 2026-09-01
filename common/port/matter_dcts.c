@@ -1,3 +1,21 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <platform_opts.h>
 #include <platform/platform_stdlib.h>
 
@@ -28,6 +46,18 @@ extern "C" {
 
 #define ENABLE_BACKUP           MATTER_KVS_ENABLE_BACKUP
 #define ENABLE_WEAR_LEVELING    MATTER_KVS_ENABLE_WEAR_LEVELING
+
+static volatile bool g_dct_init = false;
+
+static inline s32 dct_check_init(void)
+{
+    if (!g_dct_init) {
+        printf("%s: dct is not init.\n", __FUNCTION__);
+        return DCT_ERROR;
+    }
+
+    return DCT_SUCCESS;
+}
 
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
 #if defined(MBEDTLS_CIPHER_MODE_CTR)
@@ -65,18 +95,14 @@ int32_t dct_set_encrypted_variable(dct_handle_t *dct_handle, char *variable_name
 
     // encrypt the variable value
     ret = dct_encrypt(variable_value, variable_value_length, encrypted_data);
-    if (ret != 0)
-    {
-       return DCT_ERROR;
+    if (ret != 0) {
+        return DCT_ERROR;
     }
 
     // store into dct
-    if (region == DCT_REGION_1)
-    {
+    if (region == DCT_REGION_1) {
         ret = dct_set_variable_new(dct_handle, variable_name, encrypted_data, variable_value_length);
-    }
-    else if (region == DCT_REGION_2)
-    {
+    } else if (region == DCT_REGION_2) {
         ret = dct_set_variable_new2(dct_handle, variable_name, encrypted_data, variable_value_length);
     }
 
@@ -89,92 +115,88 @@ int32_t dct_get_encrypted_variable(dct_handle_t *dct_handle, char *variable_name
     uint8_t encrypted_data[404] = {0};
 
     // get the encrypted value from dct
-    if (region == DCT_REGION_1)
-    {
+    if (region == DCT_REGION_1) {
         ret = dct_get_variable_new(dct_handle, variable_name, encrypted_data, buffer_size);
-    }
-    else if (region == DCT_REGION_2)
-    {
+    } else if (region == DCT_REGION_2) {
         ret = dct_get_variable_new2(dct_handle, variable_name, encrypted_data, buffer_size);
     }
-    
-    if (ret != DCT_SUCCESS)
-    {
+
+    if (ret != DCT_SUCCESS) {
         return ret;
     }
 
     // decrypt the encrypted value
     ret = dct_decrypt(encrypted_data, *buffer_size, buffer);
-    if (ret != 0)
-    {
+    if (ret != 0) {
         return DCT_ERROR;
     }
-    
+
     return ret;
 }
 
 #else
-#error "MBEDTLS_CIPHER_MODE_CTR must be enabled to perform DCT flash encryption" 
+#error "MBEDTLS_CIPHER_MODE_CTR must be enabled to perform DCT flash encryption"
 #endif /* MBEDTLS_CIPHER_MODE_CTR */
 #endif
 
 s32 initPref(void)
 {
+    if (g_dct_init) {
+        return DCT_SUCCESS;
+    }
+
     s32 ret;
 
     ret = dct_init(DCT_BEGIN_ADDR_MATTER, MODULE_NUM, VARIABLE_NAME_SIZE, VARIABLE_VALUE_SIZE, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
-    if (ret != DCT_SUCCESS)
-    {
+    if (ret != DCT_SUCCESS) {
         printf("dct_init failed with error: %d\n", ret);
-    }
-    else
-    {
+    } else {
         printf("dct_init success\n");
     }
 
     ret = dct_init2(DCT_BEGIN_ADDR_MATTER2, MODULE_NUM2, VARIABLE_NAME_SIZE2, VARIABLE_VALUE_SIZE2, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
-    if (ret != DCT_SUCCESS)
-    {
+    if (ret != DCT_SUCCESS) {
         printf("dct_init2 failed with error: %d\n", ret);
-    }
-    else
-    {
+    } else {
         printf("dct_init2 success\n");
     }
 
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
     // Initialize mbedtls aes context and set encryption key
     mbedtls_aes_init(&aes);
-    if (mbedtls_aes_setkey_enc(&aes, key, 256) != 0)
-    {
+    if (mbedtls_aes_setkey_enc(&aes, key, 256) != 0) {
         return DCT_ERROR;
     }
 #endif
+
+    if (ret == DCT_SUCCESS) {
+        g_dct_init = 1;
+    }
 
     return ret;
 }
 
 s32 deinitPref(void)
 {
+    if (!g_dct_init) {
+        return DCT_SUCCESS;
+    }
+
+    g_dct_init = 0;
+
     s32 ret;
 
     ret = dct_format(DCT_BEGIN_ADDR_MATTER, MODULE_NUM, VARIABLE_NAME_SIZE, VARIABLE_VALUE_SIZE, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
-    if (ret != DCT_SUCCESS)
-    {
+    if (ret != DCT_SUCCESS) {
         printf("dct_init failed with error: %d\n", ret);
-    }
-    else
-    {
+    } else {
         printf("dct_init success\n");
     }
 
     ret = dct_format2(DCT_BEGIN_ADDR_MATTER2, MODULE_NUM2, VARIABLE_NAME_SIZE2, VARIABLE_VALUE_SIZE2, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
-    if (ret != DCT_SUCCESS)
-    {
+    if (ret != DCT_SUCCESS) {
         printf("dct_init2 failed with error: %d\n", ret);
-    }
-    else
-    {
+    } else {
         printf("dct_init2 success\n");
     }
 
@@ -188,21 +210,21 @@ s32 deinitPref(void)
 
 s32 registerPref(void)
 {
-    s32 ret;
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     char ns[15];
 
-    for (size_t i=0; i<MODULE_NUM; i++)
-    {
-        snprintf(ns, 15, "matter_kvs1_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM; i++) {
+        snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
         ret = dct_register_module(ns);
-        if (ret != DCT_SUCCESS)
-        {
+        if (ret != DCT_SUCCESS) {
             printf("DCT1 modules registration failed\n");
             goto exit;
-        }
-        else
-        {
+        } else {
             printf("dct_register_module %s success\n", ns);
         }
     }
@@ -214,21 +236,21 @@ exit:
 
 s32 registerPref2(void)
 {
-    s32 ret;
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     char ns[15];
 
-    for (size_t i=0; i<MODULE_NUM2; i++)
-    {
-        snprintf(ns, 15, "matter_kvs2_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM2; i++) {
+        snprintf(ns, 15, "matter_kvs2_%d", i + 1);
 
         ret = dct_register_module2(ns);
-        if (ret != DCT_SUCCESS)
-        {
+        if (ret != DCT_SUCCESS) {
             printf("DCT2 modules registration failed\n");
             goto exit;
-        }
-        else
-        {
+        } else {
             printf("dct_register_module2 %s success\n", ns);
         }
     }
@@ -240,21 +262,21 @@ exit:
 
 s32 clearPref(void)
 {
-    s32 ret;
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     char ns[15];
 
-    for (size_t i=0; i<MODULE_NUM; i++)
-    {
-        snprintf(ns, 15, "matter_kvs1_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM; i++) {
+        snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
         ret = dct_unregister_module(ns);
-        if (ret != DCT_SUCCESS)
-        {
+        if (ret != DCT_SUCCESS) {
             printf("DCT1 modules unregistration failed\n");
             goto exit;
-        }
-        else
-        {
+        } else {
             printf("dct_unregister_module %s success\n", ns);
         }
     }
@@ -266,21 +288,21 @@ exit:
 
 s32 clearPref2(void)
 {
-    s32 ret;
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     char ns[15];
 
-    for (size_t i=0; i<MODULE_NUM2; i++)
-    {
-        snprintf(ns, 15, "matter_kvs2_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM2; i++) {
+        snprintf(ns, 15, "matter_kvs2_%d", i + 1);
 
         ret = dct_unregister_module2(ns);
-        if (ret != DCT_SUCCESS)
-        {
+        if (ret != DCT_SUCCESS) {
             printf("DCT2 modules unregistration failed\n");
             goto exit;
-        }
-        else
-        {
+        } else {
             printf("dct_unregister_module2 %s success\n", ns);
         }
     }
@@ -292,25 +314,26 @@ exit:
 
 s32 deleteKey(const char *domain, const char *key)
 {
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     dct_handle_t handle;
-    s32 ret;
     char ns[15];
 
     // Loop over DCT1 modules
-    for (size_t i=0; i<MODULE_NUM; i++)
-    {
-        snprintf(ns, 15, "matter_kvs1_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM; i++) {
+        snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
         ret = dct_open_module(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 
         ret = dct_delete_variable(&handle, (char *)key);
-        if (ret == DCT_SUCCESS) // return success once deleted
-        {
+        if (ret == DCT_SUCCESS) { // return success once deleted
             dct_close_module(&handle);
             goto exit;
         }
@@ -319,20 +342,17 @@ s32 deleteKey(const char *domain, const char *key)
     }
 
     // Loop over DCT2 modules
-    for (size_t i=0; i<MODULE_NUM2; i++)
-    {
-        snprintf(ns, 15, "matter_kvs2_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM2; i++) {
+        snprintf(ns, 15, "matter_kvs2_%d", i + 1);
 
         ret = dct_open_module2(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module2(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 
         ret = dct_delete_variable2(&handle, (char *)key);
-        if (ret == DCT_SUCCESS) // return success once deleted
-        {
+        if (ret == DCT_SUCCESS) { // return success once deleted
             dct_close_module2(&handle);
             goto exit;
         }
@@ -347,29 +367,30 @@ exit:
 
 bool checkExist(const char *domain, const char *key)
 {
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     dct_handle_t handle;
-    s32 ret;
     uint16_t len = 0;
     char ns[15];
 
     u8 *str = malloc(sizeof(u8) * VARIABLE_VALUE_SIZE2); // use the bigger buffer size
 
     // Loop over DCT1 modules
-    for (size_t i=0; i<MODULE_NUM; i++)
-    {
-        snprintf(ns, 15, "matter_kvs1_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM; i++) {
+        snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
         ret = dct_open_module(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 
         len = sizeof(u32);
         ret = dct_get_variable_new(&handle, (char *)key, (char *)str, &len);
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             printf("checkExist key=%s found.\n", key);
             dct_close_module(&handle);
             goto exit;
@@ -377,8 +398,7 @@ bool checkExist(const char *domain, const char *key)
 
         len = sizeof(u64);
         ret = dct_get_variable_new(&handle, (char *)key, (char *)str, &len);
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             printf("checkExist key=%s found.\n", key);
             dct_close_module(&handle);
             goto exit;
@@ -388,21 +408,18 @@ bool checkExist(const char *domain, const char *key)
     }
 
     // Loop over DCT2 modules
-    for (size_t i=0; i<MODULE_NUM2; i++)
-    {
-        snprintf(ns, 15, "matter_kvs2_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM2; i++) {
+        snprintf(ns, 15, "matter_kvs2_%d", i + 1);
 
         ret = dct_open_module2(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module2(%s) failed with error : %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module2(%s) failed with error : %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 
         len = VARIABLE_VALUE_SIZE2;
         ret = dct_get_variable_new2(&handle, (char *)key, (char *)str, &len);
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             printf("checkExist key=%s found.\n", key);
             dct_close_module2(&handle);
             goto exit;
@@ -419,34 +436,33 @@ exit:
 
 s32 setPref_new(const char *domain, const char *key, u8 *value, size_t byteCount)
 {
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     dct_handle_t handle;
-    s32 ret;
     char ns[15];
 
-    if (byteCount <= 64)
-    {
+    if (byteCount <= 64) {
         // Loop over DCT1 modules
-        for (size_t i=0; i<MODULE_NUM; i++)
-        {
-            snprintf(ns, 15, "matter_kvs1_%d", i+1);
+        for (size_t i = 0; i < MODULE_NUM; i++) {
+            snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
             ret = dct_open_module(&handle, ns);
-            if (ret != DCT_SUCCESS)
-            {
-                printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+            if (ret != DCT_SUCCESS) {
+                printf("%s : dct_open_module(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
                 goto exit;
             }
 
-            if (dct_remain_variable(&handle) > 0)
-            {
+            if (dct_remain_variable(&handle) > 0) {
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
                 ret = dct_set_encrypted_variable(&handle, (char *)key, value, byteCount, DCT_REGION_1);
 #else
                 ret = dct_set_variable_new(&handle, (char *)key, (char *)value, (uint16_t)byteCount);
 #endif
-                if (ret != DCT_SUCCESS)
-                {
-                    printf("%s : dct_set_variable(%s) failed with error: %d\n" ,__FUNCTION__, key, ret);
+                if (ret != DCT_SUCCESS) {
+                    printf("%s : dct_set_variable(%s) failed with error: %d\n", __FUNCTION__, key, ret);
                     dct_close_module(&handle);
                     goto exit;
                 }
@@ -455,31 +471,25 @@ s32 setPref_new(const char *domain, const char *key, u8 *value, size_t byteCount
             }
             dct_close_module(&handle);
         }
-    }
-    else
-    {
+    } else {
         // Loop over DCT2 modules
-        for (size_t i=0; i<MODULE_NUM2; i++)
-        {
-            snprintf(ns, 15, "matter_kvs2_%d", i+1);
+        for (size_t i = 0; i < MODULE_NUM2; i++) {
+            snprintf(ns, 15, "matter_kvs2_%d", i + 1);
 
             ret = dct_open_module2(&handle, ns);
-            if (ret != DCT_SUCCESS)
-            {
-                printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+            if (ret != DCT_SUCCESS) {
+                printf("%s : dct_open_module2(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
                 goto exit;
             }
 
-            if (dct_remain_variable2(&handle) > 0)
-            {
+            if (dct_remain_variable2(&handle) > 0) {
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
                 ret = dct_set_encrypted_variable(&handle, (char *)key, value, byteCount, DCT_REGION_2);
 #else
                 ret = dct_set_variable_new2(&handle, (char *)key, (char *)value, (uint16_t)byteCount);
 #endif
-                if (ret != DCT_SUCCESS)
-                {
-                    printf("%s : dct_set_variable2(%s) failed with error: %d\n" ,__FUNCTION__, key, ret);
+                if (ret != DCT_SUCCESS) {
+                    printf("%s : dct_set_variable2(%s) failed with error: %d\n", __FUNCTION__, key, ret);
                     dct_close_module2(&handle);
                     goto exit;
                 }
@@ -497,20 +507,22 @@ exit:
 
 s32 getPref_bool_new(const char *domain, const char *key, u8 *val)
 {
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     dct_handle_t handle;
-    s32 ret;
     uint16_t len = sizeof(u8);
     char ns[15];
 
     // Loop over DCT1 modules
-    for (size_t i=0; i<MODULE_NUM; i++)
-    {
-        snprintf(ns, 15, "matter_kvs1_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM; i++) {
+        snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
         ret = dct_open_module(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -518,8 +530,7 @@ s32 getPref_bool_new(const char *domain, const char *key, u8 *val)
 #else
         ret = dct_get_variable_new(&handle, (char *)key, (char *)val, &len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module(&handle);
             goto exit;
         }
@@ -527,13 +538,11 @@ s32 getPref_bool_new(const char *domain, const char *key, u8 *val)
     }
 
     // Loop over DCT2 modules
-    for (size_t i=0; i<MODULE_NUM2; i++)
-    {
-        snprintf(ns, 15, "matter_kvs2_%d", i+1); 
+    for (size_t i = 0; i < MODULE_NUM2; i++) {
+        snprintf(ns, 15, "matter_kvs2_%d", i + 1);
         ret = dct_open_module2(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module2(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -541,8 +550,7 @@ s32 getPref_bool_new(const char *domain, const char *key, u8 *val)
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, (char *)val, &len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module2(&handle);
             goto exit;
         }
@@ -555,20 +563,22 @@ exit:
 
 s32 getPref_u32_new(const char *domain, const char *key, u32 *val)
 {
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     dct_handle_t handle;
-    s32 ret;
     uint16_t len = sizeof(u32);
     char ns[15];
 
     // Loop over DCT1 modules
-    for (size_t i=0; i<MODULE_NUM; i++)
-    {
-        snprintf(ns, 15, "matter_kvs1_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM; i++) {
+        snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
         ret = dct_open_module(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -576,8 +586,7 @@ s32 getPref_u32_new(const char *domain, const char *key, u32 *val)
 #else
         ret = dct_get_variable_new(&handle, (char *)key, (char *)val, &len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module(&handle);
             goto exit;
         }
@@ -585,14 +594,12 @@ s32 getPref_u32_new(const char *domain, const char *key, u32 *val)
     }
 
     // Loop over DCT2 modules
-    for (size_t i=0; i<MODULE_NUM2; i++)
-    {
-        snprintf(ns, 15, "matter_kvs2_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM2; i++) {
+        snprintf(ns, 15, "matter_kvs2_%d", i + 1);
 
         ret = dct_open_module2(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module2(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -600,8 +607,7 @@ s32 getPref_u32_new(const char *domain, const char *key, u32 *val)
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, (char *)val, &len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module2(&handle);
             goto exit;
         }
@@ -614,20 +620,22 @@ exit:
 
 s32 getPref_u64_new(const char *domain, const char *key, u64 *val)
 {
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     dct_handle_t handle;
-    s32 ret;
     uint16_t len = sizeof(u64);
     char ns[15];
 
     // Loop over DCT1 modules
-    for (size_t i=0; i<MODULE_NUM; i++)
-    {
-        snprintf(ns, 15, "matter_kvs1_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM; i++) {
+        snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
         ret = dct_open_module(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -635,8 +643,7 @@ s32 getPref_u64_new(const char *domain, const char *key, u64 *val)
 #else
         ret = dct_get_variable_new(&handle, (char *)key, (char *)val, &len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module(&handle);
             goto exit;
         }
@@ -644,14 +651,12 @@ s32 getPref_u64_new(const char *domain, const char *key, u64 *val)
     }
 
     // Loop over DCT2 modules
-    for (size_t i=0; i<MODULE_NUM2; i++)
-    {
-        snprintf(ns, 15, "matter_kvs2_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM2; i++) {
+        snprintf(ns, 15, "matter_kvs2_%d", i + 1);
 
         ret = dct_open_module2(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module2(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -659,8 +664,7 @@ s32 getPref_u64_new(const char *domain, const char *key, u64 *val)
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, (char *)val, &len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module2(&handle);
             goto exit;
         }
@@ -673,20 +677,22 @@ exit:
 
 s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSize, size_t *outLen)
 {
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     dct_handle_t handle;
-    s32 ret;
     char ns[15];
     uint16_t *len = (uint16_t *)(&bufSize);
 
     // Loop over DCT1 modules
-    for (size_t i=0; i<MODULE_NUM; i++)
-    {
-        snprintf(ns, 15, "matter_kvs1_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM; i++) {
+        snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
         ret = dct_open_module(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -694,8 +700,7 @@ s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSi
 #else
         ret = dct_get_variable_new(&handle, (char *)key, buf, len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module(&handle);
             *outLen = bufSize;
             goto exit;
@@ -704,14 +709,12 @@ s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSi
     }
 
     // Loop over DCT2 modules
-    for (size_t i=0; i<MODULE_NUM2; i++)
-    {
-        snprintf(ns, 15, "matter_kvs2_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM2; i++) {
+        snprintf(ns, 15, "matter_kvs2_%d", i + 1);
 
         ret = dct_open_module2(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module2(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -719,8 +722,7 @@ s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSi
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, buf, len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module2(&handle);
             *outLen = bufSize;
             goto exit;
@@ -734,20 +736,22 @@ exit:
 
 s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize, size_t *outLen)
 {
+    s32 ret = dct_check_init();
+    if (ret != DCT_SUCCESS) {
+        return ret;
+    }
+
     dct_handle_t handle;
-    s32 ret;
     char ns[15];
     uint16_t *len = (uint16_t *)(&bufSize);
 
     // Loop over DCT1 modules
-    for (size_t i=0; i<MODULE_NUM; i++)
-    {
-        snprintf(ns, 15, "matter_kvs1_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM; i++) {
+        snprintf(ns, 15, "matter_kvs1_%d", i + 1);
 
         ret = dct_open_module(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -755,8 +759,7 @@ s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize
 #else
         ret = dct_get_variable_new(&handle, (char *)key, (char *)buf, len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module(&handle);
             *outLen = bufSize;
             goto exit;
@@ -765,14 +768,12 @@ s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize
     }
 
     // Loop over DCT2 modules
-    for (size_t i=0; i<MODULE_NUM2; i++)
-    {
-        snprintf(ns, 15, "matter_kvs2_%d", i+1);
+    for (size_t i = 0; i < MODULE_NUM2; i++) {
+        snprintf(ns, 15, "matter_kvs2_%d", i + 1);
 
         ret = dct_open_module2(&handle, ns);
-        if (ret != DCT_SUCCESS)
-        {
-            printf("%s : dct_open_module2(%s) failed with error: %d\n" ,__FUNCTION__, ns, ret);
+        if (ret != DCT_SUCCESS) {
+            printf("%s : dct_open_module2(%s) failed with error: %d\n", __FUNCTION__, ns, ret);
             goto exit;
         }
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -780,8 +781,7 @@ s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize
 #else
         ret = dct_get_variable_new2(&handle, (char *)key, (char *)buf, len);
 #endif
-        if (ret == DCT_SUCCESS)
-        {
+        if (ret == DCT_SUCCESS) {
             dct_close_module2(&handle);
             *outLen = bufSize;
             goto exit;
