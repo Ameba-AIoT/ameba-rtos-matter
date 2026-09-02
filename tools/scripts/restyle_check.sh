@@ -22,16 +22,18 @@ fi
 
 
 # =========================
-# Canonical header content
+# Canonical header template
+# __YEAR__ is replaced per-file with the file's creation year
 # =========================
+HEADER_TEMPLATE=$(mktemp)
 HEADER_FILE=$(mktemp)
 
-cat << 'EOF' > "$HEADER_FILE"
+cat << 'EOF' > "$HEADER_TEMPLATE"
 /*
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) __YEAR__, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,6 +48,19 @@ cat << 'EOF' > "$HEADER_FILE"
  *    limitations under the License.
  */
 EOF
+
+
+# =========================
+# Detect the year a file was created (first added to git).
+# Falls back to the current year for files not yet committed.
+# =========================
+get_file_year() {
+    year=$(git log --follow --diff-filter=A --format=%ad --date=format:%Y -- "$1" 2>/dev/null | tail -1)
+    if [ -z "$year" ]; then
+        year=$(date +%Y)
+    fi
+    echo "$year"
+}
 
 
 # =========================
@@ -124,11 +139,15 @@ if [ -n "$changed_files" ]; then
             # Check: must contain canonical Realtek marker
             if ! grep -q "Realtek Semiconductor Corporation" "$f"; then
                 echo "  -> Missing Realtek header: $f"
-                rm -f "$HEADER_FILE"
+                rm -f "$HEADER_FILE" "$HEADER_TEMPLATE"
                 exit 1
             fi
         else
             echo "  -> Normalizing header"
+
+            # build canonical header with this file's creation year
+            year=$(get_file_year "$f")
+            sed "s/__YEAR__/$year/" "$HEADER_TEMPLATE" > "$HEADER_FILE"
 
             # remove ALL existing top headers
             strip_leading_comments "$f"
@@ -164,4 +183,4 @@ if [ -n "$changed_files" ]; then
 fi
 
 
-rm -f "$HEADER_FILE"
+rm -f "$HEADER_FILE" "$HEADER_TEMPLATE"
