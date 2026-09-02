@@ -1,0 +1,69 @@
+name: Check PR Commits
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+jobs:
+  commit-message:
+    name: Commit message format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages
+        run: |
+          VALID_ICS="amebaz2|amebaz2plus|amebad|amebasmart|amebagreen2|common"
+          VALID_COMPONENTS="api|atcmd|ble|core|data-model|dct|docs|drivers|examples|kvs|lwip|mbedtls|ota|scripts|sdk|soc|timer|tools|wifi"
+          SUBJECT_RE="^\[($VALID_ICS)\]\[($VALID_COMPONENTS)\] .{3,}"
+
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.sha }}"
+          errors=0
+
+          while IFS= read -r commit; do
+            [ -z "$commit" ] && continue
+            short=$(git rev-parse --short "$commit")
+            subject=$(git log -1 --format="%s" "$commit")
+            body=$(git log -1 --format="%b" "$commit" | sed '/^[[:space:]]*$/d')
+
+            if ! echo "$subject" | grep -qE "$SUBJECT_RE"; then
+              echo "FAIL [$short] bad subject: $subject"
+              echo "     Expected: [IC][component] description"
+              echo "     ICs: amebaz2 | amebaz2plus | amebad | amebalite | amebad+ | amebasmart | amebagreen2 | common"
+              echo "     Components: api | atcmd | ble | core | data-model | dct |docs | drivers | examples | kvs | lwip | mbedtls | ota | scripts | sdk | soc | timer | tools | wifi"
+              errors=$((errors + 1))
+            fi
+
+            if [ -z "$body" ]; then
+              echo "FAIL [$short] missing commit body: $subject"
+              echo "     Add a body explaining what this commit does and why."
+              errors=$((errors + 1))
+            fi
+          done <<< "$(git log --no-merges --format="%H" "$BASE..$HEAD")"
+
+          if [ "$errors" -gt 0 ]; then
+            echo ""
+            echo "$errors commit message error(s) found."
+            exit 1
+          fi
+
+          echo "All commit messages are valid."
+
+  restyle:
+    name: Code style and headers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install astyle
+        run: sudo apt-get install -y astyle
+
+      - name: Run restyle check
+        run: |
+          RESTYLE_BASE="origin/${{ github.base_ref }}" \
+            sh tools/scripts/restyle_check.sh --check
