@@ -15,9 +15,13 @@ jobs:
 
       - name: Validate commit messages
         run: |
-          VALID_ICS="amebaz2|amebaz2plus|amebad|amebasmart|amebagreen2|common"
-          VALID_COMPONENTS="api|atcmd|ble|core|data-model|dct|docs|drivers|examples|kvs|lwip|mbedtls|ota|scripts|sdk|soc|timer|tools|wifi"
-          SUBJECT_RE="^\[($VALID_ICS)\]\[($VALID_COMPONENTS)\] .{3,}"
+          VALID_TYPES="feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert"
+          # IC tag is optional; omit it for common (chip-agnostic) changes.
+          VALID_ICS="amebaz2|amebaz2plus|amebad|amebalite|amebadplus|amebasmart|amebagreen2"
+          VALID_COMPONENTS="api|atcmd|ble|core|data-model|dct|docs|drivers|examples|fs|kvs|lwip|mbedtls|ota|scripts|sdk|soc|timer|tools|util|wifi"
+          # A leading [..] is only allowed if it is a valid IC; otherwise the
+          # subject must not start with '[' (catches typos like [amebadd]).
+          SUBJECT_RE="^($VALID_TYPES)\(($VALID_COMPONENTS)\)!?: (\[($VALID_ICS)\] )?[^[].{2,}"
 
           BASE="${{ github.event.pull_request.base.sha }}"
           HEAD="${{ github.sha }}"
@@ -31,9 +35,12 @@ jobs:
 
             if ! echo "$subject" | grep -qE "$SUBJECT_RE"; then
               echo "FAIL [$short] bad subject: $subject"
-              echo "     Expected: [IC][component] description"
-              echo "     ICs: amebaz2 | amebaz2plus | amebad | amebalite | amebad+ | amebasmart | amebagreen2 | common"
-              echo "     Components: api | atcmd | ble | core | data-model | dct |docs | drivers | examples | kvs | lwip | mbedtls | ota | scripts | sdk | soc | timer | tools | wifi"
+              echo "     Expected: type(component): [IC] description   (min 3 chars; [IC] optional, omit for common; append ! before ':' for breaking changes)"
+              echo "     Examples: feat(dct): serialize post-init DCT operations        (common)"
+              echo "               fix(api): [amebaz2plus] guard null pointer          (chip-specific)"
+              echo "     Types:      feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert"
+              echo "     ICs:        amebaz2 | amebaz2plus | amebad | amebalite | amebadplus | amebasmart | amebagreen2   (omit for common)"
+              echo "     Components: api | atcmd | ble | core | data-model | dct | docs | drivers | examples | fs | kvs | lwip | mbedtls | ota | scripts | sdk | soc | timer | tools | util | wifi"
               errors=$((errors + 1))
             fi
 
