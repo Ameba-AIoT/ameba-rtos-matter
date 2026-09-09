@@ -1,18 +1,29 @@
 #!/bin/bash
 # Validates commit message format for all commits being pushed.
 #
-# Required format:
-#   [IC][component] Short description
+# Required format (with optional IC tag):
+#   type(component): [IC] Short description
 #
 #   Body explaining what this commit does and why.  (mandatory)
+#
+# The [IC] tag is optional: omit it for common (chip-agnostic) changes,
+#   e.g. feat(dct): serialize post-init DCT operations
+# and add it only for chip-specific changes,
+#   e.g. fix(api): [amebaz2plus] guard null pointer
+# Append '!' before the colon for breaking changes,
+#   e.g. feat(api)!: rename matter_clear_all_fabric
 #
 
 ZERO_SHA=0000000000000000000000000000000000000000
 
-VALID_ICS="amebaz2|amebaz2plus|amebad|amebalite|amebad+|amebasmart|amebagreen2|common"
-VALID_COMPONENTS="api|atcmd|ble|core|data-model|dct|docs|drivers|examples|kvs|lwip|mbedtls|ota|scripts|sdk|soc|timer|tools|wifi"
+VALID_TYPES="feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert"
+# IC tag is optional; omit it for common (chip-agnostic) changes.
+VALID_ICS="amebaz2|amebaz2plus|amebad|amebalite|amebadplus|amebasmart|amebagreen2"
+VALID_COMPONENTS="api|atcmd|ble|core|data-model|dct|docs|drivers|examples|fs|kvs|lwip|mbedtls|ota|scripts|sdk|soc|timer|tools|util|wifi"
 
-SUBJECT_RE="^\[($VALID_ICS)\]\[($VALID_COMPONENTS)\] .{3,}"
+# A leading [..] is only allowed if it is a valid IC; otherwise the subject
+# must not start with '[' (catches typos like [amebadd]).
+SUBJECT_RE="^($VALID_TYPES)\(($VALID_COMPONENTS)\)!?: (\[($VALID_ICS)\] )?[^[].{2,}"
 
 errors=0
 
@@ -34,9 +45,12 @@ while read -r local_ref local_sha remote_ref remote_sha; do
 
         if ! echo "$subject" | grep -qE "$SUBJECT_RE"; then
             printf "\n[FAIL] %s  bad subject:\n  %s\n" "$short" "$subject"
-            printf "  Expected: [IC][component] description (min 3 chars)\n"
-            printf "  ICs:       amebaz2 | amebaz2plus | amebad | amebalite | amebad+ | amebasmart | amebagreen2 | common\n"
-            printf "  Components: api | atcmd | ble | core | data-model | dct |docs | drivers | examples | kvs | lwip | mbedtls | ota | scripts | sdk | soc | timer | tools | wifi\n"
+            printf "  Expected: type(component): [IC] description  (min 3 chars; [IC] optional, omit for common; add ! before ':' for breaking changes)\n"
+            printf "  Examples: feat(dct): serialize post-init DCT operations        (common)\n"
+            printf "            fix(api): [amebaz2plus] guard null pointer          (chip-specific)\n"
+            printf "  Types:      feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert\n"
+            printf "  ICs:        amebaz2 | amebaz2plus | amebad | amebalite | amebadplus | amebasmart | amebagreen2   (omit for common)\n"
+            printf "  Components: api | atcmd | ble | core | data-model | dct | docs | drivers | examples | fs | kvs | lwip | mbedtls | ota | scripts | sdk | soc | timer | tools | util | wifi\n"
             errors=$((errors + 1))
         fi
 
