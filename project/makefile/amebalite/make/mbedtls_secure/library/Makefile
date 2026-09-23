@@ -56,7 +56,7 @@ CSRC = $(DIR)/library/aes.c \
        $(DIR_FWLIB)/ameba_app_start.c
 ifeq ($(MBEDTLS_MATTER_V_2_28_1_ENABLE), y)
 CSRC += $(DIR)/library/rsa_internal.c
-else ifeq ($(MBEDTLS_MATTER_V_3_6_1_ENABLE), y)
+else ifeq ($(MBEDTLS_MATTER_V_3_6_7_ENABLE), y)
 CSRC += $(DIR)/library/bignum_core.c \
         $(DIR)/library/bignum_mod.c \
         $(DIR)/library/bignum_mod_raw.c \

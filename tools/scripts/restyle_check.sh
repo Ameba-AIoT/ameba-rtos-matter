@@ -116,13 +116,13 @@ if [ -n "$RESTYLE_BASE" ]; then
     changed_files=$(
         git diff --name-only "$RESTYLE_BASE...HEAD" |
         grep -E '\.(c|cpp|h|hpp)$' |
-        grep -Ev '^(common/lwip/lwip_v2\.1\.2|common/mbedtls/)'
+        grep -Ev '^(common/lwip/lwip_v2\.1\.2|common/mbedtls/|.*platform_autoconf\.h$)'
     )
 else
     changed_files=$(
         git diff --name-only HEAD~1 HEAD |
         grep -E '\.(c|cpp|h|hpp)$' |
-        grep -Ev '^(common/lwip/lwip_v2\.1\.2|common/mbedtls/)'
+        grep -Ev '^(common/lwip/lwip_v2\.1\.2|common/mbedtls/|.*platform_autoconf\.h$)'
     )
 fi
 

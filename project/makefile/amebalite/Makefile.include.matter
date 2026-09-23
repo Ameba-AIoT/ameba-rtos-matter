@@ -20,8 +20,8 @@ MATTER_INCLUDE     := $(MATTER_BUILD_DIR)/Makefile.include.matter
 ifeq ($(MBEDTLS_MATTER_ENABLE),y)
 ifeq ($(MBEDTLS_MATTER_V_2_28_1_ENABLE), y)
 MBEDTLSDIR	       := $(MATTER_MBEDTLS_DIR)/mbedtls-2.28.1
-else ifeq ($(MBEDTLS_MATTER_V_3_6_1_ENABLE), y)
-MBEDTLSDIR	       := $(MATTER_MBEDTLS_DIR)/mbedtls-3.6.1
+else ifeq ($(MBEDTLS_MATTER_V_3_6_7_ENABLE), y)
+MBEDTLSDIR	       := $(MATTER_MBEDTLS_DIR)/mbedtls-3.6.7
 endif
 endif
 
@@ -38,7 +38,7 @@ IFLAGS               += -I$(MATTER_DIR)/common/mbedtls
 ifeq ($(MBEDTLS_MATTER_ENABLE),y)
 IFLAGS               += -I$(MBEDTLSDIR)/include
 IFLAGS               += -I$(BASEDIR)/component/ssl/mbedtls_ram_map/rom
-ifeq ($(MBEDTLS_MATTER_V_3_6_1_ENABLE), y)
+ifeq ($(MBEDTLS_MATTER_V_3_6_7_ENABLE), y)
 IFLAGS               += -I$(MBEDTLSDIR)/library
 endif
 endif

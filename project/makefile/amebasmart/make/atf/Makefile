@@ -11,7 +11,7 @@ BL32_SOURCES += ${MBEDTLS_SOURCES} \
                 ${MATTER_DIR}/common/atf/service/matter_rtk_svc_setup.c
 
 # Add WARNINGS for Matter Secure
-WARNINGS_TEMP := ${WARNINGS} -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-label
+WARNINGS_TEMP := ${WARNINGS} -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-label -Wno-redundant-decls
 WARNINGS      := $(filter-out -Wmaybe-uninitialized, ${WARNINGS_TEMP})
 
 # Add DEFINITIONS for Matter Secure

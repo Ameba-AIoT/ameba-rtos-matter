@@ -7,8 +7,8 @@
 MATTER_MBEDTLS_DIR = $(MATTER_DIR)/common/mbedtls
 ifeq ($(MBEDTLS_MATTER_V_2_28_1_ENABLE), y)
 MBEDTLS_DIR       = $(MATTER_DIR)/common/mbedtls/mbedtls-2.28.1
-else ifeq ($(MBEDTLS_MATTER_V_3_6_1_ENABLE), y)
-MBEDTLS_DIR       = $(MATTER_DIR)/common/mbedtls/mbedtls-3.6.1
+else ifeq ($(MBEDTLS_MATTER_V_3_6_7_ENABLE), y)
+MBEDTLS_DIR       = $(MATTER_DIR)/common/mbedtls/mbedtls-3.6.7
 endif
 
 ifneq (${MATTER_SECURE_MBEDTLS_MK},1)
@@ -74,7 +74,7 @@ ifeq ($(MBEDTLS_MATTER_V_2_28_1_ENABLE), y)
 LIBMBEDTLS_SRCS+= $(addprefix ${MBEDTLS_DIR}/library/, \
                     rsa_internal.c \
                     )
-else ifeq ($(MBEDTLS_MATTER_V_3_6_1_ENABLE), y)
+else ifeq ($(MBEDTLS_MATTER_V_3_6_7_ENABLE), y)
 LIBMBEDTLS_SRCS+= $(addprefix ${MBEDTLS_DIR}/library/, \
                     bignum_core.c \
                     bignum_mod.c \
