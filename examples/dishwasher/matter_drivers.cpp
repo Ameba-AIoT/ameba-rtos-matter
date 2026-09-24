@@ -92,19 +92,6 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
         err = CHIP_ERROR_INTERNAL;
     }
 
-    BitMask<AlarmMap> supported; // Set dishwasher alarm supported value
-    supported.SetField(AlarmMap::kInflowError, 1);           // 0x01, 1
-    supported.SetField(AlarmMap::kDrainError, 1);            // 0x02, 2
-    supported.SetField(AlarmMap::kDoorError, 1);             // 0x04, 4
-    supported.SetField(AlarmMap::kTempTooLow, 1);            // 0x08, 8
-    supported.SetField(AlarmMap::kTempTooHigh, 1);           // 0x10, 16
-    supported.SetField(AlarmMap::kWaterLevelError, 1);       // 0x20, 32
-    dishwasherAlarmInstance.SetSupportedValue(1, supported); // 0x3F, 63
-    if (status != Status::Success) {
-        ChipLogProgress(DeviceLayer, "Failed to set Dishwasher Alarm Supported Value!\n");
-        err = CHIP_ERROR_INTERNAL;
-    }
-
     BitMask<AlarmMap> mask; // Set dishwasher alarm mask value
     mask.SetField(AlarmMap::kInflowError, 1);      // 0x01, 1
     mask.SetField(AlarmMap::kDrainError, 1);       // 0x02, 2
@@ -115,19 +102,6 @@ CHIP_ERROR matter_driver_dishwasher_set_startup_value()
     dishwasherAlarmInstance.SetMaskValue(1, mask); // 0x3F, 63
     if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set Dishwasher Alarm Mask Value!\n");
-        err = CHIP_ERROR_INTERNAL;
-    }
-
-    BitMask<AlarmMap> latch; // Set dishwasher alarm latch value
-    // SetLatchValue will call DishwasherAlarmServer::HasResetFeature(EndpointId endpoint)
-    // This means that the device needs to support reset feature to be able to set the latch value.
-    // Hence FeatureMap value of DishwasherAlarm Cluster must be set to 1 in Zap file.
-    latch.SetField(AlarmMap::kInflowError, 1);       // 0x01, 1
-    latch.SetField(AlarmMap::kDoorError, 1);         // 0x04, 4
-    latch.SetField(AlarmMap::kTempTooLow, 1);        // 0x08, 8
-    dishwasherAlarmInstance.SetLatchValue(1, latch); // 0x0D, 13
-    if (status != Status::Success) {
-        ChipLogProgress(DeviceLayer, "Failed to set Dishwasher Alarm Latch Value!\n");
         err = CHIP_ERROR_INTERNAL;
     }
 

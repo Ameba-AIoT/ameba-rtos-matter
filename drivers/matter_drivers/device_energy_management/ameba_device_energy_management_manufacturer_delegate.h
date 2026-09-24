@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -40,17 +40,23 @@ public:
     virtual int64_t GetApproxEnergyDuringSession() = 0;
 
     virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
-                                                                      AdjustmentCauseEnum cause)
+            AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerAdjustCompletion()
+    {
+        return CHIP_NO_ERROR;
+    }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPowerAdjustRequest(CauseEnum cause)
+    {
+        return CHIP_NO_ERROR;
+    }
 
     virtual CHIP_ERROR HandleDeviceEnergyManagementStartTimeAdjustRequest(const uint32_t requestedStartTimeUtc,
-                                                                          AdjustmentCauseEnum cause)
+            AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }
@@ -60,23 +66,32 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPauseCompletion()
+    {
+        return CHIP_NO_ERROR;
+    }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPauseRequest(CauseEnum cause)
+    {
+        return CHIP_NO_ERROR;
+    }
 
-    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelRequest() { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelRequest()
+    {
+        return CHIP_NO_ERROR;
+    }
 
     virtual CHIP_ERROR
     HandleModifyForecastRequest(const uint32_t forecastID,
-                                const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+                                const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> &slotAdjustments,
                                 AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }
 
     virtual CHIP_ERROR RequestConstraintBasedForecast(
-        const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> & constraints,
-        AdjustmentCauseEnum cause)
+                    const DataModel::DecodableList<DeviceEnergyManagement::Structs::ConstraintsStruct::DecodableType> &constraints,
+                    AdjustmentCauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }
@@ -102,7 +117,7 @@ public:
      * @param[in]  aCumulativeEnergyExported -total energy exported in milli-watthours
      */
     virtual CHIP_ERROR SendCumulativeEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                                   int64_t aCumulativeEnergyExported)
+            int64_t aCumulativeEnergyExported)
     {
         return CHIP_NO_ERROR;
     }
@@ -115,7 +130,23 @@ public:
      * @param[in]  aPeriodicEnergyExported - energy exported in milli-watthours in last period
      */
     virtual CHIP_ERROR SendPeriodicEnergyReading(EndpointId aEndpointId, int64_t aCumulativeEnergyImported,
-                                                 int64_t aCumulativeEnergyExported)
+            int64_t aCumulativeEnergyExported)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerRangeAdjustRequest(const Optional<int64_t> minPower,
+            const Optional<int64_t> maxPower,
+            const uint32_t durationS, AdjustmentCauseEnum cause)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    virtual CHIP_ERROR HandleDeviceEnergyManagementPowerRangeAdjustCompletion()
+    {
+        return CHIP_NO_ERROR;
+    }
+    virtual CHIP_ERROR HandleDeviceEnergyManagementCancelPowerRangeAdjustRequest(CauseEnum cause)
     {
         return CHIP_NO_ERROR;
     }
