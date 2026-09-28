@@ -112,7 +112,7 @@ CHIP_ERROR EnergyEvseInit(chip::EndpointId endpointId)
                                     EndpointId(endpointId), *gEvseDelegate,
                                     BitMask<EnergyEvse::Feature, uint32_t>(EnergyEvse::Feature::kChargingPreferences),
                                     BitMask<EnergyEvse::OptionalAttributes, uint32_t>(EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
-                                    BitMask<EnergyEvse::OptionalCommands, uint32_t>());
+                                    EnergyEvseCluster::OptionalCommandSet());
 
     if (!gEvseInstance) {
         ChipLogError(AppServer, "Failed to allocate memory for EnergyEvseManager");

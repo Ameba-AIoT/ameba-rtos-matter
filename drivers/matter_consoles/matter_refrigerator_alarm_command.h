@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include "controller/InvokeInteraction.h"
@@ -44,117 +44,87 @@ Engine sShellManualRefrigeratorAlarmStateSubCommands;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 
-CHIP_ERROR ManualRefrigeratorAlarmCommandHelpHandler(int argc, char ** argv)
+CHIP_ERROR ManualRefrigeratorAlarmCommandHelpHandler(int argc, char **argv)
 {
     sShellManualRefrigeratorAlarmStateSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ManualRefrigeratorAlarmCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualRefrigeratorAlarmCommandHandler(int argc, char **argv)
 {
-    if (argc == 0)
-    {
+    if (argc == 0) {
         return ManualRefrigeratorAlarmCommandHelpHandler(argc, argv);
     }
 
     return sShellManualRefrigeratorAlarmStateSubCommands.ExecCommand(argc, argv);
 }
 
-CHIP_ERROR ManualRefrigeratorAlarmDoorOpenCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualRefrigeratorAlarmDoorOpenCommandHandler(int argc, char **argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status;
-    RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
+    RefrigeratorAlarmServer &serverInstance = RefrigeratorAlarmServer::Instance();
 
     status = serverInstance.SetMaskValue(1, 0);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
+    if (status != Protocols::InteractionModel::Status::Success) {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, 1);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        goto exit;
-    }
-
-    status = serverInstance.SetSupportedValue(1, 0);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
+    if (status != Protocols::InteractionModel::Status::Success) {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "ManualRefrigeratorAlarmDoorOpenCommandHandler Failed!\r\n");
     }
 
     return err;
 }
 
-CHIP_ERROR ManualRefrigeratorAlarmDoorCloseCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualRefrigeratorAlarmDoorCloseCommandHandler(int argc, char **argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status;
-    RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
+    RefrigeratorAlarmServer &serverInstance = RefrigeratorAlarmServer::Instance();
 
     status = serverInstance.SetMaskValue(1, 1);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
+    if (status != Protocols::InteractionModel::Status::Success) {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
     status = serverInstance.SetStateValue(1, 0);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        goto exit;
-    }
-
-    status = serverInstance.SetSupportedValue(1, 1);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
+    if (status != Protocols::InteractionModel::Status::Success) {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "ManualRefrigeratorAlarmDoorCloseCommandHandler Failed!\r\n");
     }
 
     return err;
 }
 
-CHIP_ERROR ManualRefrigeratorAlarmSuppressCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualRefrigeratorAlarmSuppressCommandHandler(int argc, char **argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Protocols::InteractionModel::Status status;
-    RefrigeratorAlarmServer & serverInstance = RefrigeratorAlarmServer::Instance();
-
-    status = serverInstance.SetSupportedValue(1, 1);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
-        err = CHIP_ERROR_INTERNAL;
-        goto exit;
-    }
+    RefrigeratorAlarmServer &serverInstance = RefrigeratorAlarmServer::Instance();
 
     status = serverInstance.SetStateValue(1, 0);
-    if (status != Protocols::InteractionModel::Status::Success)
-    {
+    if (status != Protocols::InteractionModel::Status::Success) {
         err = CHIP_ERROR_INTERNAL;
         goto exit;
     }
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "ManualRefrigeratorAlarmDoorCloseCommandHandler Failed!\r\n");
     }
 

@@ -106,16 +106,14 @@ CHIP_ERROR matter_driver_refrigerator_set_startup_value(void)
         err = CHIP_ERROR_INTERNAL;
     }
 
-    BitMask<AlarmMap> supported; // Set refrigerator alarm supported value
-    supported.SetField(AlarmMap::kDoorOpen, 1);
-    status = refrigeratorAlarmObject.SetSupportedValue(1, supported);
+    BitMask<AlarmMap> mask(0); // set as close
+
+    status = refrigeratorAlarmObject.SetMaskValue(1, mask);
     if (status != Status::Success) {
-        ChipLogProgress(DeviceLayer, "Failed to set Refrigerator Alarm Supported Value!\n");
+        ChipLogProgress(DeviceLayer, "Failed to set Refrigerator Alarm Mask Value!\n");
         err = CHIP_ERROR_INTERNAL;
     }
 
-    BitMask<AlarmMap> mask; // Set refrigerator alarm mask value
-    mask.SetField(AlarmMap::kDoorOpen, 1);
     status = refrigeratorAlarmObject.SetMaskValue(1, mask);
     if (status != Status::Success) {
         ChipLogProgress(DeviceLayer, "Failed to set Refrigerator Alarm Mask Value!\n");
@@ -227,12 +225,12 @@ void matter_driver_downlink_update_handler(AppEvent *event)
     }
     break;
     case AppEvent::kEventType_Downlink_Refrigerator_Alarm_State: {
-        BitMask<AlarmMap> value;
-        value.SetField(AlarmMap::kDoorOpen, event->value._u8);
-        ChipLogProgress(DeviceLayer, "Set Refrigerator Alarm State Value 0x%x\n", event->value._u8);
-        alarmChangedStatus = refrigeratorAlarmObject.SetStateValue(1, value);
+        uint8_t value = event->value._u8;
+        ChipLogProgress(DeviceLayer, "Set Refrigerator Alarm State Value 0x%x\n", value);
+        BitMask<AlarmMap> mask(value);
+        alarmChangedStatus = refrigeratorAlarmObject.SetStateValue(1, mask);
         if (alarmChangedStatus != Status::Success) {
-            ChipLogProgress(DeviceLayer, "Failed to set door status!\n");
+            ChipLogProgress(DeviceLayer, "Failed to set refrigerator alarm state!\n");
         }
     }
     break;

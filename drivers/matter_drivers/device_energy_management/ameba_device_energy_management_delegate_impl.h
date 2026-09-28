@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <device_energy_management/ameba_device_energy_management_manufacturer_delegate.h>
@@ -33,12 +33,13 @@ class DeviceEnergyManagementDelegate : public DeviceEnergyManagement::Delegate
 {
 public:
     DeviceEnergyManagementDelegate();
+    ~DeviceEnergyManagementDelegate();
 
-    void SetDeviceEnergyManagementInstance(DeviceEnergyManagement::Instance & instance);
+    void SetDeviceEnergyManagementInstance(DeviceEnergyManagement::Instance &instance);
 
-    void SetDEMManufacturerDelegate(DEMManufacturerDelegate & deviceEnergyManagementManufacturerDelegate);
+    void SetDEMManufacturerDelegate(DEMManufacturerDelegate &deviceEnergyManagementManufacturerDelegate);
 
-    chip::app::Clusters::DeviceEnergyManagement::DEMManufacturerDelegate * GetDEMManufacturerDelegate();
+    chip::app::Clusters::DeviceEnergyManagement::DEMManufacturerDelegate *GetDEMManufacturerDelegate();
     /**
      *
      * Implement the DeviceEnergyManagement::Delegate interface
@@ -57,7 +58,7 @@ public:
      * @return  Success if the adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
      */
     chip::Protocols::InteractionModel::Status PowerAdjustRequest(const int64_t powerMw, const uint32_t durationS,
-                                                                 AdjustmentCauseEnum cause) override;
+            AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Make the ESA end the active power adjustment session & return to normal (or idle) power levels.
@@ -84,7 +85,7 @@ public:
      * IM_Status.
      */
     chip::Protocols::InteractionModel::Status StartTimeAdjustRequest(const uint32_t requestedStartTimeUtc,
-                                                                     AdjustmentCauseEnum cause) override;
+            AdjustmentCauseEnum cause) override;
 
     /**
      * @brief Handler for PauseRequest command
@@ -130,7 +131,7 @@ public:
      */
     chip::Protocols::InteractionModel::Status
     ModifyForecastRequest(const uint32_t forecastID,
-                          const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> & slotAdjustments,
+                          const DataModel::DecodableList<Structs::SlotAdjustmentStruct::DecodableType> &slotAdjustments,
                           AdjustmentCauseEnum cause) override;
 
     /**
@@ -145,7 +146,7 @@ public:
      * @return  Success if successful, otherwise the command SHALL be rejected returning other IM_Status.
      */
     chip::Protocols::InteractionModel::Status
-    RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> & constraints,
+    RequestConstraintBasedForecast(const DataModel::DecodableList<Structs::ConstraintsStruct::DecodableType> &constraints,
                                    AdjustmentCauseEnum cause) override;
 
     /**
@@ -167,6 +168,32 @@ public:
      */
     chip::Protocols::InteractionModel::Status CancelRequest() override;
 
+    /**
+     * @brief Handler for PowerRangeAdjustRequest
+     *
+     *   If the ESA supports PRA, and the ESAState is Online or PowerAdjustActive, then the ESA SHALL attempt to
+     *   adjust its power operation to stay within the requested power range for the requested duration.
+     *
+     * @param minPower Minimum power in mW that the ESA can operate at during the adjustment period.
+     * @param maxPower Maximum power in mW that the ESA can operate at during the adjustment period.
+     * @param duration Duration in seconds that the ESA SHALL maintain the power range for.
+     * @param cause Who (Grid/local) is triggering this change.
+     * @return  Success if the power range adjustment is accepted; otherwise the command SHALL be rejected with appropriate error.
+     */
+    chip::Protocols::InteractionModel::Status PowerRangeAdjustRequest(const Optional<int64_t> minPower,
+            const Optional<int64_t> maxPower, uint32_t duration,
+            AdjustmentCauseEnum cause) override;
+
+    /**
+     * @brief Handler for CancelPowerRangeAdjustRequest
+     *
+     *   The ESA SHALL update its PowerRangeAdjustment attribute to Null and return to normal (or idle) power levels.
+     *   The ESA SHALL also generate a PowerRangeAdjustEnd Event and the ESAState SHALL be restored to Online.
+     *
+     * @return Success if the power range adjustment is cancelled; otherwise the command SHALL be rejected with appropriate error.
+     */
+    chip::Protocols::InteractionModel::Status CancelPowerRangeAdjustRequest() override;
+
     // ------------------------------------------------------------------
     // Overridden DeviceEnergyManagement::Delegate Get attribute methods
 
@@ -175,9 +202,10 @@ public:
     ESAStateEnum GetESAState() override;
     int64_t GetAbsMinPower() override;
     int64_t GetAbsMaxPower() override;
-    const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> & GetPowerAdjustmentCapability() override;
-    const DataModel::Nullable<Structs::ForecastStruct::Type> & GetForecast() override;
+    const DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> &GetPowerAdjustmentCapability() override;
+    const DataModel::Nullable<Structs::ForecastStruct::Type> &GetForecast() override;
     OptOutStateEnum GetOptOutState() override;
+    const DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> &GetPowerRangeAdjustment() override;
 
     // ------------------------------------------------------------------
     // Overridden DeviceEnergyManagement::Delegate Set attribute methods
@@ -226,7 +254,26 @@ public:
     // DEMManufacturerDelegate::HandleModifyForecastRequest cannot be interrupted by any other CHIP task activity.
     CHIP_ERROR SetForecast(const DataModel::Nullable<Structs::ForecastStruct::Type> &);
 
-    CHIP_ERROR SetOptOutState(OptOutStateEnum);
+    /**
+     * @brief Set the OptOutState, implementing cumulative bitwise opt-out logic.
+     *
+     * OptOutStateEnum uses bitwise flags:
+     *   - kNoOptOut = 0x00 (no opt-out)
+     *   - kLocalOptOut = 0x01 (local optimization opted out)
+     *   - kGridOptOut = 0x02 (grid optimization opted out)
+     *   - kOptOut = 0x03 (both opted out - computed as kLocalOptOut | kGridOptOut)
+     *
+     * When setting a new opt-out state:
+     *   - If transitioning from kLocalOptOut to kGridOptOut (or vice versa), the result becomes
+     *     cumulative kOptOut (0x03) to track that BOTH reasons are now opted out.
+     *   - All active PowerAdjustment, PauseRequest, and PowerRangeAdjustment operations matching
+     *     the newly opted-out reason(s) are automatically cancelled.
+     *   - Forecast updates due to the opted-out reason are reverted to InternalOptimization.
+     *
+     * @param newValue The new opt-out state to set.
+     * @return CHIP_NO_ERROR on success; error code if cancellation of active operations fails.
+     */
+    CHIP_ERROR SetOptOutState(OptOutStateEnum newValue);
 
     // Returns whether the DeviceEnergyManagement is supported
     uint32_t HasFeature(Feature feature) const;
@@ -240,7 +287,7 @@ private:
     void HandlePowerAdjustRequestFailure();
 
     // Methods to handle when a PowerAdjustment completes
-    static void PowerAdjustTimerExpiry(System::Layer * systemLayer, void * delegate);
+    static void PowerAdjustTimerExpiry(System::Layer *systemLayer, void *delegate);
     void HandlePowerAdjustTimerExpiry();
 
     // Method to cancel a PowerAdjustment
@@ -257,7 +304,7 @@ private:
     void HandlePauseRequestFailure();
 
     // Methods to handle when a PauseRequest completes
-    static void PauseRequestTimerExpiry(System::Layer * systemLayer, void * delegate);
+    static void PauseRequestTimerExpiry(System::Layer *systemLayer, void *delegate);
     void HandlePauseRequestTimerExpiry();
 
     // Method to cancel a PauseRequest
@@ -266,13 +313,25 @@ private:
     // Method to generate a Paused event
     CHIP_ERROR GenerateResumedEvent(CauseEnum cause);
 
+    // Methods to handle when a PowerRangeAdjustRequest completes
+    static void PowerRangeAdjustTimerExpiry(System::Layer *systemLayer, void *delegate);
+    void HandlePowerRangeAdjustTimerExpiry();
+
+    // Method to handle PowerRangeAdjustRequest failure
+
+    // Method to cancel a PowerRangeAdjustRequest
+    CHIP_ERROR CancelPowerRangeAdjustRequestAndGenerateEvent(CauseEnum cause);
+
+    // Method to generate a PowerRangeAdjustEnd event
+    CHIP_ERROR GeneratePowerRangeAdjustEndEvent(CauseEnum cause);
+
 private:
     // Have a pointer to partner instance object
-    DeviceEnergyManagement::Instance * mpDEMInstance;
+    DeviceEnergyManagement::Instance *mpDEMInstance;
 
     // The DEMManufacturerDelegate object knows how to handle
     // manufacturer/product specific operations
-    DEMManufacturerDelegate * mpDEMManufacturerDelegate;
+    DEMManufacturerDelegate *mpDEMManufacturerDelegate;
 
     // Various attributes
     ESATypeEnum mEsaType;
@@ -283,6 +342,9 @@ private:
     OptOutStateEnum mOptOutState;
 
     DataModel::Nullable<Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustCapabilityStruct;
+
+    // Power Range Adjustment attribute
+    DataModel::Nullable<Structs::PowerRangeAdjustStruct::Type> mPowerRangeAdjustment;
 
     // See note above on SetForecast() about mForecast memory management
     DataModel::Nullable<Structs::ForecastStruct::Type> mForecast;
@@ -295,8 +357,13 @@ private:
 
     // Keep track whether a PauseRequest is in progress
     bool mPauseRequestInProgress;
-};
 
+    // Keep track whether a PowerRangeAdjustment is in progress
+    bool mPowerRangeAdjustmentInProgress;
+
+    // Keep track of when that PowerRangeAdjustment started
+    uint32_t mPowerRangeAdjustmentStartTimeUtc;
+};
 } // namespace DeviceEnergyManagement
 } // namespace Clusters
 } // namespace app

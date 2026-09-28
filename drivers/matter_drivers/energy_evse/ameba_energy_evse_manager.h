@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2023-2024 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #pragma once
 
 #include <energy_evse/ameba_energy_evse_delegate_impl.h>
@@ -31,8 +31,8 @@ namespace EnergyEvse {
 class EnergyEvseManager : public Instance
 {
 public:
-    EnergyEvseManager(EndpointId aEndpointId, EnergyEvseDelegate & aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
-                      OptionalCommands aOptionalCmds) :
+    EnergyEvseManager(EndpointId aEndpointId, EnergyEvseDelegate &aDelegate, Feature aFeature, OptionalAttributes aOptionalAttrs,
+                      EnergyEvseCluster::OptionalCommandSet aOptionalCmds) :
         EnergyEvse::Instance(aEndpointId, aDelegate, aFeature, aOptionalAttrs, aOptionalCmds)
     {
         mDelegate = &aDelegate;
@@ -41,17 +41,20 @@ public:
     // Delete copy constructor and assignment operator.
     EnergyEvseManager(const EnergyEvseManager &)             = delete;
     EnergyEvseManager(const EnergyEvseManager &&)            = delete;
-    EnergyEvseManager & operator=(const EnergyEvseManager &) = delete;
+    EnergyEvseManager &operator=(const EnergyEvseManager &) = delete;
 
     CHIP_ERROR Init();
     void Shutdown();
 
     CHIP_ERROR LoadPersistentAttributes();
 
-    EnergyEvseDelegate * GetDelegate() { return mDelegate; };
+    EnergyEvseDelegate *GetDelegate()
+    {
+        return mDelegate;
+    };
 
 private:
-    EnergyEvseDelegate * mDelegate;
+    EnergyEvseDelegate *mDelegate;
 };
 
 } // namespace EnergyEvse

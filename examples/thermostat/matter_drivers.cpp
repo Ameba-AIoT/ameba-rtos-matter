@@ -1,3 +1,21 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <thermostat_driver.h>
@@ -10,6 +28,18 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <app/clusters/thermostat-server/AttributeAccessorShim.h>
+#include <app/clusters/thermostat-server/CodegenIntegration.h>
+#include <app/clusters/thermostat-server/ThermostatCluster.h>
+
+#include "thermostat-delegate-impl.h"
+#include "thermostat-hold-delegate-impl.h"
+#include "thermostat-mode-delegate-impl.h"
+#include "thermostat-presets-delegate-impl.h"
+#include "thermostat-sensors-delegate-impl.h"
+#include "thermostat-setpoints-delegate-impl.h"
+#include "thermostat-suggestions-delegate-impl.h"
 
 using namespace ::chip::app;
 using chip::Protocols::InteractionModel::Status;
@@ -25,8 +55,25 @@ static Identify gIdentify1 = {
     chip::EndpointId{ 1 }, matter_driver_on_identify_start, matter_driver_on_identify_stop, Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator, matter_driver_on_trigger_effect,
 };
 
+constexpr chip::EndpointId gThermostatEndpoint(1);
+static Clusters::Thermostat::ThermostatDelegate gThermostatDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSetpointsDelegate gSetpointsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatHoldDelegate gHoldDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatPresetsDelegate gPresetsDelegate(gThermostatEndpoint);
+static Clusters::Thermostat::ThermostatSuggestionsDelegate gSuggestionsDelegate(gThermostatEndpoint, gPresetsDelegate);
+static Clusters::Thermostat::ThermostatSensorsDelegate gSensorsDelegate(gThermostatEndpoint);
+
+using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster <
+                              Clusters::Thermostat::ThermostatDelegate, Clusters::Thermostat::ThermostatSetpointsDelegate,
+                              Clusters::Thermostat::ThermostatHoldDelegate, Clusters::Thermostat::ThermostatPresetsDelegate,
+                              Clusters::Thermostat::ThermostatSuggestionsDelegate, Clusters::Thermostat::ThermostatSensorsDelegate >;
+
 CHIP_ERROR matter_driver_thermostat_init(void)
 {
+    Clusters::Thermostat::ServerInit<ThermostatClusterType>(gThermostatEndpoint, gThermostatDelegate, gSetpointsDelegate,
+            gHoldDelegate, gPresetsDelegate, gSuggestionsDelegate,
+            gSensorsDelegate);
+
     thermostat.Init();
     return CHIP_NO_ERROR;
 }
@@ -47,22 +94,19 @@ CHIP_ERROR matter_driver_thermostat_ui_set_startup_value(void)
     chip::app::Clusters::Thermostat::SystemModeEnum SystemMode;
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
-    getstatus = Clusters::Thermostat::Attributes::LocalTemperature::Get(1, temp);
+    getstatus = Clusters::Thermostat::Attributes::LocalTemperature::Get(gThermostatEndpoint, temp);
     VerifyOrExit(getstatus == Status::Success, err = CHIP_ERROR_INTERNAL);
-    getstatus = Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Get(1, &OccupiedCoolingSetpoint);
+    getstatus = Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Get(gThermostatEndpoint, &OccupiedCoolingSetpoint);
     VerifyOrExit(getstatus == Status::Success, err = CHIP_ERROR_INTERNAL);
-    getstatus = Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Get(1, &OccupiedHeatingSetpoint);
+    getstatus = Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Get(gThermostatEndpoint, &OccupiedHeatingSetpoint);
     VerifyOrExit(getstatus == Status::Success, err = CHIP_ERROR_INTERNAL);
-    getstatus = Clusters::Thermostat::Attributes::SystemMode::Get(1, &SystemMode);
+    getstatus = Clusters::Thermostat::Attributes::SystemMode::Get(gThermostatEndpoint, &SystemMode);
     VerifyOrExit(getstatus == Status::Success, err = CHIP_ERROR_INTERNAL);
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
-    if (temp.IsNull())
-    {
+    if (temp.IsNull()) {
         ui.SetLocalTemperature(0);
-    }
-    else
-    {
+    } else {
         ui.SetLocalTemperature(temp.Value());
     }
 
@@ -73,8 +117,7 @@ CHIP_ERROR matter_driver_thermostat_ui_set_startup_value(void)
     ui.UpdateDisplay();
 
 exit:
-    if (err == CHIP_ERROR_INTERNAL)
-    {
+    if (err == CHIP_ERROR_INTERNAL) {
         chip::DeviceLayer::PlatformMgr().UnlockChipStack();
     }
 
@@ -93,8 +136,7 @@ void matter_driver_on_identify_stop(Identify *identify)
 
 void matter_driver_on_trigger_effect(Identify *identify)
 {
-    switch (identify->mCurrentEffectIdentifier)
-    {
+    switch (identify->mCurrentEffectIdentifier) {
     case Clusters::Identify::EffectIdentifierEnum::kBlink:
         ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
         break;
@@ -115,8 +157,7 @@ void matter_driver_on_trigger_effect(Identify *identify)
 
 void IdentifyTimerHandler(chip::System::Layer *systemLayer, void *appState, CHIP_ERROR error)
 {
-    if (identifyTimerCount)
-    {
+    if (identifyTimerCount) {
         identifyTimerCount--;
     }
 }
@@ -139,38 +180,31 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == 1,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId)
-    {
-    case Clusters::Identify::Id:
-        {
-            matter_driver_OnIdentifyPostAttributeChangeCallback(&(aEvent->value._u8));
+    switch (path.mClusterId) {
+    case Clusters::Identify::Id: {
+        matter_driver_OnIdentifyPostAttributeChangeCallback(&(aEvent->value._u8));
+    }
+    break;
+    case Clusters::Thermostat::Id: {
+        if (path.mAttributeId == Clusters::Thermostat::Attributes::LocalTemperature::Id) {
+            ui.SetLocalTemperature(aEvent->value._u16);
+            thermostat.Do();
         }
-        break;
-    case Clusters::Thermostat::Id:
-        {
-            if (path.mAttributeId == Clusters::Thermostat::Attributes::LocalTemperature::Id)
-            {
-                ui.SetLocalTemperature(aEvent->value._u16);
-                thermostat.Do();
-            }
-            if (path.mAttributeId == Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Id)
-            {
-                ui.SetOccupiedCoolingSetpoint(aEvent->value._u16);
-                thermostat.Do();
-            }
-            if (path.mAttributeId == Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Id)
-            {
-                ui.SetOccupiedHeatingSetpoint(aEvent->value._u16);
-                thermostat.Do();
-            }
-            if (path.mAttributeId == Clusters::Thermostat::Attributes::SystemMode::Id)
-            {
-                ui.SetSystemMode(aEvent->value._u8);
-                thermostat.Do();
-            }
-            ui.UpdateDisplay();
+        if (path.mAttributeId == Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::Id) {
+            ui.SetOccupiedCoolingSetpoint(aEvent->value._u16);
+            thermostat.Do();
         }
-        break;
+        if (path.mAttributeId == Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::Id) {
+            ui.SetOccupiedHeatingSetpoint(aEvent->value._u16);
+            thermostat.Do();
+        }
+        if (path.mAttributeId == Clusters::Thermostat::Attributes::SystemMode::Id) {
+            ui.SetSystemMode(aEvent->value._u8);
+            thermostat.Do();
+        }
+        ui.UpdateDisplay();
+    }
+    break;
     case Clusters::RelativeHumidityMeasurement::Id:
         break;
     case Clusters::FanControl::Id:
@@ -185,8 +219,7 @@ void matter_driver_downlink_update_handler(AppEvent *event)
 {
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (event->Type)
-    {
+    switch (event->Type) {
     default:
         break;
     }
