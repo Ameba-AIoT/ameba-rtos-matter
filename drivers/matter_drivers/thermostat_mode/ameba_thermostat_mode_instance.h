@@ -21,34 +21,18 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
-#include <system/SystemLayer.h>
+#include <app/clusters/mode-base-server/mode-base-server.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace SmokeCoAlarm {
+namespace ThermostatMode {
 
-class AmebaSmokeCoAlarmEvent : public chip::TestEventTriggerHandler
-{
-public:
-    AmebaSmokeCoAlarmEvent()  = default;
-    ~AmebaSmokeCoAlarmEvent() = default;
+ModeBase::Instance *GetAmebaThermostatModeInstance(void);
+CHIP_ERROR AmebaThermostatModeInstanceInit(EndpointId endpoint);
+void AmebaThermostatModeInstanceShutdown(void);
 
-    void SelfTestingEventHandler(void);
-
-    /**
-     *   @brief
-     *   Timer callback which finishes the self-test: clears TestInProgress and
-     *   recomputes the ExpressedState according to the priority order.
-     */
-    static void EndSelfTestingEventHandler(System::Layer *systemLayer, void *appState);
-};
-
-CHIP_ERROR AmebaSmokeCoAlarmTestEventInit(EndpointId endpoint);
-
-} // namespace SmokeCoAlarm
+} // namespace ThermostatMode
 } // namespace Clusters
 } // namespace app
 } // namespace chip

@@ -17,22 +17,24 @@
  *    limitations under the License.
  */
 #include <smoke_co_alarm/ameba_smoke_co_alarm_delegate.h>
-#include <smoke_co_alarm/ameba_smoke_co_alarm_test_event.h>
-#include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
-#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
-#include <platform/CHIPDeviceLayer.h>
+#include <lib/support/CodeUtils.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SmokeCoAlarm;
 
-void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
+CHIP_ERROR SmokeCoAlarm::AmebaSmokeCoAlarmDelegateInit(EndpointId endpoint)
 {
-    //AmebaSmokeCoAlarmEvent::SelfTestingEventHandler();
-}
+    static AmebaSmokeCoAlarmDelegate sSmokeCODelegate;
 
-void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint)
-{
-    SmokeCoAlarm::AmebaSmokeCoAlarmDelegateInit(endpoint);
+    SmokeCoAlarmCluster::Config config;
+    config.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
+    LogErrorOnFailure(SmokeCoAlarmServer::Instance().Init(endpoint, config, &sSmokeCODelegate));
+
+    // utc_time_in_matter_epoch(datetime(2126, 1, 1, tzinfo=timezone.utc)) / 1_000_000
+    SmokeCoAlarmServer::Instance().SetExpiryDate(endpoint, 3976214400);
+
+    return CHIP_NO_ERROR;
 }

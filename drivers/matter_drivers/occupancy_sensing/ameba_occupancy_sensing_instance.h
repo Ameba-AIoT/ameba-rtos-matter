@@ -18,37 +18,20 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
-#include <system/SystemLayer.h>
+#include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace SmokeCoAlarm {
+namespace OccupancySensing {
 
-class AmebaSmokeCoAlarmEvent : public chip::TestEventTriggerHandler
-{
-public:
-    AmebaSmokeCoAlarmEvent()  = default;
-    ~AmebaSmokeCoAlarmEvent() = default;
+LazyRegisteredServerCluster<OccupancySensingCluster> *GetAmebaOccupancySensingInstance(void);
+CHIP_ERROR AmebaOccupancySensingInstanceInit(EndpointId endpointId);
+void AmebaOccupancySensingShutdown(void);
 
-    void SelfTestingEventHandler(void);
-
-    /**
-     *   @brief
-     *   Timer callback which finishes the self-test: clears TestInProgress and
-     *   recomputes the ExpressedState according to the priority order.
-     */
-    static void EndSelfTestingEventHandler(System::Layer *systemLayer, void *appState);
-};
-
-CHIP_ERROR AmebaSmokeCoAlarmTestEventInit(EndpointId endpoint);
-
-} // namespace SmokeCoAlarm
+} // namespace OccupancySensing
 } // namespace Clusters
 } // namespace app
 } // namespace chip

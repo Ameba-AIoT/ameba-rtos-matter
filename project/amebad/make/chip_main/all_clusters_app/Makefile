@@ -39,6 +39,7 @@ IFLAGS += -I$(MATTER_EXAMPLE_DIR)/chiptest
 IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/all-clusters-common/include
 IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/ameba/main/include
 IFLAGS += -I$(CHIPDIR)/examples/all-clusters-app/ameba/build/chip/gen/include
+IFLAGS += -I$(CHIPDIR)/examples/thermostat/thermostat-common/include
 IFLAGS += -I$(CODEGEN_DIR)
 
 # -------------------------------------------------------------------
@@ -102,6 +103,8 @@ CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/microwave_oven_mode/ameba_microwav
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/microwave_oven_mode/ameba_microwave_oven_mode_instance.cpp
 # mode select cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/mode_select/ameba_mode_select_manager.cpp
+# occupancy sensing cluster
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/occupancy_sensing/ameba_occupancy_sensing_instance.cpp
 # operational state cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_delegate.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_instance.cpp
@@ -128,8 +131,9 @@ CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/rvc_run_mode/ameba_rvc_run_mode_in
 # rvc operational state cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/rvc_operational_state/ameba_rvc_operational_state_delegate.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/rvc_operational_state/ameba_rvc_operational_state_instance.cpp
-# smoke co alram cluster 
+# smoke co alram cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/smoke_co_alarm/ameba_smoke_co_alarm_test_event.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/smoke_co_alarm/ameba_smoke_co_alarm_delegate.cpp
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/smoke_co_alarm/ameba_smoke_co_alarm_manager.cpp
 # soil measurement cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/soil_measurement/ameba_soil_measurement_instance.cpp
@@ -137,6 +141,16 @@ CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/soil_measurement/ameba_soil_measur
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/switch/ameba_switch_event.cpp
 # temperature controls cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/temperature_control/ameba_temperature_control_delegate.cpp
+# thermostat cluster
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/thermostat/ameba_thermostat_delegate.cpp
+# thermostat mode cluster
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/thermostat_mode/ameba_thermostat_mode_delegate.cpp
+CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/thermostat_mode/ameba_thermostat_mode_instance.cpp
+# thermostat cluster (hold, presets, sensors, suggestions)
+CPPSRC += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-hold-delegate-impl.cpp
+CPPSRC += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-presets-delegate-impl.cpp
+CPPSRC += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-sensors-delegate-impl.cpp
+CPPSRC += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-suggestions-delegate-impl.cpp
 # valve control cluster
 CPPSRC += $(MATTER_DRIVER_DIR)/matter_drivers/valve_control/ameba_valve_control_delegate.cpp
 # water heater management cluster

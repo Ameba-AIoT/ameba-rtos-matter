@@ -16,10 +16,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <app/clusters/mode-base-server/ModeBaseCluster.h>
+#ifndef __CLUSTER_CONFIG_H__
+#define __CLUSTER_CONFIG_H__
 
-using namespace chip::app;
+/* Thermostat Cluster */
+#define CONFIG_TSTAT_FEAT_F00           1         // Heating device
+#define CONFIG_TSTAT_FEAT_F01           1         // Cooling device
+#define CONFIG_TSTAT_FEAT_F02           0         // Occupied & Unoccupied setpoint
+#define CONFIG_TSTAT_FEAT_F05           0         // System Mode of Auto
 
-void __attribute__((weak)) MatterThermostatModeClusterInitCallback(chip::EndpointId endpointId) {}
+#define CONFIG_TSTAT_ATTR_PROTECTION    0
 
-void __attribute__((weak)) MatterThermostatModeClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}
+#if (CONFIG_TSTAT_FEAT_F00 == 0)
+#undef CONFIG_TSTAT_FEAT_F00
+#define CONFIG_TSTAT_FEAT_F00           1         // Forcing F00 to 1 to prevent build error
+#endif
+
+#endif /* __PLATFORM_OPTS_MATTER_H__ */

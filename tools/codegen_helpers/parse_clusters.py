@@ -10,6 +10,12 @@ import os
 excluded_files = [
     "TemporaryTestCoupling.cpp",
     "access-control-server/ArlEncoder.cpp",
+    # Occupancy Sensing is served by the Ameba dynamic instance
+    # (occupancy_sensing/ameba_occupancy_sensing_instance.cpp), which provides its
+    # own MatterOccupancySensingClusterInitCallback/ShutdownCallback with the
+    # desired feature map. Compiling the codegen integration here would both
+    # collide with those callbacks and register a hardcoded FeatureMap (kOccupancyEvent only).
+    "occupancy-sensor-server/CodegenIntegration.cpp",
 ]
 
 def parse_zapfile_clusters(cluster_file, chip_path):

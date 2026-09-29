@@ -1,7 +1,8 @@
 /*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright (c) 2022 Project CHIP Authors
- *    All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +16,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "controller/InvokeInteraction.h"
 #include "controller/ReadInteraction.h"
-#include <app/clusters/occupancy-sensor-server/CodegenIntegration.h>
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
+#include <occupancy_sensing/ameba_occupancy_sensing_instance.h>
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include "lib/shell/Engine.h"
@@ -43,7 +43,7 @@ Engine sShellManualOccupancySensingSubCommands;
 
 #if CONFIG_ENABLE_CHIP_SHELL
 
-CHIP_ERROR ManualOccupancySensingCommandHelpHandler(int argc, char ** argv)
+CHIP_ERROR ManualOccupancySensingCommandHelpHandler(int argc, char **argv)
 {
     sShellManualOccupancySensingSubCommands.ForEachCommand(Shell::PrintCommandHelp, nullptr);
 
@@ -54,27 +54,26 @@ CHIP_ERROR ManualOccupancySensingCommandHelpHandler(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ManualOccupancySensingCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOccupancySensingCommandHandler(int argc, char **argv)
 {
-    if (argc == 0)
-    {
+    if (argc == 0) {
         return ManualOccupancySensingCommandHelpHandler(argc, argv);
     }
     return sShellManualOccupancySensingSubCommands.ExecCommand(argc, argv);
 }
 
 
-CHIP_ERROR ManualOccupancySensingSetOccupancyCommandHandler(int argc, char ** argv)
+CHIP_ERROR ManualOccupancySensingSetOccupancyCommandHandler(int argc, char **argv)
 {
     if (argc != 1) {
         return ManualOccupancySensingCommandHelpHandler(argc, argv);
     }
 
-    chip::app::Clusters::OccupancySensingCluster * cluster = OccupancySensing::FindClusterOnEndpoint(1);
-    if (cluster == nullptr) {
+    auto *instance = OccupancySensing::GetAmebaOccupancySensingInstance();
+    if (instance == nullptr || !instance->IsConstructed()) {
         return CHIP_ERROR_INTERNAL;
     }
-    cluster->SetOccupancy(atoi(argv[0]));
+    instance->Cluster().SetOccupancy(atoi(argv[0]));
     return CHIP_NO_ERROR;
 }
 

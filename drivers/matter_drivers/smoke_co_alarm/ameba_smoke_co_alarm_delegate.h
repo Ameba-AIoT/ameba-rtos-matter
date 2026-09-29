@@ -18,35 +18,35 @@
  */
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/TestEventTriggerDelegate.h>
+#include <smoke_co_alarm/ameba_smoke_co_alarm_test_event.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
-#include <system/SystemLayer.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace SmokeCoAlarm {
 
-class AmebaSmokeCoAlarmEvent : public chip::TestEventTriggerHandler
+constexpr uint16_t kSelfTestingTimeoutSec = 10;
+
+class AmebaSmokeCoAlarmDelegate : public SmokeCoAlarmDelegate
 {
 public:
-    AmebaSmokeCoAlarmEvent()  = default;
-    ~AmebaSmokeCoAlarmEvent() = default;
+    void OnSelfTestRequested() override
+    {
+        ChipLogProgress(Support, "[Smoke-CO-Alarm] => Self test running");
 
-    void SelfTestingEventHandler(void);
-
-    /**
-     *   @brief
-     *   Timer callback which finishes the self-test: clears TestInProgress and
-     *   recomputes the ExpressedState according to the priority order.
-     */
-    static void EndSelfTestingEventHandler(System::Layer *systemLayer, void *appState);
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
+                        System::Clock::Seconds32(kSelfTestingTimeoutSec),
+                        AmebaSmokeCoAlarmEvent::EndSelfTestingEventHandler,
+                        nullptr);
+    }
 };
 
-CHIP_ERROR AmebaSmokeCoAlarmTestEventInit(EndpointId endpoint);
+CHIP_ERROR AmebaSmokeCoAlarmDelegateInit(EndpointId endpoint);
 
 } // namespace SmokeCoAlarm
 } // namespace Clusters

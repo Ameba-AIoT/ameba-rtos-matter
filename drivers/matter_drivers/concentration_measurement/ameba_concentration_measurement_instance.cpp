@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <concentration_measurement/ameba_concentration_measurement_instance.h>
 
 using namespace chip;
@@ -26,194 +25,186 @@ using namespace chip::app::Clusters::ConcentrationMeasurement;
 using namespace chip::app::DataModel;
 
 static Instance gAmebaCarbonDioxideCMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), CarbonDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), CarbonDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 static Instance gAmebaCarbonMonoxideCMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), CarbonMonoxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), CarbonMonoxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 static Instance gAmebaNitrogenDioxideCMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), NitrogenDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), NitrogenDioxideConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 static Instance gAmebaPm1CMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), Pm1ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), Pm1ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 static Instance gAmebaPm10CMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), Pm10ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 static Instance gAmebaPm25CMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), Pm25ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), Pm25ConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 static Instance gAmebaRadonCMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), RadonConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), RadonConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 static Instance gAmebaTotalVolatileOrganicCompoundsCMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
-        MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, MeasurementMediumEnum::kAir,
+                                MeasurementUnitEnum::kPpm);
 
 static Instance gAmebaOzoneCMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), OzoneConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), OzoneConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 static Instance gAmebaFormaldehydeCMInstance =
-    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
-        EndpointId(1), FormaldehydeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
+                CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+                                EndpointId(1), FormaldehydeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
 void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-     gAmebaCarbonDioxideCMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.SetMeasuredValue(MakeNullable(2.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonDioxideCMInstance.SetLevelValue(LevelValueEnum::kLow);
 
-     gAmebaCarbonDioxideCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-     gAmebaCarbonDioxideCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-     gAmebaCarbonDioxideCMInstance.SetMeasuredValue(MakeNullable(2.0f));
-     gAmebaCarbonDioxideCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-     gAmebaCarbonDioxideCMInstance.SetPeakMeasuredValueWindow(320);
-     gAmebaCarbonDioxideCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-     gAmebaCarbonDioxideCMInstance.SetAverageMeasuredValueWindow(320);
-     gAmebaCarbonDioxideCMInstance.SetUncertainty(0.0f);
-     gAmebaCarbonDioxideCMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfCarbonMonoxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gAmebaCarbonMonoxideCMInstance.Init();
-
-    gAmebaCarbonMonoxideCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    gAmebaCarbonMonoxideCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gAmebaCarbonMonoxideCMInstance.SetMeasuredValue(MakeNullable(1.0f));
-    gAmebaCarbonMonoxideCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gAmebaCarbonMonoxideCMInstance.SetPeakMeasuredValueWindow(320);
-    gAmebaCarbonMonoxideCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gAmebaCarbonMonoxideCMInstance.SetAverageMeasuredValueWindow(320);
-    gAmebaCarbonMonoxideCMInstance.SetUncertainty(0.0f);
-    gAmebaCarbonMonoxideCMInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaCarbonMonoxideCMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfNitrogenDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gAmebaNitrogenDioxideCMInstance.Init();
-
-    gAmebaNitrogenDioxideCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    gAmebaNitrogenDioxideCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gAmebaNitrogenDioxideCMInstance.SetMeasuredValue(MakeNullable(1.0f));
-    gAmebaNitrogenDioxideCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gAmebaNitrogenDioxideCMInstance.SetPeakMeasuredValueWindow(320);
-    gAmebaNitrogenDioxideCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gAmebaNitrogenDioxideCMInstance.SetAverageMeasuredValueWindow(320);
-    gAmebaNitrogenDioxideCMInstance.SetUncertainty(0.0f);
-    gAmebaNitrogenDioxideCMInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaNitrogenDioxideCMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfPm1ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gAmebaPm1CMInstance.Init();
 
-    gAmebaPm1CMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    gAmebaPm1CMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gAmebaPm1CMInstance.SetMeasuredValue(MakeNullable(1.0f));
-    gAmebaPm1CMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gAmebaPm1CMInstance.SetPeakMeasuredValueWindow(320);
-    gAmebaPm1CMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gAmebaPm1CMInstance.SetAverageMeasuredValueWindow(320);
-    gAmebaPm1CMInstance.SetUncertainty(0.0f);
-    gAmebaPm1CMInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaPm1CMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfPm10ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gAmebaPm10CMInstance.Init();
-
-    gAmebaPm10CMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    gAmebaPm10CMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gAmebaPm10CMInstance.SetMeasuredValue(MakeNullable(1.0f));
-    gAmebaPm10CMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gAmebaPm10CMInstance.SetPeakMeasuredValueWindow(320);
-    gAmebaPm10CMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gAmebaPm10CMInstance.SetAverageMeasuredValueWindow(320);
-    gAmebaPm10CMInstance.SetUncertainty(0.0f);
-    gAmebaPm10CMInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaPm10CMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfPm25ConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gAmebaPm25CMInstance.Init();
-
-    gAmebaPm25CMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    gAmebaPm25CMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gAmebaPm25CMInstance.SetMeasuredValue(MakeNullable(1.0f));
-    gAmebaPm25CMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gAmebaPm25CMInstance.SetPeakMeasuredValueWindow(320);
-    gAmebaPm25CMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gAmebaPm25CMInstance.SetAverageMeasuredValueWindow(320);
-    gAmebaPm25CMInstance.SetUncertainty(0.0f);
-    gAmebaPm25CMInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaPm25CMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfRadonConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gAmebaRadonCMInstance.Init();
-
-    gAmebaRadonCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    gAmebaRadonCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gAmebaRadonCMInstance.SetMeasuredValue(MakeNullable(1.0f));
-    gAmebaRadonCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gAmebaRadonCMInstance.SetPeakMeasuredValueWindow(320);
-    gAmebaRadonCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gAmebaRadonCMInstance.SetAverageMeasuredValueWindow(320);
-    gAmebaRadonCMInstance.SetUncertainty(0.0f);
-    gAmebaRadonCMInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaRadonCMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.Init();
-
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.SetMeasuredValue(MakeNullable(1.0f));
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.SetPeakMeasuredValueWindow(320);
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.SetAverageMeasuredValueWindow(320);
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.SetUncertainty(0.0f);
-    gAmebaTotalVolatileOrganicCompoundsCMInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaTotalVolatileOrganicCompoundsCMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfOzoneConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gAmebaOzoneCMInstance.Init();
-
-    gAmebaOzoneCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    gAmebaOzoneCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gAmebaOzoneCMInstance.SetMeasuredValue(MakeNullable(1.0f));
-    gAmebaOzoneCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gAmebaOzoneCMInstance.SetPeakMeasuredValueWindow(320);
-    gAmebaOzoneCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gAmebaOzoneCMInstance.SetAverageMeasuredValueWindow(320);
-    gAmebaOzoneCMInstance.SetUncertainty(0.0f);
-    gAmebaOzoneCMInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaOzoneCMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
-    gAmebaFormaldehydeCMInstance.Init();
-
-    gAmebaFormaldehydeCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
-    gAmebaFormaldehydeCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
-    gAmebaFormaldehydeCMInstance.SetMeasuredValue(MakeNullable(1.0f));
-    gAmebaFormaldehydeCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
-    gAmebaFormaldehydeCMInstance.SetPeakMeasuredValueWindow(320);
-    gAmebaFormaldehydeCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
-    gAmebaFormaldehydeCMInstance.SetAverageMeasuredValueWindow(320);
-    gAmebaFormaldehydeCMInstance.SetUncertainty(0.0f);
-    gAmebaFormaldehydeCMInstance.SetLevelValue(LevelValueEnum::kLow);
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.SetMaxMeasuredValue(MakeNullable(1000.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.Init();
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gAmebaFormaldehydeCMInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
 void emberAfCarbonDioxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
