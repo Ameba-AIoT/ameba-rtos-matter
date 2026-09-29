@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ static uint32_t matter_ota_new_firmware_addr_end;
 static uint8_t matter_ota_header[MATTER_OTA_HEADER_SIZE];
 static uint8_t matter_ota_header_size = 0; // variable to track size of ota header
 static uint16_t matter_ota_buffer_size = 0; // variable to track size of buffer
-static uint8_t matter_ota_buffer[MATTER_OTA_SECTOR_SIZE]; // 4KB buffer to be written to one sector
+static uint8_t *matter_ota_buffer;
 
 static const char *kOTACompleted = "ota_completed";
 
@@ -176,6 +176,12 @@ uint8_t matter_ota_get_current_header_size(void)
 
 void matter_ota_prepare_partition(void)
 {
+    matter_ota_buffer = (uint8_t *)malloc(MATTER_OTA_SECTOR_SIZE);
+    if (matter_ota_buffer == NULL) {
+        RTK_LOGE(TAG, "matter_ota_buffer malloc failed\n");
+        return;
+    }
+
     matter_ota_first_sector_written = false;
 
     memset(matter_ota_buffer, 0, sizeof(matter_ota_buffer));
@@ -381,6 +387,9 @@ int8_t matter_ota_flush_last(void)
         matter_ota_buffer_size = 0;
     }
 
+    free(matter_ota_buffer);
+    matter_ota_buffer = NULL;
+
     return OTA_SUCCESS;
 }
 
@@ -470,6 +479,9 @@ static void matter_ota_abort_task(void *pvParameters)
         }
     }
     matter_ota_first_sector_written = false;
+
+    free(matter_ota_buffer);
+    matter_ota_buffer = NULL;
 
     vTaskDelete(NULL);
 }
