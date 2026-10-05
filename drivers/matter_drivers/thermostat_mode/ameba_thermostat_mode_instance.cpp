@@ -39,9 +39,9 @@ CHIP_ERROR ThermostatMode::AmebaThermostatModeInstanceInit(EndpointId endpoint)
     auto *delegate = GetAmebaThermostatModeDelegate();
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INTERNAL);
 
-    gAmebaThermostatModeInstance = new ModeBase::Instance(delegate, endpoint, ThermostatMode::Id,
-            to_underlying(ThermostatMode::Feature::kCoreModes));
+    gAmebaThermostatModeInstance = new ModeBase::Instance(delegate, endpoint, ThermostatMode::Id, 0);
     VerifyOrReturnError(gAmebaThermostatModeInstance != nullptr, CHIP_ERROR_INTERNAL);
+
 
     gAmebaThermostatModeInstance->Init();
 
