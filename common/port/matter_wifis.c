@@ -1,3 +1,21 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <platform_opts.h>
 #include <platform/platform_stdlib.h>
 
@@ -44,31 +62,54 @@ void matter_wifi_reg_event_handler(matter_wifi_event event_cmds, rtw_event_handl
 static const char *matter_wifi_security_to_str(rtw_security_t sec)
 {
     switch (sec) {
-    case RTW_SECURITY_OPEN:                        return "Open";
-    case RTW_SECURITY_WEP_PSK:                     return "WEP";
-    case RTW_SECURITY_WPA_TKIP_PSK:                return "WPA TKIP";
-    case RTW_SECURITY_WPA_AES_PSK:                 return "WPA AES";
-    case RTW_SECURITY_WPA_MIXED_PSK:               return "WPA Mixed";
-    case RTW_SECURITY_WPA2_AES_PSK:                return "WPA2 AES";
-    case RTW_SECURITY_WPA2_TKIP_PSK:               return "WPA2 TKIP";
-    case RTW_SECURITY_WPA2_MIXED_PSK:              return "WPA2 Mixed";
-    case RTW_SECURITY_WPA_WPA2_TKIP_PSK:           return "WPA/WPA2 TKIP";
-    case RTW_SECURITY_WPA_WPA2_AES_PSK:            return "WPA/WPA2 AES";
-    case RTW_SECURITY_WPA_WPA2_MIXED_PSK:          return "WPA/WPA2 Mixed";
-    case RTW_SECURITY_WPA_TKIP_ENTERPRISE:         return "WPA TKIP Enterprise";
-    case RTW_SECURITY_WPA_AES_ENTERPRISE:          return "WPA AES Enterprise";
-    case RTW_SECURITY_WPA_MIXED_ENTERPRISE:        return "WPA Mixed Enterprise";
-    case RTW_SECURITY_WPA2_TKIP_ENTERPRISE:        return "WPA2 TKIP Enterprise";
-    case RTW_SECURITY_WPA2_AES_ENTERPRISE:         return "WPA2 AES Enterprise";
-    case RTW_SECURITY_WPA2_MIXED_ENTERPRISE:       return "WPA2 Mixed Enterprise";
-    case RTW_SECURITY_WPA_WPA2_TKIP_ENTERPRISE:    return "WPA/WPA2 TKIP Enterprise";
-    case RTW_SECURITY_WPA_WPA2_AES_ENTERPRISE:     return "WPA/WPA2 AES Enterprise";
-    case RTW_SECURITY_WPA_WPA2_MIXED_ENTERPRISE:   return "WPA/WPA2 Mixed Enterprise";
+    case RTW_SECURITY_OPEN:
+        return "Open";
+    case RTW_SECURITY_WEP_PSK:
+        return "WEP";
+    case RTW_SECURITY_WPA_TKIP_PSK:
+        return "WPA TKIP";
+    case RTW_SECURITY_WPA_AES_PSK:
+        return "WPA AES";
+    case RTW_SECURITY_WPA_MIXED_PSK:
+        return "WPA Mixed";
+    case RTW_SECURITY_WPA2_AES_PSK:
+        return "WPA2 AES";
+    case RTW_SECURITY_WPA2_TKIP_PSK:
+        return "WPA2 TKIP";
+    case RTW_SECURITY_WPA2_MIXED_PSK:
+        return "WPA2 Mixed";
+    case RTW_SECURITY_WPA_WPA2_TKIP_PSK:
+        return "WPA/WPA2 TKIP";
+    case RTW_SECURITY_WPA_WPA2_AES_PSK:
+        return "WPA/WPA2 AES";
+    case RTW_SECURITY_WPA_WPA2_MIXED_PSK:
+        return "WPA/WPA2 Mixed";
+    case RTW_SECURITY_WPA_TKIP_ENTERPRISE:
+        return "WPA TKIP Enterprise";
+    case RTW_SECURITY_WPA_AES_ENTERPRISE:
+        return "WPA AES Enterprise";
+    case RTW_SECURITY_WPA_MIXED_ENTERPRISE:
+        return "WPA Mixed Enterprise";
+    case RTW_SECURITY_WPA2_TKIP_ENTERPRISE:
+        return "WPA2 TKIP Enterprise";
+    case RTW_SECURITY_WPA2_AES_ENTERPRISE:
+        return "WPA2 AES Enterprise";
+    case RTW_SECURITY_WPA2_MIXED_ENTERPRISE:
+        return "WPA2 Mixed Enterprise";
+    case RTW_SECURITY_WPA_WPA2_TKIP_ENTERPRISE:
+        return "WPA/WPA2 TKIP Enterprise";
+    case RTW_SECURITY_WPA_WPA2_AES_ENTERPRISE:
+        return "WPA/WPA2 AES Enterprise";
+    case RTW_SECURITY_WPA_WPA2_MIXED_ENTERPRISE:
+        return "WPA/WPA2 Mixed Enterprise";
 #ifdef CONFIG_SAE_SUPPORT
-    case  RTW_SECURITY_WPA3_AES_PSK:               return "WPA3-SAE AES";
-    case  RTW_SECURITY_WPA2_WPA3_MIXED:            return "WPA2/WPA3-SAE AES";
+    case  RTW_SECURITY_WPA3_AES_PSK:
+        return "WPA3-SAE AES";
+    case  RTW_SECURITY_WPA2_WPA3_MIXED:
+        return "WPA2/WPA3-SAE AES";
 #endif
-    default:                                       return "Unknown";
+    default:
+        return "Unknown";
     }
 }
 
@@ -180,7 +221,7 @@ static void matter_wifi_autoreconnect_thread(void *param)
 
     int ret = RTW_ERROR;
     char empty_bssid[ETH_ALEN] = {0};
-    bool assoc_by_bssid = false;
+    bool assoc_by_bssid = 0;
 
     unsigned char *saved_bssid = rltk_wlan_get_saved_bssid();
 
@@ -191,7 +232,7 @@ static void matter_wifi_autoreconnect_thread(void *param)
 #endif
 
     if (memcmp(saved_bssid, empty_bssid, ETH_ALEN) != 0) {
-        assoc_by_bssid = true;
+        assoc_by_bssid = 1;
     }
 
     if (assoc_by_bssid) {
@@ -279,11 +320,10 @@ static int matter_find_ap_from_scan_buf(char *buf, int buflen, char *target_ssid
     rtw_wifi_setting_t *pwifi = (rtw_wifi_setting_t *) user_data;
     int plen = 0;
 
-    while (plen < buflen)
-    {
-        u8 len = (u8) *(buf + plen);
+    while (plen < buflen) {
+        u8 len = (u8) * (buf + plen);
         if (len == 0) {
-            break; 
+            break;
         }
 
         u8 ssid_len = len - SCAN_RECORD_SSID_OFFSET;
@@ -293,7 +333,7 @@ static int matter_find_ap_from_scan_buf(char *buf, int buflen, char *target_ssid
             strncpy((char *) pwifi->ssid, target_ssid, MAX_SSID_LEN + 1);
             pwifi->channel = *(buf + plen + SCAN_RECORD_CHANNEL_OFFSET);
 
-            u8 security_mode = (u8) *(buf + plen + SCAN_RECORD_SECURITY_OFFSET);
+            u8 security_mode = (u8) * (buf + plen + SCAN_RECORD_SECURITY_OFFSET);
             if (security_mode == IW_ENCODE_ALG_NONE) {
                 pwifi->security_type = RTW_SECURITY_OPEN;
             } else if (security_mode == IW_ENCODE_ALG_WEP) {
