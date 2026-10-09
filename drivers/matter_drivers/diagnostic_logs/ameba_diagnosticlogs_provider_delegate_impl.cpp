@@ -1,10 +1,28 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <platform_stdlib.h>
 #include <platform_opts.h>
+
+#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
 #include <device_lock.h>
 #include <flash_api.h>
 #include <lfs.h>
-
-#if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
 #include <matter_fs.h>
 #include <diagnostic_logs/ameba_diagnosticlogs_provider_delegate_impl.h>
 
@@ -16,7 +34,7 @@ using namespace chip::app::Clusters::DiagnosticLogs;
 /* Attach the log provider delegate to the server via callback */
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
-    auto & logProvider = AmebaDiagnosticLogsProvider::GetInstance();
+    auto &logProvider = AmebaDiagnosticLogsProvider::GetInstance();
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
 
@@ -30,42 +48,37 @@ size_t GetFileSize(char *path, void *fpp)
 }
 
 namespace {
-    bool IsValidIntent(IntentEnum intent)
-    {
-        return intent != IntentEnum::kUnknownEnumValue;
-    }
+bool IsValidIntent(IntentEnum intent)
+{
+    return intent != IntentEnum::kUnknownEnumValue;
+}
 }
 
 AmebaDiagnosticLogsProvider::AmebaDiagnosticLogsProvider()
 {
     int res;
 
-    if (AmebaDiagnosticLogsProvider::bInitedFs == false)
-    {
+    if (AmebaDiagnosticLogsProvider::bInitedFs == false) {
         res = matter_fs_get_init();
-        if (res < 0)
-        {
+        if (res < 0) {
             ChipLogError(DeviceLayer, "Fail to init flash fs for logging! %" CHIP_ERROR_FORMAT, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
             goto exit;
-        } 
+        }
 
         res = matter_fs_fopen(USER_LOG_FILENAME, &fpUserLog, LFS_O_RDWR | LFS_O_CREAT);
-        if (res < 0)
-        {
+        if (res < 0) {
             ChipLogError(DeviceLayer, "Failed to open user.log file. Error code: %d", res);
             goto exit;
         }
 
         res = matter_fs_fopen(NET_LOG_FILENAME, &fpNetdiagLog, LFS_O_RDWR | LFS_O_CREAT);
-        if (res < 0)
-        {
+        if (res < 0) {
             ChipLogError(DeviceLayer, "Failed to open netdiag.log file. Error code: %d", res);
             goto cleanup_user_log;
         }
 
         res = matter_fs_fopen(CRASH_LOG_FILENAME, &fpCrashLog, LFS_O_RDWR | LFS_O_CREAT);
-        if (res < 0)
-        {
+        if (res < 0) {
             ChipLogError(DeviceLayer, "Failed to open crash.log file. Error code: %d", res);
             goto cleanup_netdiag_log;
         }
@@ -94,8 +107,7 @@ size_t AmebaDiagnosticLogsProvider::GetSizeForIntent(IntentEnum intent)
 
     size_t logsize = 0;
 
-    switch (intent) 
-    {
+    switch (intent) {
     case IntentEnum::kEndUserSupport:
         // Get the size of the current user.log file
         logsize = GetFileSize(NULL, &fpUserLog);
@@ -115,14 +127,14 @@ size_t AmebaDiagnosticLogsProvider::GetSizeForIntent(IntentEnum intent)
     return logsize;
 }
 
-CHIP_ERROR AmebaDiagnosticLogsProvider::StartLogCollection(IntentEnum intent, LogSessionHandle & outHandle, Optional<uint64_t> & outTimeStamp, Optional<uint64_t> & outTimeSinceBoot)
+CHIP_ERROR AmebaDiagnosticLogsProvider::StartLogCollection(IntentEnum intent, LogSessionHandle &outHandle, Optional<uint64_t> &outTimeStamp,
+        Optional<uint64_t>  &outTimeSinceBoot)
 {
     VerifyOrReturnValue(IsValidIntent(intent), CHIP_ERROR_INVALID_ARGUMENT);
 
-    lfs_file_t* fp = nullptr;
+    lfs_file_t *fp = nullptr;
 
-    switch(intent)
-    {
+    switch (intent) {
     case IntentEnum::kEndUserSupport:
         fp = &fpUserLog;
         break;
@@ -148,7 +160,7 @@ CHIP_ERROR AmebaDiagnosticLogsProvider::StartLogCollection(IntentEnum intent, Lo
 
     outHandle = mLogSessionHandle;
     mLogFiles[mLogSessionHandle] = fp;
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -157,24 +169,19 @@ CHIP_ERROR AmebaDiagnosticLogsProvider::EndLogCollection(LogSessionHandle sessio
     VerifyOrReturnValue(sessionHandle != kInvalidLogSessionHandle, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnValue(mLogFiles.count(sessionHandle), CHIP_ERROR_INVALID_ARGUMENT);
 
-    lfs_file_t* fp = mLogFiles[sessionHandle];
+    lfs_file_t *fp = mLogFiles[sessionHandle];
     VerifyOrReturnError(fp != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // WARNING: If the handle is closed, it needs to be reopened or will assert in LFS layer on future calls
     matter_fs_fclear(fp);  // Since the file has been read, it is safe to clear it
 
-    if (fp == &fpUserLog)
-    {
+    if (fp == &fpUserLog) {
         ChipLogProgress(DeviceLayer, "Removing Logs for User logs");
         matter_fs_remove(USER_LOG_FILENAME);
-    }
-    else if (fp == &fpNetdiagLog)
-    {
+    } else if (fp == &fpNetdiagLog) {
         ChipLogProgress(DeviceLayer, "Removing Logs for Network logs");
         matter_fs_remove(NET_LOG_FILENAME);
-    }
-    else if (fp == &fpCrashLog)
-    {
+    } else if (fp == &fpCrashLog) {
         ChipLogProgress(DeviceLayer, "Removing Logs for Crash logs");
         matter_fs_remove(CRASH_LOG_FILENAME);
     }
@@ -186,9 +193,9 @@ CHIP_ERROR AmebaDiagnosticLogsProvider::EndLogCollection(LogSessionHandle sessio
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AmebaDiagnosticLogsProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSpan & outBuffer, bool & outIsEndOfLog)
+CHIP_ERROR AmebaDiagnosticLogsProvider::CollectLog(LogSessionHandle sessionHandle, MutableByteSpan &outBuffer, bool &outIsEndOfLog)
 {
-    lfs_file_t* fp = mLogFiles[sessionHandle]; // Obtain the file handle
+    lfs_file_t *fp = mLogFiles[sessionHandle]; // Obtain the file handle
     VerifyOrReturnError(fp != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     int filesize = matter_fs_fsize(fp); // Get the filesize
@@ -207,10 +214,11 @@ CHIP_ERROR AmebaDiagnosticLogsProvider::CollectLog(LogSessionHandle sessionHandl
     // Required for BDX transaction to tell it when to read next block
     outIsEndOfLog = filesize == matter_fs_ftell(fp);
 
-    return CHIP_NO_ERROR; 
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AmebaDiagnosticLogsProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan & outBuffer, Optional<uint64_t> & outTimeStamp, Optional<uint64_t> & outTimeSinceBoot)
+CHIP_ERROR AmebaDiagnosticLogsProvider::GetLogForIntent(IntentEnum intent, MutableByteSpan &outBuffer, Optional<uint64_t> &outTimeStamp,
+        Optional<uint64_t> &outTimeSinceBoot)
 {
     VerifyOrReturnValue(IsValidIntent(intent), CHIP_ERROR_INVALID_ARGUMENT);
 
