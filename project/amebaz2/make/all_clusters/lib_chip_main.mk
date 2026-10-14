@@ -44,6 +44,7 @@ endif
 # Include Path
 # -------------------------------------------------------------------
 INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/ameba/main/include
+INCLUDES += -I$(CHIPDIR)/examples/thermostat/thermostat-common/include
 INCLUDES += -I$(CHIPDIR)/examples/all-clusters-app/ameba/build/chip/gen/include
 INCLUDES += -I$(MATTER_EXAMPLE_DIR)/chiptest
 INCLUDES += -I$(CODEGENDIR)
@@ -109,6 +110,8 @@ SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/microwave_oven_mode/ameba_microwa
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/microwave_oven_mode/ameba_microwave_oven_mode_instance.cpp
 # mode select cluster
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/mode_select/ameba_mode_select_manager.cpp
+# occupancy sensing cluster
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/occupancy_sensing/ameba_occupancy_sensing_instance.cpp
 # operational state cluster
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_delegate.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/operational_state/ameba_operational_state_instance.cpp
@@ -135,8 +138,9 @@ SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/rvc_run_mode/ameba_rvc_run_mode_i
 # rvc operational state cluster
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/rvc_operational_state/ameba_rvc_operational_state_delegate.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/rvc_operational_state/ameba_rvc_operational_state_instance.cpp
-# smoke co alram cluster 
+# smoke co alram cluster
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/smoke_co_alarm/ameba_smoke_co_alarm_test_event.cpp
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/smoke_co_alarm/ameba_smoke_co_alarm_delegate.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/smoke_co_alarm/ameba_smoke_co_alarm_manager.cpp
 # soil measurement cluster
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/soil_measurement/ameba_soil_measurement_instance.cpp
@@ -144,6 +148,11 @@ SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/soil_measurement/ameba_soil_measu
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/switch/ameba_switch_event.cpp
 # temperature controls cluster
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/temperature_control/ameba_temperature_control_delegate.cpp
+# thermostat cluster
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/thermostat/ameba_thermostat_delegate.cpp
+# thermostat mode cluster
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/thermostat_mode/ameba_thermostat_mode_delegate.cpp
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/thermostat_mode/ameba_thermostat_mode_instance.cpp
 # valve control cluster
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/valve_control/ameba_valve_control_delegate.cpp
 # water heater management cluster
