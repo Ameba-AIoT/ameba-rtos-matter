@@ -24,9 +24,11 @@
 
 #include <fan_control/ameba_fan_control_manager.h>
 #include <energy_evse/ameba_energy_evse_main.h>
+#include <occupancy_sensing/ameba_occupancy_sensing_instance.h>
 #include <valve_control/ameba_valve_control_delegate.h>
 #include <water_heater_management/ameba_water_heater_management_main.h>
 #include <mode_select/ameba_mode_select_manager.h>
+#include <thermostat/ameba_thermostat_delegate.h>
 #if CONFIG_ENABLE_AMEBA_TEST_EVENT_TRIGGER
 #include <smoke_co_alarm/ameba_smoke_co_alarm_test_event.h>
 #include <app/clusters/water-heater-management-server/WaterHeaterManagementTestEventTriggerHandler.h>
