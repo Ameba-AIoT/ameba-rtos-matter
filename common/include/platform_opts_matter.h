@@ -68,7 +68,7 @@
 #endif /* CONFIG_EXAMPLE_WLAN_FAST_CONNECT */
 #endif /* CONFIG_EXAMPLE_MATTER */
 
-#if defined(CONFIG_PLATFORM_8710C) || defined(CONFIG_PLATFORM_8721D)
+/************************** DCT Configuration Start **************************/
 
 /* DCT size : module size is 4k, module number is 4, the total module number is 4 + 0*4 = 4, the size is 4*4 = 16k,
  *            if backup enabled, the total module number is 4 + 1*4 = 8, the size is 4*8 = 32k;
@@ -100,13 +100,12 @@
  ****************************************************************/
 #define MATTER_FACTORY_DATA                     (0x3FF000)
 
-#endif
-
+/*
+ * Apply the Matter-specific Flash layout overrides only when building
+ * firmware. These overrides must not affect Matter library builds.
+*/
+#if !defined(CHIP_PROJECT) && !defined(MATTER_USER_FLASH_CONFIG)
 #if defined(CONFIG_PLATFORM_8710C)
-
-#undef CONFIG_USE_AZURE_EMBEDDED_C
-#define CONFIG_USE_AZURE_EMBEDDED_C             0
-
 /* Matter layout */
 #undef FAST_RECONNECT_DATA
 #undef BT_FTL_PHY_ADDR0
@@ -150,14 +149,17 @@
 #undef MATTER_KVS_BEGIN_ADDR
 #undef MATTER_KVS_BEGIN_ADDR2
 
-#define UART_SETTING_SECTOR                     0x001B6000              // 1K
-#define AP_SETTING_SECTOR                       0x001B7000              // 1K
-#define FTL_PHY_PAGE_START_ADDR                 0x001B8000              // 3K
-#define FAST_RECONNECT_DATA                     0x001CB000              // 1K
+#define UART_SETTING_SECTOR                     0x001B6000              // 4K
+#define AP_SETTING_SECTOR                       0x001B7000              // 4K
+#define FTL_PHY_PAGE_START_ADDR                 0x001B8000              // 12K
+#define FAST_RECONNECT_DATA                     0x001CB000              // 4K
 #define MATTER_KVS_BEGIN_ADDR                   0x001CC000
 #define MATTER_KVS_BEGIN_ADDR2                  0x003B6000
 
 #endif /* CONFIG_PLATFORM_87XXX */
+#endif
+
+/************************** DCT Configuration End **************************/
 
 /**
  * CONFIG_ENABLE_AMEBA_DLOG==1: to support diagnosic logs.
