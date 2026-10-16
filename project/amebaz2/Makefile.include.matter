@@ -19,7 +19,12 @@ MATTER_EXAMPLE_DIR   := $(MATTER_DIR)/examples
 MATTER_TOOL_DIR      := $(MATTER_DIR)/tools
 
 # Networking and Security Directories
+LWIP_DIR_SELECTION = matter
+ifeq ($(LWIP_DIR_SELECTION), matter)
 LWIP_DIR             := $(MATTER_COMMON_DIR)/lwip
+else
+LWIP_DIR             := $(SDKROOTDIR)/component/common/network/lwip
+endif
 MATTER_LWIP_DIR       = $(LWIP_DIR)
 
 MBEDTLS_DIR_SELECTION = matter
