@@ -19,7 +19,12 @@ MATTER_EXAMPLE_DIR   := $(MATTER_DIR)/examples
 MATTER_TOOL_DIR      := $(MATTER_DIR)/tools
 
 # Networking and Security Directories
+LWIP_DIR_SELECTION = matter
+ifeq ($(LWIP_DIR_SELECTION), matter)
 LWIP_DIR             := $(MATTER_COMMON_DIR)/lwip
+else
+LWIP_DIR             := $(SDKROOTDIR)/component/common/network/lwip
+endif
 MATTER_LWIP_DIR       = $(LWIP_DIR)
 
 MBEDTLS_DIR_SELECTION = matter
@@ -47,7 +52,7 @@ include $(MATTER_INCLUDE_TOOLCHAIN)
 
 FREERTOS_VERSION   = freertos_v10.0.1
 LWIP_VERSION       = lwip_v2.1.2
-MBEDTLS_VERSION    = mbedtls-2.28.1
+MBEDTLS_VERSION    = mbedtls-3.6.6
 
 # -------------------------------------------------------------------
 # Compiler Flags
