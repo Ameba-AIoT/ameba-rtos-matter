@@ -54,6 +54,7 @@ Starting from **Matter v1.4**, we have moved to these new repositories:
 | Matter v1.4    | (Branch) release/v1.4     | (Branch) v1.4-branch    |
 | Matter v1.4.2  | (Branch) release/v1.4.2   | (Branch) v1.4.2-branch  |
 | Matter v1.5    | (Branch) release/v1.5     | (Branch) v1.5-branch    |
+| Matter v1.6    | (Branch) release/v1.6     | (Branch) v1.6-branch    |
 
 ## Ameba RTOS Matter Repo Integration
 
