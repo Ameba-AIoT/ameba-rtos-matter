@@ -26,8 +26,7 @@ extern "C" {
 /**
   * @brief  Matter OTA error number.
   */
-enum
-{
+enum {
     OTA_SUCCESS = 1,            /**< Matter OTA success */
     OTA_ERROR = -1,             /**< Matter OTA error */
 };
@@ -53,6 +52,8 @@ void matter_ota_prepare_partition(void);
 /**
  * @brief  Store Matter OTA firmware header.
  *         Firmware header will only be included in the first frame, record it down.
+ *         Once all 32 bytes of the Ameba OTA container header have arrived they
+ *         are validated immediately.
  * @param[in]  data: Pointer to the firmware header data.
  * @param[in]  size: Size of the firmware header.
  * @return OTA_SUCCESS if store successful; OTA_ERROR otherwise

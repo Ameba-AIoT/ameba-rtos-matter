@@ -1,4 +1,5 @@
 # Generate args.gn to compile lib_chip_core
+# args.gn definition found in connectedhomeip/src/platform/BUILD.gn
 
 file(MAKE_DIRECTORY ${OUTPUT_DIR})
 file(WRITE  ${OUTPUT_DIR}/args.gn "")
@@ -69,6 +70,12 @@ file(APPEND ${OUTPUT_DIR}/args.gn "chip_logging = true\n")
 file(APPEND ${OUTPUT_DIR}/args.gn "chip_error_logging  = true\n")
 file(APPEND ${OUTPUT_DIR}/args.gn "chip_progress_logging  = true\n")
 file(APPEND ${OUTPUT_DIR}/args.gn "chip_detail_logging = false\n")
+
+# These declare_args default to "" in connectedhomeip/src/platform/BUILD.gn, so all four must
+# be written as quoted strings; GN rejects unquoted hex like 0xFFF1 ("not a valid number").
+file(APPEND ${OUTPUT_DIR}/args.gn
+    "chip_device_config_device_software_version_string = \"${CONFIG_MATTER_DEVICE_SOFTWARE_VERSION_STR}\"\n"
+)
 
 if(DEFINED REGEN_ARGS_GN) #regenarate args gn after clean_matter_libs require different sed commands
     execute_process(COMMAND bash "-c" "sed -i 's/lwip_default_hooks\\.h/\\\\\"lwip_default_hooks\\.h\\\\\"/g' ${OUTPUT_DIR}/args.gn")
