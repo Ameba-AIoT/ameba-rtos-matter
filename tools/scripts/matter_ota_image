@@ -1,0 +1,94 @@
+#!/bin/bash -l
+#
+# Build a Matter OTA image using ota_all.bin.
+#
+# The vendor ID, product ID and software version are read back out of the
+# menuconfig, so the OTA image always matches the identity the firmware reports
+# and the software version the firmware confirms after an update reboots.
+#
+# Usage: matter_ota_image [output ota image]
+
+set -e
+
+PATH_TO_AMEBA_RTOS_MATTER=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+SOC_INFO_JSON="$PATH_TO_AMEBA_RTOS_MATTER/soc_info.json"
+OTA_DIR="$PATH_TO_AMEBA_RTOS_MATTER/tools/ota"
+OUTPUT_OTA_IMAGE=${1:-$PWD/matter_ota_all.bin}
+
+if [ ! -e "$SOC_INFO_JSON" ]; then
+  echo "$SOC_INFO_JSON does not exist, please run \`ameba.py soc\` and choose the SoC for your project."
+  exit 1
+fi
+
+# The build output directory is named after the SoC, e.g. build_RTL8721F.
+SOC_NAME=$(python3 -c "import json; print(json.load(open('$SOC_INFO_JSON'))['soc']['name'])")
+BUILD_DIR="$PATH_TO_AMEBA_RTOS_MATTER/build_$SOC_NAME"
+OTA_ALL_BIN="$BUILD_DIR/ota_all.bin"
+MENUCONFIG="$BUILD_DIR/menuconfig/.config"
+
+# When CONFIG_OTA_FW_SIGN_VERIFY use ota_all_signed.bin
+# else use ota_all.bin to generate matter ota image.
+OTA_ALL_SIGNED_BIN="$BUILD_DIR/ota_all_signed.bin"
+OTA_PAYLOAD_BIN="$OTA_ALL_BIN"
+if [ -e "$OTA_ALL_SIGNED_BIN" ]; then
+  OTA_PAYLOAD_BIN="$OTA_ALL_SIGNED_BIN"
+fi
+
+if [ ! -e "$OTA_PAYLOAD_BIN" ]; then
+  echo "$OTA_PAYLOAD_BIN does not exist, please run \`matter_build_proj <Matter App Example>\` first."
+  exit 1
+fi
+
+if [ ! -e "$MENUCONFIG" ]; then
+  echo "$MENUCONFIG does not exist, please run \`matter_apply_conf\` first."
+  exit 1
+fi
+
+# Read the device identity out of the menuconfig. The same values are compiled
+# into the firmware by public_definitions_matter.cmake.
+VENDOR_ID=$(grep -E '^CONFIG_MATTER_DEVICE_VENDOR_ID=' "$MENUCONFIG" | tail -1 | cut -d= -f2-)
+PRODUCT_ID=$(grep -E '^CONFIG_MATTER_DEVICE_PRODUCT_ID=' "$MENUCONFIG" | tail -1 | cut -d= -f2-)
+VERSION=$(grep -E '^CONFIG_MATTER_DEVICE_SOFTWARE_VERSION=' "$MENUCONFIG" | tail -1 | cut -d= -f2-)
+VERSION_STR=$(grep -E '^CONFIG_MATTER_DEVICE_SOFTWARE_VERSION_STR=' "$MENUCONFIG" | tail -1 | cut -d= -f2-)
+
+if [ -z "$VENDOR_ID" ] || [ -z "$PRODUCT_ID" ] || [ -z "$VERSION" ] || [ -z "$VERSION_STR" ]; then
+  echo "Matter device identity is not set in $MENUCONFIG"
+  echo "Please run \`matter_apply_conf\` or \`ameba.py menuconfig\` and set:"
+  echo "  CONFIG_MATTER_DEVICE_VENDOR_ID"
+  echo "  CONFIG_MATTER_DEVICE_PRODUCT_ID"
+  echo "  CONFIG_MATTER_DEVICE_SOFTWARE_VERSION"
+  echo "  CONFIG_MATTER_DEVICE_SOFTWARE_VERSION_STR"
+  exit 1
+fi
+
+# The version string is a quoted Kconfig string; strip the quotes for the tool.
+VERSION_STR=${VERSION_STR%\"}
+VERSION_STR=${VERSION_STR#\"}
+
+echo "Matter OTA image"
+echo "  container:   $OTA_PAYLOAD_BIN"
+echo "  vendor ID:   $VENDOR_ID"
+echo "  product ID:  $PRODUCT_ID"
+echo "  version:     $VERSION ($VERSION_STR)"
+echo "  output:      $OUTPUT_OTA_IMAGE"
+
+# Validate the Ameba OTA container before wrapping it, so a bad or truncated
+# build is caught here rather than on the device. Always validate the unsigned
+# container: it is the part with the file header, and ota_all_tool.py does not
+# know about the RSIG block that precedes it in the signed file.
+if ! python3 "$OTA_DIR/ota_all_tool.py" verify "$OTA_ALL_BIN"; then
+  echo "Aborting: $OTA_ALL_BIN is not a usable Ameba OTA image."
+  exit 1
+fi
+
+python3 "$OTA_DIR/ota_image_tool.py" create \
+  -v "$VENDOR_ID" \
+  -p "$PRODUCT_ID" \
+  -vn "$VERSION" \
+  -vs "$VERSION_STR" \
+  -da sha256 \
+  "$OTA_PAYLOAD_BIN" \
+  "$OUTPUT_OTA_IMAGE"
+
+echo
+echo "Wrote $OUTPUT_OTA_IMAGE"

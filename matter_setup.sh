@@ -72,6 +72,7 @@ create_matter_env_script(){
   echo "chmod u+x \"$PATH_TO_AMEBA_RTOS_MATTER_SCRIPTS\"/matter_*" >> "$MATTER_ENV_SCRIPT"
   echo "source \"$PATH_TO_AMEBA_RTOS_MATTER_SCRIPTS/completion_script/matter_build_proj_completion.bash\"" >> "$MATTER_ENV_SCRIPT"
   echo "source \"$PATH_TO_AMEBA_RTOS_MATTER_SCRIPTS/completion_script/matter_apply_conf_completion.bash\"" >> "$MATTER_ENV_SCRIPT"
+  echo "source \"$PATH_TO_AMEBA_RTOS_MATTER_SCRIPTS/completion_script/matter_ota_image_completion.bash\"" >> "$MATTER_ENV_SCRIPT"
 }
 
 turn_off_wifi_fast_reconnect() {

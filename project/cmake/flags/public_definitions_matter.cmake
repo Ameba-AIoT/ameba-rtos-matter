@@ -154,6 +154,14 @@ else()
     ameba_list_append(matter_defintions CONFIG_ENABLE_OTA_REQUESTOR=0)
 endif()
 
+# Matter Onboarding Flags
+# String should be defined in generate_args_gn.cmake
+ameba_list_append(matter_defintions
+    CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID=${CONFIG_MATTER_DEVICE_VENDOR_ID}
+    CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID=${CONFIG_MATTER_DEVICE_PRODUCT_ID}
+    CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION=${CONFIG_MATTER_DEVICE_SOFTWARE_VERSION}
+)
+
 # Matter ICD Flags
 if(CHIP_ENABLE_ICD)
     ameba_list_append(matter_defintions CHIP_CONFIG_ENABLE_ICD_SERVER=1)

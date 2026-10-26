@@ -7,18 +7,21 @@ PATH_TO_AMEBA_RTOS_MATTER="$PWD"
 SOC_INFO_JSON="$PATH_TO_AMEBA_RTOS_MATTER/soc_info.json"
 
 if [ -e "$SOC_INFO_JSON" ]; then
-  PATH_TO_BUILD_FOLDER="$PATH_TO_AMEBA_RTOS_MATTER/build_$(python3 -c "import json; print(json.load(open('$SOC_INFO_JSON'))['soc']['name'])")/build"
+  PATH_TO_BUILD_FOLDER="$PATH_TO_AMEBA_RTOS_MATTER/build_$(python3 -c "import json; print(json.load(open('$SOC_INFO_JSON'))['soc']['name'])")"
 else
   echo "$SOC_INFO_JSON does not exist, please run \`ameba.py soc\` and choose the SoC for your project."
   exit 1
 fi
-
+echo ""
 if [ -d "$PATH_TO_BUILD_FOLDER" ]; then
-  cd "$PATH_TO_BUILD_FOLDER"
+  cd "$PATH_TO_BUILD_FOLDER/build"
   ninja clean_matter_libs
   cd "$PATH_TO_AMEBA_RTOS_MATTER"
   $AMEBA_PY clean
+  if [ -f "$PATH_TO_BUILD_FOLDER/matter_ota_image.bin" ]; then
+    rm "$PATH_TO_BUILD_FOLDER/matter_ota_image.bin"
+  fi
   echo "Cleaned matter project"
 else
-  echo "$PATH_TO_BUILD_FOLDER does not exist, clean can only be run when build has occured."
+  echo "$PATH_TO_BUILD_FOLDER/build does not exist, clean can only be run when build has occured."
 fi

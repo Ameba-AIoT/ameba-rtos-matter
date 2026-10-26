@@ -3,6 +3,37 @@ menu "Matter Config"
         bool "Enable Matter"
         default n
     if MATTER_EN
+        menu "Matter Onboarding Payload"
+            config MATTER_DEVICE_VENDOR_ID
+                hex "Matter device vendor ID"
+                default 0xFFF1
+                help
+                  Vendor ID reported in the Basic Information cluster.
+                  Use your CSA-allocated vendor ID for products; 0xFFF1 is the test vendor ID.
+                  Overridden by factory data when enabled.
+
+            config MATTER_DEVICE_PRODUCT_ID
+                hex "Matter device product ID"
+                default 0x8001
+                help
+                  Product ID reported in the Basic Information cluster.
+                  0x8001 is the test product ID.
+                  Overridden by factory data when enabled.
+
+            config MATTER_DEVICE_SOFTWARE_VERSION
+                int "Matter device software version"
+                default 1
+                help
+                  Numeric software version.
+
+            config MATTER_DEVICE_SOFTWARE_VERSION_STR
+                string "Matter device software version string"
+                default "1.0"
+                help
+                  Human-readable software version, reported alongside the numeric
+                  version. "1.0" is the test version string.
+        endmenu
+
         choice
             prompt "Ameba RTOS version"
             default AMEBARTOS_V1_2
@@ -48,6 +79,7 @@ menu "Matter Config"
         config MATTER_TIME_SYNC_EN
             bool "Enable Matter Time Sync"
             default n
+
         config MATTER_SECURE_EN
             bool "Enable Matter Secure"
             default n
