@@ -48,6 +48,18 @@ extern "C" {
 #define ENABLE_WEAR_LEVELING    MATTER_KVS_ENABLE_WEAR_LEVELING
 
 static volatile bool g_dct_init = false;
+static SemaphoreHandle_t g_dct_mutex = NULL;
+
+#define MATTER_DCT_LOCK() \
+    do { \
+        configASSERT(g_dct_mutex != NULL); \
+        xSemaphoreTake(g_dct_mutex, portMAX_DELAY); \
+    } while (0)
+
+#define MATTER_DCT_UNLOCK() \
+    do { \
+        xSemaphoreGive(g_dct_mutex); \
+    } while (0)
 
 static inline s32 dct_check_init(void)
 {
@@ -57,6 +69,17 @@ static inline s32 dct_check_init(void)
     }
 
     return DCT_SUCCESS;
+}
+
+static void matter_dct_mutex_init(void)
+{
+    if (g_dct_mutex != NULL) {
+        return;
+    }
+
+    g_dct_mutex = xSemaphoreCreateMutex();
+
+    configASSERT(g_dct_mutex != NULL);
 }
 
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -141,11 +164,17 @@ int32_t dct_get_encrypted_variable(dct_handle_t *dct_handle, char *variable_name
 
 s32 initPref(void)
 {
+    s32 ret;
+    s32 ret2;
+
+    matter_dct_mutex_init();
+
+    MATTER_DCT_LOCK();
+
     if (g_dct_init) {
+        MATTER_DCT_UNLOCK();
         return DCT_SUCCESS;
     }
-
-    s32 ret;
 
     ret = dct_init(DCT_BEGIN_ADDR_MATTER, MODULE_NUM, VARIABLE_NAME_SIZE, VARIABLE_VALUE_SIZE, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
     if (ret != DCT_SUCCESS) {
@@ -154,17 +183,22 @@ s32 initPref(void)
         printf("dct_init success\n");
     }
 
-    ret = dct_init2(DCT_BEGIN_ADDR_MATTER2, MODULE_NUM2, VARIABLE_NAME_SIZE2, VARIABLE_VALUE_SIZE2, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
-    if (ret != DCT_SUCCESS) {
-        printf("dct_init2 failed with error: %d\n", ret);
+    ret2 = dct_init2(DCT_BEGIN_ADDR_MATTER2, MODULE_NUM2, VARIABLE_NAME_SIZE2, VARIABLE_VALUE_SIZE2, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
+    if (ret2 != DCT_SUCCESS) {
+        printf("dct_init2 failed with error: %d\n", ret2);
     } else {
         printf("dct_init2 success\n");
+    }
+
+    if (ret2 != DCT_SUCCESS) {
+        ret = ret2;
     }
 
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
     // Initialize mbedtls aes context and set encryption key
     mbedtls_aes_init(&aes);
     if (mbedtls_aes_setkey_enc(&aes, key, 256) != 0) {
+        MATTER_DCT_UNLOCK();
         return DCT_ERROR;
     }
 #endif
@@ -173,31 +207,40 @@ s32 initPref(void)
         g_dct_init = 1;
     }
 
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 deinitPref(void)
 {
+    s32 ret;
+    s32 ret2;
+
+    MATTER_DCT_LOCK();
+
     if (!g_dct_init) {
+        MATTER_DCT_UNLOCK();
         return DCT_SUCCESS;
     }
 
     g_dct_init = 0;
 
-    s32 ret;
-
     ret = dct_format(DCT_BEGIN_ADDR_MATTER, MODULE_NUM, VARIABLE_NAME_SIZE, VARIABLE_VALUE_SIZE, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
     if (ret != DCT_SUCCESS) {
-        printf("dct_init failed with error: %d\n", ret);
+        printf("dct_format failed with error: %d\n", ret);
     } else {
-        printf("dct_init success\n");
+        printf("dct_format success\n");
     }
 
-    ret = dct_format2(DCT_BEGIN_ADDR_MATTER2, MODULE_NUM2, VARIABLE_NAME_SIZE2, VARIABLE_VALUE_SIZE2, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
-    if (ret != DCT_SUCCESS) {
-        printf("dct_init2 failed with error: %d\n", ret);
+    ret2 = dct_format2(DCT_BEGIN_ADDR_MATTER2, MODULE_NUM2, VARIABLE_NAME_SIZE2, VARIABLE_VALUE_SIZE2, ENABLE_BACKUP, ENABLE_WEAR_LEVELING);
+    if (ret2 != DCT_SUCCESS) {
+        printf("dct_format2 failed with error: %d\n", ret2);
     } else {
-        printf("dct_init2 success\n");
+        printf("dct_format2 success\n");
+    }
+
+    if (ret2 != DCT_SUCCESS) {
+        ret = ret2;
     }
 
 #if defined(CONFIG_ENABLE_AMEBA_DCT_ENC) && (CONFIG_ENABLE_AMEBA_DCT_ENC == 1)
@@ -205,14 +248,19 @@ s32 deinitPref(void)
     mbedtls_aes_free(&aes);
 #endif
 
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 registerPref(void)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     char ns[15];
@@ -230,15 +278,19 @@ s32 registerPref(void)
     }
 
 exit:
-
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 registerPref2(void)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     char ns[15];
@@ -256,15 +308,19 @@ s32 registerPref2(void)
     }
 
 exit:
-
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 clearPref(void)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     char ns[15];
@@ -282,15 +338,19 @@ s32 clearPref(void)
     }
 
 exit:
-
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 clearPref2(void)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     char ns[15];
@@ -308,15 +368,19 @@ s32 clearPref2(void)
     }
 
 exit:
-
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 deleteKey(const char *domain, const char *key)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     dct_handle_t handle;
@@ -361,22 +425,31 @@ s32 deleteKey(const char *domain, const char *key)
     }
 
 exit:
-
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 bool checkExist(const char *domain, const char *key)
 {
-    s32 ret = dct_check_init();
+    s32 ret;
+    u8 *str = NULL;
+
+    MATTER_DCT_LOCK();
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     dct_handle_t handle;
     uint16_t len = 0;
     char ns[15];
 
-    u8 *str = malloc(sizeof(u8) * VARIABLE_VALUE_SIZE2); // use the bigger buffer size
+    str = malloc(sizeof(u8) * VARIABLE_VALUE_SIZE2); // use the bigger buffer size
+    if (str == NULL) {
+        ret = DCT_ERR_NO_MEMORY;
+        goto exit;
+    }
 
     // Loop over DCT1 modules
     for (size_t i = 0; i < MODULE_NUM; i++) {
@@ -429,16 +502,20 @@ bool checkExist(const char *domain, const char *key)
     }
 
 exit:
-
     free(str);
+    MATTER_DCT_UNLOCK();
     return (ret == DCT_SUCCESS) ? true : false;
 }
 
 s32 setPref_new(const char *domain, const char *key, u8 *value, size_t byteCount)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     dct_handle_t handle;
@@ -501,15 +578,19 @@ s32 setPref_new(const char *domain, const char *key, u8 *value, size_t byteCount
     }
 
 exit:
-
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 getPref_bool_new(const char *domain, const char *key, u8 *val)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     dct_handle_t handle;
@@ -558,14 +639,19 @@ s32 getPref_bool_new(const char *domain, const char *key, u8 *val)
     }
 
 exit:
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 getPref_u32_new(const char *domain, const char *key, u32 *val)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     dct_handle_t handle;
@@ -615,14 +701,19 @@ s32 getPref_u32_new(const char *domain, const char *key, u32 *val)
     }
 
 exit:
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 getPref_u64_new(const char *domain, const char *key, u64 *val)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     dct_handle_t handle;
@@ -672,14 +763,19 @@ s32 getPref_u64_new(const char *domain, const char *key, u64 *val)
     }
 
 exit:
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSize, size_t *outLen)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     dct_handle_t handle;
@@ -731,14 +827,19 @@ s32 getPref_str_new(const char *domain, const char *key, char *buf, size_t bufSi
     }
 
 exit:
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
 s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize, size_t *outLen)
 {
-    s32 ret = dct_check_init();
+    MATTER_DCT_LOCK();
+
+    s32 ret;
+
+    ret = dct_check_init();
     if (ret != DCT_SUCCESS) {
-        return ret;
+        goto exit;
     }
 
     dct_handle_t handle;
@@ -790,6 +891,7 @@ s32 getPref_bin_new(const char *domain, const char *key, u8 *buf, size_t bufSize
     }
 
 exit:
+    MATTER_DCT_UNLOCK();
     return ret;
 }
 
