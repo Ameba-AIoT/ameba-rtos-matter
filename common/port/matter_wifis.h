@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ extern "C" {
 
 #include <wifi_conf.h>
 #include <lwip_netconf.h>
-#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+#if defined(CONFIG_AMEBARTOS_V1_0)
 #include <wifi_ind.h>
 #endif
 
@@ -102,8 +102,7 @@ typedef enum {
     MATTER_WIFI_EVENT_MAX,
 } matter_wifi_event;
 
-#if (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+#if !defined(CONFIG_AMEBARTOS_V1_0)
 
 /******************************************************
  *         WiFi Modes

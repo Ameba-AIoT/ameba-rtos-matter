@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,10 +26,9 @@
 #include <errno.h>
 #include <time.h>
 #include <matter_timers.h>
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
 #include <sntp/sntp.h>
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
 #include <lwip/apps/sntp.h>
 #include <sntp/sntp_api.h>
 #endif
@@ -111,8 +110,7 @@ __weak void sntp_set_oneshot(int enable)
 
 void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
 {
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
     unsigned int update_tick = 0, retry = 0;
     time_t update_sec = 0, update_usec = 0;
 
@@ -134,7 +132,7 @@ void matter_sntp_get_current_time(time_t *current_sec, time_t *current_usec)
     } else { //if the sntp is not reachable yet, use the last known epoch time if available
         *current_sec = matter_rtc_read();
     }
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     uint32_t sec  = 0;
     uint32_t usec = 0;
     SNTP_GET_SYSTEM_TIME(sec, usec);
@@ -161,7 +159,7 @@ void matter_sntp_init_with_server(const char *server)
         sntp_stop();
     }
     // ameba-rtos v1.0 and v1.1 set the SNTP server at component/network/sntp/sntp.c
-#if defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#if !defined(CONFIG_AMEBARTOS_V1_0) && !defined(CONFIG_AMEBARTOS_V1_1)
     sntp_setservername(0, server);
 #if SNTP_MAX_SERVERS > 1
     sntp_setservername(1, SNTP_FALLBACK_SERVER_1);

@@ -27,7 +27,7 @@ if(CONFIG_AMEBARTOS_V1_1)
         ${FREERTOS_DIR}/portable/GCC/AmebaDplus_KM4/non_secure
         ${FREERTOS_DIR}/portable/GCC/AmebaDplus_KM4/secure
     )
-elseif(CONFIG_AMEBARTOS_V1_2)
+else()
     ameba_list_append(public_includes
         ${FREERTOS_DIR}/portable/GCC/AmebaDplus_KM4
     )
@@ -38,7 +38,7 @@ if(CONFIG_AMEBARTOS_V1_1)
         ${FREERTOS_DIR}/portable/GCC/AmebaLite_KM4/non_secure
         ${FREERTOS_DIR}/portable/GCC/AmebaLite_KM4/secure
     )
-elseif(CONFIG_AMEBARTOS_V1_2)
+else()
     ameba_list_append(public_includes
         ${FREERTOS_DIR}/portable/GCC/AmebaLite_KM4
     )

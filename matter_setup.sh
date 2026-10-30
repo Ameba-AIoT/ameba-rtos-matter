@@ -10,6 +10,28 @@ PATH_TO_AMEBA_RTOS_MATTER_SCRIPTS="$PATH_TO_AMEBA_RTOS_MATTER/tools/scripts"
 
 cd $1
 PATH_TO_AMEBA_RTOS="$PWD"
+PATH_TO_AMEBA_RTOS_BRANCH=$(git -C "$PATH_TO_AMEBA_RTOS" branch --show-current)
+
+echo "Detected Ameba RTOS branch: $CTX_RTOS_BRANCH"
+
+case "$CTX_RTOS_BRANCH" in
+    master)
+        AMEBARTOS_VERSION="MASTER"
+        ;;
+    release/v1.2)
+        AMEBARTOS_VERSION="AMEBARTOS_V1_2"
+        ;;
+    release/v1.1)
+        AMEBARTOS_VERSION="AMEBARTOS_V1_1"
+        ;;
+    *)
+        echo "[ERROR] Unsupported Ameba RTOS branch: ${CTX_RTOS_BRANCH:-detached HEAD}"
+        return 1
+        ;;
+esac
+
+echo "Detected Ameba RTOS branch: $CTX_RTOS_BRANCH"
+echo "AMEBARTOS_VERSION: $AMEBARTOS_VERSION"
 
 cd ../connectedhomeip
 PATH_TO_CONNECTEDHOMEIP="$PWD"
@@ -20,13 +42,6 @@ environment_scripts=(
   "$PATH_TO_CONNECTEDHOMEIP/scripts/bootstrap.sh"
   "$PATH_TO_AMEBA_RTOS/env.sh"
   "$PATH_TO_CONNECTEDHOMEIP/scripts/activate.sh"
-)
-
-ameba_wifi_config=(
-  "$PATH_TO_AMEBA_RTOS/component/soc/usrcfg/amebadplus/ameba_wificfg.c"
-  "$PATH_TO_AMEBA_RTOS/component/soc/usrcfg/amebalite/ameba_wificfg.c"
-  "$PATH_TO_AMEBA_RTOS/component/soc/usrcfg/amebasmart/ameba_wificfg.c"
-  "$PATH_TO_AMEBA_RTOS/component/soc/usrcfg/amebagreen2/ameba_wificfg.c"
 )
 
 create_matter_env_script(){
@@ -75,23 +90,9 @@ create_matter_env_script(){
   echo "source \"$PATH_TO_AMEBA_RTOS_MATTER_SCRIPTS/completion_script/matter_ota_image_completion.bash\"" >> "$MATTER_ENV_SCRIPT"
 }
 
-turn_off_wifi_fast_reconnect() {
-  echo "Turning off WiFi fast reconnect"
-  for file_path in "${ameba_wifi_config[@]}"; do
-    if [ -e "$file_path" ]; then
-      sed -i 's/^\([[:space:]]*wifi_user_config\.fast_reconnect_en[[:space:]]*=[[:space:]]*\)1;/\10;/' "$file_path"
-      echo "File $file_path updated."
-    else
-      echo "File $file_path does not exist."
-    fi
-  done
-}
-
 echo "Configuring Ameba RTOS SDK"
 
 create_matter_env_script
-
-turn_off_wifi_fast_reconnect
 
 echo "Creating symlink to connectedhomeip"
 

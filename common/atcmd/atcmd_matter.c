@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -328,8 +328,7 @@ static u32 atcmd_matter_secure_heap(u16 argc, u8 *argv[])
 
 static u32 atcmd_matter_help(u16 argc, u8 *argv[]);
 
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
 CMD_TABLE_DATA_SECTION
 const COMMAND_TABLE matter_atcmd[] = {
     {(const u8 *)"ATM$", 0, atcmd_matter_factory_reset, (const u8 *)"ATM$ : factory reset. (Usage: ATM$)"},
@@ -344,7 +343,7 @@ const COMMAND_TABLE matter_atcmd[] = {
     {(const u8 *)"ATMV", 0, atcmd_matter_secure_heap, (const u8 *)"ATMV : Secure Heap Status. (Usage: ATMV)"},
 #endif
 };
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
 CMD_TABLE_DATA_SECTION
 const COMMAND_TABLE matter_atcmd[] = {
     {(const char *)"ATM$", atcmd_matter_factory_reset},
@@ -381,12 +380,11 @@ static u32 atcmd_matter_help(u16 argc, u8 *argv[])
     u32 index;
     RTK_LOGI(TAG, "\r\nMatter AT Commands List\r\n\r\n");
     for (index = 0 ; index < (sizeof(matter_atcmd) / sizeof(COMMAND_TABLE)); index++) {
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
         if (matter_atcmd[index].msg) {
             RTK_LOGI(TAG, "    %s\n", matter_atcmd[index].msg);
         }
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
         if (matter_atcmd_help[index]) {
             RTK_LOGI(TAG, "    %s\n", matter_atcmd_help[index]);
         }
