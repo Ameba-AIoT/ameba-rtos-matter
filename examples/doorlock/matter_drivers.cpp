@@ -1,3 +1,21 @@
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
+ *
+ *    Copyright(c) 2026, Realtek Semiconductor Corporation. All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #include <matter_drivers.h>
 #include <matter_interaction.h>
 #include <doorlock_driver.h>
@@ -42,22 +60,18 @@ gpio_irq_t gpio_edge;
 int current_edge = IRQ_FALL;
 
 // Button to trigger unlock or lock downlink event
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
 void matter_gpio_edge_irq_handler(uint32_t id, gpio_irq_event event)
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
 void matter_gpio_edge_irq_handler(uint32_t id, uint32_t event)
 #endif
 {
     (void)event;
     gpio_irq_event *edge = (gpio_irq_event *) id;
-    if(doorLock.GetLockStatus() == true)
-    {
+    if (doorLock.GetLockStatus() == true) {
         doorLock.Unlock();
         matter_driver_doorlock_lock_state_callback(static_cast<uint32_t>(DlLockState::kUnlocked));
-    }
-    else
-    {
+    } else {
         doorLock.Lock();
         matter_driver_doorlock_lock_state_callback(static_cast<uint32_t>(DlLockState::kLocked));
     }
@@ -81,33 +95,24 @@ CHIP_ERROR matter_driver_doorlock_set_startup_value(void)
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
     // Set Lock State based on physical doorlock status
-    if(doorLock.GetLockStatus() == true)
-    {
+    if (doorLock.GetLockStatus() == true) {
         DoorLockServer::Instance().SetLockState(DOORLOCK_ENDPOINT, DlLockState::kLocked);
-    }
-    else
-    {
+    } else {
         DoorLockServer::Instance().SetLockState(DOORLOCK_ENDPOINT, DlLockState::kUnlocked);
     }
 
     // Set RequirePINforRemoteOperation to 1
     auto status = Attributes::RequirePINforRemoteOperation::Set(DOORLOCK_ENDPOINT, true);
-    if(status == Status::Success)
-    {
+    if (status == Status::Success) {
         ChipLogProgress(DeviceLayer, "RequirePINforRemoteOperation is set to true");
-    }
-    else
-    {
+    } else {
         ChipLogError(DeviceLayer, "Failed to set RequirePINforRemoteOperation to true");
     }
 
     // Add admin during initialization
-    if (AmebaLockManager::Instance().InitAdmin(DOORLOCK_ENDPOINT))
-    {
+    if (AmebaLockManager::Instance().InitAdmin(DOORLOCK_ENDPOINT)) {
         ChipLogProgress(DeviceLayer, "Admin initialized");
-    }
-    else
-    {
+    } else {
         ChipLogProgress(DeviceLayer, "Failed to initialize Admin");
     }
 
@@ -134,48 +139,43 @@ void matter_driver_uplink_update_handler(AppEvent *aEvent)
     VerifyOrExit(aEvent->path.mEndpointId == DOORLOCK_ENDPOINT,
                  ChipLogError(DeviceLayer, "Unexpected EndPoint ID: `0x%02x'", path.mEndpointId));
 
-    switch (path.mClusterId)
-    {
-    case Clusters::DoorLock::Id:
-        {
-            ChipLogProgress(DeviceLayer, "DoorLock(ClusterId=0x%x) at Endpoint 0x%x: change AttributeId=0x%x\n", path.mClusterId, path.mEndpointId, path.mAttributeId);
+    switch (path.mClusterId) {
+    case Clusters::DoorLock::Id: {
+        ChipLogProgress(DeviceLayer, "DoorLock(ClusterId=0x%x) at Endpoint 0x%x: change AttributeId=0x%x\n", path.mClusterId, path.mEndpointId, path.mAttributeId);
 
-            switch (path.mAttributeId)
-            {
-            case Clusters::DoorLock::Attributes::LockState::Id:
-                {
+        switch (path.mAttributeId) {
+        case Clusters::DoorLock::Attributes::LockState::Id: {
 #if defined(CONFIG_WHC_DEV)
-                    whc_matter_dev_uplink_hdl(path.mClusterId, path.mAttributeId, &aEvent->value._u8, sizeof(uint8_t));
+            whc_matter_dev_uplink_hdl(path.mClusterId, path.mAttributeId, &aEvent->value._u8, sizeof(uint8_t));
 #else
-                    switch (aEvent->value._u8)
-                    {
-                    case static_cast<uint8_t>(DlLockState::kNotFullyLocked):
-                        ChipLogProgress(DeviceLayer, "LockState changed to not fully locked");
-                        // If door is not fully locked, do something here ...
-                        break;
-                    case static_cast<uint8_t>(DlLockState::kLocked):
-                        ChipLogProgress(DeviceLayer, "LockState changed to locked");
-                        doorLock.Lock();
-                        break;
-                    case static_cast<uint8_t>(DlLockState::kUnlocked):
-                        ChipLogProgress(DeviceLayer, "LockState changed to unlocked");
-                        doorLock.Unlock();
-                        break;
-                    case static_cast<uint8_t>(DlLockState::kUnlatched):
-                        ChipLogProgress(DeviceLayer, "LockState changed to unlatched");
-                        doorLock.Unlock(); // Unlatched = Unlock ?
-                        break;
-                    default:
-                        break;
-                    }
-#endif
-                }
+            switch (aEvent->value._u8) {
+            case static_cast<uint8_t>(DlLockState::kNotFullyLocked):
+                ChipLogProgress(DeviceLayer, "LockState changed to not fully locked");
+                // If door is not fully locked, do something here ...
+                break;
+            case static_cast<uint8_t>(DlLockState::kLocked):
+                ChipLogProgress(DeviceLayer, "LockState changed to locked");
+                doorLock.Lock();
+                break;
+            case static_cast<uint8_t>(DlLockState::kUnlocked):
+                ChipLogProgress(DeviceLayer, "LockState changed to unlocked");
+                doorLock.Unlock();
+                break;
+            case static_cast<uint8_t>(DlLockState::kUnlatched):
+                ChipLogProgress(DeviceLayer, "LockState changed to unlatched");
+                doorLock.Unlock(); // Unlatched = Unlock ?
                 break;
             default:
                 break;
             }
+#endif
         }
         break;
+        default:
+            break;
+        }
+    }
+    break;
     default:
         break;
     }
@@ -192,14 +192,12 @@ void matter_driver_downlink_update_handler(AppEvent *aEvent)
 
     chip::DeviceLayer::PlatformMgr().LockChipStack();
 
-    switch (aEvent->Type)
-    {
-    case AppEvent::kEventType_Downlink_DoorLock_Lock_State:
-        {
-            ChipLogProgress(DeviceLayer, "Set Door Lock State Value 0x%x\n", aEvent->value._u8);
-            DoorLockServer::Instance().SetLockState(aEvent->path.mEndpointId, static_cast<DoorLock::DlLockState>(aEvent->value._u8));
-        }
-        break;
+    switch (aEvent->Type) {
+    case AppEvent::kEventType_Downlink_DoorLock_Lock_State: {
+        ChipLogProgress(DeviceLayer, "Set Door Lock State Value 0x%x\n", aEvent->value._u8);
+        DoorLockServer::Instance().SetLockState(aEvent->path.mEndpointId, static_cast<DoorLock::DlLockState>(aEvent->value._u8));
+    }
+    break;
     default:
         break;
     }

@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,76 +30,68 @@ void matter_lwip_dhcp(void)
     netif_set_link_up(&xnetif[0]);
     matter_wifi_set_autoreconnect(0);
 
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
     LwIP_DHCP(0, DHCP_START);
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     lwip_dhcp(0, DHCP_START);
 #endif
 }
 
 void matter_lwip_releaseip(void)
 {
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
     LwIP_ReleaseIP(0);
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     lwip_clear_ip(0);
 #endif
 }
 
 void matter_lwip_netif_set_link_up(uint8_t idx)
 {
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
     LwIP_netif_set_link_up(idx);
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     lwip_netif_set_link_up(idx);
 #endif
 }
 
 unsigned char *matter_LwIP_GetIP(uint8_t idx)
 {
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
     return LwIP_GetIP(idx);
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     return lwip_get_ip(idx);
 #endif
 }
 
 unsigned char *matter_LwIP_GetGW(uint8_t idx)
 {
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
     return LwIP_GetGW(idx);
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     return lwip_get_gw(idx);
 #endif
 }
 
 uint8_t *matter_LwIP_GetMASK(uint8_t idx)
 {
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
     return LwIP_GetMASK(idx);
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     return lwip_get_mask(idx);
 #endif
 }
 
 uint8_t matter_lwip_request_ip(uint8_t idx)
 {
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
     return LwIP_DHCP(idx, DHCP_START);
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     return lwip_request_ip(idx);
 #endif
 }
 
 #if LWIP_IPV6
-
 uint8_t *LwIP_GetIPv6_linklocal(uint8_t idx)
 {
     return (uint8_t *) netif_ip6_addr(&xnetif[idx], 0)->addr;
@@ -163,8 +155,7 @@ static void matter_LwIP_IP_Address_Request_thread(void *pvParameters)
         netifapi_netif_set_up(pnetif);
     }
 
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
 #if LWIP_IPV4
     while (dhcp_ret != DHCP_ADDRESS_ASSIGNED) {
         dhcp_ret = LwIP_DHCP(0, DHCP_START);
@@ -172,15 +163,15 @@ static void matter_LwIP_IP_Address_Request_thread(void *pvParameters)
 #endif
 #if LWIP_IPV6
     LwIP_AUTOIP_IPv6(pnetif);
-    matter_lwip_dhcp6();
 #endif
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     while (dhcp_ret != DHCP_ADDRESS_ASSIGNED) {
         dhcp_ret = lwip_request_ip(NETIF_WLAN_STA_INDEX);
     }
+#endif
+
 #if LWIP_IPV6
     matter_lwip_dhcp6();
-#endif
 #endif
 
 #if CONFIG_ENABLE_AMEBA_SNTP

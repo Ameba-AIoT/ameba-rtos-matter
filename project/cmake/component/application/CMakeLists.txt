@@ -1,8 +1,8 @@
-if(CONFIG_AMEBARTOS_V1_2)
-set(MATTER_DIR ${EXAMPLEDIR})
-elseif(CONFIG_AMEBARTOS_V1_1)
+if(CONFIG_AMEBARTOS_V1_1)
 set(BASEDIR    ${c_BASEDIR})
 set(MATTER_DIR ${BASEDIR}/component/application/matter)
+else()
+set(MATTER_DIR ${EXAMPLEDIR})
 endif()
 
 set(DIR         ${MATTER_DIR})
