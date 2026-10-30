@@ -17,7 +17,7 @@ list(APPEND LIB_CHIP_CORE_INC_PATH
 
 )
 
-if(CONFIG_AMEBARTOS_V1_2)
+if(NOT CONFIG_AMEBARTOS_V1_1)
 list(APPEND LIB_CHIP_CORE_INC_PATH
     ${BASEDIR}/component/file_system/kv
     ${BASEDIR}/component/lwip/api

@@ -1,10 +1,10 @@
 # Matter Directories
 #----------------------------------------#
 set(CHIP_DIR           "${BASEDIR}/third_party/connectedhomeip")
-if(CONFIG_AMEBARTOS_V1_2)
-set(MATTER_DIR         "${EXAMPLEDIR}")
-elseif(CONFIG_AMEBARTOS_V1_1)
+if(CONFIG_AMEBARTOS_V1_1)
 set(MATTER_DIR         "${BASEDIR}/component/application/matter")
+else()
+set(MATTER_DIR         "${EXAMPLEDIR}")
 endif()
 set(MATTER_CMAKE_DIR   "${MATTER_DIR}/project/cmake")
 set(MATTER_API_DIR     "${MATTER_DIR}/api")

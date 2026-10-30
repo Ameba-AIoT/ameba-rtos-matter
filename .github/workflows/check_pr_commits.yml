@@ -67,8 +67,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install astyle
-        run: sudo apt-get install -y astyle
+      - name: Install Astyle 3.1
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential curl
+
+          curl -fL \
+            "https://downloads.sourceforge.net/project/astyle/astyle/astyle%203.1/astyle_3.1_linux.tar.gz" \
+            -o /tmp/astyle-3.1.tar.gz
+
+          mkdir -p /tmp/astyle-3.1
+          tar -xzf /tmp/astyle-3.1.tar.gz -C /tmp/astyle-3.1
+
+          cd /tmp/astyle-3.1/astyle/build/gcc
+          make
+
+          sudo cp bin/astyle /usr/local/bin/astyle
+          sudo chmod +x /usr/local/bin/astyle
+
+          astyle --version
 
       - name: Run restyle check
         run: |

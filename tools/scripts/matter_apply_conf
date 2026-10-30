@@ -5,7 +5,7 @@ PATH_TO_AMEBA_RTOS=$(cat .PATH_TO_AMEBA_RTOS)
 AMEBA_PY="python $PATH_TO_AMEBA_RTOS/ameba.py"
 
 PATH_TO_AMEBA_RTOS_MATTER="$PWD"
-PATH_TO_MATTER_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/project/cmake/config/ameba-rtos-v1.2/"
+PATH_TO_MATTER_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/project/cmake/config/"
 CURRENT_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/current_proj.conf"
 TEMP_PROJ_CONFIG="$PATH_TO_AMEBA_RTOS_MATTER/.temp_proj.conf"
 SOC_INFO_JSON="$PATH_TO_AMEBA_RTOS_MATTER/soc_info.json"
@@ -17,6 +17,27 @@ matter_device_configs=(
 )
 
 valid_device_configs=false
+
+AMEBA_RTOS_BRANCH=$(git -C "$PATH_TO_AMEBA_RTOS" branch --show-current)
+
+case "$AMEBA_RTOS_BRANCH" in
+  master)
+    AMEBARTOS_VERSION="AMEBARTOS_MASTER"
+    ;;
+  release/v1.2)
+    AMEBARTOS_VERSION="AMEBARTOS_V1_2"
+    ;;
+  release/v1.1)
+    AMEBARTOS_VERSION="AMEBARTOS_V1_1"
+    ;;
+  *)
+    echo "[ERROR] Unsupported Ameba RTOS branch: ${CTX_RTOS_BRANCH:-detached HEAD}"
+    exit 1
+    ;;
+esac
+
+echo "Detected Ameba RTOS branch: $CTX_RTOS_BRANCH"
+echo "Ameba RTOS version: $AMEBARTOS_VERSION"
 
 list_matter_device_configs() {
   echo "Available Matter device configs:"
@@ -83,6 +104,7 @@ else
     echo "No existing menuconfig found (${MENUCONFIG_PATH}), applying Matter defaults directly..."
     cp "$MATTER_PROJ_CONFIG" "$TEMP_PROJ_CONFIG"
   fi
+  echo "CONFIG_${AMEBARTOS_VERSION}=y" >> "$TEMP_PROJ_CONFIG"
 
   # Apply the combined configuration
   $AMEBA_PY menuconfig -f "$TEMP_PROJ_CONFIG"

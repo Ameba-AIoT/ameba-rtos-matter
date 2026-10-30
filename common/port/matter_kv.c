@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ extern int fclose(FILE *stream);
 extern size_t fwrite(const void *ptr, size_t size, size_t count, FILE *stream);
 extern size_t fread(void *ptr, size_t size, size_t count, FILE *stream);
 
-#if defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#if !defined(CONFIG_AMEBARTOS_V1_0) && !defined(CONFIG_AMEBARTOS_V1_1)
 extern int kv_init_done;
 #endif
 static char *kv_matter_prefix;
@@ -41,7 +41,7 @@ int rt_kv_deinit(void)
 {
     int res = -1;
     char *path = NULL;
-#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
+#if defined(CONFIG_AMEBARTOS_V1_0)
     void **directory;
     struct dirent *dir;
 
@@ -81,52 +81,18 @@ int rt_kv_deinit(void)
     if (res < 0) {
         VFS_DBG(VFS_ERROR, "closedir failed,err is %d!!!", res);
     }
-#elif defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)
+#else
     dirent *info;
+#if defined(CONFIG_AMEBARTOS_V1_1)
     DIR *dir;
-
-    kv_matter_prefix = find_vfs_tag(VFS_REGION_1);
-    if (kv_matter_prefix == NULL) {
-        goto exit;
-    }
-
-    if ((path = rtos_mem_zmalloc(MAX_KEY_LENGTH + 2)) == NULL) {
-        VFS_DBG(VFS_ERROR, "KV malloc fail");
-        goto exit;
-    }
-
-    DiagSnPrintf(path, MAX_KEY_LENGTH + 2, "%s:KV", kv_matter_prefix);
-
-    dir = (DIR *)opendir(path);
-    if (dir == NULL) {
-        VFS_DBG(VFS_ERROR, "opendir failed");
-        goto exit;
-    }
-
-    while (1) {
-        info = readdir((void **)dir);
-        if (info == NULL) {
-            break;
-        } else if (strcmp(info->d_name, ".") != 0 && strcmp(info->d_name, "..") != 0) {
-            res = rt_kv_delete(info->d_name);
-            if (res < 0) {
-                RTK_LOGE(TAG, "%s: failed to delete %s\n", __func__, info->d_name);
-                goto exit;
-            } else {
-                RTK_LOGI(TAG, "%s: succesfully deleted %s\n", __func__, info->d_name);
-            }
-        }
-    }
-
-    res = closedir((void **)dir);
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
-    dirent *info;
+#else
     void *dir;
 
     if (kv_init_done != 1) {
         VFS_DBG(VFS_ERROR, "KV init fail");
         goto exit;
     }
+#endif
 
     kv_matter_prefix = find_vfs_tag(VFS_REGION_1);
     if (kv_matter_prefix == NULL) {
@@ -141,14 +107,23 @@ int rt_kv_deinit(void)
 
     DiagSnPrintf(path, MAX_KEY_LENGTH + 2, "%s:KV", kv_matter_prefix);
 
+#if defined(CONFIG_AMEBARTOS_V1_1)
+    dir = (DIR *)opendir(path);
+#else
     dir = opendir(path);
+#endif
+
     if (dir == NULL) {
         VFS_DBG(VFS_ERROR, "opendir failed");
         goto exit;
     }
 
     while (1) {
+#if defined(CONFIG_AMEBARTOS_V1_1)
+        info = readdir((void **)dir);
+#else
         info = readdir(dir);
+#endif
         if (info == NULL) {
             break;
         } else if (strcmp(info->d_name, ".") != 0 && strcmp(info->d_name, "..") != 0) {
@@ -162,7 +137,11 @@ int rt_kv_deinit(void)
         }
     }
 
+#if defined(CONFIG_AMEBARTOS_V1_1)
+    res = closedir((void **)dir);
+#else
     res = closedir(dir);
+#endif
 #endif // CONFIG_AMEBARTOS_XXX
 
 exit:

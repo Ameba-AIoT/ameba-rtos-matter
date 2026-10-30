@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,17 +26,16 @@
 IMAGE3_ENTRY_SECTION
 void NS_ENTRY vMatterPrintSecureHeapStatus(void)
 {
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1))
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
     RTK_LOGI(NOTAG, "Image 3 heap size               = %d\n", secureconfigTOTAL_SRAM_HEAP_SIZE);
-#elif defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1)
+#else
     RTK_LOGI(NOTAG, "Image 3 heap size               = %d\n", __image3_heap_size__);
 #endif
     RTK_LOGI(NOTAG, "xPortGetMinimumEverFreeHeapSize = %d\n", xPortGetMinimumEverFreeHeapSize());
     RTK_LOGI(NOTAG, "xPortGetFreeHeapSize            = %d\n", xPortGetFreeHeapSize());
 }
 
-#if (defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) && defined(CONFIG_AMEBALITE)
+#if defined(CONFIG_AMEBARTOS_V1_0) && defined(CONFIG_AMEBALITE)
 void *rtos_mem_malloc(uint32_t size)
 {
     return pvPortMalloc(size);
