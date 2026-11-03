@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #define MATTER_FACTORY_DATA (0x08400000 - SPI_FLASH_BASE)
 #elif defined(CONFIG_AMEBASMART)
 #define MATTER_FACTORY_DATA (0x08644000 - SPI_FLASH_BASE)
-#elif defined(CONFIG_AMEBAGREEN2)
+#elif defined(CONFIG_AMEBAGREEN2) || defined (CONFIG_RTL8720F)
 #define MATTER_FACTORY_DATA (0x08440000 - SPI_FLASH_BASE)
 #endif
 #if CONFIG_ENABLE_AMEBA_OTP
@@ -413,20 +413,17 @@ exit:
     return ret;
 }
 
-#if CONFIG_ENABLE_AMEBA_OTP
-
+#if defined(CONFIG_ENABLE_AMEBA_OTP) && (CONFIG_ENABLE_AMEBA_OTP == 1)
+#if defined(CONFIG_AMEBARTOS_V1_0)
+#define RTK_FAIL _FAIL
+#define RTK_SUCCESS _SUCCESS
+#endif
 int32_t ReadFromOtp(uint32_t addr, uint8_t *data, uint8_t length)
 {
     uint32_t bytes_read = 0;
 
     for (uint32_t index = 0; index < length; index++) {
-#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
-        if (OTP_Read8(addr + index, data + index) == _FAIL)
-#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
-      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
-        if (OTP_Read8(addr + index, data + index) == RTK_FAIL)
-#endif
-        {
+        if (OTP_Read8(addr + index, data + index) == RTK_FAIL) {
             RTK_LOGE(TAG, "[%s] OTP_Read8(0x%03x) failed!\n", __func__, addr + index);
             return -1;
         }
@@ -443,24 +440,12 @@ int32_t WriteToOtp(uint32_t addr, uint8_t *data, uint8_t length)
 
     for (uint32_t index = 0; index < length; index++) {
         // check OTP value of the address
-#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
-        if (OTP_Read8(addr + index, &buffer) == _SUCCESS)
-#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
-      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
-        if (OTP_Read8(addr + index, &buffer) == RTK_SUCCESS)
-#endif
-        {
+        if (OTP_Read8(addr + index, &buffer) == RTK_SUCCESS) {
             // Two conditions to write on OTP:
             // 1. OTP has not been written (buffer == 0xff)
             // 2. The data that is going to be written is not 0xff (*(data + index) != 0xff)
             if ((buffer == 0xff) && (*(data + index) != 0xff)) {
-#if defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)
-                if (OTP_Write8(addr + index, *(data + index)) == _FAIL)
-#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
-      (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
-                if (OTP_Write8(addr + index, *(data + index)) == RTK_FAIL)
-#endif
-                {
+                if (OTP_Write8(addr + index, *(data + index)) == RTK_FAIL) {
                     RTK_LOGE(TAG, "[%s] OTP_Write8(0x%03x) failed!\n", __func__, addr + index);
                     return -1;
                 }
@@ -484,37 +469,10 @@ int32_t ReadDacPrivateKeyFromOtp(uint8_t *dacPrivateKey)
 {
     return ReadFromOtp(DAC_PRIV_KEY_ADDRESS, dacPrivateKey, DAC_PRIV_KEY_LENGTH);
 }
-
-#endif
+#endif // CONFIG_ENABLE_AMEBA_OTP
 
 #if defined(CONFIG_MATTER_SECURE) && CONFIG_MATTER_SECURE
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
-#define MATTER_SECURE_CONTEXT_STACK_SIZE 4096
-extern int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void);
-extern int NS_ENTRY matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size);
-extern int NS_ENTRY matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *msg, size_t msg_size, unsigned char *signature);
-extern int NS_ENTRY matter_secure_get_opkey(uint8_t *buf, size_t size);
-extern int NS_ENTRY matter_secure_get_opkey_pub(uint8_t *pubkey, size_t pubkey_size);
-extern int NS_ENTRY matter_secure_new_csr(uint8_t *out_csr, size_t csr_length);
-extern int NS_ENTRY matter_secure_serialize(uint8_t *output_buf, size_t output_size);
-extern void NS_ENTRY vMatterPrintSecureHeapStatus(void);
-static bool matter_secure_context_created = false;
-
-void matter_create_secure_context(void)
-{
-    if (matter_secure_context_created) {
-        return;
-    }
-
-    rtos_create_secure_context(MATTER_SECURE_CONTEXT_STACK_SIZE);
-    rtos_time_delay_ms(10); // to avoid hardfault when switching to TZ
-    secure_mbedtls_platform_set_calloc_free();
-
-    matter_secure_context_created = true;
-}
-
-#elif defined(CONFIG_AMEBASMART)
-
+#if defined(CONFIG_AMEBASMART)
 static bool matter_secure_mbedtls_initialized = false;
 struct arm_smccc_res {
     unsigned long a0;
@@ -579,17 +537,40 @@ void matter_secure_print_mbedtls_heap_status(void)
     }
     invoke_matter_secure_smc(MATTER_SECURE_SMC_MBEDTLS_HEAP_STATUS, 0, 0, 0);
 }
+#else
+#define MATTER_SECURE_CONTEXT_STACK_SIZE 4096
+extern int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void);
+extern int NS_ENTRY matter_secure_dac_init_keypair(uint8_t *pub_buf, size_t pub_size);
+extern int NS_ENTRY matter_secure_ecdsa_sign_msg(matter_key_type key_type, const unsigned char *msg, size_t msg_size, unsigned char *signature);
+extern int NS_ENTRY matter_secure_get_opkey(uint8_t *buf, size_t size);
+extern int NS_ENTRY matter_secure_get_opkey_pub(uint8_t *pubkey, size_t pubkey_size);
+extern int NS_ENTRY matter_secure_new_csr(uint8_t *out_csr, size_t csr_length);
+extern int NS_ENTRY matter_secure_serialize(uint8_t *output_buf, size_t output_size);
+extern void NS_ENTRY vMatterPrintSecureHeapStatus(void);
+static bool matter_secure_context_created = false;
 
-#endif
+void matter_create_secure_context(void)
+{
+    if (matter_secure_context_created) {
+        return;
+    }
+
+    rtos_create_secure_context(MATTER_SECURE_CONTEXT_STACK_SIZE);
+    rtos_time_delay_ms(10); // to avoid hardfault when switching to TZ
+    secure_mbedtls_platform_set_calloc_free();
+
+    matter_secure_context_created = true;
+}
+#endif // CONFIG_AMEBAXXX
 
 int matter_get_signature(uint8_t *pub_buf, size_t pub_size, const unsigned char *msg, size_t msg_size, unsigned char *signature)
 {
     int result = 0;
 
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
-    matter_create_secure_context();
-#elif defined(CONFIG_AMEBASMART)
+#if defined(CONFIG_AMEBASMART)
     matter_init_matter_secure_mbedtls();
+#else
+    matter_create_secure_context();
 #endif
 
     result = matter_secure_dac_init_keypair(pub_buf, pub_size);
@@ -598,10 +579,10 @@ int matter_get_signature(uint8_t *pub_buf, size_t pub_size, const unsigned char 
         goto exit;
     }
 
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
-    result = matter_secure_ecdsa_sign_msg(MATTER_DACKEY_KEY_TYPE, msg, msg_size, signature);
-#elif defined(CONFIG_AMEBASMART)
+#if defined(CONFIG_AMEBASMART)
     result = matter_secure_dackey_ecdsa_sign_msg(msg, msg_size, signature);
+#else
+    result = matter_secure_ecdsa_sign_msg(MATTER_DACKEY_KEY_TYPE, msg, msg_size, signature);
 #endif
     if (result != 0) {
         RTK_LOGE(TAG, "%s ecdsa sign failed, result=%d\n", __FUNCTION__, result);
@@ -615,11 +596,10 @@ exit:
 int matter_ecdsa_sign_msg(const unsigned char *msg, size_t msg_size, unsigned char *signature)
 {
     int result = 0;
-
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
-    result = matter_secure_ecdsa_sign_msg(MATTER_OPKEY_KEY_TYPE, msg, msg_size, signature);
-#elif defined(CONFIG_AMEBASMART)
+#if defined(CONFIG_AMEBASMART)
     result = matter_secure_opkey_ecdsa_sign_msg(msg, msg_size, signature);
+#else
+    result = matter_secure_ecdsa_sign_msg(MATTER_OPKEY_KEY_TYPE, msg, msg_size, signature);
 #endif
     if (result != 0) {
         RTK_LOGE(TAG, "%s get signature failed, result=%d\n", __FUNCTION__, result);
@@ -668,10 +648,10 @@ int matter_deserialize(uint8_t *buf, size_t size)
 {
     int result = 0;
 
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
-    matter_create_secure_context();
-#elif defined(CONFIG_AMEBASMART)
+#if defined(CONFIG_AMEBASMART)
     matter_init_matter_secure_mbedtls();
+#else
+    matter_create_secure_context();
 #endif
 
     result = matter_secure_get_opkey(buf, size);
@@ -685,10 +665,10 @@ int matter_deserialize(uint8_t *buf, size_t size)
 
 void matter_check_secure_heap_status(void)
 {
-#if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
-    vMatterPrintSecureHeapStatus();
-#elif defined(CONFIG_AMEBASMART)
+#if defined(CONFIG_AMEBASMART)
     matter_secure_print_mbedtls_heap_status();
+#else
+    vMatterPrintSecureHeapStatus();
 #endif
 }
 #endif /* configENABLE_TRUSTZONE */

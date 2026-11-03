@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -46,10 +46,11 @@ extern "C" {
 #define F_BT_LE_USE_STATIC_RANDOM_ADDR      1
 #endif
 
-#if (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
 /** @brief  Redefine Return Codes */
+#ifndef RTW_SUCCESS
 #define RTW_SUCCESS RTK_SUCCESS
+#endif
+#ifndef RTW_ERROR
 #define RTW_ERROR   RTK_FAIL
 #endif
 

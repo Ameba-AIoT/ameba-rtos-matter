@@ -36,12 +36,18 @@ menu "Matter Config"
 
         choice
             prompt "Ameba RTOS version"
-            default AMEBARTOS_V1_2
-            config AMEBARTOS_V1_1
-                bool "Ameba RTOS v1.1"
+            default AMEBARTOS_MASTER
+
+            config AMEBARTOS_MASTER
+                bool "Ameba RTOS master"
+
             config AMEBARTOS_V1_2
                 bool "Ameba RTOS v1.2"
+
+            config AMEBARTOS_V1_1
+                bool "Ameba RTOS v1.1"
         endchoice
+
         config MBEDTLS_V_3_6_2_ENABLE
             bool
             default y
