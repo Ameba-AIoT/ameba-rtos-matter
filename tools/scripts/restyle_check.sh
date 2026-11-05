@@ -12,14 +12,18 @@ cd "$REPO_ROOT" || exit 1
 
 # =========================
 # Hook installation check
+# Skip in CI because checks are executed directly by the workflow.
 # =========================
-_hooks_path=$(git config core.hooksPath 2>/dev/null)
-if [ "$_hooks_path" != "tools/scripts/hooks" ] && [ ! -f "$REPO_ROOT/.git/hooks/pre-push" ]; then
-    echo "WARNING: Git hooks are not installed — commit message and restyle checks will not run on push."
-    echo "         Run once to enable:  sh tools/scripts/hooks/install.sh"
-    echo ""
-fi
+if [ "${GITHUB_ACTIONS:-false}" != "true" ]; then
+    _hooks_path=$(git config core.hooksPath 2>/dev/null)
 
+    if [ "$_hooks_path" != "tools/scripts/hooks" ] &&
+       [ ! -f "$(git rev-parse --git-path hooks)/pre-push" ]; then
+        echo "WARNING: Git hooks are not installed — commit message and restyle checks will not run on push."
+        echo "         Run once to enable:  sh tools/scripts/hooks/install.sh"
+        echo ""
+    fi
+fi
 
 # =========================
 # Canonical header template
@@ -138,9 +142,8 @@ if [ -n "$changed_files" ]; then
         if [ "$CHECK_ONLY" -eq 1 ]; then
             # Check: must contain canonical Realtek marker
             if ! grep -q "Realtek Semiconductor Corporation" "$f"; then
-                echo "  -> Missing Realtek header: $f"
-                rm -f "$HEADER_FILE" "$HEADER_TEMPLATE"
-                exit 1
+                echo "FAIL: Missing Realtek header: $f"
+                errors=$((errors + 1))
             fi
         else
             echo "  -> Normalizing header"
@@ -164,13 +167,22 @@ if [ -n "$changed_files" ]; then
     # Run astyle
     # =========================
     if [ "$CHECK_ONLY" -eq 1 ]; then
-        astyle --style=linux \
-               --attach-namespaces \
-               -p -xg -H -U -k3 -j \
-               -xC160 -xL -T4 -z2 \
-               --indent=spaces=4 \
-               --indent-continuation=4 \
-               --dry-run $changed_files | grep -q "Formatted" && exit 1
+        astyle_output=$(
+            astyle --style=linux \
+                   --attach-namespaces \
+                   -p -xg -H -U -k3 -j \
+                   -xC160 -xL -T4 -z2 \
+                   --indent=spaces=4 \
+                   --indent-continuation=4 \
+                   --dry-run $changed_files 2>&1
+        )
+    
+        if echo "$astyle_output" | grep -q "Formatted"; then
+            echo "FAIL: Astyle formatting issues detected:"
+            echo "$astyle_output" | grep "Formatted"
+            rm -f "$HEADER_FILE" "$HEADER_TEMPLATE"
+            exit 1
+        fi
     else
         astyle --style=linux \
                --attach-namespaces \

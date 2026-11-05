@@ -83,7 +83,7 @@ SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509_csr.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509write_crt.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/x509write_csr.c
 
-ifeq ($(MBEDTLS_VERSION), mbedtls-2.28.1)
+ifneq ($(findstring mbedtls-2,$(MBEDTLS_VERSION)),)
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/arc4.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/blowfish.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/certs.c
@@ -94,7 +94,7 @@ SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/pkcs11.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/rsa_internal.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/ssl_srv.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/xtea.c
-else ifeq ($(MBEDTLS_VERSION), mbedtls-3.6.6)
+else ifneq ($(filter mbedtls-3.%,$(MBEDTLS_VERSION)),)
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aes_alt.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/aesce.c
 SRC_C += $(MATTER_MBEDTLS_DIR)/$(MBEDTLS_VERSION)/library/bignum_core.c
