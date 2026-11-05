@@ -18,6 +18,38 @@ You can check the current image's software version using `chip-tool` commands be
     ./chip-tool basicinformation read software-version 1 0
     ./chip-tool basicinformation read software-version-string 1 0
 
+### Using the Make Target
+
+The simplest way to generate the OTA image is the `gen_matter_ota_image` make target, which wraps `ota_image_tool.py`, removes any stale output first, and prints the generated image metadata for verification. Run it from the directory listed below for your chip:
+
+| Chip        | Directory                                                          |
+|-------------|--------------------------------------------------------------------|
+| AmebaZ2     | `project/realtek_amebaz2_v0_example/GCC-RELEASE`                    |
+| AmebaZ2Plus | `project/realtek_amebaz2plus_v0_example/GCC-RELEASE`                |
+| AmebaD      | `project/realtek_amebaD_va0_example/GCC-RELEASE/project_hp/asdk`    |
+
+    make gen_matter_ota_image
+
+The OTA metadata defaults to Vendor ID `0xFFF1`, Product ID `0x8001`, version `2`, and version string `2.0`. Override any of them with make variables:
+
+    make gen_matter_ota_image MATTER_OTA_VENDOR_ID=0xFFF1 MATTER_OTA_PRODUCT_ID=0x8001 MATTER_OTA_VERSION=3 MATTER_OTA_VERSION_STRING=3.0
+
+| Variable                    | Default  | Description                                                     |
+|-----------------------------|----------|-----------------------------------------------------------------|
+| `MATTER_OTA_VENDOR_ID`      | `0xFFF1` | Vendor ID, must match the device's Basic Information cluster    |
+| `MATTER_OTA_PRODUCT_ID`     | `0x8001` | Product ID, must match the device's Basic Information cluster   |
+| `MATTER_OTA_VERSION`        | `2`      | Software version (numeric), must be higher than the running one |
+| `MATTER_OTA_VERSION_STRING` | `2.0`    | Software version string                                         |
+
+For AmebaD, the target first adds the AmebaD OTA header with `python_custom_ecdsa_D_gcc.py` before embedding the Matter OTA header, so no additional step is needed.
+
+The generated Matter OTA image is written to:
+
+- AmebaZ2/AmebaZ2Plus: `application_is/Debug/bin/matter_ota_image.bin`
+- AmebaD: `asdk/image/matter_ota_image.bin`
+
+The sections below describe the equivalent manual steps.
+
 <details>
   <summary>For AmebaZ2/AmebaZ2Plus OTA Image</summary>
 
@@ -85,17 +117,19 @@ Example:
 
     python3 ota_image_tool.py create -v 0xFFF1 -p 0x8001 -vn 2 -vs 2.0 -da sha256 ota_firmware.bin ota_image.bin
 
+The `make gen_matter_ota_image` target described above performs both the AmebaD header and Matter OTA header steps automatically and writes the result to `asdk/image/matter_ota_image.bin`.
+
 </details>
 
 Ensure that the `VERSION` and `VERSIONSTRING` matches your `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION` and `CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING` respectively.
 
-To check your OTA image
+To check your OTA image (the `gen_matter_ota_image` target already does this at the end of its run)
 
     python3 ota_image_tool.py show <ota image>
 
 Once you have ensured that the OTA image is correct, copy the output OTA image to the directory of the ota-provider built from the previous step.
 
-    cp ota_image.bin <path to the ota-provider directory>
+    cp matter_ota_image.bin <path to the ota-provider directory>
 
 ## Executing the OTA
 
