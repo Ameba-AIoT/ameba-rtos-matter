@@ -28,7 +28,7 @@ ameba_list_append(matter_defintions
 
 )
 
-if(CONFIG_AMEBAGREEN2)
+if(CONFIG_AMEBAGREEN2 OR CONFIG_RTL8720F)
     ameba_list_append(matter_defintions
         hw_sha_context=SHA_context
     )
@@ -44,14 +44,21 @@ endif()
 
 if(CONFIG_MATTER_SECURE_EN)
     ameba_list_append(matter_defintions
-        # matter factory data options
+        # matter crypto options
         CONFIG_ENABLE_AMEBA_CRYPTO=1
-        # matter additional secure options
-        CONFIG_ENABLE_AMEBA_FACTORY_DATA=1
     )
 else()
     ameba_list_append(matter_defintions
         CONFIG_ENABLE_AMEBA_CRYPTO=0
+    )
+endif()
+
+if(CONFIG_MATTER_FACTORY_DATA_EN)
+    ameba_list_append(matter_defintions
+        CONFIG_ENABLE_AMEBA_FACTORY_DATA=1
+    )
+else()
+    ameba_list_append(matter_defintions
         CONFIG_ENABLE_AMEBA_FACTORY_DATA=0
     )
 endif()

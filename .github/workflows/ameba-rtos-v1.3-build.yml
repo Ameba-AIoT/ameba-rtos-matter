@@ -1,0 +1,47 @@
+name: Build Ameba RTOS v1.3 + Matter v1.6 Docker Image
+
+on:
+  pull_request:
+    branches:
+      - ameba-rtos/release/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+          docker-images: true
+          swap-storage: true
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build Docker common base image
+      run: |
+        docker buildx build --file tools/docker/Dockerfile --tag ameba-rtos-matter:common --load .
+
+    - name: Build AmebaRTOS Docker image
+      run: |
+        docker buildx build \
+          --build-arg AMEBA_MATTER_TAG_NAME=${{ github.head_ref || github.ref_name }} \
+          --build-arg AMEBA_MATTER_REPO=${{ github.event.pull_request.head.repo.clone_url || format('{0}/{1}.git', github.server_url, github.repository) }} \
+          --file tools/docker/ameba-rtos/v1.3/Dockerfile --tag ameba-rtos-matter:ameba-rtos-v1.3 --load .
+
+    - name: Check Docker images
+      run: docker images
+
+    - name: Run Docker container for RTL8720F and execute scripts
+      run: |
+        chmod +x ./tools/docker/ameba-rtos/v1.3/RTL8720F/run_docker_build_scripts.sh
+        ./tools/docker/ameba-rtos/v1.3/RTL8720F/run_docker_build_scripts.sh
+
+    - name: Clean up Docker
+      run: docker system prune -af
