@@ -1,17 +1,21 @@
-/********************************************************************************
- * @file    chip_porting.h
- * @author
- * @version
- * @brief   A gateway header for access in the connectedhomeip
- ********************************************************************************
- * @attention
+/*
+ *    This module is a confidential and proprietary property of RealTek and
+ *    possession or use of this module requires written permission of RealTek.
  *
- * This module is a confidential and proprietary property of RealTek and
- * possession or use of this module requires written permission of RealTek.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
- * Copyright(c) 2016, Realtek Semiconductor Corporation. All rights reserved.
-********************************************************************************/
-
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 #ifndef _RTK_CHIP_PORTING_H_
 #define _RTK_CHIP_PORTING_H_
 
@@ -29,7 +33,9 @@ extern "C" {
 #include <wifi_structures.h>
 
 #include <matter_dcts.h>
+#if defined(CONFIG_ENABLE_AMEBA_LFS) && (CONFIG_ENABLE_AMEBA_LFS == 1)
 #include <matter_fs.h>
+#endif
 #include <matter_lwip.h>
 #include <matter_ota.h>
 #include <matter_timers.h>

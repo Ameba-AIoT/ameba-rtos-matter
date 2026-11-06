@@ -22,7 +22,7 @@
 #include <matter_api.h>
 #include <matter_core.h>
 #include <matter_dcts.h>
-#include <matter_data_providers.h>
+#include <matter_device_utils.h>
 #include <matter_events.h>
 #include <matter_interaction.h>
 #include <matter_ota_initializer.h>
@@ -33,9 +33,6 @@
 #endif
 #if defined(CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER) && (CONFIG_ENABLE_AMEBA_FABRIC_OBSERVER == 1)
 #include <matter_fabric_observer.h>
-#endif
-#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
-#include <matter_device_utils.h>
 #endif
 #if defined(CONFIG_ENABLE_AMEBA_MDNS_FILTER) && (CONFIG_ENABLE_AMEBA_MDNS_FILTER == 1)
 #include <matter_mdns_filter.h>
@@ -102,8 +99,7 @@ using namespace ::chip::DeviceLayer;
 // DeferredAttribute object describes a deferred attribute, but also holds a buffer with a value to
 // be written, so it must live so long as the DeferredAttributePersistenceProvider object.
 
-DeferredAttribute gDeferredAttributeArray[] =
-{
+DeferredAttribute gDeferredAttributeArray[] = {
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::LevelControl::Id, Clusters::LevelControl::Attributes::CurrentLevel::Id)),
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentHue::Id)),
     DeferredAttribute(ConcreteAttributePath(1 /* kLightEndpointId */, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentSaturation::Id)),
@@ -148,46 +144,37 @@ void matter_core_device_callback_internal(const ChipDeviceEvent *event, intptr_t
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
         static bool isOTAInitialized = false; // use this static variable to replace CheckInit()
 #endif
-        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established)
-        {
+        if (event->InternetConnectivityChange.IPv4 == kConnectivity_Established) {
             ChipLogProgress(DeviceLayer, "IPv4 Server ready...");
             chip::app::DnssdServer::Instance().StartServer();
-        }
-        else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
-        {
+        } else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost) {
             ChipLogProgress(DeviceLayer, "Lost IPv4 connectivity...");
         }
-        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
-        {
+        if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established) {
             ChipLogProgress(DeviceLayer, "IPv6 Server ready...");
             chip::app::DnssdServer::Instance().StartServer();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
             // Init OTA requestor only when we have gotten IPv6 address
-            if (!isOTAInitialized)
-            {
+            if (!isOTAInitialized) {
                 matter_ota_initializer();
                 isOTAInitialized = true;
             }
 #endif
-        }
-        else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
-        {
+        } else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost) {
             ChipLogProgress(DeviceLayer, "Lost IPv6 connectivity...");
         }
         break;
     case DeviceEventType::kInterfaceIpAddressChanged:
         if ((event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV4_Assigned) ||
-                (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned))
-        {
+            (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)) {
             // MDNS server restart on any ip assignment: if link local ipv6 is configured, that
             // will not trigger a 'internet connectivity change' as there is no internet
             // connectivity. MDNS still wants to refresh its listening interfaces to include the
             // newly selected address.
             chip::app::DnssdServer::Instance().StartServer();
         }
-        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned)
-        {
+        if (event->InterfaceIpAddressChanged.Type == InterfaceIpChangeType::kIpV6_Assigned) {
             ChipLogProgress(DeviceLayer, "Initializing route hook...");
             ameba_route_hook_init();
         }
@@ -264,7 +251,7 @@ void matter_core_init_server(intptr_t context)
 
 #if defined(CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION) && (CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION == 1)
     const Optional<app::TermsAndConditions> termsAndConditions = Optional<app::TermsAndConditions>(
-                app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
+                            app::TermsAndConditions(CHIP_AMEBA_TC_REQUIRED_ACKNOWLEDGEMENTS, CHIP_AMEBA_TC_MIN_REQUIRED_VERSION));
     PersistentStorageDelegate &persistentStorageDelegate = Server::GetInstance().GetPersistentStorage();
     chip::app::TermsAndConditionsManager::GetInstance()->Init(&persistentStorageDelegate, termsAndConditions);
 #endif
@@ -310,15 +297,13 @@ CHIP_ERROR matter_core_init(void)
     SuccessOrExit(err);
 
 #if defined(CONFIG_ENABLE_AMEBA_DLOG) && (CONFIG_ENABLE_AMEBA_DLOG == 1)
-    if (instance.GetAmebaLogSubsystemInited())
-    {
+    if (instance.GetAmebaLogSubsystemInited()) {
         instance.RegisterAmebaErrorFormatter(); // only register the custom error formatter if the log subsystem was inited.
     }
 #endif
 
     err = mFactoryDataProvider.Init();
-    if (err != CHIP_NO_ERROR)
-    {
+    if (err != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "Error initializing FactoryData!");
         ChipLogError(DeviceLayer, "Check if you have flashed it correctly!");
     }
@@ -327,8 +312,7 @@ CHIP_ERROR matter_core_init(void)
     SetDeviceAttestationCredentialsProvider(&mFactoryDataProvider);
     SetDeviceInstanceInfoProvider(&mFactoryDataProvider);
 
-    if (CONFIG_NETWORK_LAYER_BLE)
-    {
+    if (CONFIG_NETWORK_LAYER_BLE) {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
 
@@ -344,13 +328,7 @@ CHIP_ERROR matter_core_init(void)
     PlatformMgr().ScheduleWork(matter_core_init_server, reinterpret_cast<intptr_t>(xTaskGetCurrentTaskHandle()));
     xTaskNotifyWait(0, 0, NULL, portMAX_DELAY);
 
-    matter_data_provider_init(); // initialize data provider
-
-    matter_store_boot_reason();
-
-#if defined(CONFIG_ENABLE_AMEBA_OPHOURS) && (CONFIG_ENABLE_AMEBA_OPHOURS == 1)
-    matter_op_hours();
-#endif
+    matter_device_post_init();
 
 exit:
     return err;
@@ -358,8 +336,7 @@ exit:
 
 CHIP_ERROR matter_core_start(void)
 {
-    if (initPref() != 0)
-    {
+    if (initPref() != 0) {
         return CHIP_ERROR_PERSISTED_STORAGE_FAILED;
     }
 
@@ -368,8 +345,7 @@ CHIP_ERROR matter_core_start(void)
     int res = matter_fs_init();
 
     /* init flash fs and read existing fault log into fs */
-    if (res == 0)
-    {
+    if (res == 0) {
         ChipLogProgress(DeviceLayer, "Matter FlashFS Initialized");
     }
 
