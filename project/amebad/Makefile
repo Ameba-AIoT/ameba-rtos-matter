@@ -218,3 +218,34 @@ create_lwip_symlink:
 	else \
 		echo "Symbolic link already exists"; \
 	fi
+
+#*****************************************************************************#
+#                              CREATE MATTER OTA IMAGE                        #
+#*****************************************************************************#
+# Generate Matter OTA image.
+# Usage:
+#   make gen_matter_ota_image
+#   make gen_matter_ota_image MATTER_OTA_VENDOR_ID=0xFFF1 MATTER_OTA_PRODUCT_ID=0x8001 MATTER_OTA_VERSION=3 MATTER_OTA_VERSION_STRING=3.0
+
+MATTER_OTA_VENDOR_ID       ?= 0xFFF1
+MATTER_OTA_PRODUCT_ID      ?= 0x8001
+MATTER_OTA_VERSION         ?= 2
+MATTER_OTA_VERSION_STRING  ?= 2.0
+
+gen_matter_ota_image:
+	@rm -f $(ABS_ROOTDIR)/image/matter_ota_image.bin
+	@python3 $(MATTER_DIR)/tools/ota/python_custom_ecdsa_D_gcc.py \
+		$(ABS_ROOTDIR)/image/km0_km4_image2.bin $(ABS_ROOTDIR)/image/ota_firmware.bin
+	@python3 $(MATTER_DIR)/tools/ota/ota_image_tool.py create \
+		-v $(MATTER_OTA_VENDOR_ID) \
+		-p $(MATTER_OTA_PRODUCT_ID) \
+		-vn $(MATTER_OTA_VERSION) \
+		-vs $(MATTER_OTA_VERSION_STRING) \
+		-da sha256 \
+		$(ABS_ROOTDIR)/image/ota_firmware.bin \
+		$(ABS_ROOTDIR)/image/matter_ota_image.bin
+	@echo "Matter OTA image generated successfully in $(ABS_ROOTDIR)/image"
+	@python3 $(MATTER_DIR)/tools/ota/ota_image_tool.py show \
+		$(ABS_ROOTDIR)/image/matter_ota_image.bin
+	@echo "To change OTA metadata, run:"
+	@echo "  make gen_matter_ota_image MATTER_OTA_VENDOR_ID=0xFFF1 MATTER_OTA_PRODUCT_ID=0x8001 MATTER_OTA_VERSION=3 MATTER_OTA_VERSION_STRING=3.0"
