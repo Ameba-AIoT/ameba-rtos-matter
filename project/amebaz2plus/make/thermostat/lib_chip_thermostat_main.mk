@@ -55,7 +55,6 @@ endif
 # Source Files (Example)
 # -------------------------------------------------------------------
 SRC_CPP += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp
-SRC_CPP += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-delegate-impl.cpp
 SRC_CPP += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-hold-delegate-impl.cpp
 SRC_CPP += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-mode-delegate-impl.cpp
 SRC_CPP += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-occupancy-delegate-impl.cpp
@@ -65,6 +64,7 @@ SRC_CPP += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-setpo
 SRC_CPP += $(CHIPDIR)/examples/thermostat/thermostat-common/src/thermostat-suggestions-delegate-impl.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/device/thermostat_driver.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/device/thermostat_ui_driver.cpp
+SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/thermostat/ameba_thermostat_delegate.cpp
 SRC_CPP += $(MATTER_DRIVER_DIR)/matter_drivers/thermostat_mode/ameba_thermostat_mode_stub.cpp
 SRC_CPP += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/example_matter_thermostat.cpp
 SRC_CPP += $(MATTER_EXAMPLE_DIR)/$(DEVICE_TYPE)/matter_drivers.cpp

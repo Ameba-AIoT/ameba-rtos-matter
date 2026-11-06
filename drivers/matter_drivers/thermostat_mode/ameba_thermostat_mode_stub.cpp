@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2026, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@
  */
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 
-void __attribute__((weak)) MatterThermostatModeClusterInitCallback(chip::EndpointId) {}
+using namespace chip::app;
+
+void __attribute__((weak)) MatterThermostatModeClusterInitCallback(chip::EndpointId endpointId) {}
 
 void __attribute__((weak)) MatterThermostatModeClusterShutdownCallback(chip::EndpointId, MatterClusterShutdownType) {}

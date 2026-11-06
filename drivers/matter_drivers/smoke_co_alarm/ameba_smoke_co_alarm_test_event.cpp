@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include <smoke_co_alarm/ameba_smoke_co_alarm_test_event.h>
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <app/server/Server.h>
@@ -38,7 +37,7 @@ static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> 
     ExpressedStateEnum::kEndOfService,   ExpressedStateEnum::kBatteryAlert
 };
 
-static void EndSelfTestingEventHandler(System::Layer * systemLayer, void * appState)
+void AmebaSmokeCoAlarmEvent::EndSelfTestingEventHandler(System::Layer *systemLayer, void *appState)
 {
     SmokeCoAlarmServer::Instance().SetTestInProgress(1, false);
     SmokeCoAlarmServer::Instance().SetExpressedStateByPriority(1, sPriorityOrder);
@@ -51,16 +50,15 @@ void AmebaSmokeCoAlarmEvent::SelfTestingEventHandler(void)
     ChipLogProgress(Support, "[Smoke-CO-Alarm] => Start Self Test");
 
     DeviceLayer::SystemLayer().StartTimer(
-            System::Clock::Seconds32(kSelfTestingTimeoutSec),
-            EndSelfTestingEventHandler, nullptr);
+                    System::Clock::Seconds32(kSelfTestingTimeoutSec),
+                    EndSelfTestingEventHandler, nullptr);
 }
 
 bool HandleSmokeCOTestEventTrigger(uint64_t eventTrigger)
 {
     SmokeCOTrigger trigger = static_cast<SmokeCOTrigger>(eventTrigger);
 
-    switch (trigger)
-    {
+    switch (trigger) {
     case SmokeCOTrigger::kForceSmokeCritical:
         ChipLogProgress(Support, "[Smoke-CO-Alarm-Test-Event] => Force smoke (critical)");
         VerifyOrReturnValue(SmokeCoAlarmServer::Instance().SetSmokeState(1, AlarmStateEnum::kCritical), true);

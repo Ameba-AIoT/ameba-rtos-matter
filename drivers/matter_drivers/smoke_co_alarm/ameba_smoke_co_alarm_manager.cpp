@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
+#include <smoke_co_alarm/ameba_smoke_co_alarm_delegate.h>
 #include <smoke_co_alarm/ameba_smoke_co_alarm_test_event.h>
 #include <app/clusters/smoke-co-alarm-server/SmokeCOTestEventTriggerHandler.h>
 #include <app/clusters/smoke-co-alarm-server/smoke-co-alarm-server.h>
@@ -34,5 +34,5 @@ void emberAfPluginSmokeCoAlarmSelfTestRequestCommand(EndpointId endpointId)
 
 void emberAfSmokeCoAlarmClusterInitCallback(chip::EndpointId endpoint)
 {
-    return;
+    SmokeCoAlarm::AmebaSmokeCoAlarmDelegateInit(endpoint);
 }
