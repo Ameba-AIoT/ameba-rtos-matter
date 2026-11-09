@@ -118,13 +118,12 @@ static int _random(void *p_rng, unsigned char *output, size_t output_len)
 
 #endif //defined(CONFIG_XXX)
 
-#if ((defined(CONFIG_AMEBARTOS_V1_0) && (CONFIG_AMEBARTOS_V1_0 == 1)) && defined(CONFIG_AMEBASMART))
+#if (defined(CONFIG_AMEBARTOS_V1_0) && defined(CONFIG_AMEBASMART))
 int secure_mbedtls_platform_set_calloc_free(void)
 {
     return mbedtls_platform_set_calloc_free(_calloc, _free);
 }
-#elif (defined(CONFIG_AMEBARTOS_V1_1) && (CONFIG_AMEBARTOS_V1_1 == 1)) || \
-    (defined(CONFIG_AMEBARTOS_V1_2) && (CONFIG_AMEBARTOS_V1_2 == 1))
+#else !defined(CONFIG_AMEBARTOS_V1_0)
 #if defined(CONFIG_AMEBADPLUS) || defined(CONFIG_AMEBALITE) || defined(CONFIG_AMEBAGREEN2)
 IMAGE3_ENTRY_SECTION
 int NS_ENTRY secure_mbedtls_platform_set_calloc_free(void)

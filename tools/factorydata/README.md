@@ -33,7 +33,9 @@ To use the Factory Data Tools in Window, ensure the following softwares are inst
 
 #### Firmware Configuration
 
-Ensure your firmware is built with `CONFIG_ENABLE_AMEBA_FACTORY_DATA` enabled in the `Makefile.include.matter`.
+Ensure your firmware is built with `Enable Matter Factory Data` (`CONFIG_MATTER_FACTORY_DATA_EN`) enabled. In `menuconfig`, it is under `CONFIG APPLICATION` → `Matter Config`.
+
+It defaults to `y` when `Enable Matter Secure` is on, and can be enabled on its own: without Matter Secure the DAC private key is read from the factory data and used in software, with Matter Secure the signing is delegated to the secure image.
 
 ### Generating your own Certificates and Keys
 
