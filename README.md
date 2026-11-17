@@ -35,6 +35,14 @@ Feel free to explore our curated list of supported ICs below to find the best ma
 | RTL8710E  |![alt text][supported]      | ameba-rtos/release/* |
 | RTL8730E  |![alt text][supported]      | ameba-rtos/release/* |
 | RTL8721F  |![alt text][supported]      | ameba-rtos/release/* |
+| RTL8720F  |![alt text][supported]      | ameba-rtos/master    |
+
+> [!NOTE]
+> RTL8720F is only available on the `master` branch of `ameba-rtos`. The
+> `ameba-rtos/release/*` branches carry RTL8721Dx, RTL8726E, RTL8720E,
+> RTL8713E, RTL8710E, RTL8730E and RTL8721F only. Check the supported-chip table
+> in the [ameba-rtos README](https://github.com/Ameba-AIoT/ameba-rtos) before
+> pinning a branch.
 
 [supported]: https://img.shields.io/badge/supported-brightgreen
 [not-supported]: https://img.shields.io/badge/not%20supported-lightgrey

@@ -71,7 +71,7 @@ Navigate to the `ameba-rtos-matter` directory:
 
     cd ameba-rtos-matter
 
-    ameba.py soc < RTL8721Dx / RTL8726E / RTL8720E / RTL8713E / RTL8710E / RTL8730E / RTL8721F >
+    ameba.py soc < RTL8721Dx / RTL8726E / RTL8720E / RTL8713E / RTL8710E / RTL8730E / RTL8721F / RTL8720F >
 
 ### Build CHIP library by GN and Final Firmware
 
@@ -151,46 +151,50 @@ Within `ameba-rtos-matter` folder, clean the whole project with the following co
 ### Flash Image using ameba.py command
 
 The generated images are found in the build folder `build_RTL87XXX` of `ameba-rtos-matter` sdk:
-- bootloader image:
-    - RTL8721Dx / RTL8726E / RTL8720E / RTL8713E / RTL8710E / RTL8730E: `km4_boot_all.bin`
-    - RTL8721F: `amebagreen2_boot.bin`
-- application image:
-    - RTL8721Dx: `km0_km4_app.bin`
-    - RTL8726E / RTL8720E / RTL8713E / RTL8710E: `kr4_km4_app.bin`
-    - RTL8730E: `km0_km4_ca32_app.bin`
-    - RTL8721F: `amebagreen2_app.bin`
+- bootloader image: `boot.bin`
+- application image: `app.bin`
+- Ameba OTA container: `ota_all.bin` (32-byte Ameba OTA header + `app.bin`; with `CONFIG_UPGRADE_BOOTLOADER` enabled the bootloader is prepended as a second image). This is the file to wrap into a Matter OTA image - see the [OTA Guide](../tools/ota/README.md).
+
+Without `--image/-i`, `ameba.py flash` takes the images from the build directory via its SoC profile, so the same flash command works on every chip. Older SDK releases used per-SoC file names for the bootloader and application images; current ones produce `boot.bin` / `app.bin` for every chip.
 
 Both bootloader and appication images will be flashed. Within `ameba-rtos-matter` folder, flash the image to the Ameba port (e.g. `/dev/ttyUSB0`).
 
     ameba.py flash -p /dev/ttyUSB0
 
-If the app image is too large, please add the --image/-i option:
+If the app image is too large, please add the --image/-i option. The addresses below are the default `FLASH_BOOT_OFFSET` and `FLASH_OTA1_*` values from the SDK's `component/soc/usrcfg/<soc>/Kconfig`; check them against your own layout if you changed it.
 
 <details>
   <summary>Complete flash command to RTL8721Dx</summary>
 
-    ameba.py flash -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08014000 -i km0_km4_app.bin 0x08014000 0x08300000
+    ameba.py flash -p /dev/ttyUSB0 -i boot.bin 0x08000000 0x08014000 -i app.bin 0x08014000 0x08200000
 
 </details>
 
 <details>
   <summary>Complete flash command to RTL8726E / RTL8720E / RTL8713E / RTL8710E</summary>
 
-    ameba.py flash -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08014000 -i kr4_km4_app.bin 0x08014000 0x08300000
+    ameba.py flash -p /dev/ttyUSB0 -i boot.bin 0x08000000 0x08014000 -i app.bin 0x08014000 0x08200000
 
 </details>
 
 <details>
   <summary>Complete flash command to RTL8730E</summary>
 
-    ameba.py flash -p /dev/ttyUSB0 -i km4_boot_all.bin 0x08000000 0x08040000 -i km0_km4_ca32_app.bin 0x08040000 0x08340000
+    ameba.py flash -p /dev/ttyUSB0 -i boot.bin 0x08000000 0x08040000 -i app.bin 0x08040000 0x08300000
 
 </details>
 
 <details>
   <summary>Complete flash command to RTL8721F</summary>
 
-    ameba.py flash -p /dev/ttyUSB0 -i amebagreen2_boot.bin 0x08000000 0x08040000 -i amebagreen2_app.bin 0x08040000 0x08240000
+    ameba.py flash -p /dev/ttyUSB0 -i boot.bin 0x08000000 0x08040000 -i app.bin 0x08040000 0x081C0000
+
+</details>
+
+<details>
+  <summary>Complete flash command to RTL8720F</summary>
+
+    ameba.py flash -p /dev/ttyUSB0 -i boot.bin 0x08000000 0x08014000 -i app.bin 0x08014000 0x08200000
 
 </details>
 

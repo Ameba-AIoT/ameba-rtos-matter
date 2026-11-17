@@ -2,7 +2,7 @@
  *    This module is a confidential and proprietary property of RealTek and
  *    possession or use of this module requires written permission of RealTek.
  *
- *    Copyright(c) 2024, Realtek Semiconductor Corporation. All rights reserved.
+ *    Copyright(c) 2025, Realtek Semiconductor Corporation. All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ void matter_op_hours(void)
 #define SW_WDG_RESET_SRC (AON_BIT_RSTF_WDG1 | AON_BIT_RSTF_WDG2 | AON_BIT_RSTF_WDG3 | AON_BIT_RSTF_WDG4)
 #define HW_WDG_RESET_SRC (AON_BIT_RSTF_IWDG)
 #define SW_RESET_SRC     (AON_BIT_RSTF_LPSYS | AON_BIT_RSTF_NPSYS | AON_BIT_RSTF_APSYS)
-#elif defined(CONFIG_AMEBAGREEN2)
+#elif defined(CONFIG_AMEBAGREEN2) || defined(CONFIG_RTL8720F)
 #define BOR_RESET_SRC    (AON_BIT_RSTF_BOR)
 #define SW_WDG_RESET_SRC (AON_BIT_RSTF_WDG0_CPU | AON_BIT_RSTF_WDG1_CPU | AON_BIT_RSTF_WDG2_CPU | AON_BIT_RSTF_WDG0_GLB | AON_BIT_RSTF_WDG1_GLB | AON_BIT_RSTF_WDG2_GLB)
 #define HW_WDG_RESET_SRC (AON_BIT_RSTF_IWDG)

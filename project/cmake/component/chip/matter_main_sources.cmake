@@ -62,6 +62,13 @@ list(APPEND LIB_CHIP_CORE_INC_PATH
     ${BASEDIR}/component/soc/amebagreen2/hal/src
     ${BASEDIR}/component/soc/amebagreen2/misc
 )
+elseif(CONFIG_RTL8720F)
+list(APPEND LIB_CHIP_CORE_INC_PATH
+    ${BASEDIR}/component/soc/RTL8720F/app/monitor/include
+    ${BASEDIR}/component/soc/RTL8720F/hal/include
+    ${BASEDIR}/component/soc/RTL8720F/hal/src
+    ${BASEDIR}/component/soc/RTL8720F/misc
+)
 endif()
 endif()
 

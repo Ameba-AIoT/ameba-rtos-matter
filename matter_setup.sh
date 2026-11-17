@@ -18,6 +18,9 @@ case "$CTX_RTOS_BRANCH" in
     master)
         AMEBARTOS_VERSION="MASTER"
         ;;
+    release/v1.3)
+        AMEBARTOS_VERSION="AMEBARTOS_V1_3"
+        ;;
     release/v1.2)
         AMEBARTOS_VERSION="AMEBARTOS_V1_2"
         ;;

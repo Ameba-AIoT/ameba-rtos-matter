@@ -40,8 +40,19 @@ list(
 
 list(
 	APPEND c_GLOBAL_COMMON_COMPILE_CPP_OPTIONS
-	
+
 	-std=gnu++17
 	-fno-rtti
 	-Wno-register
 )
+
+# RTL8720F's ameba_boot.h uses C11-only _Static_assert, but ameba.h includes it
+# unconditionally and CHIP's C++ sources pull in ameba.h. Map it to C++11's
+# static_assert for C++ TUs only -- the same one-token rename hw_sha_context uses.
+# Scoped to C++ so the C11 keyword keeps working in C sources.
+if(CONFIG_RTL8720F)
+	list(
+		APPEND c_GLOBAL_COMMON_COMPILE_CPP_OPTIONS
+		-D_Static_assert=static_assert
+	)
+endif()

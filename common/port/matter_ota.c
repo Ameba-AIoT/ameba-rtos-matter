@@ -528,6 +528,9 @@ uint8_t matter_ota_get_current_header_size(void)
 
 void matter_ota_prepare_partition(void)
 {
+    uint8_t index;
+    uint8_t slot_idx;
+
     matter_ota_buffer = (uint8_t *)malloc(MATTER_OTA_SECTOR_SIZE);
     if (matter_ota_buffer == NULL) {
         RTK_LOGE(TAG, "matter_ota_buffer malloc failed\n");
@@ -569,20 +572,6 @@ void matter_ota_prepare_partition(void)
     matterCtx.otactrl->ImgId = OTA_IMGID_APP;
     matterCtx.otaTargetHdr->FileImgHdr[OTA_INDEX_1].ImgID = OTA_IMGID_APP;
     matterCtx.otaTargetHdr->FileImgHdr[OTA_INDEX_2].ImgID = OTA_IMGID_APP;
-
-    if (ota_get_cur_index(matterCtx.otactrl->ImgId) == OTA_INDEX_1) {
-        matterCtx.otactrl->index = OTA_INDEX_1;
-        matterCtx.otactrl->targetIdx = OTA_INDEX_2;
-        flash_get_layout_info(IMG_APP_OTA2, &matter_ota_new_firmware_addr_start, &matter_ota_new_firmware_addr_end);
-    } else {
-        matterCtx.otactrl->index = OTA_INDEX_2;
-        matterCtx.otactrl->targetIdx = OTA_INDEX_1;
-        flash_get_layout_info(IMG_APP_OTA1, &matter_ota_new_firmware_addr_start, &matter_ota_new_firmware_addr_end);
-    }
-#if defined(CONFIG_OTA_FW_SIGN_VERIFY) && (CONFIG_OTA_FW_SIGN_VERIFY == 1)
-    matter_ota_sig_slot_idx = matterCtx.otactrl->targetIdx;
-#endif
-    matterCtx.otactrl->FlashAddr       = matter_ota_new_firmware_addr_start;
 #else
     matterCtx.otaCtrl = &matterOtaCtrl;
     matterCtx.otaHdrManager = &matterOtaTargetHdr;
@@ -591,25 +580,40 @@ void matter_ota_prepare_partition(void)
     matterCtx.otaCtrl->ImgId = OTA_IMGID_APP;
     matterCtx.otaHdrManager->FileImgHdr[OTA_INDEX_1].ImgID = OTA_IMGID_APP;
     matterCtx.otaHdrManager->FileImgHdr[OTA_INDEX_2].ImgID = OTA_IMGID_APP;
+#endif
 
-    if (ota_get_cur_index(matterCtx.otaCtrl->ImgId) == OTA_INDEX_1) {
-        matterCtx.otaCtrl->index = OTA_INDEX_1;
-        matterCtx.otaCtrl->slotIdx = OTA_INDEX_2;
+    if (ota_get_cur_index(OTA_IMGID_APP) == OTA_INDEX_1) {
+        index = OTA_INDEX_1;
+        slot_idx = OTA_INDEX_2;
         flash_get_layout_info(IMG_APP_OTA2, &matter_ota_new_firmware_addr_start, &matter_ota_new_firmware_addr_end);
     } else {
-        matterCtx.otaCtrl->index = OTA_INDEX_2;
-        matterCtx.otaCtrl->slotIdx = OTA_INDEX_1;
+        index = OTA_INDEX_2;
+        slot_idx = OTA_INDEX_1;
         flash_get_layout_info(IMG_APP_OTA1, &matter_ota_new_firmware_addr_start, &matter_ota_new_firmware_addr_end);
     }
-#if defined(CONFIG_OTA_FW_SIGN_VERIFY) && (CONFIG_OTA_FW_SIGN_VERIFY == 1)
-    matter_ota_sig_slot_idx = matterCtx.otaCtrl->slotIdx;
+
+#if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
+    matterCtx.otactrl->index = index;
+    matterCtx.otactrl->targetIdx = slot_idx;
+    matterCtx.otactrl->FlashAddr = matter_ota_new_firmware_addr_start;
+#else
+#if defined(CONFIG_AMEBARTOS_V1_2)
+    matterCtx.otaCtrl->index = index;
+    matterCtx.otaCtrl->slotIdx = slot_idx;
+#else
+    matterCtx.otaCtrl->Index = index;
+    matterCtx.otaCtrl->SlotIdx = slot_idx;
 #endif
-    matterCtx.otaCtrl->FlashAddr       = matter_ota_new_firmware_addr_start;
+    matterCtx.otaCtrl->FlashAddr = matter_ota_new_firmware_addr_start;
 #endif
 
-    matter_ota_new_firmware_addr_start = matter_ota_new_firmware_addr_start - SPI_FLASH_BASE;
-    matter_ota_new_firmware_addr_end   = matter_ota_new_firmware_addr_end   - SPI_FLASH_BASE;
-    matter_ota_flash_sector_base       = matter_ota_new_firmware_addr_start; // Note that the new fw address must be multiples of 4KB
+#if defined(CONFIG_OTA_FW_SIGN_VERIFY) && (CONFIG_OTA_FW_SIGN_VERIFY == 1)
+    matter_ota_sig_slot_idx = slot_idx;
+#endif
+
+    matter_ota_new_firmware_addr_start -= SPI_FLASH_BASE;
+    matter_ota_new_firmware_addr_end -= SPI_FLASH_BASE;
+    matter_ota_flash_sector_base = matter_ota_new_firmware_addr_start; // Note that the new fw address must be multiples of 4KB
 
 #if defined(CONFIG_AMEBASMART)
 #if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
@@ -617,9 +621,11 @@ void matter_ota_prepare_partition(void)
 #else
     boot_from_nor = SYSCFG_OTP_BootFromNor();
 #endif
+
     if (!boot_from_nor) { // NAND
         matter_ota_nand_create_bbt();
         matter_ota_nand_flash_erase_new_ota_region();
+
         if (matter_ota_nand_block_status(matter_ota_nand_region_block_id_start) == MATTER_OTA_NAND_BBT_BAD) {
             RTK_LOGE(TAG_NAND, "CRITICAL ERROR: FIRST BLOCK IS BAD BLOCK, OTA MAY NOT PROCEED!!!!!\n");
         }
@@ -896,8 +902,34 @@ static int8_t matter_ota_verify_image(void)
     return OTA_SUCCESS;
 }
 
+#if !defined(CONFIG_AMEBARTOS_V1_0) && !defined(CONFIG_AMEBARTOS_V1_1) && !defined(CONFIG_AMEBARTOS_V1_2)
+static int8_t matter_ota_commit_manifest(uint8_t index)
+{
+    ameba_ota_manifest_t *manifest = &(matterCtx.otaHdrManager->Manifest[index]);
+    uint32_t base = matter_ota_new_firmware_addr_start;
+
+    if (flash_burst_write(&matter_ota_flash,
+                          base + OTA_MANIFEST_PATTERN_LEN,
+                          MATTER_OTA_MANIFEST_SIZE - OTA_MANIFEST_PATTERN_LEN,
+                          (uint8_t *)manifest + OTA_MANIFEST_PATTERN_LEN) != 1 ||
+        flash_burst_write(&matter_ota_flash, base,
+                          OTA_MANIFEST_PATTERN_LEN, (uint8_t *)manifest) != 1) {
+        RTK_LOGE(TAG, "manifest write failed at 0x%08x\n", (unsigned int)base);
+        return OTA_ERROR;
+    }
+
+    RTK_LOGI(TAG, "manifest committed at 0x%08x, version major: %x, minor: %x\n",
+             (unsigned int)base, manifest->MajorKeyVer, manifest->MinorKeyVer);
+
+    return OTA_SUCCESS;
+}
+#endif /* !V1_0 && !V1_1 && !V1_2 */
+
 int8_t matter_ota_update_signature(void)
 {
+    uint8_t index;
+    uint8_t slot_idx;
+
     if (matter_ota_verify_image() != OTA_SUCCESS) {
         return OTA_ERROR;
     }
@@ -909,40 +941,72 @@ int8_t matter_ota_update_signature(void)
 #endif
 
 #if defined(CONFIG_AMEBARTOS_V1_0) || defined(CONFIG_AMEBARTOS_V1_1)
-    memcpy(&(matterCtx.otaTargetHdr->Manifest[matterCtx.otactrl->index]), matter_ota_manifest, MATTER_OTA_MANIFEST_SIZE);
+    index = matterCtx.otactrl->index;
+    slot_idx = matterCtx.otactrl->targetIdx;
+    memcpy(&(matterCtx.otaTargetHdr->Manifest[index]), matter_ota_manifest, MATTER_OTA_MANIFEST_SIZE);
+
 #if defined(CONFIG_AMEBASMART)
     if (boot_from_nor) { // NOR
-        if (!ota_update_manifest(matterCtx.otaTargetHdr, matterCtx.otactrl->targetIdx, matterCtx.otactrl->index)) {
+        if (!ota_update_manifest(matterCtx.otaTargetHdr, slot_idx, index)) {
             return OTA_ERROR;
         }
     } else { // NAND
-        if (!matter_ota_nand_flash_update_manifest(matterCtx.otaTargetHdr, matterCtx.otactrl->targetIdx, matterCtx.otactrl->index)) {
+        if (!matter_ota_nand_flash_update_manifest(matterCtx.otaTargetHdr, slot_idx, index)) {
             return OTA_ERROR;
         }
     }
 #else
-    if (!ota_update_manifest(matterCtx.otaTargetHdr, matterCtx.otactrl->targetIdx, matterCtx.otactrl->index)) {
+    if (!ota_update_manifest(matterCtx.otaTargetHdr, slot_idx, index)) {
         return OTA_ERROR;
     }
-#endif // CONFIG_AMEBAXXX
+#endif // CONFIG_AMEBASMART
+
 #else
-    memcpy(&(matterCtx.otaHdrManager->Manifest[matterCtx.otaCtrl->index]), matter_ota_manifest, MATTER_OTA_MANIFEST_SIZE);
+
+#if defined(CONFIG_AMEBARTOS_V1_2)
+    index = matterCtx.otaCtrl->index;
+    slot_idx = matterCtx.otaCtrl->slotIdx;
+#else
+    index = matterCtx.otaCtrl->Index;
+    slot_idx = matterCtx.otaCtrl->SlotIdx;
+#endif
+    memcpy(&(matterCtx.otaHdrManager->Manifest[index]), matter_ota_manifest, MATTER_OTA_MANIFEST_SIZE);
+
+#if defined(CONFIG_AMEBARTOS_V1_2)
 #if defined(CONFIG_AMEBASMART)
     if (boot_from_nor) { // NOR
-        if (ota_storage_update_manifest(matterCtx.otaHdrManager, matterCtx.otaCtrl->slotIdx, matterCtx.otaCtrl->index) != OTA_OK) {
+        if (ota_storage_update_manifest(matterCtx.otaHdrManager, slot_idx, index) != OTA_OK) {
             return OTA_ERROR;
         }
     } else { // NAND
-        if (!matter_ota_nand_flash_update_manifest(matterCtx.otaHdrManager, matterCtx.otaCtrl->slotIdx, matterCtx.otaCtrl->index)) {
+        if (!matter_ota_nand_flash_update_manifest(matterCtx.otaHdrManager, slot_idx, index)) {
             return OTA_ERROR;
         }
     }
 #else
-    if (ota_storage_update_manifest(matterCtx.otaHdrManager, matterCtx.otaCtrl->slotIdx, matterCtx.otaCtrl->index) != OTA_OK) {
+    if (ota_storage_update_manifest(matterCtx.otaHdrManager, slot_idx, index) != OTA_OK) {
         return OTA_ERROR;
     }
-#endif // CONFIG_AMEBAXXX
+#endif // CONFIG_AMEBASMART
+#else
+#if defined(CONFIG_AMEBASMART)
+    if (boot_from_nor) { // NOR
+        if (matter_ota_commit_manifest(index) != OTA_SUCCESS) {
+            return OTA_ERROR;
+        }
+    } else { // NAND
+        if (!matter_ota_nand_flash_update_manifest(matterCtx.otaHdrManager, slot_idx, index)) {
+            return OTA_ERROR;
+        }
+    }
+#else
+    if (matter_ota_commit_manifest(index) != OTA_SUCCESS) {
+        return OTA_ERROR;
+    }
+#endif // CONFIG_AMEBASMART
+#endif // CONFIG_AMEBARTOS_V1_2
 #endif // CONFIG_AMEBARTOS_V1_X
+
     return OTA_SUCCESS;
 }
 

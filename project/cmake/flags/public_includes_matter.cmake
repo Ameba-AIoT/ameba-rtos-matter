@@ -57,6 +57,10 @@ elseif(CONFIG_AMEBAGREEN2)
     ameba_list_append(public_includes
         ${FREERTOS_DIR}/portable/GCC/AmebaGreen2_KM4
     )
+elseif(CONFIG_RTL8720F)
+    ameba_list_append(public_includes
+        ${FREERTOS_DIR}/portable/GCC/RTL8720F_KM55
+    )
 endif()
 
 if(CONFIG_BT_MATTER_ADAPTER)
